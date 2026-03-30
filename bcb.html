@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>專業籃球戰術板 (極致流暢觸控版)</title>
+    <title>專業籃球戰術板 (優化介面版)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         html, body {
@@ -14,7 +14,7 @@
             background-color: #212529; 
             user-select: none; 
             touch-action: none; 
-            -webkit-touch-callout: none; /* 禁用長按選單 */
+            -webkit-touch-callout: none;
         }
 
         .app-container {
@@ -45,13 +45,12 @@
             margin-bottom: 15px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
         }
         .sidebar-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
         @media (max-width: 768px) {
             .sidebar { width: 130px; padding: 10px; }
-            .sidebar-group { padding-bottom: 10px; margin-bottom: 10px; gap: 8px; }
+            .sidebar-group { padding-bottom: 10px; margin-bottom: 10px; }
             .sidebar h4 { font-size: 1.1rem !important; }
             .sidebar label, .sidebar small { font-size: 0.75rem !important; }
             .btn { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
@@ -91,7 +90,7 @@
 
         #drawCanvas { position: absolute; top: 0; left: 0; z-index: 1; }
 
-        /* --- 旗幟設定 (優化觸控體驗) --- */
+        /* --- 旗幟設定 --- */
         .flag {
             position: absolute;
             width: 35px; height: 35px;
@@ -104,14 +103,11 @@
             cursor: grab; 
             z-index: 10;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-            /* 縮短縮放動畫時間，使其更敏銳 */
             transition: transform 0.05s ease;
-            /* 開啟硬體加速，防止拖曳掉幀 */
             will-change: left, top, transform;
             touch-action: none; 
         }
         
-        /* 擴大隱形觸控熱區 (非常重要：減少手機按不到的機率) */
         .flag::after {
             content: '';
             position: absolute;
@@ -138,30 +134,30 @@
         </div>
 
         <div class="sidebar-group">
-            <label class="text-muted fw-bold mb-0">🎨 場地風格</label>
-            <select id="themeSelector" class="form-select form-select-sm" onchange="changeTheme(this.value)">
+            <label class="text-muted fw-bold mb-1">🎨 場地風格</label>
+            <select id="themeSelector" class="form-select form-select-sm mb-2" onchange="changeTheme(this.value)">
                 <option value="classic">🌲 經典木紋</option>
                 <option value="blue">🟦 現代藍色</option>
                 <option value="dark">🟫 深色硬木</option>
                 <option value="street">⬛ 街頭黑灰</option>
             </select>
-            <input type="color" id="penColorPicker" class="form-control form-control-color mt-1" value="#333333" title="點擊更換畫筆顏色">
+            
+            <label class="text-muted fw-bold mb-1 mt-1">🖍️ 畫筆顏色</label>
+            <input type="color" id="penColorPicker" class="form-control form-control-color w-100" value="#333333" title="點擊更換畫筆顏色">
         </div>
 
-        <div class="sidebar-group">
-            <label class="text-muted fw-bold mb-0">🛠️ 工具模式</label>
-            <div class="btn-group-vertical w-100" role="group">
+        <div class="sidebar-group border-bottom-0 pb-0">
+            <label class="text-muted fw-bold mb-1">🛠️ 工具模式</label>
+            <div class="btn-group-vertical w-100 mb-3" role="group">
                 <input type="radio" class="btn-check" name="mode" id="modeMove" checked onclick="setMode('move')">
-                <label class="btn btn-outline-primary" for="modeMove">✋ 移動旗幟</label>
+                <label class="btn btn-outline-primary" for="modeMove">✋ 移動</label>
                 
                 <input type="radio" class="btn-check" name="mode" id="modeDraw" onclick="setMode('draw')">
-                <label class="btn btn-outline-secondary" for="modeDraw">✏️ 畫線教練</label>
+                <label class="btn btn-outline-secondary" for="modeDraw">✏️ 畫線</label>
             </div>
-            <button class="btn btn-sm btn-outline-danger w-100 mt-1" onclick="clearLines()">🧹 清除畫布</button>
-        </div>
-
-        <div class="sidebar-group mt-auto border-bottom-0 pb-0">
-            <button class="btn btn-outline-dark btn-sm w-100" onclick="resetBoard()">🔄 全部重置</button>
+            
+            <button class="btn btn-sm btn-outline-danger w-100 mb-2" onclick="clearLines()">🧹 清除畫布</button>
+            <button class="btn btn-sm btn-outline-dark w-100" onclick="resetBoard()">🔄 全部重置</button>
         </div>
     </aside>
 
@@ -198,7 +194,6 @@
     let initialPositions = []; 
     let scaleFactor = 1;
 
-    // 用於優化拖曳效能的變數
     let dragTargetX = 0;
     let dragTargetY = 0;
     let isDragPending = false; 
@@ -292,7 +287,6 @@
             
             initialPositions.push({ id: config.id, left: left, top: top });
             
-            // 加入 passive: false 使其能攔截滑動
             el.addEventListener('mousedown', onPointerDown);
             el.addEventListener('touchstart', onPointerDown, { passive: false });
             
@@ -341,7 +335,6 @@
         ctx.moveTo(x, y);
     }
 
-    // --- 【全新優化】將實際畫面更新交給瀏覽器的繪圖迴圈 ---
     function renderDragPosition() {
         if (activeFlag) {
             activeFlag.style.left = dragTargetX + 'px';
@@ -370,7 +363,6 @@
             if (y < 0) y = 0;
             if (y > boardHeight - flagSize) y = boardHeight - flagSize;
 
-            // 將計算好的目標座標存起來，呼叫 renderDragPosition 進行平滑渲染
             dragTargetX = x;
             dragTargetY = y;
             if (!isDragPending) {
@@ -379,7 +371,6 @@
             }
         }
 
-        // 畫筆邏輯保持即時渲染
         if (isDrawing && currentMode === 'draw') {
             e.preventDefault();
             let pos = getPointerPos(e);
