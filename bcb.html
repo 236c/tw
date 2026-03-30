@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>專業籃球戰術板</title>
+    <title>專業籃球戰術板 (實心按鈕醒目版)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         html, body {
@@ -49,39 +49,36 @@
         .sidebar-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
         @media (max-width: 768px) {
-            .sidebar { width: 130px; padding: 10px; }
+            .sidebar { width: 140px; padding: 10px; }
             .sidebar-group { padding-bottom: 10px; margin-bottom: 10px; }
             .sidebar h4 { font-size: 1.1rem !important; }
-            .sidebar label, .sidebar small { font-size: 0.75rem !important; }
-            .btn { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
+            .btn { font-size: 0.9rem; }
         }
 
-        /* --- 【終極修復】徹底消滅手機上 Bootstrap 按鈕的殘留顏色 --- */
+        /* --- 【終極修復】確保實心按鈕在手機上點擊後不會卡住深色狀態 --- */
         @media (hover: none) {
-            .btn-outline-danger:hover, 
-            .btn-outline-danger:focus, 
-            .btn-outline-danger:focus-visible {
-                color: #dc3545 !important;
-                background-color: transparent !important;
+            .btn-danger:hover, 
+            .btn-danger:focus, 
+            .btn-danger:focus-visible {
+                background-color: #dc3545 !important;
                 border-color: #dc3545 !important;
                 box-shadow: none !important;
             }
-            .btn-outline-danger:active {
-                color: #fff !important;
-                background-color: #dc3545 !important;
+            .btn-danger:active {
+                background-color: #b02a37 !important;
+                border-color: #a52834 !important;
             }
 
-            .btn-outline-dark:hover, 
-            .btn-outline-dark:focus, 
-            .btn-outline-dark:focus-visible {
-                color: #212529 !important;
-                background-color: transparent !important;
+            .btn-dark:hover, 
+            .btn-dark:focus, 
+            .btn-dark:focus-visible {
+                background-color: #212529 !important;
                 border-color: #212529 !important;
                 box-shadow: none !important;
             }
-            .btn-outline-dark:active {
-                color: #fff !important;
-                background-color: #212529 !important;
+            .btn-dark:active {
+                background-color: #1a1d20 !important;
+                border-color: #191c1f !important;
             }
         }
 
@@ -169,30 +166,30 @@
         </div>
 
         <div class="sidebar-group">
-            <select id="themeSelector" class="form-select form-select-sm mb-3" onchange="changeTheme(this.value)">
+            <select id="themeSelector" class="form-select mb-3" onchange="changeTheme(this.value)">
                 <option value="classic">🌲 經典木紋</option>
                 <option value="blue">🟦 現代藍色</option>
                 <option value="dark">🟫 深色硬木</option>
                 <option value="street">⬛ 街頭黑灰</option>
             </select>
             
-            <label class="btn btn-outline-secondary btn-sm w-100 d-flex align-items-center justify-content-center gap-2 mb-0 color-picker-wrapper" for="penColorPicker">
-                <span>畫筆顏色</span>
+            <div class="d-flex flex-column gap-2 mb-3">
+                <input type="radio" class="btn-check" name="mode" id="modeMove" checked onclick="setMode('move')">
+                <label class="btn btn-outline-primary py-2 m-0" for="modeMove">✋ 移動</label>
+                
+                <input type="radio" class="btn-check" name="mode" id="modeDraw" onclick="setMode('draw')">
+                <label class="btn btn-outline-secondary py-2 m-0" for="modeDraw">✏️ 畫線</label>
+            </div>
+
+            <label class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 mb-0 py-2 color-picker-wrapper" for="penColorPicker">
+                <span>🖍️ 畫筆顏色</span>
                 <input type="color" id="penColorPicker" value="#333333">
             </label>
         </div>
 
         <div class="sidebar-group border-bottom-0 pb-0">
-            <div class="btn-group-vertical w-100 mb-3" role="group">
-                <input type="radio" class="btn-check" name="mode" id="modeMove" checked onclick="setMode('move')">
-                <label class="btn btn-outline-primary" for="modeMove">✋ 移動</label>
-                
-                <input type="radio" class="btn-check" name="mode" id="modeDraw" onclick="setMode('draw')">
-                <label class="btn btn-outline-secondary" for="modeDraw">✏️ 畫線</label>
-            </div>
-            
-            <button class="btn btn-sm btn-outline-danger w-100 mb-2" onclick="clearLines(this)">🧹 清除畫布</button>
-            <button class="btn btn-sm btn-outline-dark w-100 mb-2" onclick="resetBoard(this)">🔄 全部重置</button>
+            <button class="btn btn-danger w-100 mb-2 py-2" onclick="clearLines(this)">🧹 清除畫布</button>
+            <button class="btn btn-dark w-100 mb-2 py-2" onclick="resetBoard(this)">🔄 全部重置</button>
         </div>
     </aside>
 
