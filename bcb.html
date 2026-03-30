@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>專業籃球戰術板 (側欄固定 + 自動適應滿版)</title>
+    <title>專業籃球戰術板 (極致流暢觸控版)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* 根層級設定：鎖定畫面，防止瀏覽器預設下拉或滑動 */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: #212529; /* 深色背景，讓木紋戰術板更突顯 */
+            background-color: #212529; 
             user-select: none; 
             touch-action: none; 
+            -webkit-touch-callout: none; /* 禁用長按選單 */
         }
 
-        /* 核心版面佈局：永遠保持橫向排列 (Left Sidebar + Right Content) */
         .app-container {
             display: flex;
-            flex-direction: row; /* 強制橫向 */
+            flex-direction: row; 
             height: 100vh;
             width: 100vw;
         }
@@ -32,15 +31,14 @@
             z-index: 1000;
             display: flex;
             flex-direction: column;
-            width: 240px; /* 電腦預設寬度 */
+            width: 240px; 
             flex-shrink: 0;
             height: 100%;
-            overflow-y: auto; /* 若螢幕太矮允許側欄上下滾動 */
+            overflow-y: auto; 
             padding: 15px;
-            touch-action: auto; /* 允許側欄正常滑動 */
+            touch-action: auto; 
         }
 
-        /* 側欄內部元素間距 */
         .sidebar-group {
             border-bottom: 1px solid #dee2e6;
             padding-bottom: 15px;
@@ -51,17 +49,12 @@
         }
         .sidebar-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
-        /* 手機/小螢幕專屬調整：將側欄變窄，按鈕變緊湊 */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 130px; /* 手機版變窄 */
-                padding: 10px;
-            }
+            .sidebar { width: 130px; padding: 10px; }
             .sidebar-group { padding-bottom: 10px; margin-bottom: 10px; gap: 8px; }
             .sidebar h4 { font-size: 1.1rem !important; }
             .sidebar label, .sidebar small { font-size: 0.75rem !important; }
             .btn { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
-            #timerDisplay { font-size: 1.1rem !important; padding: 5px !important; }
         }
 
         /* --- 右側戰術板容納區 --- */
@@ -74,7 +67,6 @@
             position: relative;
         }
 
-        /* 戰術板本體 (保持原始比例 900x550，透過 JS scale 自動縮放滿版) */
         #tactics-board {
             position: relative;
             width: 900px;
@@ -99,7 +91,7 @@
 
         #drawCanvas { position: absolute; top: 0; left: 0; z-index: 1; }
 
-        /* 旗幟設定 */
+        /* --- 旗幟設定 (優化觸控體驗) --- */
         .flag {
             position: absolute;
             width: 35px; height: 35px;
@@ -112,17 +104,27 @@
             cursor: grab; 
             z-index: 10;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-            transition: transform 0.1s ease;
+            /* 縮短縮放動畫時間，使其更敏銳 */
+            transition: transform 0.05s ease;
+            /* 開啟硬體加速，防止拖曳掉幀 */
+            will-change: left, top, transform;
             touch-action: none; 
         }
         
-        .flag:active { cursor: grabbing !important; transform: scale(1.1); }
+        /* 擴大隱形觸控熱區 (非常重要：減少手機按不到的機率) */
+        .flag::after {
+            content: '';
+            position: absolute;
+            top: -20px; left: -20px; right: -20px; bottom: -20px;
+            border-radius: 50%;
+        }
+
+        .flag:active { cursor: grabbing !important; transform: scale(1.15); }
         .flag.offense { background-color: #ff4d4d; color: white; border-color: #b30000; } 
         .flag.defense { background-color: #4da6ff; color: white; border-color: #0059b3; } 
         .flag.ball { background-color: #ff9900; border-color: #cc7a00; width: 25px; height: 25px; z-index: 11;} 
 
         #penColorPicker { width: 100%; height: 35px; cursor: pointer; padding: 2px;}
-        #timerDisplay { text-align: center; letter-spacing: 1px; font-size: 1.5rem;}
     </style>
 </head>
 <body>
@@ -155,21 +157,16 @@
                 <input type="radio" class="btn-check" name="mode" id="modeDraw" onclick="setMode('draw')">
                 <label class="btn btn-outline-secondary" for="modeDraw">✏️ 畫線教練</label>
             </div>
-            <button class="btn btn-sm btn-outline-danger w-100 mt-1" onclick="clearLines()">🧹 清除畫線</button>
+            <button class="btn btn-sm btn-outline-danger w-100 mt-1" onclick="clearLines()">🧹 清除畫布</button>
         </div>
 
-        <div class="sidebar-group mt-auto">
-            <label class="text-muted fw-bold mb-0">📹 錄製重播</label>
-            <span id="timerDisplay" class="badge bg-dark d-block w-100 py-2 font-monospace">00:00.0</span>
-            <button id="btnRecord" class="btn btn-danger btn-sm w-100" onclick="startRecording()">🔴 開始錄製</button>
-            <button id="btnStop" class="btn btn-secondary btn-sm w-100" onclick="stopRecording()" disabled>⏹️ 停止</button>
-            <button id="btnPlay" class="btn btn-success btn-sm w-100" onclick="playRecording()" disabled>▶️ 倒數重播</button>
-            <button class="btn btn-outline-dark btn-sm w-100 mt-2" onclick="resetBoard()">🔄 全部重置</button>
+        <div class="sidebar-group mt-auto border-bottom-0 pb-0">
+            <button class="btn btn-outline-dark btn-sm w-100" onclick="resetBoard()">🔄 全部重置</button>
         </div>
     </aside>
 
     <main class="board-wrapper" id="board-wrapper">
-        <div id="tactics-board" data-base-border="#333">
+        <div id="tactics-board">
             <svg class="court-lines" viewBox="0 0 900 550" xmlns="http://www.w3.org/2000/svg">
                 <rect class="court-svg-elem" x="0" y="0" width="900" height="550" fill="none" stroke="white" stroke-width="2"/>
                 <line class="court-svg-elem" x1="450" y1="0" x2="450" y2="550" stroke="white" stroke-width="2"/>
@@ -194,23 +191,17 @@
     const ctx = canvas.getContext('2d');
     const statusBar = document.getElementById('status-bar');
     const penColorPicker = document.getElementById('penColorPicker');
-    const timerDisplay = document.getElementById('timerDisplay');
-    
-    const btnRecord = document.getElementById('btnRecord');
-    const btnStop = document.getElementById('btnStop');
-    const btnPlay = document.getElementById('btnPlay');
 
     let currentMode = 'move'; 
     let isDrawing = false;
     let activeFlag = null; 
-    let isRecording = false;
-    let isPlaying = false;
-    let animationId = null; 
-    let recordingTimerId = null;
     let initialPositions = []; 
-    let recordedPathData = []; 
-    let startTime = 0;
     let scaleFactor = 1;
+
+    // 用於優化拖曳效能的變數
+    let dragTargetX = 0;
+    let dragTargetY = 0;
+    let isDragPending = false; 
 
     const penCursor = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><text y='20' font-size='20'>✏️</text></svg>") 0 20, crosshair`;
 
@@ -239,26 +230,20 @@
         setMode('move'); 
         changeTheme('classic'); 
         
-        // 初始縮放並綁定視窗縮放事件 (如手機旋轉)
         resizeBoard();
         window.addEventListener('resize', resizeBoard);
     }
 
-    // --- 自動完美滿版縮放核心 ---
     function resizeBoard() {
         const availableWidth = boardWrapper.clientWidth;
         const availableHeight = boardWrapper.clientHeight;
-        
-        // 預留一點點邊距，避免太貼邊緣 (各留 20px)
         const targetW = availableWidth - 20;
         const targetH = availableHeight - 20;
         
         const scaleX = targetW / 900;
         const scaleY = targetH / 550;
         
-        // 取得最小縮放比，不僅支援縮小，也支援「放大」填滿大螢幕
         scaleFactor = Math.min(scaleX, scaleY); 
-        
         board.style.transform = `scale(${scaleFactor})`;
     }
 
@@ -268,26 +253,16 @@
         return { x: e.clientX, y: e.clientY };
     }
 
-    function formatTime(ms) {
-        let totalSeconds = Math.floor(ms / 1000);
-        let minutes = Math.floor(totalSeconds / 60);
-        let seconds = totalSeconds % 60;
-        let milliseconds = Math.floor((ms % 1000) / 100); 
-        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds}`;
-    }
-
     function changeTheme(themeKey) {
         const theme = courtThemes[themeKey];
         if(!theme) return;
         board.style.backgroundColor = theme.bg;
-        board.dataset.baseBorder = theme.border; 
-        if(!isRecording) board.style.borderColor = theme.border;
+        board.style.borderColor = theme.border;
         document.querySelectorAll('.court-svg-elem').forEach(el => el.setAttribute('stroke', theme.line));
         penColorPicker.value = (themeKey === 'street' || themeKey === 'dark') ? '#ffffff' : '#333333';
     }
 
     function setMode(mode) {
-        if (isPlaying) return;
         currentMode = mode;
         if (mode === 'draw') {
             statusBar.textContent = "✏️ 畫筆";
@@ -317,6 +292,7 @@
             
             initialPositions.push({ id: config.id, left: left, top: top });
             
+            // 加入 passive: false 使其能攔截滑動
             el.addEventListener('mousedown', onPointerDown);
             el.addEventListener('touchstart', onPointerDown, { passive: false });
             
@@ -337,7 +313,7 @@
     }
 
     function onPointerDown(e) {
-        if (currentMode !== 'move' || isPlaying) return;
+        if (currentMode !== 'move') return;
         e.preventDefault(); 
         
         let pos = getPointerPos(e);
@@ -351,14 +327,13 @@
     }
 
     function onCanvasPointerDown(e) {
-        if (currentMode !== 'draw' || isPlaying) return;
+        if (currentMode !== 'draw') return;
         e.preventDefault();
         
         isDrawing = true;
         let pos = getPointerPos(e);
         const rect = canvas.getBoundingClientRect();
         
-        // 校正縮放比
         let x = (pos.x - rect.left) / scaleFactor;
         let y = (pos.y - rect.top) / scaleFactor;
         
@@ -366,12 +341,20 @@
         ctx.moveTo(x, y);
     }
 
+    // --- 【全新優化】將實際畫面更新交給瀏覽器的繪圖迴圈 ---
+    function renderDragPosition() {
+        if (activeFlag) {
+            activeFlag.style.left = dragTargetX + 'px';
+            activeFlag.style.top = dragTargetY + 'px';
+        }
+        isDragPending = false;
+    }
+
     function onPointerMove(e) {
-        if (activeFlag && currentMode === 'move' && !isPlaying) {
+        if (activeFlag && currentMode === 'move') {
             e.preventDefault();
             let pos = getPointerPos(e);
             
-            // 校正縮放拖曳距離
             let dx = (pos.x - activeFlag.startX) / scaleFactor;
             let dy = (pos.y - activeFlag.startY) / scaleFactor;
             
@@ -387,13 +370,17 @@
             if (y < 0) y = 0;
             if (y > boardHeight - flagSize) y = boardHeight - flagSize;
 
-            activeFlag.style.left = x + 'px';
-            activeFlag.style.top = y + 'px';
-
-            if (isRecording) recordCurrentState();
+            // 將計算好的目標座標存起來，呼叫 renderDragPosition 進行平滑渲染
+            dragTargetX = x;
+            dragTargetY = y;
+            if (!isDragPending) {
+                isDragPending = true;
+                requestAnimationFrame(renderDragPosition);
+            }
         }
 
-        if (isDrawing && currentMode === 'draw' && !isPlaying) {
+        // 畫筆邏輯保持即時渲染
+        if (isDrawing && currentMode === 'draw') {
             e.preventDefault();
             let pos = getPointerPos(e);
             ctx.strokeStyle = penColorPicker.value; 
@@ -408,7 +395,11 @@
     }
 
     function onPointerUp(e) {
-        if (activeFlag) { activeFlag.style.zIndex = (activeFlag.id === 'ball') ? 11 : 10; activeFlag = null; }
+        if (activeFlag) { 
+            activeFlag.style.zIndex = (activeFlag.id === 'ball') ? 11 : 10; 
+            activeFlag = null; 
+            isDragPending = false;
+        }
         if (isDrawing) { ctx.closePath(); isDrawing = false; }
     }
 
@@ -419,127 +410,15 @@
     }
 
     function clearLines() {
-        if (isPlaying) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    function updateRecordingTimer() {
-        if (!isRecording) return;
-        let elapsed = Date.now() - startTime;
-        timerDisplay.textContent = formatTime(elapsed);
-        recordingTimerId = requestAnimationFrame(updateRecordingTimer);
-    }
-
-    function startRecording() {
-        if (isPlaying) return;
-        isRecording = true;
-        recordedPathData = []; 
-        startTime = Date.now(); 
-        timerDisplay.textContent = "00:00.0";
-        recordCurrentState(0);
-        updateRecordingTimer(); 
-
-        btnRecord.disabled = true;
-        btnStop.disabled = false;
-        btnPlay.disabled = true;
-        board.style.borderColor = "#ff4d4d"; 
-    }
-
-    function recordCurrentState(forcedTimeOffset = null) {
-        const timeOffset = (forcedTimeOffset !== null) ? forcedTimeOffset : (Date.now() - startTime);
-        const currentPlayersData = flags.map(el => ({
-            id: el.id, x: parseFloat(el.style.left), y: parseFloat(el.style.top)
-        }));
-        recordedPathData.push({ time: timeOffset, players: currentPlayersData });
-    }
-
-    function stopRecording() {
-        if (!isRecording) return;
-        isRecording = false;
-        cancelAnimationFrame(recordingTimerId); 
-        
-        btnRecord.disabled = false;
-        btnStop.disabled = true;
-        if (recordedPathData.length > 1) { 
-            btnPlay.disabled = false;
-            const finalTime = recordedPathData[recordedPathData.length - 1].time;
-            timerDisplay.textContent = formatTime(finalTime); 
-        }
-        board.style.borderColor = board.dataset.baseBorder; 
-    }
-
-    function playRecording() {
-        if (isRecording || isPlaying || recordedPathData.length < 2) return;
-        isPlaying = true;
-        
-        btnPlay.disabled = true; btnRecord.disabled = true; btnStop.disabled = true;
-        document.getElementById('modeMove').disabled = true; document.getElementById('modeDraw').disabled = true;
-        document.getElementById('themeSelector').disabled = true; penColorPicker.disabled = true; 
-        
-        canvas.style.opacity = 0.5;
-
-        let currentIndex = 0;
-        const totalFrames = recordedPathData.length;
-        const playbackStartTime = Date.now();
-        const recordingDuration = recordedPathData[totalFrames - 1].time;
-
-        function animate() {
-            if (!isPlaying) return; 
-            const elapsed = Date.now() - playbackStartTime;
-            const remainingTime = Math.max(0, recordingDuration - elapsed);
-            timerDisplay.textContent = formatTime(remainingTime);
-
-            if (elapsed >= recordingDuration) {
-                renderFrame(totalFrames - 1);
-                endPlayback(); 
-                return;
-            }
-
-            while (currentIndex < totalFrames - 1 && recordedPathData[currentIndex + 1].time < elapsed) { currentIndex++; }
-            renderFrame(currentIndex);
-            animationId = requestAnimationFrame(animate);
-        }
-
-        function renderFrame(index) {
-            recordedPathData[index].players.forEach(playerData => {
-                const flagEl = document.getElementById(playerData.id);
-                if (flagEl) { flagEl.style.left = playerData.x + 'px'; flagEl.style.top = playerData.y + 'px'; }
-            });
-        }
-
-        function endPlayback() {
-            isPlaying = false;
-            btnPlay.disabled = false; btnRecord.disabled = false;
-            document.getElementById('modeMove').disabled = false; document.getElementById('modeDraw').disabled = false;
-            document.getElementById('themeSelector').disabled = false; penColorPicker.disabled = false;
-            canvas.style.opacity = 1;
-            setMode(currentMode);
-            timerDisplay.textContent = formatTime(0); 
-        }
-        animate();
-    }
-
     function resetBoard() {
-        if (isPlaying) {
-            isPlaying = false;
-            cancelAnimationFrame(animationId);
-            btnPlay.disabled = false; btnRecord.disabled = false;
-            document.getElementById('modeMove').disabled = false; document.getElementById('modeDraw').disabled = false;
-            document.getElementById('themeSelector').disabled = false; penColorPicker.disabled = false;
-            canvas.style.opacity = 1;
-        }
-        if (isRecording) cancelAnimationFrame(recordingTimerId);
-        
         initialPositions.forEach(pos => {
             const el = document.getElementById(pos.id);
             if (el) { el.style.left = pos.left + 'px'; el.style.top = pos.top + 'px'; }
         });
-
         clearLines();
-        isRecording = false; recordedPathData = []; timerDisplay.textContent = "00:00.0"; 
-        
-        btnPlay.disabled = true; btnStop.disabled = true; btnRecord.disabled = false;
-        board.style.borderColor = board.dataset.baseBorder;
     }
 
     window.onload = init;
