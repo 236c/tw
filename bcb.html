@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專業籃球戰術板 (重播倒數計時版)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            padding-top: 20px;
+            user-select: none; 
+        }
+
+        #tactics-board {
+            position: relative;
+            width: 900px;
+            height: 550px;
+            background-color: #e0ac69;
+            border: 10px solid #333;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            margin: 0 auto;
+            overflow: hidden; 
+            transition: background-color 0.3s, border-color 0.3s; 
+        }
+
+        .court-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; 
+            opacity: 0.8;
+        }
+        
+        .court-lines * {
+            transition: stroke 0.3s;
+        }
+
+        #drawCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .flag {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 3px solid #000;
+            color: #000;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab; 
+            z-index: 10;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            transition: transform 0.1s ease;
+        }
+        
+        .flag:active {
+            cursor: grabbing !important; 
+            transform: scale(1.1);
+        }
+
+        .flag.offense { background-color: #ff4d4d; color: white; border-color: #b30000; } 
+        .flag.defense { background-color: #4da6ff; color: white; border-color: #0059b3; } 
+        .flag.ball { background-color: #ff9900; border-color: #cc7a00; width: 25px; height: 25px; z-index: 11;} 
+
+        .control-panel {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        #status-bar { font-weight: bold; }
+        
+        #penColorPicker {
+            width: 40px;
+            height: 35px;
+            cursor: pointer;
+        }
+
+        #timerDisplay {
+            min-width: 90px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="text-center mb-4">
+        <h1 class="display-5">🏀 互動籃球戰術板</h1>
+    </header>
+
+    <div class="control-panel d-flex justify-content-between align-items-center flex-wrap gap-3">
+        
+        <div class="d-flex gap-3 align-items-center flex-wrap">
+            <div class="d-flex align-items-center gap-2 border-end pe-3">
+                <span class="text-muted fw-bold">風格：</span>
+                <select id="themeSelector" class="form-select form-select-sm w-auto" onchange="changeTheme(this.value)">
+                    <option value="classic">🌲 經典木紋</option>
+                    <option value="blue">🟦 現代藍色</option>
+                    <option value="dark">🟫 深色硬木</option>
+                    <option value="street">⬛ 街頭黑灰</option>
+                </select>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 border-end pe-3">
+                <span class="text-muted fw-bold">畫筆：</span>
+                <input type="color" id="penColorPicker" class="form-control form-control-color p-1" value="#333333" title="選擇畫筆顏色">
+            </div>
+
+            <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="mode" id="modeMove" checked onclick="setMode('move')">
+                <label class="btn btn-outline-primary" for="modeMove">✋ 移動</label>
+                
+                <input type="radio" class="btn-check" name="mode" id="modeDraw" onclick="setMode('draw')">
+                <label class="btn btn-outline-secondary" for="modeDraw">✏️ 畫線</label>
+            </div>
+            <button class="btn btn-sm btn-outline-danger" onclick="clearLines()">清除畫線</button>
+        </div>
+
+        <div class="d-flex gap-2 align-items-center">
+            <span id="timerDisplay" class="badge bg-dark fs-5 font-monospace">00:00.0</span>
+            
+            <button id="btnRecord" class="btn btn-danger" onclick="startRecording()">🔴 開始錄製</button>
+            <button id="btnStop" class="btn btn-secondary" onclick="stopRecording()" disabled>⏹️ 停止</button>
+            <button id="btnPlay" class="btn btn-success" onclick="playRecording()" disabled>▶️ 重播</button>
+            <button class="btn btn-outline-dark" onclick="resetBoard()">🔄 全部重置</button>
+        </div>
+    </div>
+
+    <div id="status-bar" class="alert alert-info text-center p-2 mb-3">準備就緒。請選擇模式或開始錄製。</div>
+
+    <div id="tactics-board" data-base-border="#333">
+        <svg class="court-lines" viewBox="0 0 900 550" xmlns="http://www.w3.org/2000/svg">
+            <rect class="court-svg-elem" x="0" y="0" width="900" height="550" fill="none" stroke="white" stroke-width="2"/>
+            <line class="court-svg-elem" x1="450" y1="0" x2="450" y2="550" stroke="white" stroke-width="2"/>
+            <circle class="court-svg-elem" cx="450" cy="275" r="60" fill="none" stroke="white" stroke-width="2"/>
+            <rect class="court-svg-elem" x="0" y="185" width="170" height="180" fill="none" stroke="white" stroke-width="2"/>
+            <path class="court-svg-elem" d="M 170 185 A 60 60 0 0 1 170 365" fill="none" stroke="white" stroke-width="2" stroke-dasharray="5,5"/> 
+            <path class="court-svg-elem" d="M 0 40 L 140 40 A 250 250 0 0 1 140 510 L 0 510" fill="none" stroke="white" stroke-width="2"/> 
+            <rect class="court-svg-elem" x="730" y="185" width="170" height="180" fill="none" stroke="white" stroke-width="2"/>
+            <path class="court-svg-elem" d="M 730 185 A 60 60 0 0 0 730 365" fill="none" stroke="white" stroke-width="2" stroke-dasharray="5,5"/>
+            <path class="court-svg-elem" d="M 900 40 L 760 40 A 250 250 0 0 0 760 510 L 900 510" fill="none" stroke="white" stroke-width="2"/>
+        </svg>
+
+        <canvas id="drawCanvas" width="900" height="550"></canvas>
+    </div>
+</div>
+
+<script>
+    const board = document.getElementById('tactics-board');
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+    const statusBar = document.getElementById('status-bar');
+    const penColorPicker = document.getElementById('penColorPicker');
+    const timerDisplay = document.getElementById('timerDisplay');
+    
+    const btnRecord = document.getElementById('btnRecord');
+    const btnStop = document.getElementById('btnStop');
+    const btnPlay = document.getElementById('btnPlay');
+
+    let currentMode = 'move'; 
+    let isDrawing = false;
+    let activeFlag = null; 
+    
+    let isRecording = false;
+    let isPlaying = false;
+    let animationId = null; 
+    let recordingTimerId = null;
+    
+    let initialPositions = []; 
+    let recordedPathData = []; 
+    let startTime = 0;
+
+    const penCursor = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><text y='20' font-size='20'>✏️</text></svg>") 0 20, crosshair`;
+
+    const courtThemes = {
+        classic: { bg: '#e0ac69', line: '#ffffff', border: '#333333' },
+        blue:    { bg: '#2b5e9c', line: '#ffffff', border: '#1a3b63' },
+        dark:    { bg: '#6b4226', line: '#f0d9b5', border: '#382212' },
+        street:  { bg: '#555555', line: '#ffffff', border: '#222222' }
+    };
+
+    const flagConfigs = [
+        { id: 'off1', class: 'flag offense', text: '1' }, { id: 'off2', class: 'flag offense', text: '2' },
+        { id: 'off3', class: 'flag offense', text: '3' }, { id: 'off4', class: 'flag offense', text: '4' },
+        { id: 'off5', class: 'flag offense', text: '5' },
+        { id: 'def1', class: 'flag defense', text: '1' }, { id: 'def2', class: 'flag defense', text: '2' },
+        { id: 'def3', class: 'flag defense', text: '3' }, { id: 'def4', class: 'flag defense', text: '4' },
+        { id: 'def5', class: 'flag defense', text: '5' },
+        { id: 'ball', class: 'flag ball', text: '🏀' }
+    ];
+    const flags = []; 
+
+    function init() {
+        createFlags();
+        initCanvas();
+        setupGlobalEvents();
+        setMode('move'); 
+        changeTheme('classic'); 
+    }
+
+    function formatTime(ms) {
+        let totalSeconds = Math.floor(ms / 1000);
+        let minutes = Math.floor(totalSeconds / 60);
+        let seconds = totalSeconds % 60;
+        let milliseconds = Math.floor((ms % 1000) / 100); 
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds}`;
+    }
+
+    function changeTheme(themeKey) {
+        const theme = courtThemes[themeKey];
+        if(!theme) return;
+
+        board.style.backgroundColor = theme.bg;
+        board.dataset.baseBorder = theme.border; 
+
+        if(!isRecording) {
+            board.style.borderColor = theme.border;
+        }
+
+        const svgLines = document.querySelectorAll('.court-svg-elem');
+        svgLines.forEach(el => {
+            el.setAttribute('stroke', theme.line);
+        });
+
+        let recommendedPenColor = (themeKey === 'street' || themeKey === 'dark') ? '#ffffff' : '#333333';
+        penColorPicker.value = recommendedPenColor;
+    }
+
+    function setMode(mode) {
+        if (isPlaying) return;
+        currentMode = mode;
+        
+        if (mode === 'draw') {
+            updateStatus("✏️ 模式：畫筆。在板上拖拽以繪製線條。");
+            canvas.style.cursor = penCursor;
+            flags.forEach(f => { f.style.pointerEvents = 'none'; });
+        } else {
+            updateStatus("✋ 模式：移動。拖拽旗幟安排戰術。");
+            canvas.style.cursor = 'grab';
+            flags.forEach(f => { f.style.pointerEvents = 'auto'; });
+        }
+    }
+
+    canvas.addEventListener('mousedown', () => {
+        if (currentMode === 'move') canvas.style.cursor = 'grabbing';
+    });
+    canvas.addEventListener('mouseup', () => {
+        if (currentMode === 'move') canvas.style.cursor = 'grab';
+    });
+
+    function createFlags() {
+        flagConfigs.forEach((config) => {
+            const el = document.createElement('div');
+            el.id = config.id;
+            el.className = config.class;
+            el.innerHTML = config.text;
+            
+            let top, left;
+            if (config.id.includes('off')) {
+                left = 50; top = 60 + (parseInt(config.text) - 1) * 90;
+            } else if (config.id.includes('def')) {
+                left = 815; top = 60 + (parseInt(config.text) - 1) * 90;
+            } else { 
+                left = 437; top = 262;
+            }
+
+            el.style.left = left + 'px';
+            el.style.top = top + 'px';
+            
+            initialPositions.push({ id: config.id, left: left, top: top });
+            el.addEventListener('mousedown', onFlagMouseDown);
+            
+            board.appendChild(el);
+            flags.push(el);
+        });
+    }
+
+    function onFlagMouseDown(e) {
+        if (currentMode !== 'move' || isPlaying) return;
+        activeFlag = e.target;
+        activeFlag.style.zIndex = 100; 
+        
+        activeFlag.startX = e.clientX;
+        activeFlag.startY = e.clientY;
+        activeFlag.startLeft = activeFlag.offsetLeft;
+        activeFlag.startTop = activeFlag.offsetTop;
+    }
+
+    function setupGlobalEvents() {
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    }
+
+    function onMouseMove(e) {
+        if (activeFlag && currentMode === 'move' && !isPlaying) {
+            e.preventDefault();
+            
+            let dx = e.clientX - activeFlag.startX;
+            let dy = e.clientY - activeFlag.startY;
+            
+            let x = activeFlag.startLeft + dx;
+            let y = activeFlag.startTop + dy;
+            
+            const flagSize = activeFlag.offsetWidth;
+            const boardWidth = board.clientWidth; 
+            const boardHeight = board.clientHeight;
+
+            if (x < 0) x = 0;
+            if (x > boardWidth - flagSize) x = boardWidth - flagSize;
+            if (y < 0) y = 0;
+            if (y > boardHeight - flagSize) y = boardHeight - flagSize;
+
+            activeFlag.style.left = x + 'px';
+            activeFlag.style.top = y + 'px';
+
+            if (isRecording) recordCurrentState();
+        }
+
+        if (isDrawing && currentMode === 'draw' && !isPlaying) {
+            ctx.strokeStyle = penColorPicker.value; 
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+        }
+    }
+
+    function onMouseUp() {
+        if (activeFlag) {
+            activeFlag.style.zIndex = (activeFlag.id === 'ball') ? 11 : 10; 
+            activeFlag = null;
+        }
+        if (isDrawing) {
+            ctx.closePath();
+            isDrawing = false;
+        }
+    }
+
+    function initCanvas() {
+        ctx.lineWidth = 3;         
+        ctx.lineCap = 'round';     
+        ctx.lineJoin = 'round';
+        
+        canvas.addEventListener('mousedown', (e) => {
+            if (currentMode !== 'draw' || isPlaying) return;
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        });
+    }
+
+    function clearLines() {
+        if (isPlaying) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // --- 錄製計時器維持正數 (往上加) ---
+    function updateRecordingTimer() {
+        if (!isRecording) return;
+        let elapsed = Date.now() - startTime;
+        timerDisplay.textContent = formatTime(elapsed);
+        recordingTimerId = requestAnimationFrame(updateRecordingTimer);
+    }
+
+    function startRecording() {
+        if (isPlaying) return;
+        isRecording = true;
+        recordedPathData = []; 
+        startTime = Date.now(); 
+        timerDisplay.textContent = "00:00.0";
+        recordCurrentState(0);
+        updateRecordingTimer(); 
+
+        btnRecord.disabled = true;
+        btnStop.disabled = false;
+        btnPlay.disabled = true;
+        board.style.borderColor = "#ff4d4d"; 
+    }
+
+    function recordCurrentState(forcedTimeOffset = null) {
+        const timeOffset = (forcedTimeOffset !== null) ? forcedTimeOffset : (Date.now() - startTime);
+        const currentPlayersData = flags.map(el => ({
+            id: el.id, x: parseFloat(el.style.left), y: parseFloat(el.style.top)
+        }));
+        recordedPathData.push({ time: timeOffset, players: currentPlayersData });
+    }
+
+    function stopRecording() {
+        if (!isRecording) return;
+        isRecording = false;
+        cancelAnimationFrame(recordingTimerId); 
+        
+        btnRecord.disabled = false;
+        btnStop.disabled = true;
+        if (recordedPathData.length > 1) { 
+            btnPlay.disabled = false;
+            const finalTime = recordedPathData[recordedPathData.length - 1].time;
+            timerDisplay.textContent = formatTime(finalTime); // 停止時顯示總時間
+        }
+        board.style.borderColor = board.dataset.baseBorder; 
+    }
+
+    // --- 播放改為倒數計時 ---
+    function playRecording() {
+        if (isRecording || isPlaying || recordedPathData.length < 2) return;
+        isPlaying = true;
+        
+        btnPlay.disabled = true;
+        btnRecord.disabled = true;
+        btnStop.disabled = true;
+        document.getElementById('modeMove').disabled = true;
+        document.getElementById('modeDraw').disabled = true;
+        document.getElementById('themeSelector').disabled = true;
+        penColorPicker.disabled = true; 
+        
+        canvas.style.opacity = 0.5;
+
+        let currentIndex = 0;
+        const totalFrames = recordedPathData.length;
+        const playbackStartTime = Date.now();
+        const recordingDuration = recordedPathData[totalFrames - 1].time;
+
+        function animate() {
+            if (!isPlaying) return; 
+            const elapsed = Date.now() - playbackStartTime;
+
+            // 【新邏輯】計算剩餘時間並顯示 (確保不會低於 0)
+            const remainingTime = Math.max(0, recordingDuration - elapsed);
+            timerDisplay.textContent = formatTime(remainingTime);
+
+            if (elapsed >= recordingDuration) {
+                renderFrame(totalFrames - 1);
+                endPlayback(); // 呼叫結束函式
+                return;
+            }
+
+            while (currentIndex < totalFrames - 1 && recordedPathData[currentIndex + 1].time < elapsed) {
+                currentIndex++;
+            }
+
+            renderFrame(currentIndex);
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function renderFrame(index) {
+            recordedPathData[index].players.forEach(playerData => {
+                const flagEl = document.getElementById(playerData.id);
+                if (flagEl) {
+                    flagEl.style.left = playerData.x + 'px';
+                    flagEl.style.top = playerData.y + 'px';
+                }
+            });
+        }
+
+        function endPlayback() {
+            isPlaying = false;
+            btnPlay.disabled = false;
+            btnRecord.disabled = false;
+            document.getElementById('modeMove').disabled = false;
+            document.getElementById('modeDraw').disabled = false;
+            document.getElementById('themeSelector').disabled = false;
+            penColorPicker.disabled = false;
+            canvas.style.opacity = 1;
+            setMode(currentMode);
+            
+            // 播放完畢，計時器精準停在 00:00.0
+            timerDisplay.textContent = formatTime(0); 
+        }
+
+        animate();
+    }
+
+    function resetBoard() {
+        if (isPlaying) {
+            isPlaying = false;
+            cancelAnimationFrame(animationId);
+            btnPlay.disabled = false;
+            btnRecord.disabled = false;
+            document.getElementById('modeMove').disabled = false;
+            document.getElementById('modeDraw').disabled = false;
+            document.getElementById('themeSelector').disabled = false;
+            penColorPicker.disabled = false;
+            canvas.style.opacity = 1;
+        }
+        if (isRecording) {
+            cancelAnimationFrame(recordingTimerId);
+        }
+        
+        initialPositions.forEach(pos => {
+            const el = document.getElementById(pos.id);
+            if (el) { el.style.left = pos.left + 'px'; el.style.top = pos.top + 'px'; }
+        });
+
+        clearLines();
+        isRecording = false;
+        recordedPathData = [];
+        timerDisplay.textContent = "00:00.0"; 
+        
+        btnPlay.disabled = true;
+        btnStop.disabled = true;
+        btnRecord.disabled = false;
+        board.style.borderColor = board.dataset.baseBorder;
+    }
+
+    function updateStatus(msg) { statusBar.textContent = msg; }
+
+    window.onload = init;
+
+</script>
+</body>
+</html>
