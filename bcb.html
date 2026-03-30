@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>專業籃球戰術板 (行動端按鈕完美修復版)</title>
+    <title>專業籃球戰術板</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         html, body {
@@ -58,7 +58,6 @@
 
         /* --- 【終極修復】徹底消滅手機上 Bootstrap 按鈕的殘留顏色 --- */
         @media (hover: none) {
-            /* 針對清除畫布按鈕 (紅) */
             .btn-outline-danger:hover, 
             .btn-outline-danger:focus, 
             .btn-outline-danger:focus-visible {
@@ -72,7 +71,6 @@
                 background-color: #dc3545 !important;
             }
 
-            /* 針對全部重置按鈕 (黑) */
             .btn-outline-dark:hover, 
             .btn-outline-dark:focus, 
             .btn-outline-dark:focus-visible {
@@ -166,9 +164,8 @@
 <div class="app-container">
     
     <aside class="sidebar">
-        <div class="text-center mt-2 mb-2">
+        <div class="text-center mt-2 mb-3">
             <h4 class="fw-bold mb-0">🏀 戰術板</h4>
-            <small id="status-bar" class="text-muted d-block mt-1">就緒</small>
         </div>
 
         <div class="sidebar-group">
@@ -223,7 +220,6 @@
     const board = document.getElementById('tactics-board');
     const canvas = document.getElementById('drawCanvas');
     const ctx = canvas.getContext('2d');
-    const statusBar = document.getElementById('status-bar');
     const penColorPicker = document.getElementById('penColorPicker');
 
     let currentMode = 'move'; 
@@ -298,11 +294,9 @@
     function setMode(mode) {
         currentMode = mode;
         if (mode === 'draw') {
-            statusBar.textContent = "✏️ 畫筆";
             canvas.style.cursor = penCursor;
             flags.forEach(f => { f.style.pointerEvents = 'none'; });
         } else {
-            statusBar.textContent = "✋ 移位";
             canvas.style.cursor = 'grab';
             flags.forEach(f => { f.style.pointerEvents = 'auto'; });
         }
@@ -438,12 +432,9 @@
         ctx.lineJoin = 'round';
     }
 
-    // --- 接收 btn 參數，確保精準消除焦點 ---
     function clearLines(btn = null) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (btn) {
-            setTimeout(() => btn.blur(), 50); // 延遲釋放焦點，避免被系統再蓋過
-        }
+        if (btn) setTimeout(() => btn.blur(), 50); 
     }
 
     function resetBoard(btn = null) {
