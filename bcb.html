@@ -2,16 +2,72 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>專業籃球戰術板 (重播倒數計時版)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>專業籃球戰術板 (支援平板觸控側邊欄版)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f4f4f4;
-            padding-top: 20px;
+        /* 讓整個應用程式滿版，防止手機下拉更新或亂滾動 */
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background-color: #f0f2f5;
             user-select: none; 
+            touch-action: none; /* 禁用瀏覽器預設手勢 */
         }
 
+        /* 核心版面佈局 (Flexbox) */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* 側邊/頂部 控制欄 */
+        .sidebar {
+            background-color: #ffffff;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+        }
+
+        /* 戰術板容納區 (自動填滿剩餘空間並置中) */
+        .board-wrapper {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        /* 平板與電腦的佈局 (側邊欄) */
+        @media (min-width: 768px) {
+            .app-container { flex-direction: row; }
+            .sidebar {
+                flex-direction: column;
+                width: 280px;
+                height: 100vh;
+                overflow-y: auto;
+                border-right: 1px solid #dee2e6;
+            }
+        }
+
+        /* 手機佈局 (頂部橫向滾動) */
+        @media (max-width: 767px) {
+            .sidebar {
+                flex-direction: row;
+                width: 100%;
+                overflow-x: auto;
+                border-bottom: 1px solid #dee2e6;
+                align-items: center;
+            }
+            .sidebar-group { flex-shrink: 0; } /* 防止按鈕被擠壓 */
+        }
+
+        /* 戰術板本體 (保持 900x550 比例，透過 JS 進行 CSS Transform 縮放) */
         #tactics-board {
             position: relative;
             width: 900px;
@@ -20,148 +76,129 @@
             border: 10px solid #333;
             border-radius: 8px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            margin: 0 auto;
-            overflow: hidden; 
-            transition: background-color 0.3s, border-color 0.3s; 
+            transform-origin: center center;
+            flex-shrink: 0;
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
         .court-lines {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             pointer-events: none; 
             opacity: 0.8;
         }
         
-        .court-lines * {
-            transition: stroke 0.3s;
-        }
+        .court-lines * { transition: stroke 0.3s; }
 
         #drawCanvas {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             z-index: 1;
         }
 
+        /* 旗幟設定 */
         .flag {
             position: absolute;
-            width: 35px;
-            height: 35px;
+            width: 35px; height: 35px;
             border-radius: 50%;
             background-color: #fff;
             border: 3px solid #000;
             color: #000;
-            font-weight: bold;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-weight: bold; font-size: 18px;
+            display: flex; align-items: center; justify-content: center;
             cursor: grab; 
             z-index: 10;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
             transition: transform 0.1s ease;
+            touch-action: none; /* 讓觸控完全交由 JS 處理 */
         }
         
-        .flag:active {
-            cursor: grabbing !important; 
-            transform: scale(1.1);
-        }
-
+        .flag:active { cursor: grabbing !important; transform: scale(1.1); }
         .flag.offense { background-color: #ff4d4d; color: white; border-color: #b30000; } 
         .flag.defense { background-color: #4da6ff; color: white; border-color: #0059b3; } 
         .flag.ball { background-color: #ff9900; border-color: #cc7a00; width: 25px; height: 25px; z-index: 11;} 
 
-        .control-panel {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        
-        #status-bar { font-weight: bold; }
-        
-        #penColorPicker {
-            width: 40px;
-            height: 35px;
-            cursor: pointer;
-        }
-
-        #timerDisplay {
-            min-width: 90px;
-            text-align: center;
-            letter-spacing: 1px;
-        }
+        #penColorPicker { width: 40px; height: 35px; cursor: pointer; padding: 2px;}
+        #timerDisplay { text-align: center; letter-spacing: 1px; font-size: 1.5rem;}
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header class="text-center mb-4">
-        <h1 class="display-5">🏀 互動籃球戰術板</h1>
-    </header>
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="text-center mb-md-3 sidebar-group pe-3 pe-md-0">
+            <h4 class="mb-0 fw-bold">🏀 戰術板</h4>
+            <small id="status-bar" class="text-muted d-none d-md-block mt-1">就緒</small>
+        </div>
 
-    <div class="control-panel d-flex justify-content-between align-items-center flex-wrap gap-3">
-        
-        <div class="d-flex gap-3 align-items-center flex-wrap">
-            <div class="d-flex align-items-center gap-2 border-end pe-3">
-                <span class="text-muted fw-bold">風格：</span>
-                <select id="themeSelector" class="form-select form-select-sm w-auto" onchange="changeTheme(this.value)">
+        <div class="sidebar-group border-bottom pb-md-3 pe-3 pe-md-0 d-flex flex-column gap-2">
+            <label class="text-muted fw-bold mb-1 d-none d-md-block">視圖設定</label>
+            <div class="d-flex align-items-center gap-2">
+                <span class="d-md-none">風格:</span>
+                <select id="themeSelector" class="form-select form-select-sm" onchange="changeTheme(this.value)">
                     <option value="classic">🌲 經典木紋</option>
                     <option value="blue">🟦 現代藍色</option>
                     <option value="dark">🟫 深色硬木</option>
                     <option value="street">⬛ 街頭黑灰</option>
                 </select>
             </div>
-
-            <div class="d-flex align-items-center gap-2 border-end pe-3">
-                <span class="text-muted fw-bold">畫筆：</span>
-                <input type="color" id="penColorPicker" class="form-control form-control-color p-1" value="#333333" title="選擇畫筆顏色">
+            <div class="d-flex align-items-center gap-2 mt-md-2">
+                <span class="d-md-none">畫筆:</span>
+                <input type="color" id="penColorPicker" class="form-control form-control-color" value="#333333">
+                <span class="text-muted small d-none d-md-block">畫筆顏色</span>
             </div>
+        </div>
 
-            <div class="btn-group" role="group">
+        <div class="sidebar-group border-bottom pb-md-3 pe-3 pe-md-0 d-flex flex-column gap-2">
+            <label class="text-muted fw-bold mb-1 d-none d-md-block">工具模式</label>
+            <div class="btn-group w-100" role="group">
                 <input type="radio" class="btn-check" name="mode" id="modeMove" checked onclick="setMode('move')">
                 <label class="btn btn-outline-primary" for="modeMove">✋ 移動</label>
                 
                 <input type="radio" class="btn-check" name="mode" id="modeDraw" onclick="setMode('draw')">
                 <label class="btn btn-outline-secondary" for="modeDraw">✏️ 畫線</label>
             </div>
-            <button class="btn btn-sm btn-outline-danger" onclick="clearLines()">清除畫線</button>
+            <button class="btn btn-sm btn-outline-danger w-100 mt-md-2" onclick="clearLines()">🧹 清除畫線</button>
         </div>
 
-        <div class="d-flex gap-2 align-items-center">
-            <span id="timerDisplay" class="badge bg-dark fs-5 font-monospace">00:00.0</span>
-            
-            <button id="btnRecord" class="btn btn-danger" onclick="startRecording()">🔴 開始錄製</button>
-            <button id="btnStop" class="btn btn-secondary" onclick="stopRecording()" disabled>⏹️ 停止</button>
-            <button id="btnPlay" class="btn btn-success" onclick="playRecording()" disabled>▶️ 重播</button>
-            <button class="btn btn-outline-dark" onclick="resetBoard()">🔄 全部重置</button>
+        <div class="sidebar-group pe-3 pe-md-0 d-flex flex-column gap-2">
+            <label class="text-muted fw-bold mb-1 d-none d-md-block">路徑錄製</label>
+            <span id="timerDisplay" class="badge bg-dark d-block w-100 py-2">00:00.0</span>
+            <div class="d-flex d-md-block gap-2">
+                <button id="btnRecord" class="btn btn-danger w-100 mb-md-2" onclick="startRecording()">🔴 錄製</button>
+                <button id="btnStop" class="btn btn-secondary w-100 mb-md-2" onclick="stopRecording()" disabled>⏹️ 停止</button>
+                <button id="btnPlay" class="btn btn-success w-100" onclick="playRecording()" disabled>▶️ 重播</button>
+            </div>
         </div>
-    </div>
+        
+        <div class="sidebar-group mt-md-auto pe-3 pe-md-0">
+            <button class="btn btn-outline-dark w-100" onclick="resetBoard()">🔄 復原初始</button>
+        </div>
+    </aside>
 
-    <div id="status-bar" class="alert alert-info text-center p-2 mb-3">準備就緒。請選擇模式或開始錄製。</div>
+    <main class="board-wrapper" id="board-wrapper">
+        <div id="tactics-board" data-base-border="#333">
+            <svg class="court-lines" viewBox="0 0 900 550" xmlns="http://www.w3.org/2000/svg">
+                <rect class="court-svg-elem" x="0" y="0" width="900" height="550" fill="none" stroke="white" stroke-width="2"/>
+                <line class="court-svg-elem" x1="450" y1="0" x2="450" y2="550" stroke="white" stroke-width="2"/>
+                <circle class="court-svg-elem" cx="450" cy="275" r="60" fill="none" stroke="white" stroke-width="2"/>
+                <rect class="court-svg-elem" x="0" y="185" width="170" height="180" fill="none" stroke="white" stroke-width="2"/>
+                <path class="court-svg-elem" d="M 170 185 A 60 60 0 0 1 170 365" fill="none" stroke="white" stroke-width="2" stroke-dasharray="5,5"/> 
+                <path class="court-svg-elem" d="M 0 40 L 140 40 A 250 250 0 0 1 140 510 L 0 510" fill="none" stroke="white" stroke-width="2"/> 
+                <rect class="court-svg-elem" x="730" y="185" width="170" height="180" fill="none" stroke="white" stroke-width="2"/>
+                <path class="court-svg-elem" d="M 730 185 A 60 60 0 0 0 730 365" fill="none" stroke="white" stroke-width="2" stroke-dasharray="5,5"/>
+                <path class="court-svg-elem" d="M 900 40 L 760 40 A 250 250 0 0 0 760 510 L 900 510" fill="none" stroke="white" stroke-width="2"/>
+            </svg>
 
-    <div id="tactics-board" data-base-border="#333">
-        <svg class="court-lines" viewBox="0 0 900 550" xmlns="http://www.w3.org/2000/svg">
-            <rect class="court-svg-elem" x="0" y="0" width="900" height="550" fill="none" stroke="white" stroke-width="2"/>
-            <line class="court-svg-elem" x1="450" y1="0" x2="450" y2="550" stroke="white" stroke-width="2"/>
-            <circle class="court-svg-elem" cx="450" cy="275" r="60" fill="none" stroke="white" stroke-width="2"/>
-            <rect class="court-svg-elem" x="0" y="185" width="170" height="180" fill="none" stroke="white" stroke-width="2"/>
-            <path class="court-svg-elem" d="M 170 185 A 60 60 0 0 1 170 365" fill="none" stroke="white" stroke-width="2" stroke-dasharray="5,5"/> 
-            <path class="court-svg-elem" d="M 0 40 L 140 40 A 250 250 0 0 1 140 510 L 0 510" fill="none" stroke="white" stroke-width="2"/> 
-            <rect class="court-svg-elem" x="730" y="185" width="170" height="180" fill="none" stroke="white" stroke-width="2"/>
-            <path class="court-svg-elem" d="M 730 185 A 60 60 0 0 0 730 365" fill="none" stroke="white" stroke-width="2" stroke-dasharray="5,5"/>
-            <path class="court-svg-elem" d="M 900 40 L 760 40 A 250 250 0 0 0 760 510 L 900 510" fill="none" stroke="white" stroke-width="2"/>
-        </svg>
-
-        <canvas id="drawCanvas" width="900" height="550"></canvas>
-    </div>
+            <canvas id="drawCanvas" width="900" height="550"></canvas>
+        </div>
+    </main>
 </div>
 
 <script>
+    // --- 核心 DOM 元素 ---
+    const boardWrapper = document.getElementById('board-wrapper');
     const board = document.getElementById('tactics-board');
     const canvas = document.getElementById('drawCanvas');
     const ctx = canvas.getContext('2d');
@@ -173,6 +210,7 @@
     const btnStop = document.getElementById('btnStop');
     const btnPlay = document.getElementById('btnPlay');
 
+    // --- 系統狀態與變量 ---
     let currentMode = 'move'; 
     let isDrawing = false;
     let activeFlag = null; 
@@ -185,6 +223,9 @@
     let initialPositions = []; 
     let recordedPathData = []; 
     let startTime = 0;
+
+    // 動態縮放比例 (為支援各種螢幕大小)
+    let scaleFactor = 1;
 
     const penCursor = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><text y='20' font-size='20'>✏️</text></svg>") 0 20, crosshair`;
 
@@ -206,14 +247,46 @@
     ];
     const flags = []; 
 
+    // --- 初始化系統 ---
     function init() {
         createFlags();
         initCanvas();
         setupGlobalEvents();
         setMode('move'); 
         changeTheme('classic'); 
+        
+        // 初始縮放並綁定視窗縮放事件
+        resizeBoard();
+        window.addEventListener('resize', resizeBoard);
     }
 
+    // --- 【全新】RWD 畫布縮放邏輯 ---
+    function resizeBoard() {
+        // 計算容器可用空間 (減去一點 padding 以策安全)
+        const availableWidth = boardWrapper.clientWidth - 20;
+        const availableHeight = boardWrapper.clientHeight - 20;
+        
+        // 戰術板原始大小 900x550
+        const scaleX = availableWidth / 900;
+        const scaleY = availableHeight / 550;
+        
+        // 取最小的比例，確保完整顯示不被裁切
+        scaleFactor = Math.min(scaleX, scaleY, 1); // 最大不超過原始大小(1)
+        
+        board.style.transform = `scale(${scaleFactor})`;
+    }
+
+    // --- 【全新】取得指標位置 (統一處理滑鼠與觸控) ---
+    function getPointerPos(e) {
+        if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        } else if (e.changedTouches && e.changedTouches.length > 0) {
+            return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+    }
+
+    // --- UI 與 時間格式 ---
     function formatTime(ms) {
         let totalSeconds = Math.floor(ms / 1000);
         let minutes = Math.floor(totalSeconds / 60);
@@ -225,45 +298,28 @@
     function changeTheme(themeKey) {
         const theme = courtThemes[themeKey];
         if(!theme) return;
-
         board.style.backgroundColor = theme.bg;
         board.dataset.baseBorder = theme.border; 
-
-        if(!isRecording) {
-            board.style.borderColor = theme.border;
-        }
-
-        const svgLines = document.querySelectorAll('.court-svg-elem');
-        svgLines.forEach(el => {
-            el.setAttribute('stroke', theme.line);
-        });
-
-        let recommendedPenColor = (themeKey === 'street' || themeKey === 'dark') ? '#ffffff' : '#333333';
-        penColorPicker.value = recommendedPenColor;
+        if(!isRecording) board.style.borderColor = theme.border;
+        document.querySelectorAll('.court-svg-elem').forEach(el => el.setAttribute('stroke', theme.line));
+        penColorPicker.value = (themeKey === 'street' || themeKey === 'dark') ? '#ffffff' : '#333333';
     }
 
     function setMode(mode) {
         if (isPlaying) return;
         currentMode = mode;
-        
         if (mode === 'draw') {
-            updateStatus("✏️ 模式：畫筆。在板上拖拽以繪製線條。");
+            if(statusBar) statusBar.textContent = "✏️ 畫線模式";
             canvas.style.cursor = penCursor;
             flags.forEach(f => { f.style.pointerEvents = 'none'; });
         } else {
-            updateStatus("✋ 模式：移動。拖拽旗幟安排戰術。");
+            if(statusBar) statusBar.textContent = "✋ 移動模式";
             canvas.style.cursor = 'grab';
             flags.forEach(f => { f.style.pointerEvents = 'auto'; });
         }
     }
 
-    canvas.addEventListener('mousedown', () => {
-        if (currentMode === 'move') canvas.style.cursor = 'grabbing';
-    });
-    canvas.addEventListener('mouseup', () => {
-        if (currentMode === 'move') canvas.style.cursor = 'grab';
-    });
-
+    // --- 建立旗幟與綁定事件 ---
     function createFlags() {
         flagConfigs.forEach((config) => {
             const el = document.createElement('div');
@@ -279,47 +335,81 @@
             } else { 
                 left = 437; top = 262;
             }
-
             el.style.left = left + 'px';
             el.style.top = top + 'px';
             
             initialPositions.push({ id: config.id, left: left, top: top });
-            el.addEventListener('mousedown', onFlagMouseDown);
+            
+            // 綁定滑鼠與觸控事件 (passive: false 允許攔截滾動)
+            el.addEventListener('mousedown', onPointerDown);
+            el.addEventListener('touchstart', onPointerDown, { passive: false });
             
             board.appendChild(el);
             flags.push(el);
         });
     }
 
-    function onFlagMouseDown(e) {
+    // --- 全域事件監聽 (支援 Mouse & Touch) ---
+    function setupGlobalEvents() {
+        document.addEventListener('mousemove', onPointerMove, { passive: false });
+        document.addEventListener('touchmove', onPointerMove, { passive: false });
+        
+        document.addEventListener('mouseup', onPointerUp);
+        document.addEventListener('touchend', onPointerUp);
+
+        // 處理畫布的點擊/觸控開始
+        canvas.addEventListener('mousedown', onCanvasPointerDown);
+        canvas.addEventListener('touchstart', onCanvasPointerDown, { passive: false });
+    }
+
+    // --- 核心互動邏輯：按下 ---
+    function onPointerDown(e) {
         if (currentMode !== 'move' || isPlaying) return;
+        e.preventDefault(); // 防止手機出現預設選取或滾動
+        
+        let pos = getPointerPos(e);
         activeFlag = e.target;
         activeFlag.style.zIndex = 100; 
         
-        activeFlag.startX = e.clientX;
-        activeFlag.startY = e.clientY;
+        activeFlag.startX = pos.x;
+        activeFlag.startY = pos.y;
         activeFlag.startLeft = activeFlag.offsetLeft;
         activeFlag.startTop = activeFlag.offsetTop;
     }
 
-    function setupGlobalEvents() {
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
+    function onCanvasPointerDown(e) {
+        if (currentMode !== 'draw' || isPlaying) return;
+        e.preventDefault();
+        
+        isDrawing = true;
+        let pos = getPointerPos(e);
+        const rect = canvas.getBoundingClientRect();
+        
+        // 【關鍵】除以 scaleFactor 來校正縮放後的坐標
+        let x = (pos.x - rect.left) / scaleFactor;
+        let y = (pos.y - rect.top) / scaleFactor;
+        
+        ctx.beginPath();
+        ctx.moveTo(x, y);
     }
 
-    function onMouseMove(e) {
+    // --- 核心互動邏輯：移動 ---
+    function onPointerMove(e) {
+        // 1. 移動旗幟
         if (activeFlag && currentMode === 'move' && !isPlaying) {
             e.preventDefault();
+            let pos = getPointerPos(e);
             
-            let dx = e.clientX - activeFlag.startX;
-            let dy = e.clientY - activeFlag.startY;
+            // 【關鍵】除以 scaleFactor 來校正拖曳距離
+            let dx = (pos.x - activeFlag.startX) / scaleFactor;
+            let dy = (pos.y - activeFlag.startY) / scaleFactor;
             
             let x = activeFlag.startLeft + dx;
             let y = activeFlag.startTop + dy;
             
             const flagSize = activeFlag.offsetWidth;
-            const boardWidth = board.clientWidth; 
-            const boardHeight = board.clientHeight;
+            const boardWidth = 900; // 內部原始寬度
+            const boardHeight = 550;
 
             if (x < 0) x = 0;
             if (x > boardWidth - flagSize) x = boardWidth - flagSize;
@@ -332,15 +422,23 @@
             if (isRecording) recordCurrentState();
         }
 
+        // 2. 畫筆
         if (isDrawing && currentMode === 'draw' && !isPlaying) {
+            e.preventDefault();
+            let pos = getPointerPos(e);
             ctx.strokeStyle = penColorPicker.value; 
+            
             const rect = canvas.getBoundingClientRect();
-            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            let x = (pos.x - rect.left) / scaleFactor;
+            let y = (pos.y - rect.top) / scaleFactor;
+            
+            ctx.lineTo(x, y);
             ctx.stroke();
         }
     }
 
-    function onMouseUp() {
+    // --- 核心互動邏輯：放開 ---
+    function onPointerUp(e) {
         if (activeFlag) {
             activeFlag.style.zIndex = (activeFlag.id === 'ball') ? 11 : 10; 
             activeFlag = null;
@@ -355,14 +453,6 @@
         ctx.lineWidth = 3;         
         ctx.lineCap = 'round';     
         ctx.lineJoin = 'round';
-        
-        canvas.addEventListener('mousedown', (e) => {
-            if (currentMode !== 'draw' || isPlaying) return;
-            isDrawing = true;
-            const rect = canvas.getBoundingClientRect();
-            ctx.beginPath();
-            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-        });
     }
 
     function clearLines() {
@@ -370,7 +460,7 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    // --- 錄製計時器維持正數 (往上加) ---
+    // --- 錄製與播放 ---
     function updateRecordingTimer() {
         if (!isRecording) return;
         let elapsed = Date.now() - startTime;
@@ -411,12 +501,11 @@
         if (recordedPathData.length > 1) { 
             btnPlay.disabled = false;
             const finalTime = recordedPathData[recordedPathData.length - 1].time;
-            timerDisplay.textContent = formatTime(finalTime); // 停止時顯示總時間
+            timerDisplay.textContent = formatTime(finalTime); 
         }
         board.style.borderColor = board.dataset.baseBorder; 
     }
 
-    // --- 播放改為倒數計時 ---
     function playRecording() {
         if (isRecording || isPlaying || recordedPathData.length < 2) return;
         isPlaying = true;
@@ -439,14 +528,12 @@
         function animate() {
             if (!isPlaying) return; 
             const elapsed = Date.now() - playbackStartTime;
-
-            // 【新邏輯】計算剩餘時間並顯示 (確保不會低於 0)
             const remainingTime = Math.max(0, recordingDuration - elapsed);
             timerDisplay.textContent = formatTime(remainingTime);
 
             if (elapsed >= recordingDuration) {
                 renderFrame(totalFrames - 1);
-                endPlayback(); // 呼叫結束函式
+                endPlayback(); 
                 return;
             }
 
@@ -478,8 +565,6 @@
             penColorPicker.disabled = false;
             canvas.style.opacity = 1;
             setMode(currentMode);
-            
-            // 播放完畢，計時器精準停在 00:00.0
             timerDisplay.textContent = formatTime(0); 
         }
 
@@ -518,8 +603,7 @@
         board.style.borderColor = board.dataset.baseBorder;
     }
 
-    function updateStatus(msg) { statusBar.textContent = msg; }
-
+    // 啟動應用
     window.onload = init;
 
 </script>
