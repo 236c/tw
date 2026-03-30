@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>專業籃球戰術板 (側欄滑動與按鈕優化版)</title>
+    <title>專業籃球戰術板 (完美按鈕修正版)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* 改用 100dvh 解決手機橫向瀏覽器網址列遮擋問題，移除 body 的 touch-action: none 以恢復側欄滑動 */
         html, body {
             height: 100dvh; 
             margin: 0;
@@ -34,8 +33,8 @@
             width: 240px; 
             flex-shrink: 0;
             height: 100%;
-            overflow-y: auto; /* 允許垂直滾動 */
-            -webkit-overflow-scrolling: touch; /* 讓 iOS 滑動更順暢 */
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; 
             padding: 15px;
         }
 
@@ -45,7 +44,7 @@
             margin-bottom: 15px;
             display: flex;
             flex-direction: column;
-            flex-shrink: 0; /* 防止橫向螢幕太矮時，群組被擠壓變形 */
+            flex-shrink: 0; 
         }
         .sidebar-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
@@ -57,6 +56,28 @@
             .btn { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
         }
 
+        /* --- 解決手機端 Bootstrap 按鈕點擊後 hover 狀態卡住的問題 (Sticky Hover Fix) --- */
+        @media (hover: none) {
+            .btn-outline-danger:hover {
+                color: #dc3545;
+                background-color: transparent;
+                border-color: #dc3545;
+            }
+            .btn-outline-danger:active {
+                background-color: #dc3545;
+                color: #fff;
+            }
+            .btn-outline-dark:hover {
+                color: #212529;
+                background-color: transparent;
+                border-color: #212529;
+            }
+            .btn-outline-dark:active {
+                background-color: #212529;
+                color: #fff;
+            }
+        }
+
         /* --- 右側戰術板容納區 --- */
         .board-wrapper {
             flex-grow: 1;
@@ -65,7 +86,7 @@
             justify-content: center;
             overflow: hidden;
             position: relative;
-            touch-action: none; /* 將防干擾鎖定移到這裡，確保只有戰術板區域不會誤觸滾動 */
+            touch-action: none; 
         }
 
         #tactics-board {
@@ -123,16 +144,9 @@
         .flag.ball { background-color: #ff9900; border-color: #cc7a00; width: 25px; height: 25px; z-index: 11;} 
 
         /* 畫筆顏色選擇器美化 */
-        .color-picker-wrapper {
-            cursor: pointer;
-        }
+        .color-picker-wrapper { cursor: pointer; }
         #penColorPicker { 
-            width: 25px; 
-            height: 25px; 
-            padding: 0; 
-            border: none; 
-            background: transparent;
-            cursor: pointer;
+            width: 25px; height: 25px; padding: 0; border: none; background: transparent; cursor: pointer;
         }
         #penColorPicker::-webkit-color-swatch-wrapper { padding: 0; }
         #penColorPicker::-webkit-color-swatch { border: 2px solid #ccc; border-radius: 4px; }
@@ -171,8 +185,8 @@
                 <label class="btn btn-outline-secondary" for="modeDraw">✏️ 畫線</label>
             </div>
             
-            <button class="btn btn-sm btn-outline-danger w-100 mb-2" onclick="clearLines(); this.blur();">🧹 清除畫布</button>
-            <button class="btn btn-sm btn-outline-dark w-100 mb-2" onclick="resetBoard(); this.blur();">🔄 全部重置</button>
+            <button class="btn btn-sm btn-outline-danger w-100 mb-2" onclick="clearLines()">🧹 清除畫布</button>
+            <button class="btn btn-sm btn-outline-dark w-100 mb-2" onclick="resetBoard()">🔄 全部重置</button>
         </div>
     </aside>
 
@@ -417,6 +431,11 @@
 
     function clearLines() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // 延遲強制清除按鈕焦點，解決手機點擊後顏色卡住的問題
+        setTimeout(() => {
+            if (document.activeElement) document.activeElement.blur();
+        }, 50);
     }
 
     function resetBoard() {
@@ -424,7 +443,7 @@
             const el = document.getElementById(pos.id);
             if (el) { el.style.left = pos.left + 'px'; el.style.top = pos.top + 'px'; }
         });
-        clearLines();
+        clearLines(); // 內部已經包含清除焦點的功能
     }
 
     window.onload = init;
