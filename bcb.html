@@ -109,7 +109,10 @@
     let currentMode = 'move', isDrawing = false, initialPositions = [], scaleFactor = 1;
 
     // --- 【全新】多點觸控追蹤 Map ---
-    const activeTouches = {}; // { touchId: { element, startX, startY, startLeft, startTop, isCarryingBall, carryOffsetX, carryOffsetY } }
+    const activeTouches = {}; 
+    
+    // --- 新增：用於硬體加速渲染的狀態旗標 ---
+    let isRendering = false;
 
     function init() {
         createFlags();
@@ -168,16 +171,30 @@
         canvas.addEventListener('mousedown', onCanvasDown);
     }
 
+    function onCanvasDown(e) {
+        if (currentMode !== 'draw') return;
+        if (e.cancelable) e.preventDefault();
+        isDrawing = true;
+        const t = e.touches ? e.touches[0] : e;
+        const rect = canvas.getBoundingClientRect();
+        ctx.beginPath();
+        ctx.moveTo((t.clientX - rect.left) / scaleFactor, (t.clientY - rect.top) / scaleFactor);
+    }
+
     // --- 核心：多點觸控開始 ---
     function onPointerDown(e, isTouch) {
         if (currentMode !== 'move') return;
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault(); // 阻擋系統預設長按選取等行為
 
         const touches = isTouch ? e.changedTouches : [e];
         for (const t of touches) {
             const id = isTouch ? t.identifier : "mouse";
             const target = e.target.closest('.flag');
             if (!target) continue;
+
+            // 避免多隻手指按住同一個棋子互相拉扯
+            const isAlreadyGrabbed = Object.values(activeTouches).some(state => state.element === target);
+            if (isAlreadyGrabbed) continue;
 
             target.style.zIndex = 100;
             const state = {
@@ -186,76 +203,94 @@
                 startY: t.clientY,
                 startLeft: target.offsetLeft,
                 startTop: target.offsetTop,
+                targetX: target.offsetLeft, // 用於 rAF 平滑渲染
+                targetY: target.offsetTop,
                 isCarryingBall: false
             };
 
-            // 持球判定 (球優先，只有點擊球員時才檢查球是否在旁邊)
+            // 持球判定
             if (target.id !== 'ball') {
                 const ballEl = document.getElementById('ball');
-                const dist = Math.hypot((target.offsetLeft + 22.5) - (ballEl.offsetLeft + 16), (target.offsetTop + 22.5) - (ballEl.offsetTop + 16));
-                if (dist < 55) { // 加大感應半徑，讓多點觸控更寬容
-                    state.isCarryingBall = true;
-                    state.carryOffsetX = ballEl.offsetLeft - target.offsetLeft;
-                    state.carryOffsetY = ballEl.offsetTop - target.offsetTop;
+                // 檢查球是否已經被其他球員帶著，或被直接按住，避免搶球抖動
+                const isBallBusy = Object.values(activeTouches).some(s => s.element.id === 'ball' || s.isCarryingBall);
+                
+                if (!isBallBusy) {
+                    const dist = Math.hypot((target.offsetLeft + 22.5) - (ballEl.offsetLeft + 16), (target.offsetTop + 22.5) - (ballEl.offsetTop + 16));
+                    if (dist < 55) {
+                        state.isCarryingBall = true;
+                        state.carryOffsetX = ballEl.offsetLeft - target.offsetLeft;
+                        state.carryOffsetY = ballEl.offsetTop - target.offsetTop;
+                    }
                 }
             }
             activeTouches[id] = state;
         }
-    }
 
-    function onCanvasDown(e) {
-        if (currentMode !== 'draw') return;
-        e.preventDefault();
-        isDrawing = true;
-        const t = e.touches ? e.touches[0] : e;
-        const rect = canvas.getBoundingClientRect();
-        ctx.beginPath();
-        ctx.moveTo((t.clientX - rect.left) / scaleFactor, (t.clientY - rect.top) / scaleFactor);
+        // 啟動硬體加速渲染迴圈
+        if (!isRendering && Object.keys(activeTouches).length > 0) {
+            isRendering = true;
+            requestAnimationFrame(renderMove);
+        }
     }
 
     // --- 核心：多點觸控移動 ---
     function onPointerMove(e, isTouch) {
+        // 只要有物件被抓住，移動時無條件阻止預設行為，徹底消滅滑動延遲
+        if (currentMode === 'move' && Object.keys(activeTouches).length > 0) {
+            if (e.cancelable) e.preventDefault();
+        }
+
         const touches = isTouch ? e.changedTouches : [e];
         for (const t of touches) {
             const id = isTouch ? t.identifier : "mouse";
             const state = activeTouches[id];
 
             if (state && currentMode === 'move') {
-                e.preventDefault();
                 const dx = (t.clientX - state.startX) / scaleFactor;
                 const dy = (t.clientY - state.startY) / scaleFactor;
                 
-                let newX = state.startLeft + dx;
-                let newY = state.startTop + dy;
-
-                // 邊界檢查
                 const fw = state.element.offsetWidth;
-                newX = Math.max(0, Math.min(newX, 900 - fw));
-                newY = Math.max(0, Math.min(newY, 550 - fw));
-
-                // 更新位置
-                state.element.style.left = newX + 'px';
-                state.element.style.top = newY + 'px';
-
-                // 連動球
-                if (state.isCarryingBall) {
-                    const ballEl = document.getElementById('ball');
-                    let bx = newX + state.carryOffsetX;
-                    let by = newY + state.carryOffsetY;
-                    ballEl.style.left = Math.max(0, Math.min(bx, 900 - 32)) + 'px';
-                    ballEl.style.top = Math.max(0, Math.min(by, 550 - 32)) + 'px';
-                }
+                // 這裡只做數學計算，不直接操作 DOM，交由 rAF 統一更新
+                state.targetX = Math.max(0, Math.min(state.startLeft + dx, 900 - fw));
+                state.targetY = Math.max(0, Math.min(state.startTop + dy, 550 - fw));
             }
         }
 
-        // 畫線邏輯 (僅支援單點畫線，避免多指亂畫)
+        // 畫線邏輯
         if (isDrawing && currentMode === 'draw') {
-            e.preventDefault();
+            if (e.cancelable) e.preventDefault();
             const t = e.touches ? e.touches[0] : e;
             ctx.strokeStyle = penColorPicker.value; 
             const rect = canvas.getBoundingClientRect();
             ctx.lineTo((t.clientX - rect.left) / scaleFactor, (t.clientY - rect.top) / scaleFactor);
             ctx.stroke();
+        }
+    }
+
+    // --- 新增：集中更新 DOM 渲染迴圈 (極大化流暢度) ---
+    function renderMove() {
+        let hasActive = false;
+        for (const id in activeTouches) {
+            const state = activeTouches[id];
+            if (!state) continue;
+            hasActive = true;
+
+            state.element.style.left = state.targetX + 'px';
+            state.element.style.top = state.targetY + 'px';
+
+            if (state.isCarryingBall) {
+                const ballEl = document.getElementById('ball');
+                let bx = state.targetX + state.carryOffsetX;
+                let by = state.targetY + state.carryOffsetY;
+                ballEl.style.left = Math.max(0, Math.min(bx, 900 - 32)) + 'px';
+                ballEl.style.top = Math.max(0, Math.min(by, 550 - 32)) + 'px';
+            }
+        }
+
+        if (hasActive) {
+            requestAnimationFrame(renderMove);
+        } else {
+            isRendering = false; // 沒人在拖曳了，關閉迴圈省電
         }
     }
 
