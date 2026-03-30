@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>專業籃球戰術板 (完美按鈕修正版)</title>
+    <title>專業籃球戰術板 (行動端按鈕完美修復版)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         html, body {
@@ -56,25 +56,34 @@
             .btn { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
         }
 
-        /* --- 解決手機端 Bootstrap 按鈕點擊後 hover 狀態卡住的問題 (Sticky Hover Fix) --- */
+        /* --- 【終極修復】徹底消滅手機上 Bootstrap 按鈕的殘留顏色 --- */
         @media (hover: none) {
-            .btn-outline-danger:hover {
-                color: #dc3545;
-                background-color: transparent;
-                border-color: #dc3545;
+            /* 針對清除畫布按鈕 (紅) */
+            .btn-outline-danger:hover, 
+            .btn-outline-danger:focus, 
+            .btn-outline-danger:focus-visible {
+                color: #dc3545 !important;
+                background-color: transparent !important;
+                border-color: #dc3545 !important;
+                box-shadow: none !important;
             }
             .btn-outline-danger:active {
-                background-color: #dc3545;
-                color: #fff;
+                color: #fff !important;
+                background-color: #dc3545 !important;
             }
-            .btn-outline-dark:hover {
-                color: #212529;
-                background-color: transparent;
-                border-color: #212529;
+
+            /* 針對全部重置按鈕 (黑) */
+            .btn-outline-dark:hover, 
+            .btn-outline-dark:focus, 
+            .btn-outline-dark:focus-visible {
+                color: #212529 !important;
+                background-color: transparent !important;
+                border-color: #212529 !important;
+                box-shadow: none !important;
             }
             .btn-outline-dark:active {
-                background-color: #212529;
-                color: #fff;
+                color: #fff !important;
+                background-color: #212529 !important;
             }
         }
 
@@ -185,8 +194,8 @@
                 <label class="btn btn-outline-secondary" for="modeDraw">✏️ 畫線</label>
             </div>
             
-            <button class="btn btn-sm btn-outline-danger w-100 mb-2" onclick="clearLines()">🧹 清除畫布</button>
-            <button class="btn btn-sm btn-outline-dark w-100 mb-2" onclick="resetBoard()">🔄 全部重置</button>
+            <button class="btn btn-sm btn-outline-danger w-100 mb-2" onclick="clearLines(this)">🧹 清除畫布</button>
+            <button class="btn btn-sm btn-outline-dark w-100 mb-2" onclick="resetBoard(this)">🔄 全部重置</button>
         </div>
     </aside>
 
@@ -429,21 +438,20 @@
         ctx.lineJoin = 'round';
     }
 
-    function clearLines() {
+    // --- 接收 btn 參數，確保精準消除焦點 ---
+    function clearLines(btn = null) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // 延遲強制清除按鈕焦點，解決手機點擊後顏色卡住的問題
-        setTimeout(() => {
-            if (document.activeElement) document.activeElement.blur();
-        }, 50);
+        if (btn) {
+            setTimeout(() => btn.blur(), 50); // 延遲釋放焦點，避免被系統再蓋過
+        }
     }
 
-    function resetBoard() {
+    function resetBoard(btn = null) {
         initialPositions.forEach(pos => {
             const el = document.getElementById(pos.id);
             if (el) { el.style.left = pos.left + 'px'; el.style.top = pos.top + 'px'; }
         });
-        clearLines(); // 內部已經包含清除焦點的功能
+        clearLines(btn);
     }
 
     window.onload = init;
