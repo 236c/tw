@@ -3,71 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>專業籃球戰術板 (支援平板觸控側邊欄版)</title>
+    <title>專業籃球戰術板 (側欄固定 + 自動適應滿版)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* 讓整個應用程式滿版，防止手機下拉更新或亂滾動 */
+        /* 根層級設定：鎖定畫面，防止瀏覽器預設下拉或滑動 */
         html, body {
             height: 100%;
             margin: 0;
+            padding: 0;
             overflow: hidden;
-            background-color: #f0f2f5;
+            background-color: #212529; /* 深色背景，讓木紋戰術板更突顯 */
             user-select: none; 
-            touch-action: none; /* 禁用瀏覽器預設手勢 */
+            touch-action: none; 
         }
 
-        /* 核心版面佈局 (Flexbox) */
+        /* 核心版面佈局：永遠保持橫向排列 (Left Sidebar + Right Content) */
         .app-container {
             display: flex;
-            flex-direction: column;
+            flex-direction: row; /* 強制橫向 */
             height: 100vh;
+            width: 100vw;
         }
 
-        /* 側邊/頂部 控制欄 */
+        /* --- 左側控制欄 --- */
         .sidebar {
             background-color: #ffffff;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 15px rgba(0,0,0,0.5);
             z-index: 1000;
             display: flex;
-            gap: 15px;
+            flex-direction: column;
+            width: 240px; /* 電腦預設寬度 */
+            flex-shrink: 0;
+            height: 100%;
+            overflow-y: auto; /* 若螢幕太矮允許側欄上下滾動 */
             padding: 15px;
+            touch-action: auto; /* 允許側欄正常滑動 */
         }
 
-        /* 戰術板容納區 (自動填滿剩餘空間並置中) */
+        /* 側欄內部元素間距 */
+        .sidebar-group {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .sidebar-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        /* 手機/小螢幕專屬調整：將側欄變窄，按鈕變緊湊 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 130px; /* 手機版變窄 */
+                padding: 10px;
+            }
+            .sidebar-group { padding-bottom: 10px; margin-bottom: 10px; gap: 8px; }
+            .sidebar h4 { font-size: 1.1rem !important; }
+            .sidebar label, .sidebar small { font-size: 0.75rem !important; }
+            .btn { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
+            #timerDisplay { font-size: 1.1rem !important; padding: 5px !important; }
+        }
+
+        /* --- 右側戰術板容納區 --- */
         .board-wrapper {
             flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 15px;
             overflow: hidden;
+            position: relative;
         }
 
-        /* 平板與電腦的佈局 (側邊欄) */
-        @media (min-width: 768px) {
-            .app-container { flex-direction: row; }
-            .sidebar {
-                flex-direction: column;
-                width: 280px;
-                height: 100vh;
-                overflow-y: auto;
-                border-right: 1px solid #dee2e6;
-            }
-        }
-
-        /* 手機佈局 (頂部橫向滾動) */
-        @media (max-width: 767px) {
-            .sidebar {
-                flex-direction: row;
-                width: 100%;
-                overflow-x: auto;
-                border-bottom: 1px solid #dee2e6;
-                align-items: center;
-            }
-            .sidebar-group { flex-shrink: 0; } /* 防止按鈕被擠壓 */
-        }
-
-        /* 戰術板本體 (保持 900x550 比例，透過 JS 進行 CSS Transform 縮放) */
+        /* 戰術板本體 (保持原始比例 900x550，透過 JS scale 自動縮放滿版) */
         #tactics-board {
             position: relative;
             width: 900px;
@@ -75,7 +82,7 @@
             background-color: #e0ac69;
             border: 10px solid #333;
             border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
             transform-origin: center center;
             flex-shrink: 0;
             transition: background-color 0.3s, border-color 0.3s;
@@ -88,14 +95,9 @@
             pointer-events: none; 
             opacity: 0.8;
         }
-        
         .court-lines * { transition: stroke 0.3s; }
 
-        #drawCanvas {
-            position: absolute;
-            top: 0; left: 0;
-            z-index: 1;
-        }
+        #drawCanvas { position: absolute; top: 0; left: 0; z-index: 1; }
 
         /* 旗幟設定 */
         .flag {
@@ -111,7 +113,7 @@
             z-index: 10;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
             transition: transform 0.1s ease;
-            touch-action: none; /* 讓觸控完全交由 JS 處理 */
+            touch-action: none; 
         }
         
         .flag:active { cursor: grabbing !important; transform: scale(1.1); }
@@ -119,61 +121,50 @@
         .flag.defense { background-color: #4da6ff; color: white; border-color: #0059b3; } 
         .flag.ball { background-color: #ff9900; border-color: #cc7a00; width: 25px; height: 25px; z-index: 11;} 
 
-        #penColorPicker { width: 40px; height: 35px; cursor: pointer; padding: 2px;}
+        #penColorPicker { width: 100%; height: 35px; cursor: pointer; padding: 2px;}
         #timerDisplay { text-align: center; letter-spacing: 1px; font-size: 1.5rem;}
     </style>
 </head>
 <body>
 
 <div class="app-container">
+    
     <aside class="sidebar">
-        <div class="text-center mb-md-3 sidebar-group pe-3 pe-md-0">
-            <h4 class="mb-0 fw-bold">🏀 戰術板</h4>
-            <small id="status-bar" class="text-muted d-none d-md-block mt-1">就緒</small>
+        <div class="text-center mt-2 mb-2">
+            <h4 class="fw-bold mb-0">🏀 戰術板</h4>
+            <small id="status-bar" class="text-muted d-block mt-1">就緒</small>
         </div>
 
-        <div class="sidebar-group border-bottom pb-md-3 pe-3 pe-md-0 d-flex flex-column gap-2">
-            <label class="text-muted fw-bold mb-1 d-none d-md-block">視圖設定</label>
-            <div class="d-flex align-items-center gap-2">
-                <span class="d-md-none">風格:</span>
-                <select id="themeSelector" class="form-select form-select-sm" onchange="changeTheme(this.value)">
-                    <option value="classic">🌲 經典木紋</option>
-                    <option value="blue">🟦 現代藍色</option>
-                    <option value="dark">🟫 深色硬木</option>
-                    <option value="street">⬛ 街頭黑灰</option>
-                </select>
-            </div>
-            <div class="d-flex align-items-center gap-2 mt-md-2">
-                <span class="d-md-none">畫筆:</span>
-                <input type="color" id="penColorPicker" class="form-control form-control-color" value="#333333">
-                <span class="text-muted small d-none d-md-block">畫筆顏色</span>
-            </div>
+        <div class="sidebar-group">
+            <label class="text-muted fw-bold mb-0">🎨 場地風格</label>
+            <select id="themeSelector" class="form-select form-select-sm" onchange="changeTheme(this.value)">
+                <option value="classic">🌲 經典木紋</option>
+                <option value="blue">🟦 現代藍色</option>
+                <option value="dark">🟫 深色硬木</option>
+                <option value="street">⬛ 街頭黑灰</option>
+            </select>
+            <input type="color" id="penColorPicker" class="form-control form-control-color mt-1" value="#333333" title="點擊更換畫筆顏色">
         </div>
 
-        <div class="sidebar-group border-bottom pb-md-3 pe-3 pe-md-0 d-flex flex-column gap-2">
-            <label class="text-muted fw-bold mb-1 d-none d-md-block">工具模式</label>
-            <div class="btn-group w-100" role="group">
+        <div class="sidebar-group">
+            <label class="text-muted fw-bold mb-0">🛠️ 工具模式</label>
+            <div class="btn-group-vertical w-100" role="group">
                 <input type="radio" class="btn-check" name="mode" id="modeMove" checked onclick="setMode('move')">
-                <label class="btn btn-outline-primary" for="modeMove">✋ 移動</label>
+                <label class="btn btn-outline-primary" for="modeMove">✋ 移動旗幟</label>
                 
                 <input type="radio" class="btn-check" name="mode" id="modeDraw" onclick="setMode('draw')">
-                <label class="btn btn-outline-secondary" for="modeDraw">✏️ 畫線</label>
+                <label class="btn btn-outline-secondary" for="modeDraw">✏️ 畫線教練</label>
             </div>
-            <button class="btn btn-sm btn-outline-danger w-100 mt-md-2" onclick="clearLines()">🧹 清除畫線</button>
+            <button class="btn btn-sm btn-outline-danger w-100 mt-1" onclick="clearLines()">🧹 清除畫線</button>
         </div>
 
-        <div class="sidebar-group pe-3 pe-md-0 d-flex flex-column gap-2">
-            <label class="text-muted fw-bold mb-1 d-none d-md-block">路徑錄製</label>
-            <span id="timerDisplay" class="badge bg-dark d-block w-100 py-2">00:00.0</span>
-            <div class="d-flex d-md-block gap-2">
-                <button id="btnRecord" class="btn btn-danger w-100 mb-md-2" onclick="startRecording()">🔴 錄製</button>
-                <button id="btnStop" class="btn btn-secondary w-100 mb-md-2" onclick="stopRecording()" disabled>⏹️ 停止</button>
-                <button id="btnPlay" class="btn btn-success w-100" onclick="playRecording()" disabled>▶️ 重播</button>
-            </div>
-        </div>
-        
-        <div class="sidebar-group mt-md-auto pe-3 pe-md-0">
-            <button class="btn btn-outline-dark w-100" onclick="resetBoard()">🔄 復原初始</button>
+        <div class="sidebar-group mt-auto">
+            <label class="text-muted fw-bold mb-0">📹 錄製重播</label>
+            <span id="timerDisplay" class="badge bg-dark d-block w-100 py-2 font-monospace">00:00.0</span>
+            <button id="btnRecord" class="btn btn-danger btn-sm w-100" onclick="startRecording()">🔴 開始錄製</button>
+            <button id="btnStop" class="btn btn-secondary btn-sm w-100" onclick="stopRecording()" disabled>⏹️ 停止</button>
+            <button id="btnPlay" class="btn btn-success btn-sm w-100" onclick="playRecording()" disabled>▶️ 倒數重播</button>
+            <button class="btn btn-outline-dark btn-sm w-100 mt-2" onclick="resetBoard()">🔄 全部重置</button>
         </div>
     </aside>
 
@@ -197,7 +188,6 @@
 </div>
 
 <script>
-    // --- 核心 DOM 元素 ---
     const boardWrapper = document.getElementById('board-wrapper');
     const board = document.getElementById('tactics-board');
     const canvas = document.getElementById('drawCanvas');
@@ -210,21 +200,16 @@
     const btnStop = document.getElementById('btnStop');
     const btnPlay = document.getElementById('btnPlay');
 
-    // --- 系統狀態與變量 ---
     let currentMode = 'move'; 
     let isDrawing = false;
     let activeFlag = null; 
-    
     let isRecording = false;
     let isPlaying = false;
     let animationId = null; 
     let recordingTimerId = null;
-    
     let initialPositions = []; 
     let recordedPathData = []; 
     let startTime = 0;
-
-    // 動態縮放比例 (為支援各種螢幕大小)
     let scaleFactor = 1;
 
     const penCursor = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><text y='20' font-size='20'>✏️</text></svg>") 0 20, crosshair`;
@@ -247,7 +232,6 @@
     ];
     const flags = []; 
 
-    // --- 初始化系統 ---
     function init() {
         createFlags();
         initCanvas();
@@ -255,38 +239,35 @@
         setMode('move'); 
         changeTheme('classic'); 
         
-        // 初始縮放並綁定視窗縮放事件
+        // 初始縮放並綁定視窗縮放事件 (如手機旋轉)
         resizeBoard();
         window.addEventListener('resize', resizeBoard);
     }
 
-    // --- 【全新】RWD 畫布縮放邏輯 ---
+    // --- 自動完美滿版縮放核心 ---
     function resizeBoard() {
-        // 計算容器可用空間 (減去一點 padding 以策安全)
-        const availableWidth = boardWrapper.clientWidth - 20;
-        const availableHeight = boardWrapper.clientHeight - 20;
+        const availableWidth = boardWrapper.clientWidth;
+        const availableHeight = boardWrapper.clientHeight;
         
-        // 戰術板原始大小 900x550
-        const scaleX = availableWidth / 900;
-        const scaleY = availableHeight / 550;
+        // 預留一點點邊距，避免太貼邊緣 (各留 20px)
+        const targetW = availableWidth - 20;
+        const targetH = availableHeight - 20;
         
-        // 取最小的比例，確保完整顯示不被裁切
-        scaleFactor = Math.min(scaleX, scaleY, 1); // 最大不超過原始大小(1)
+        const scaleX = targetW / 900;
+        const scaleY = targetH / 550;
+        
+        // 取得最小縮放比，不僅支援縮小，也支援「放大」填滿大螢幕
+        scaleFactor = Math.min(scaleX, scaleY); 
         
         board.style.transform = `scale(${scaleFactor})`;
     }
 
-    // --- 【全新】取得指標位置 (統一處理滑鼠與觸控) ---
     function getPointerPos(e) {
-        if (e.touches && e.touches.length > 0) {
-            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        } else if (e.changedTouches && e.changedTouches.length > 0) {
-            return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
-        }
+        if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        else if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
         return { x: e.clientX, y: e.clientY };
     }
 
-    // --- UI 與 時間格式 ---
     function formatTime(ms) {
         let totalSeconds = Math.floor(ms / 1000);
         let minutes = Math.floor(totalSeconds / 60);
@@ -309,17 +290,16 @@
         if (isPlaying) return;
         currentMode = mode;
         if (mode === 'draw') {
-            if(statusBar) statusBar.textContent = "✏️ 畫線模式";
+            statusBar.textContent = "✏️ 畫筆";
             canvas.style.cursor = penCursor;
             flags.forEach(f => { f.style.pointerEvents = 'none'; });
         } else {
-            if(statusBar) statusBar.textContent = "✋ 移動模式";
+            statusBar.textContent = "✋ 移位";
             canvas.style.cursor = 'grab';
             flags.forEach(f => { f.style.pointerEvents = 'auto'; });
         }
     }
 
-    // --- 建立旗幟與綁定事件 ---
     function createFlags() {
         flagConfigs.forEach((config) => {
             const el = document.createElement('div');
@@ -328,19 +308,15 @@
             el.innerHTML = config.text;
             
             let top, left;
-            if (config.id.includes('off')) {
-                left = 50; top = 60 + (parseInt(config.text) - 1) * 90;
-            } else if (config.id.includes('def')) {
-                left = 815; top = 60 + (parseInt(config.text) - 1) * 90;
-            } else { 
-                left = 437; top = 262;
-            }
+            if (config.id.includes('off')) { left = 50; top = 60 + (parseInt(config.text) - 1) * 90; } 
+            else if (config.id.includes('def')) { left = 815; top = 60 + (parseInt(config.text) - 1) * 90; } 
+            else { left = 437; top = 262; }
+            
             el.style.left = left + 'px';
             el.style.top = top + 'px';
             
             initialPositions.push({ id: config.id, left: left, top: top });
             
-            // 綁定滑鼠與觸控事件 (passive: false 允許攔截滾動)
             el.addEventListener('mousedown', onPointerDown);
             el.addEventListener('touchstart', onPointerDown, { passive: false });
             
@@ -349,7 +325,6 @@
         });
     }
 
-    // --- 全域事件監聽 (支援 Mouse & Touch) ---
     function setupGlobalEvents() {
         document.addEventListener('mousemove', onPointerMove, { passive: false });
         document.addEventListener('touchmove', onPointerMove, { passive: false });
@@ -357,15 +332,13 @@
         document.addEventListener('mouseup', onPointerUp);
         document.addEventListener('touchend', onPointerUp);
 
-        // 處理畫布的點擊/觸控開始
         canvas.addEventListener('mousedown', onCanvasPointerDown);
         canvas.addEventListener('touchstart', onCanvasPointerDown, { passive: false });
     }
 
-    // --- 核心互動邏輯：按下 ---
     function onPointerDown(e) {
         if (currentMode !== 'move' || isPlaying) return;
-        e.preventDefault(); // 防止手機出現預設選取或滾動
+        e.preventDefault(); 
         
         let pos = getPointerPos(e);
         activeFlag = e.target;
@@ -385,7 +358,7 @@
         let pos = getPointerPos(e);
         const rect = canvas.getBoundingClientRect();
         
-        // 【關鍵】除以 scaleFactor 來校正縮放後的坐標
+        // 校正縮放比
         let x = (pos.x - rect.left) / scaleFactor;
         let y = (pos.y - rect.top) / scaleFactor;
         
@@ -393,14 +366,12 @@
         ctx.moveTo(x, y);
     }
 
-    // --- 核心互動邏輯：移動 ---
     function onPointerMove(e) {
-        // 1. 移動旗幟
         if (activeFlag && currentMode === 'move' && !isPlaying) {
             e.preventDefault();
             let pos = getPointerPos(e);
             
-            // 【關鍵】除以 scaleFactor 來校正拖曳距離
+            // 校正縮放拖曳距離
             let dx = (pos.x - activeFlag.startX) / scaleFactor;
             let dy = (pos.y - activeFlag.startY) / scaleFactor;
             
@@ -408,7 +379,7 @@
             let y = activeFlag.startTop + dy;
             
             const flagSize = activeFlag.offsetWidth;
-            const boardWidth = 900; // 內部原始寬度
+            const boardWidth = 900; 
             const boardHeight = 550;
 
             if (x < 0) x = 0;
@@ -422,7 +393,6 @@
             if (isRecording) recordCurrentState();
         }
 
-        // 2. 畫筆
         if (isDrawing && currentMode === 'draw' && !isPlaying) {
             e.preventDefault();
             let pos = getPointerPos(e);
@@ -437,16 +407,9 @@
         }
     }
 
-    // --- 核心互動邏輯：放開 ---
     function onPointerUp(e) {
-        if (activeFlag) {
-            activeFlag.style.zIndex = (activeFlag.id === 'ball') ? 11 : 10; 
-            activeFlag = null;
-        }
-        if (isDrawing) {
-            ctx.closePath();
-            isDrawing = false;
-        }
+        if (activeFlag) { activeFlag.style.zIndex = (activeFlag.id === 'ball') ? 11 : 10; activeFlag = null; }
+        if (isDrawing) { ctx.closePath(); isDrawing = false; }
     }
 
     function initCanvas() {
@@ -460,7 +423,6 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    // --- 錄製與播放 ---
     function updateRecordingTimer() {
         if (!isRecording) return;
         let elapsed = Date.now() - startTime;
@@ -510,13 +472,9 @@
         if (isRecording || isPlaying || recordedPathData.length < 2) return;
         isPlaying = true;
         
-        btnPlay.disabled = true;
-        btnRecord.disabled = true;
-        btnStop.disabled = true;
-        document.getElementById('modeMove').disabled = true;
-        document.getElementById('modeDraw').disabled = true;
-        document.getElementById('themeSelector').disabled = true;
-        penColorPicker.disabled = true; 
+        btnPlay.disabled = true; btnRecord.disabled = true; btnStop.disabled = true;
+        document.getElementById('modeMove').disabled = true; document.getElementById('modeDraw').disabled = true;
+        document.getElementById('themeSelector').disabled = true; penColorPicker.disabled = true; 
         
         canvas.style.opacity = 0.5;
 
@@ -537,10 +495,7 @@
                 return;
             }
 
-            while (currentIndex < totalFrames - 1 && recordedPathData[currentIndex + 1].time < elapsed) {
-                currentIndex++;
-            }
-
+            while (currentIndex < totalFrames - 1 && recordedPathData[currentIndex + 1].time < elapsed) { currentIndex++; }
             renderFrame(currentIndex);
             animationId = requestAnimationFrame(animate);
         }
@@ -548,26 +503,19 @@
         function renderFrame(index) {
             recordedPathData[index].players.forEach(playerData => {
                 const flagEl = document.getElementById(playerData.id);
-                if (flagEl) {
-                    flagEl.style.left = playerData.x + 'px';
-                    flagEl.style.top = playerData.y + 'px';
-                }
+                if (flagEl) { flagEl.style.left = playerData.x + 'px'; flagEl.style.top = playerData.y + 'px'; }
             });
         }
 
         function endPlayback() {
             isPlaying = false;
-            btnPlay.disabled = false;
-            btnRecord.disabled = false;
-            document.getElementById('modeMove').disabled = false;
-            document.getElementById('modeDraw').disabled = false;
-            document.getElementById('themeSelector').disabled = false;
-            penColorPicker.disabled = false;
+            btnPlay.disabled = false; btnRecord.disabled = false;
+            document.getElementById('modeMove').disabled = false; document.getElementById('modeDraw').disabled = false;
+            document.getElementById('themeSelector').disabled = false; penColorPicker.disabled = false;
             canvas.style.opacity = 1;
             setMode(currentMode);
             timerDisplay.textContent = formatTime(0); 
         }
-
         animate();
     }
 
@@ -575,17 +523,12 @@
         if (isPlaying) {
             isPlaying = false;
             cancelAnimationFrame(animationId);
-            btnPlay.disabled = false;
-            btnRecord.disabled = false;
-            document.getElementById('modeMove').disabled = false;
-            document.getElementById('modeDraw').disabled = false;
-            document.getElementById('themeSelector').disabled = false;
-            penColorPicker.disabled = false;
+            btnPlay.disabled = false; btnRecord.disabled = false;
+            document.getElementById('modeMove').disabled = false; document.getElementById('modeDraw').disabled = false;
+            document.getElementById('themeSelector').disabled = false; penColorPicker.disabled = false;
             canvas.style.opacity = 1;
         }
-        if (isRecording) {
-            cancelAnimationFrame(recordingTimerId);
-        }
+        if (isRecording) cancelAnimationFrame(recordingTimerId);
         
         initialPositions.forEach(pos => {
             const el = document.getElementById(pos.id);
@@ -593,17 +536,12 @@
         });
 
         clearLines();
-        isRecording = false;
-        recordedPathData = [];
-        timerDisplay.textContent = "00:00.0"; 
+        isRecording = false; recordedPathData = []; timerDisplay.textContent = "00:00.0"; 
         
-        btnPlay.disabled = true;
-        btnStop.disabled = true;
-        btnRecord.disabled = false;
+        btnPlay.disabled = true; btnStop.disabled = true; btnRecord.disabled = false;
         board.style.borderColor = board.dataset.baseBorder;
     }
 
-    // 啟動應用
     window.onload = init;
 
 </script>
