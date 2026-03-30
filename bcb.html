@@ -23,7 +23,6 @@
             width: 100vw;
         }
 
-        /* --- 左側控制欄 --- */
         .sidebar {
             background-color: #ffffff;
             box-shadow: 2px 0 15px rgba(0,0,0,0.5);
@@ -54,49 +53,12 @@
             .btn { font-size: 0.9rem; }
         }
 
-        /* --- 【終極修復】徹底消滅手機上 Bootstrap 按鈕的殘留顏色 --- */
+        /* 按鈕防卡色修復 */
         @media (hover: none) {
-            /* 清除與重置按鈕防卡色 */
-            .btn-danger:hover, 
-            .btn-danger:focus, 
-            .btn-danger:focus-visible {
-                background-color: #dc3545 !important;
-                border-color: #dc3545 !important;
-                box-shadow: none !important;
-            }
-            .btn-danger:active {
-                background-color: #b02a37 !important;
-                border-color: #a52834 !important;
-            }
-
-            .btn-dark:hover, 
-            .btn-dark:focus, 
-            .btn-dark:focus-visible {
-                background-color: #212529 !important;
-                border-color: #212529 !important;
-                box-shadow: none !important;
-            }
-            .btn-dark:active {
-                background-color: #1a1d20 !important;
-                border-color: #191c1f !important;
-            }
-
-            /* 專門針對「畫筆顏色」按鈕防卡色 */
-            #colorPickerBtn:hover,
-            #colorPickerBtn:focus,
-            #colorPickerBtn:focus-visible {
-                color: #6c757d !important;
-                background-color: transparent !important;
-                border-color: #6c757d !important;
-                box-shadow: none !important;
-            }
-            #colorPickerBtn:active {
-                color: #fff !important;
-                background-color: #6c757d !important;
-            }
+            .btn-danger:hover, .btn-danger:focus { background-color: #dc3545 !important; }
+            .btn-dark:hover, .btn-dark:focus { background-color: #212529 !important; }
         }
 
-        /* --- 右側戰術板容納區 --- */
         .board-wrapper {
             flex-grow: 1;
             display: flex;
@@ -131,55 +93,60 @@
 
         #drawCanvas { position: absolute; top: 0; left: 0; z-index: 1; }
 
-        /* --- 旗幟設定 --- */
+        /* 棋幟與球 */
         .flag {
             position: absolute;
-            width: 35px; height: 35px;
+            width: 45px; height: 45px;
             border-radius: 50%;
             background-color: #fff;
             border: 3px solid #000;
             color: #000;
-            font-weight: bold; font-size: 18px;
+            font-weight: bold; font-size: 22px;
             display: flex; align-items: center; justify-content: center;
             cursor: grab; 
             z-index: 10;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.5);
             transition: transform 0.05s ease;
             will-change: left, top, transform;
             touch-action: none; 
         }
         
+        /* 增加觸控感應區，但「球」不需要太大以免蓋過球員 */
         .flag::after {
             content: '';
             position: absolute;
-            top: -20px; left: -20px; right: -20px; bottom: -20px;
+            top: -10px; left: -10px; right: -10px; bottom: -10px;
             border-radius: 50%;
         }
 
-        .flag:active { cursor: grabbing !important; transform: scale(1.15); }
+        .flag:active { cursor: grabbing !important; transform: scale(1.1); }
         .flag.offense { background-color: #ff4d4d; color: white; border-color: #b30000; } 
         .flag.defense { background-color: #4da6ff; color: white; border-color: #0059b3; } 
-        .flag.ball { background-color: #ff9900; border-color: #cc7a00; width: 25px; height: 25px; z-index: 11;} 
+        
+        /* 籃球：z-index 高於球員，確保在上方且優先被點擊 */
+        .flag.ball { 
+            background-color: #ff9900; 
+            border-color: #cc7a00; 
+            width: 32px; 
+            height: 32px; 
+            font-size: 18px; 
+            z-index: 20; 
+        } 
 
-        /* 畫筆顏色選擇器美化 */
         .color-picker-wrapper { cursor: pointer; }
-        #penColorPicker { 
-            width: 25px; height: 25px; padding: 0; border: none; background: transparent; cursor: pointer;
-        }
-        #penColorPicker::-webkit-color-swatch-wrapper { padding: 0; }
+        #penColorPicker { width: 25px; height: 25px; padding: 0; border: none; background: transparent; cursor: pointer; }
         #penColorPicker::-webkit-color-swatch { border: 2px solid #ccc; border-radius: 4px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    
     <aside class="sidebar">
-        <div class="sidebar-group">
+        <div class="sidebar-group mt-2">
             <select id="themeSelector" class="form-select mb-3" onchange="changeTheme(this.value)">
-                <option value="classic">🌲 經典木紋</option>
-                <option value="blue">🟦 現代藍色</option>
-                <option value="dark">🟫 深色硬木</option>
+                <option value="classic">🏀 經典木紋</option>
+                <option value="blue">🧊 現代藍色</option>
+                <option value="dark">🌲 深色硬木</option>
                 <option value="street">⬛ 街頭黑灰</option>
             </select>
             
@@ -191,7 +158,7 @@
                 <label class="btn btn-outline-secondary py-2 m-0" for="modeDraw">✏️ 畫線</label>
             </div>
 
-            <label id="colorPickerBtn" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 mb-0 py-2 color-picker-wrapper" for="penColorPicker">
+            <label class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 mb-0 py-2 color-picker-wrapper" for="penColorPicker">
                 <span>畫筆顏色</span>
                 <input type="color" id="penColorPicker" value="#333333">
             </label>
@@ -216,7 +183,6 @@
                 <path class="court-svg-elem" d="M 730 185 A 60 60 0 0 0 730 365" fill="none" stroke="white" stroke-width="2" stroke-dasharray="5,5"/>
                 <path class="court-svg-elem" d="M 900 40 L 760 40 A 250 250 0 0 0 760 510 L 900 510" fill="none" stroke="white" stroke-width="2"/>
             </svg>
-
             <canvas id="drawCanvas" width="900" height="550"></canvas>
         </div>
     </main>
@@ -228,26 +194,14 @@
     const canvas = document.getElementById('drawCanvas');
     const ctx = canvas.getContext('2d');
     const penColorPicker = document.getElementById('penColorPicker');
-    const colorPickerBtn = document.getElementById('colorPickerBtn');
 
-    let currentMode = 'move'; 
-    let isDrawing = false;
-    let activeFlag = null; 
-    let initialPositions = []; 
-    let scaleFactor = 1;
+    let currentMode = 'move', isDrawing = false, activeFlag = null; 
+    let initialPositions = [], scaleFactor = 1;
+    let dragTargetX = 0, dragTargetY = 0, isDragPending = false; 
 
-    let dragTargetX = 0;
-    let dragTargetY = 0;
-    let isDragPending = false; 
-
-    const penCursor = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><text y='20' font-size='20'>✏️</text></svg>") 0 20, crosshair`;
-
-    const courtThemes = {
-        classic: { bg: '#e0ac69', line: '#ffffff', border: '#333333' },
-        blue:    { bg: '#2b5e9c', line: '#ffffff', border: '#1a3b63' },
-        dark:    { bg: '#6b4226', line: '#f0d9b5', border: '#382212' },
-        street:  { bg: '#555555', line: '#ffffff', border: '#222222' }
-    };
+    // 持球連動變數
+    let isCarryingBall = false;
+    let carryOffsetX = 0, carryOffsetY = 0;
 
     const flagConfigs = [
         { id: 'off1', class: 'flag offense', text: '1' }, { id: 'off2', class: 'flag offense', text: '2' },
@@ -266,79 +220,52 @@
         setupGlobalEvents();
         setMode('move'); 
         changeTheme('classic'); 
-        
         resizeBoard();
         window.addEventListener('resize', resizeBoard);
-
-        // 強制釋放畫筆顏色選擇器的焦點
-        penColorPicker.addEventListener('change', function() {
-            this.blur();
-            colorPickerBtn.blur();
-        });
-        penColorPicker.addEventListener('blur', function() {
-            colorPickerBtn.blur();
-        });
     }
 
     function resizeBoard() {
-        const availableWidth = boardWrapper.clientWidth;
-        const availableHeight = boardWrapper.clientHeight;
-        const targetW = availableWidth - 20;
-        const targetH = availableHeight - 20;
-        
-        const scaleX = targetW / 900;
-        const scaleY = targetH / 550;
-        
-        scaleFactor = Math.min(scaleX, scaleY); 
+        scaleFactor = Math.min((boardWrapper.clientWidth - 20) / 900, (boardWrapper.clientHeight - 20) / 550); 
         board.style.transform = `scale(${scaleFactor})`;
     }
 
     function getPointerPos(e) {
-        if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        else if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
-        return { x: e.clientX, y: e.clientY };
+        let event = e.touches ? e.touches[0] : e;
+        return { x: event.clientX, y: event.clientY };
     }
 
     function changeTheme(themeKey) {
-        const theme = courtThemes[themeKey];
-        if(!theme) return;
-        board.style.backgroundColor = theme.bg;
-        board.style.borderColor = theme.border;
-        document.querySelectorAll('.court-svg-elem').forEach(el => el.setAttribute('stroke', theme.line));
+        const themes = {
+            classic: { bg: '#e0ac69', border: '#333', line: '#fff' },
+            blue: { bg: '#2b5e9c', border: '#1a3b63', line: '#fff' },
+            dark: { bg: '#6b4226', border: '#382212', line: '#f0d9b5' },
+            street: { bg: '#555', border: '#222', line: '#fff' }
+        };
+        const t = themes[themeKey];
+        board.style.backgroundColor = t.bg;
+        board.style.borderColor = t.border;
+        document.querySelectorAll('.court-svg-elem').forEach(el => el.setAttribute('stroke', t.line));
         penColorPicker.value = (themeKey === 'street' || themeKey === 'dark') ? '#ffffff' : '#333333';
     }
 
     function setMode(mode) {
         currentMode = mode;
-        if (mode === 'draw') {
-            canvas.style.cursor = penCursor;
-            flags.forEach(f => { f.style.pointerEvents = 'none'; });
-        } else {
-            canvas.style.cursor = 'grab';
-            flags.forEach(f => { f.style.pointerEvents = 'auto'; });
-        }
+        canvas.style.cursor = mode === 'draw' ? 'crosshair' : 'grab';
+        flags.forEach(f => f.style.pointerEvents = mode === 'draw' ? 'none' : 'auto');
     }
 
     function createFlags() {
         flagConfigs.forEach((config) => {
             const el = document.createElement('div');
-            el.id = config.id;
-            el.className = config.class;
-            el.innerHTML = config.text;
-            
+            el.id = config.id; el.className = config.class; el.innerHTML = config.text;
             let top, left;
             if (config.id.includes('off')) { left = 50; top = 60 + (parseInt(config.text) - 1) * 90; } 
             else if (config.id.includes('def')) { left = 815; top = 60 + (parseInt(config.text) - 1) * 90; } 
             else { left = 437; top = 262; }
-            
-            el.style.left = left + 'px';
-            el.style.top = top + 'px';
-            
+            el.style.left = left + 'px'; el.style.top = top + 'px';
             initialPositions.push({ id: config.id, left: left, top: top });
-            
             el.addEventListener('mousedown', onPointerDown);
             el.addEventListener('touchstart', onPointerDown, { passive: false });
-            
             board.appendChild(el);
             flags.push(el);
         });
@@ -347,10 +274,8 @@
     function setupGlobalEvents() {
         document.addEventListener('mousemove', onPointerMove, { passive: false });
         document.addEventListener('touchmove', onPointerMove, { passive: false });
-        
         document.addEventListener('mouseup', onPointerUp);
         document.addEventListener('touchend', onPointerUp);
-
         canvas.addEventListener('mousedown', onCanvasPointerDown);
         canvas.addEventListener('touchstart', onCanvasPointerDown, { passive: false });
     }
@@ -358,112 +283,106 @@
     function onPointerDown(e) {
         if (currentMode !== 'move') return;
         e.preventDefault(); 
-        
         let pos = getPointerPos(e);
-        activeFlag = e.target;
+        let target = e.target;
+
+        // 【新邏輯：球優先判定】
+        // 如果點擊到了「球」(id為ball) 或球裡面的內容，就直接選球，不進行穿透判定。
+        if (target.id === 'ball' || target.parentElement.id === 'ball') {
+            activeFlag = document.getElementById('ball');
+            isCarryingBall = false; // 單獨移動球，不觸發連動
+        } else {
+            // 如果點到的是球員
+            activeFlag = target;
+            
+            // 檢查持球連動 (點擊球員時，如果球在旁邊，球跟著走)
+            isCarryingBall = false;
+            const ballEl = document.getElementById('ball');
+            const dist = Math.hypot(
+                (activeFlag.offsetLeft + 22.5) - (ballEl.offsetLeft + 16),
+                (activeFlag.offsetTop + 22.5) - (ballEl.offsetTop + 16)
+            );
+            if (dist < 50) { // 連動範圍
+                isCarryingBall = true;
+                carryOffsetX = ballEl.offsetLeft - activeFlag.offsetLeft;
+                carryOffsetY = ballEl.offsetTop - activeFlag.offsetTop;
+            }
+        }
+
         activeFlag.style.zIndex = 100; 
-        
-        activeFlag.startX = pos.x;
+        activeFlag.startX = pos.x; 
         activeFlag.startY = pos.y;
-        activeFlag.startLeft = activeFlag.offsetLeft;
+        activeFlag.startLeft = activeFlag.offsetLeft; 
         activeFlag.startTop = activeFlag.offsetTop;
     }
 
     function onCanvasPointerDown(e) {
         if (currentMode !== 'draw') return;
         e.preventDefault();
-        
         isDrawing = true;
         let pos = getPointerPos(e);
         const rect = canvas.getBoundingClientRect();
-        
-        let x = (pos.x - rect.left) / scaleFactor;
-        let y = (pos.y - rect.top) / scaleFactor;
-        
         ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
-
-    function renderDragPosition() {
-        if (activeFlag) {
-            activeFlag.style.left = dragTargetX + 'px';
-            activeFlag.style.top = dragTargetY + 'px';
-        }
-        isDragPending = false;
+        ctx.moveTo((pos.x - rect.left) / scaleFactor, (pos.y - rect.top) / scaleFactor);
     }
 
     function onPointerMove(e) {
-        if (activeFlag && currentMode === 'move') {
-            e.preventDefault();
-            let pos = getPointerPos(e);
-            
-            let dx = (pos.x - activeFlag.startX) / scaleFactor;
-            let dy = (pos.y - activeFlag.startY) / scaleFactor;
-            
-            let x = activeFlag.startLeft + dx;
-            let y = activeFlag.startTop + dy;
-            
-            const flagSize = activeFlag.offsetWidth;
-            const boardWidth = 900; 
-            const boardHeight = 550;
-
-            if (x < 0) x = 0;
-            if (x > boardWidth - flagSize) x = boardWidth - flagSize;
-            if (y < 0) y = 0;
-            if (y > boardHeight - flagSize) y = boardHeight - flagSize;
-
-            dragTargetX = x;
-            dragTargetY = y;
-            if (!isDragPending) {
-                isDragPending = true;
-                requestAnimationFrame(renderDragPosition);
+        if (!activeFlag || currentMode !== 'move') {
+            if (isDrawing && currentMode === 'draw') {
+                e.preventDefault();
+                let pos = getPointerPos(e);
+                ctx.strokeStyle = penColorPicker.value; 
+                const rect = canvas.getBoundingClientRect();
+                ctx.lineTo((pos.x - rect.left) / scaleFactor, (pos.y - rect.top) / scaleFactor);
+                ctx.stroke();
             }
+            return;
         }
+        e.preventDefault();
+        let pos = getPointerPos(e);
+        let dx = (pos.x - activeFlag.startX) / scaleFactor;
+        let dy = (pos.y - activeFlag.startY) / scaleFactor;
+        
+        dragTargetX = activeFlag.startLeft + dx;
+        dragTargetY = activeFlag.startTop + dy;
 
-        if (isDrawing && currentMode === 'draw') {
-            e.preventDefault();
-            let pos = getPointerPos(e);
-            ctx.strokeStyle = penColorPicker.value; 
-            
-            const rect = canvas.getBoundingClientRect();
-            let x = (pos.x - rect.left) / scaleFactor;
-            let y = (pos.y - rect.top) / scaleFactor;
-            
-            ctx.lineTo(x, y);
-            ctx.stroke();
+        if (!isDragPending) {
+            isDragPending = true;
+            requestAnimationFrame(() => {
+                if (activeFlag) {
+                    activeFlag.style.left = dragTargetX + 'px';
+                    activeFlag.style.top = dragTargetY + 'px';
+                    if (isCarryingBall) {
+                        const ballEl = document.getElementById('ball');
+                        ballEl.style.left = (dragTargetX + carryOffsetX) + 'px';
+                        ballEl.style.top = (dragTargetY + carryOffsetY) + 'px';
+                    }
+                }
+                isDragPending = false;
+            });
         }
     }
 
-    function onPointerUp(e) {
-        if (activeFlag) { 
-            activeFlag.style.zIndex = (activeFlag.id === 'ball') ? 11 : 10; 
-            activeFlag = null; 
-            isDragPending = false;
+    function onPointerUp() {
+        if (activeFlag) {
+            activeFlag.style.zIndex = activeFlag.id === 'ball' ? 20 : 10;
+            activeFlag = null;
+            isCarryingBall = false;
         }
-        if (isDrawing) { ctx.closePath(); isDrawing = false; }
+        isDrawing = false;
     }
 
-    function initCanvas() {
-        ctx.lineWidth = 3;         
-        ctx.lineCap = 'round';     
-        ctx.lineJoin = 'round';
-    }
-
-    function clearLines(btn = null) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (btn) setTimeout(() => btn.blur(), 50); 
-    }
-
+    function initCanvas() { ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; }
+    function clearLines(btn = null) { ctx.clearRect(0, 0, canvas.width, canvas.height); if (btn) btn.blur(); }
     function resetBoard(btn = null) {
-        initialPositions.forEach(pos => {
-            const el = document.getElementById(pos.id);
-            if (el) { el.style.left = pos.left + 'px'; el.style.top = pos.top + 'px'; }
+        initialPositions.forEach(p => { 
+            let el = document.getElementById(p.id); 
+            el.style.left = p.left + 'px'; 
+            el.style.top = p.top + 'px'; 
         });
         clearLines(btn);
     }
-
     window.onload = init;
-
 </script>
 </body>
 </html>
