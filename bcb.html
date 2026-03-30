@@ -7,44 +7,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         html, body {
-            height: 100dvh; 
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #212529; 
-            user-select: none; 
-            -webkit-touch-callout: none;
+            height: 100dvh; margin: 0; padding: 0; overflow: hidden;
+            background-color: #212529; user-select: none; touch-action: none; -webkit-touch-callout: none;
         }
-
-        .app-container {
-            display: flex;
-            flex-direction: row; 
-            height: 100dvh;
-            width: 100vw;
-        }
-
+        .app-container { display: flex; flex-direction: row; height: 100dvh; width: 100vw; }
         .sidebar {
-            background-color: #ffffff;
-            box-shadow: 2px 0 15px rgba(0,0,0,0.5);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            width: 240px; 
-            flex-shrink: 0;
-            height: 100%;
-            overflow-y: auto; 
-            -webkit-overflow-scrolling: touch; 
-            padding: 15px;
+            background-color: #ffffff; box-shadow: 2px 0 15px rgba(0,0,0,0.5); z-index: 1000;
+            display: flex; flex-direction: column; width: 240px; flex-shrink: 0; height: 100%;
+            overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 15px;
         }
-
-        .sidebar-group {
-            border-bottom: 1px solid #dee2e6;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0; 
-        }
+        .sidebar-group { border-bottom: 1px solid #dee2e6; padding-bottom: 15px; margin-bottom: 15px; display: flex; flex-direction: column; flex-shrink: 0; }
         .sidebar-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
         @media (max-width: 768px) {
@@ -53,85 +25,28 @@
             .btn { font-size: 0.9rem; }
         }
 
-        /* 按鈕防卡色修復 */
-        @media (hover: none) {
-            .btn-danger:hover, .btn-danger:focus { background-color: #dc3545 !important; }
-            .btn-dark:hover, .btn-dark:focus { background-color: #212529 !important; }
-        }
-
-        .board-wrapper {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-            touch-action: none; 
-        }
-
+        .board-wrapper { flex-grow: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; touch-action: none; }
         #tactics-board {
-            position: relative;
-            width: 900px;
-            height: 550px;
-            background-color: #e0ac69;
-            border: 10px solid #333;
-            border-radius: 8px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-            transform-origin: center center;
-            flex-shrink: 0;
-            transition: background-color 0.3s, border-color 0.3s;
+            position: relative; width: 900px; height: 550px; background-color: #e0ac69; border: 10px solid #333;
+            border-radius: 8px; box-shadow: 0 15px 30px rgba(0,0,0,0.4); transform-origin: center center;
+            flex-shrink: 0; transition: background-color 0.3s, border-color 0.3s;
         }
-
-        .court-lines {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none; 
-            opacity: 0.8;
-        }
+        .court-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.8; }
         .court-lines * { transition: stroke 0.3s; }
-
         #drawCanvas { position: absolute; top: 0; left: 0; z-index: 1; }
 
-        /* 棋幟與球 */
         .flag {
-            position: absolute;
-            width: 45px; height: 45px;
-            border-radius: 50%;
-            background-color: #fff;
-            border: 3px solid #000;
-            color: #000;
-            font-weight: bold; font-size: 22px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: grab; 
-            z-index: 10;
-            box-shadow: 3px 3px 8px rgba(0,0,0,0.5);
-            transition: transform 0.05s ease;
-            will-change: left, top, transform;
-            touch-action: none; 
+            position: absolute; width: 45px; height: 45px; border-radius: 50%;
+            background-color: #fff; border: 3px solid #000; color: #000;
+            font-weight: bold; font-size: 22px; display: flex; align-items: center; justify-content: center;
+            cursor: grab; z-index: 10; box-shadow: 3px 3px 8px rgba(0,0,0,0.5);
+            transition: transform 0.05s ease; will-change: left, top, transform; touch-action: none; 
         }
-        
-        /* 增加觸控感應區，但「球」不需要太大以免蓋過球員 */
-        .flag::after {
-            content: '';
-            position: absolute;
-            top: -10px; left: -10px; right: -10px; bottom: -10px;
-            border-radius: 50%;
-        }
-
+        .flag::after { content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; border-radius: 50%; }
         .flag:active { cursor: grabbing !important; transform: scale(1.1); }
         .flag.offense { background-color: #ff4d4d; color: white; border-color: #b30000; } 
         .flag.defense { background-color: #4da6ff; color: white; border-color: #0059b3; } 
-        
-        /* 籃球：z-index 高於球員，確保在上方且優先被點擊 */
-        .flag.ball { 
-            background-color: #ff9900; 
-            border-color: #cc7a00; 
-            width: 32px; 
-            height: 32px; 
-            font-size: 18px; 
-            z-index: 20; 
-        } 
+        .flag.ball { background-color: #ff9900; border-color: #cc7a00; width: 32px; height: 32px; font-size: 18px; z-index: 20; } 
 
         .color-picker-wrapper { cursor: pointer; }
         #penColorPicker { width: 25px; height: 25px; padding: 0; border: none; background: transparent; cursor: pointer; }
@@ -149,21 +64,17 @@
                 <option value="dark">🌲 深色硬木</option>
                 <option value="street">⬛ 街頭黑灰</option>
             </select>
-            
             <div class="d-flex flex-column gap-2 mb-3">
                 <input type="radio" class="btn-check" name="mode" id="modeMove" checked onclick="setMode('move')">
                 <label class="btn btn-outline-primary py-2 m-0" for="modeMove">✋ 移動</label>
-                
                 <input type="radio" class="btn-check" name="mode" id="modeDraw" onclick="setMode('draw')">
                 <label class="btn btn-outline-secondary py-2 m-0" for="modeDraw">✏️ 畫線</label>
             </div>
-
             <label class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 mb-0 py-2 color-picker-wrapper" for="penColorPicker">
                 <span>畫筆顏色</span>
                 <input type="color" id="penColorPicker" value="#333333">
             </label>
         </div>
-
         <div class="sidebar-group border-bottom-0 pb-0">
             <button class="btn btn-danger w-100 mb-2 py-2" onclick="clearLines(this)">🧹 清除畫布</button>
             <button class="btn btn-dark w-100 mb-2 py-2" onclick="resetBoard(this)">🔄 全部重置</button>
@@ -195,24 +106,10 @@
     const ctx = canvas.getContext('2d');
     const penColorPicker = document.getElementById('penColorPicker');
 
-    let currentMode = 'move', isDrawing = false, activeFlag = null; 
-    let initialPositions = [], scaleFactor = 1;
-    let dragTargetX = 0, dragTargetY = 0, isDragPending = false; 
+    let currentMode = 'move', isDrawing = false, initialPositions = [], scaleFactor = 1;
 
-    // 持球連動變數
-    let isCarryingBall = false;
-    let carryOffsetX = 0, carryOffsetY = 0;
-
-    const flagConfigs = [
-        { id: 'off1', class: 'flag offense', text: '1' }, { id: 'off2', class: 'flag offense', text: '2' },
-        { id: 'off3', class: 'flag offense', text: '3' }, { id: 'off4', class: 'flag offense', text: '4' },
-        { id: 'off5', class: 'flag offense', text: '5' },
-        { id: 'def1', class: 'flag defense', text: '1' }, { id: 'def2', class: 'flag defense', text: '2' },
-        { id: 'def3', class: 'flag defense', text: '3' }, { id: 'def4', class: 'flag defense', text: '4' },
-        { id: 'def5', class: 'flag defense', text: '5' },
-        { id: 'ball', class: 'flag ball', text: '🏀' }
-    ];
-    const flags = []; 
+    // --- 【全新】多點觸控追蹤 Map ---
+    const activeTouches = {}; // { touchId: { element, startX, startY, startLeft, startTop, isCarryingBall, carryOffsetX, carryOffsetY } }
 
     function init() {
         createFlags();
@@ -229,21 +126,10 @@
         board.style.transform = `scale(${scaleFactor})`;
     }
 
-    function getPointerPos(e) {
-        let event = e.touches ? e.touches[0] : e;
-        return { x: event.clientX, y: event.clientY };
-    }
-
     function changeTheme(themeKey) {
-        const themes = {
-            classic: { bg: '#e0ac69', border: '#333', line: '#fff' },
-            blue: { bg: '#2b5e9c', border: '#1a3b63', line: '#fff' },
-            dark: { bg: '#6b4226', border: '#382212', line: '#f0d9b5' },
-            street: { bg: '#555', border: '#222', line: '#fff' }
-        };
+        const themes = { classic: { bg: '#e0ac69', border: '#333', line: '#fff' }, blue: { bg: '#2b5e9c', border: '#1a3b63', line: '#fff' }, dark: { bg: '#6b4226', border: '#382212', line: '#f0d9b5' }, street: { bg: '#555', border: '#222', line: '#fff' } };
         const t = themes[themeKey];
-        board.style.backgroundColor = t.bg;
-        board.style.borderColor = t.border;
+        board.style.backgroundColor = t.bg; board.style.borderColor = t.border;
         document.querySelectorAll('.court-svg-elem').forEach(el => el.setAttribute('stroke', t.line));
         penColorPicker.value = (themeKey === 'street' || themeKey === 'dark') ? '#ffffff' : '#333333';
     }
@@ -264,124 +150,138 @@
             else { left = 437; top = 262; }
             el.style.left = left + 'px'; el.style.top = top + 'px';
             initialPositions.push({ id: config.id, left: left, top: top });
-            el.addEventListener('mousedown', onPointerDown);
-            el.addEventListener('touchstart', onPointerDown, { passive: false });
+            
+            // 多點觸控監聽
+            el.addEventListener('touchstart', (e) => onPointerDown(e, true), { passive: false });
+            el.addEventListener('mousedown', (e) => onPointerDown(e, false));
             board.appendChild(el);
             flags.push(el);
         });
     }
 
     function setupGlobalEvents() {
-        document.addEventListener('mousemove', onPointerMove, { passive: false });
-        document.addEventListener('touchmove', onPointerMove, { passive: false });
-        document.addEventListener('mouseup', onPointerUp);
-        document.addEventListener('touchend', onPointerUp);
-        canvas.addEventListener('mousedown', onCanvasPointerDown);
-        canvas.addEventListener('touchstart', onCanvasPointerDown, { passive: false });
+        document.addEventListener('touchmove', (e) => onPointerMove(e, true), { passive: false });
+        document.addEventListener('mousemove', (e) => onPointerMove(e, false), { passive: false });
+        document.addEventListener('touchend', (e) => onPointerUp(e, true));
+        document.addEventListener('mouseup', (e) => onPointerUp(e, false));
+        canvas.addEventListener('touchstart', onCanvasDown, { passive: false });
+        canvas.addEventListener('mousedown', onCanvasDown);
     }
 
-    function onPointerDown(e) {
+    // --- 核心：多點觸控開始 ---
+    function onPointerDown(e, isTouch) {
         if (currentMode !== 'move') return;
-        e.preventDefault(); 
-        let pos = getPointerPos(e);
-        let target = e.target;
+        e.preventDefault();
 
-        // 【新邏輯：球優先判定】
-        // 如果點擊到了「球」(id為ball) 或球裡面的內容，就直接選球，不進行穿透判定。
-        if (target.id === 'ball' || target.parentElement.id === 'ball') {
-            activeFlag = document.getElementById('ball');
-            isCarryingBall = false; // 單獨移動球，不觸發連動
-        } else {
-            // 如果點到的是球員
-            activeFlag = target;
-            
-            // 檢查持球連動 (點擊球員時，如果球在旁邊，球跟著走)
-            isCarryingBall = false;
-            const ballEl = document.getElementById('ball');
-            const dist = Math.hypot(
-                (activeFlag.offsetLeft + 22.5) - (ballEl.offsetLeft + 16),
-                (activeFlag.offsetTop + 22.5) - (ballEl.offsetTop + 16)
-            );
-            if (dist < 50) { // 連動範圍
-                isCarryingBall = true;
-                carryOffsetX = ballEl.offsetLeft - activeFlag.offsetLeft;
-                carryOffsetY = ballEl.offsetTop - activeFlag.offsetTop;
+        const touches = isTouch ? e.changedTouches : [e];
+        for (const t of touches) {
+            const id = isTouch ? t.identifier : "mouse";
+            const target = e.target.closest('.flag');
+            if (!target) continue;
+
+            target.style.zIndex = 100;
+            const state = {
+                element: target,
+                startX: t.clientX,
+                startY: t.clientY,
+                startLeft: target.offsetLeft,
+                startTop: target.offsetTop,
+                isCarryingBall: false
+            };
+
+            // 持球判定 (球優先，只有點擊球員時才檢查球是否在旁邊)
+            if (target.id !== 'ball') {
+                const ballEl = document.getElementById('ball');
+                const dist = Math.hypot((target.offsetLeft + 22.5) - (ballEl.offsetLeft + 16), (target.offsetTop + 22.5) - (ballEl.offsetTop + 16));
+                if (dist < 55) { // 加大感應半徑，讓多點觸控更寬容
+                    state.isCarryingBall = true;
+                    state.carryOffsetX = ballEl.offsetLeft - target.offsetLeft;
+                    state.carryOffsetY = ballEl.offsetTop - target.offsetTop;
+                }
             }
+            activeTouches[id] = state;
         }
-
-        activeFlag.style.zIndex = 100; 
-        activeFlag.startX = pos.x; 
-        activeFlag.startY = pos.y;
-        activeFlag.startLeft = activeFlag.offsetLeft; 
-        activeFlag.startTop = activeFlag.offsetTop;
     }
 
-    function onCanvasPointerDown(e) {
+    function onCanvasDown(e) {
         if (currentMode !== 'draw') return;
         e.preventDefault();
         isDrawing = true;
-        let pos = getPointerPos(e);
+        const t = e.touches ? e.touches[0] : e;
         const rect = canvas.getBoundingClientRect();
         ctx.beginPath();
-        ctx.moveTo((pos.x - rect.left) / scaleFactor, (pos.y - rect.top) / scaleFactor);
+        ctx.moveTo((t.clientX - rect.left) / scaleFactor, (t.clientY - rect.top) / scaleFactor);
     }
 
-    function onPointerMove(e) {
-        if (!activeFlag || currentMode !== 'move') {
-            if (isDrawing && currentMode === 'draw') {
+    // --- 核心：多點觸控移動 ---
+    function onPointerMove(e, isTouch) {
+        const touches = isTouch ? e.changedTouches : [e];
+        for (const t of touches) {
+            const id = isTouch ? t.identifier : "mouse";
+            const state = activeTouches[id];
+
+            if (state && currentMode === 'move') {
                 e.preventDefault();
-                let pos = getPointerPos(e);
-                ctx.strokeStyle = penColorPicker.value; 
-                const rect = canvas.getBoundingClientRect();
-                ctx.lineTo((pos.x - rect.left) / scaleFactor, (pos.y - rect.top) / scaleFactor);
-                ctx.stroke();
-            }
-            return;
-        }
-        e.preventDefault();
-        let pos = getPointerPos(e);
-        let dx = (pos.x - activeFlag.startX) / scaleFactor;
-        let dy = (pos.y - activeFlag.startY) / scaleFactor;
-        
-        dragTargetX = activeFlag.startLeft + dx;
-        dragTargetY = activeFlag.startTop + dy;
+                const dx = (t.clientX - state.startX) / scaleFactor;
+                const dy = (t.clientY - state.startY) / scaleFactor;
+                
+                let newX = state.startLeft + dx;
+                let newY = state.startTop + dy;
 
-        if (!isDragPending) {
-            isDragPending = true;
-            requestAnimationFrame(() => {
-                if (activeFlag) {
-                    activeFlag.style.left = dragTargetX + 'px';
-                    activeFlag.style.top = dragTargetY + 'px';
-                    if (isCarryingBall) {
-                        const ballEl = document.getElementById('ball');
-                        ballEl.style.left = (dragTargetX + carryOffsetX) + 'px';
-                        ballEl.style.top = (dragTargetY + carryOffsetY) + 'px';
-                    }
+                // 邊界檢查
+                const fw = state.element.offsetWidth;
+                newX = Math.max(0, Math.min(newX, 900 - fw));
+                newY = Math.max(0, Math.min(newY, 550 - fw));
+
+                // 更新位置
+                state.element.style.left = newX + 'px';
+                state.element.style.top = newY + 'px';
+
+                // 連動球
+                if (state.isCarryingBall) {
+                    const ballEl = document.getElementById('ball');
+                    let bx = newX + state.carryOffsetX;
+                    let by = newY + state.carryOffsetY;
+                    ballEl.style.left = Math.max(0, Math.min(bx, 900 - 32)) + 'px';
+                    ballEl.style.top = Math.max(0, Math.min(by, 550 - 32)) + 'px';
                 }
-                isDragPending = false;
-            });
+            }
+        }
+
+        // 畫線邏輯 (僅支援單點畫線，避免多指亂畫)
+        if (isDrawing && currentMode === 'draw') {
+            e.preventDefault();
+            const t = e.touches ? e.touches[0] : e;
+            ctx.strokeStyle = penColorPicker.value; 
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo((t.clientX - rect.left) / scaleFactor, (t.clientY - rect.top) / scaleFactor);
+            ctx.stroke();
         }
     }
 
-    function onPointerUp() {
-        if (activeFlag) {
-            activeFlag.style.zIndex = activeFlag.id === 'ball' ? 20 : 10;
-            activeFlag = null;
-            isCarryingBall = false;
+    // --- 核心：多點觸控放開 ---
+    function onPointerUp(e, isTouch) {
+        const touches = isTouch ? e.changedTouches : [e];
+        for (const t of touches) {
+            const id = isTouch ? t.identifier : "mouse";
+            const state = activeTouches[id];
+            if (state) {
+                state.element.style.zIndex = state.element.id === 'ball' ? 20 : 10;
+                delete activeTouches[id];
+            }
         }
-        isDrawing = false;
+        if (!isTouch || e.touches.length === 0) isDrawing = false;
     }
 
+    const flagConfigs = [
+        { id: 'off1', class: 'flag offense', text: '1' }, { id: 'off2', class: 'flag offense', text: '2' }, { id: 'off3', class: 'flag offense', text: '3' }, { id: 'off4', class: 'flag offense', text: '4' }, { id: 'off5', class: 'flag offense', text: '5' },
+        { id: 'def1', class: 'flag defense', text: '1' }, { id: 'def2', class: 'flag defense', text: '2' }, { id: 'def3', class: 'flag defense', text: '3' }, { id: 'def4', class: 'flag defense', text: '4' }, { id: 'def5', class: 'flag defense', text: '5' },
+        { id: 'ball', class: 'flag ball', text: '🏀' }
+    ];
+    const flags = []; 
     function initCanvas() { ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; }
-    function clearLines(btn = null) { ctx.clearRect(0, 0, canvas.width, canvas.height); if (btn) btn.blur(); }
-    function resetBoard(btn = null) {
-        initialPositions.forEach(p => { 
-            let el = document.getElementById(p.id); 
-            el.style.left = p.left + 'px'; 
-            el.style.top = p.top + 'px'; 
-        });
-        clearLines(btn);
-    }
+    function clearLines(btn = null) { ctx.clearRect(0, 0, canvas.width, canvas.height); if (btn) setTimeout(() => btn.blur(), 50); }
+    function resetBoard(btn = null) { initialPositions.forEach(p => { let el = document.getElementById(p.id); el.style.left = p.left + 'px'; el.style.top = p.top + 'px'; }); clearLines(btn); }
     window.onload = init;
 </script>
 </body>
