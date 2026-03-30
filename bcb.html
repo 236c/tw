@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>專業籃球戰術板 (行動端細節優化版)</title>
+    <title>專業籃球戰術板 (側欄滑動與按鈕優化版)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* 改用 100dvh 解決手機橫向瀏覽器網址列遮擋問題，移除 body 的 touch-action: none 以恢復側欄滑動 */
         html, body {
-            height: 100%;
+            height: 100dvh; 
             margin: 0;
             padding: 0;
             overflow: hidden;
             background-color: #212529; 
             user-select: none; 
-            touch-action: none; 
             -webkit-touch-callout: none;
         }
 
         .app-container {
             display: flex;
             flex-direction: row; 
-            height: 100vh;
+            height: 100dvh;
             width: 100vw;
         }
 
@@ -34,9 +34,9 @@
             width: 240px; 
             flex-shrink: 0;
             height: 100%;
-            overflow-y: auto; 
+            overflow-y: auto; /* 允許垂直滾動 */
+            -webkit-overflow-scrolling: touch; /* 讓 iOS 滑動更順暢 */
             padding: 15px;
-            touch-action: auto; 
         }
 
         .sidebar-group {
@@ -45,6 +45,7 @@
             margin-bottom: 15px;
             display: flex;
             flex-direction: column;
+            flex-shrink: 0; /* 防止橫向螢幕太矮時，群組被擠壓變形 */
         }
         .sidebar-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
@@ -64,6 +65,7 @@
             justify-content: center;
             overflow: hidden;
             position: relative;
+            touch-action: none; /* 將防干擾鎖定移到這裡，確保只有戰術板區域不會誤觸滾動 */
         }
 
         #tactics-board {
@@ -120,7 +122,20 @@
         .flag.defense { background-color: #4da6ff; color: white; border-color: #0059b3; } 
         .flag.ball { background-color: #ff9900; border-color: #cc7a00; width: 25px; height: 25px; z-index: 11;} 
 
-        #penColorPicker { width: 100%; height: 35px; cursor: pointer; padding: 2px;}
+        /* 畫筆顏色選擇器美化 */
+        .color-picker-wrapper {
+            cursor: pointer;
+        }
+        #penColorPicker { 
+            width: 25px; 
+            height: 25px; 
+            padding: 0; 
+            border: none; 
+            background: transparent;
+            cursor: pointer;
+        }
+        #penColorPicker::-webkit-color-swatch-wrapper { padding: 0; }
+        #penColorPicker::-webkit-color-swatch { border: 2px solid #ccc; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -141,12 +156,13 @@
                 <option value="street">⬛ 街頭黑灰</option>
             </select>
             
-            <label for="penColorPicker" class="text-muted fw-bold mb-1">🖍️ 畫筆顏色</label>
-            <input type="color" id="penColorPicker" class="form-control form-control-color w-100" value="#333333" title="點擊更換畫筆顏色">
+            <label class="btn btn-outline-secondary btn-sm w-100 d-flex align-items-center justify-content-center gap-2 mb-0 color-picker-wrapper" for="penColorPicker">
+                <span>🖍️ 畫筆顏色</span>
+                <input type="color" id="penColorPicker" value="#333333">
+            </label>
         </div>
 
         <div class="sidebar-group border-bottom-0 pb-0">
-            <label class="text-muted fw-bold mb-1">🛠️ 工具模式</label>
             <div class="btn-group-vertical w-100 mb-3" role="group">
                 <input type="radio" class="btn-check" name="mode" id="modeMove" checked onclick="setMode('move')">
                 <label class="btn btn-outline-primary" for="modeMove">✋ 移動</label>
@@ -156,7 +172,7 @@
             </div>
             
             <button class="btn btn-sm btn-outline-danger w-100 mb-2" onclick="clearLines(); this.blur();">🧹 清除畫布</button>
-            <button class="btn btn-sm btn-outline-dark w-100" onclick="resetBoard(); this.blur();">🔄 全部重置</button>
+            <button class="btn btn-sm btn-outline-dark w-100 mb-2" onclick="resetBoard(); this.blur();">🔄 全部重置</button>
         </div>
     </aside>
 
