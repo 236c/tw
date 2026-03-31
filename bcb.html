@@ -73,8 +73,9 @@
             position: relative;
             width: 900px;
             height: 550px;
-            background-color: #e0ac69;
-            border: 10px solid #333;
+            box-sizing: content-box; 
+            background-color: #2b5e9c; 
+            border: 10px solid #1a3b63; 
             border-radius: 8px;
             box-shadow: 0 15px 30px rgba(0,0,0,0.4);
             transform-origin: center center;
@@ -96,12 +97,15 @@
         /* 棋幟與球 */
         .flag {
             position: absolute;
-            width: 45px; height: 45px;
+            width: 55px;
+            height: 55px; 
+            box-sizing: border-box; 
             border-radius: 50%;
             background-color: #fff;
             border: 3px solid #000;
             color: #000;
-            font-weight: bold; font-size: 22px;
+            font-weight: bold; 
+            font-size: 26px; 
             display: flex; align-items: center; justify-content: center;
             cursor: grab; 
             z-index: 10;
@@ -127,9 +131,9 @@
         .flag.ball { 
             background-color: #ff9900; 
             border-color: #cc7a00; 
-            width: 32px; 
-            height: 32px; 
-            font-size: 18px; 
+            width: 47px; 
+            height: 47px; 
+            font-size: 37px; 
             z-index: 20; 
         } 
 
@@ -144,10 +148,11 @@
     <aside class="sidebar">
         <div class="sidebar-group mt-2">
             <select id="themeSelector" class="form-select mb-3" onchange="changeTheme(this.value)">
-                <option value="classic">🏀 經典木紋</option>
                 <option value="blue">🧊 現代藍色</option>
+                <option value="classic">🏀 經典木紋</option>
                 <option value="dark">🌲 深色硬木</option>
                 <option value="street">⬛ 街頭黑灰</option>
+                <option value="lioneers">🦁 攻城獅紫</option>
             </select>
             
             <div class="d-flex flex-column gap-2 mb-3">
@@ -160,7 +165,7 @@
 
             <label class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 mb-0 py-2 color-picker-wrapper" for="penColorPicker">
                 <span>畫筆顏色</span>
-                <input type="color" id="penColorPicker" value="#333333">
+                <input type="color" id="penColorPicker" value="#afff00">
             </label>
         </div>
 
@@ -219,13 +224,13 @@
         initCanvas();
         setupGlobalEvents();
         setMode('move'); 
-        changeTheme('classic'); 
+        changeTheme('blue'); 
         resizeBoard();
         window.addEventListener('resize', resizeBoard);
     }
 
     function resizeBoard() {
-        scaleFactor = Math.min((boardWrapper.clientWidth) / 900, (boardWrapper.clientHeight) / 550); 
+        scaleFactor = Math.min((boardWrapper.clientWidth) / 920, (boardWrapper.clientHeight) / 570); 
         board.style.transform = `scale(${scaleFactor})`;
     }
 
@@ -236,16 +241,23 @@
 
     function changeTheme(themeKey) {
         const themes = {
-            classic: { bg: '#e0ac69', border: '#333', line: '#fff' },
             blue: { bg: '#2b5e9c', border: '#1a3b63', line: '#fff' },
+            classic: { bg: '#e0ac69', border: '#333', line: '#fff' },
             dark: { bg: '#6b4226', border: '#382212', line: '#f0d9b5' },
-            street: { bg: '#555', border: '#222', line: '#fff' }
+            street: { bg: '#555', border: '#222', line: '#fff' },
+            lioneers: { bg: '#4a197a', border: '#290c47', line: '#fff' } 
         };
         const t = themes[themeKey];
         board.style.backgroundColor = t.bg;
         board.style.borderColor = t.border;
         document.querySelectorAll('.court-svg-elem').forEach(el => el.setAttribute('stroke', t.line));
-        penColorPicker.value = (themeKey === 'street' || themeKey === 'dark') ? '#ffffff' : '#333333';
+        
+        // 依據不同主題設定預設畫筆顏色
+        if (themeKey === 'blue' || themeKey === 'street' || themeKey === 'dark' || themeKey === 'lioneers') {
+            penColorPicker.value = '#afff00'; // RGB(175, 255, 0)
+        } else {
+            penColorPicker.value = '#333333'; // classic
+        }
     }
 
     function setMode(mode) {
@@ -259,9 +271,20 @@
             const el = document.createElement('div');
             el.id = config.id; el.className = config.class; el.innerHTML = config.text;
             let top, left;
-            if (config.id.includes('off')) { left = 50; top = 60 + (parseInt(config.text) - 1) * 90; } 
-            else if (config.id.includes('def')) { left = 815; top = 60 + (parseInt(config.text) - 1) * 90; } 
-            else { left = 437; top = 262; }
+            
+            if (config.id.includes('off')) { 
+                let num = parseInt(config.text);
+                left = 450 - (num * 90) + 17.5; 
+                top = -27.5; 
+            } else if (config.id.includes('def')) { 
+                let num = parseInt(config.text);
+                left = 450 + ((num - 1) * 90) + 17.5; 
+                top = -27.5; 
+            } else { 
+                left = 426.5; 
+                top = 251.5;  
+            }
+            
             el.style.left = left + 'px'; el.style.top = top + 'px';
             initialPositions.push({ id: config.id, left: left, top: top });
             el.addEventListener('mousedown', onPointerDown);
@@ -286,23 +309,19 @@
         let pos = getPointerPos(e);
         let target = e.target;
 
-        // 【新邏輯：球優先判定】
-        // 如果點擊到了「球」(id為ball) 或球裡面的內容，就直接選球，不進行穿透判定。
         if (target.id === 'ball' || target.parentElement.id === 'ball') {
             activeFlag = document.getElementById('ball');
-            isCarryingBall = false; // 單獨移動球，不觸發連動
+            isCarryingBall = false; 
         } else {
-            // 如果點到的是球員
             activeFlag = target;
-            
-            // 檢查持球連動 (點擊球員時，如果球在旁邊，球跟著走)
             isCarryingBall = false;
             const ballEl = document.getElementById('ball');
+            
             const dist = Math.hypot(
-                (activeFlag.offsetLeft + 22.5) - (ballEl.offsetLeft + 16),
-                (activeFlag.offsetTop + 22.5) - (ballEl.offsetTop + 16)
+                (activeFlag.offsetLeft + 27.5) - (ballEl.offsetLeft + 23.5),
+                (activeFlag.offsetTop + 27.5) - (ballEl.offsetTop + 23.5)
             );
-            if (dist < 50) { // 連動範圍
+            if (dist < 62) { 
                 isCarryingBall = true;
                 carryOffsetX = ballEl.offsetLeft - activeFlag.offsetLeft;
                 carryOffsetY = ballEl.offsetTop - activeFlag.offsetTop;
@@ -350,12 +369,38 @@
             isDragPending = true;
             requestAnimationFrame(() => {
                 if (activeFlag) {
-                    activeFlag.style.left = dragTargetX + 'px';
-                    activeFlag.style.top = dragTargetY + 'px';
+                    const boardWidth = 900;
+                    const boardHeight = 550;
+
+                    const halfWidth = activeFlag.offsetWidth / 2;
+                    const halfHeight = activeFlag.offsetHeight / 2;
+
+                    const minX = -halfWidth;
+                    const minY = -halfHeight;
+                    const maxX = boardWidth - halfWidth;
+                    const maxY = boardHeight - halfHeight;
+
+                    let finalX = Math.max(minX, Math.min(dragTargetX, maxX));
+                    let finalY = Math.max(minY, Math.min(dragTargetY, maxY));
+
+                    activeFlag.style.left = finalX + 'px';
+                    activeFlag.style.top = finalY + 'px';
+
                     if (isCarryingBall) {
                         const ballEl = document.getElementById('ball');
-                        ballEl.style.left = (dragTargetX + carryOffsetX) + 'px';
-                        ballEl.style.top = (dragTargetY + carryOffsetY) + 'px';
+                        let ballTargetX = finalX + carryOffsetX;
+                        let ballTargetY = finalY + carryOffsetY;
+
+                        const ballHalfWidth = ballEl.offsetWidth / 2;
+                        const ballHalfHeight = ballEl.offsetHeight / 2;
+
+                        const ballMinX = -ballHalfWidth;
+                        const ballMinY = -ballHalfHeight;
+                        const ballMaxX = boardWidth - ballHalfWidth;
+                        const ballMaxY = boardHeight - ballHalfHeight;
+
+                        ballEl.style.left = Math.max(ballMinX, Math.min(ballTargetX, ballMaxX)) + 'px';
+                        ballEl.style.top = Math.max(ballMinY, Math.min(ballTargetY, ballMaxY)) + 'px';
                     }
                 }
                 isDragPending = false;
@@ -374,6 +419,7 @@
 
     function initCanvas() { ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; }
     function clearLines(btn = null) { ctx.clearRect(0, 0, canvas.width, canvas.height); if (btn) btn.blur(); }
+    
     function resetBoard(btn = null) {
         initialPositions.forEach(p => { 
             let el = document.getElementById(p.id); 
@@ -381,6 +427,9 @@
             el.style.top = p.top + 'px'; 
         });
         clearLines(btn);
+        
+        setMode('move');
+        document.getElementById('modeMove').checked = true;
     }
     window.onload = init;
 </script>
