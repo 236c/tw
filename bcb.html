@@ -140,6 +140,26 @@
         .color-picker-wrapper { cursor: pointer; }
         #penColorPicker { width: 25px; height: 25px; padding: 0; border: none; background: transparent; cursor: pointer; }
         #penColorPicker::-webkit-color-swatch { border: 2px solid #ccc; border-radius: 4px; }
+
+        /* 強制橫向排版 (當設備物理狀態為直向時觸發) */
+        @media screen and (orientation: portrait) {
+            html, body {
+                position: fixed; /* 防止滑動回彈 */
+                width: 100%;
+                height: 100%;
+            }
+            .app-container {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                /* 顛倒寬高來填滿螢幕 */
+                width: 100dvh;
+                height: 100vw;
+                /* 旋轉 90 度並置中對齊 */
+                transform: translate(-50%, -50%) rotate(90deg);
+                transform-origin: center center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -234,9 +254,34 @@
         board.style.transform = `scale(${scaleFactor})`;
     }
 
+    // 偵測目前設備是否為直向
+    function isPortrait() {
+        return window.innerHeight > window.innerWidth;
+    }
+
+    // 更新版的座標抓取：若為直向，自動轉換 X 與 Y
     function getPointerPos(e) {
         let event = e.touches ? e.touches[0] : e;
-        return { x: event.clientX, y: event.clientY };
+        let px = event.clientX;
+        let py = event.clientY;
+        
+        if (isPortrait()) {
+            // 將物理座標映射到旋轉 90 度後的邏輯座標
+            return { x: py, y: window.innerWidth - px };
+        }
+        return { x: px, y: py };
+    }
+
+    // 計算畫布在旋轉狀態下的正確相對位置
+    function getCanvasRect() {
+        const rect = canvas.getBoundingClientRect();
+        if (isPortrait()) {
+            return {
+                left: rect.top,
+                top: window.innerWidth - rect.right
+            };
+        }
+        return { left: rect.left, top: rect.top };
     }
 
     function changeTheme(themeKey) {
@@ -340,7 +385,7 @@
         e.preventDefault();
         isDrawing = true;
         let pos = getPointerPos(e);
-        const rect = canvas.getBoundingClientRect();
+        const rect = getCanvasRect(); // 使用新的定位函數
         ctx.beginPath();
         ctx.moveTo((pos.x - rect.left) / scaleFactor, (pos.y - rect.top) / scaleFactor);
     }
@@ -351,7 +396,7 @@
                 e.preventDefault();
                 let pos = getPointerPos(e);
                 ctx.strokeStyle = penColorPicker.value; 
-                const rect = canvas.getBoundingClientRect();
+                const rect = getCanvasRect(); // 使用新的定位函數
                 ctx.lineTo((pos.x - rect.left) / scaleFactor, (pos.y - rect.top) / scaleFactor);
                 ctx.stroke();
             }
