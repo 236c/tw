@@ -12,16 +12,16 @@
         /* 應用主體：彈性排版撐滿全螢幕 */
         #app { display: flex; flex-direction: column; width: 100%; height: 100%; padding: 1.5vmin; gap: 1.5vmin; }
         
-        /* ======= 強制橫向顯示的 CSS 魔法 ======= */
+        /* ======= 強制橫向顯示的 CSS 魔法 (已修改為向左轉觀看) ======= */
         @media screen and (orientation: portrait) {
             #app {
-                transform: rotate(-90deg);
+                transform: rotate(90deg); /* 順時針轉 90 度 */
                 transform-origin: top left;
                 width: 100vh;
                 height: 100vw;
                 position: absolute;
-                top: 100%;
-                left: 0;
+                top: 0;          /* 原點定在右上角 */
+                left: 100vw;     /* 把整個畫面推回螢幕內 */
             }
         }
 
@@ -86,7 +86,7 @@
             <div class="score" id="home-score">0</div>
             <div class="sub-info">
                 <div class="sub-item"><span class="sub-label">犯規</span><span class="sub-val" id="home-fouls">0</span></div>
-                <div class="sub-item"><span class="sub-label">暫停</span><span class="sub-val" id="home-to">3</span></div>
+                <div class="sub-item"><span class="sub-label">暫停</span><span class="sub-val" id="home-to">0</span></div>
             </div>
         </div>
 
@@ -104,7 +104,7 @@
             <div class="score" id="guest-score">0</div>
             <div class="sub-info">
                 <div class="sub-item"><span class="sub-label">犯規</span><span class="sub-val" id="guest-fouls">0</span></div>
-                <div class="sub-item"><span class="sub-label">暫停</span><span class="sub-val" id="guest-to">3</span></div>
+                <div class="sub-item"><span class="sub-label">暫停</span><span class="sub-val" id="guest-to">0</span></div>
             </div>
         </div>
     </div>
@@ -119,8 +119,8 @@
                 <button class="btn-minus" onclick="updateScore('home', -1)">-1 分</button>
                 <button class="btn-foul" onclick="updateFoul('home', 1)">犯規 +1</button>
                 <button class="btn-dark" onclick="updateFoul('home', -1)">-1</button>
-                <button class="btn-to" onclick="updateTO('home', -1)">使用暫停</button>
-                <button class="btn-dark" onclick="updateTO('home', 1)">+1</button>
+                <button class="btn-to" onclick="updateTO('home', 1)">暫停 +1</button>
+                <button class="btn-dark" onclick="updateTO('home', -1)">-1</button>
             </div>
         </div>
 
@@ -130,9 +130,12 @@
                 <button class="btn-start" id="btn-timer" onclick="toggleTimer()">開始計時</button>
                 <div style="display: flex; gap: 1vmin;">
                     <button class="btn-dark" onclick="changePeriod(1)">下一節</button>
-                    <button class="btn-dark" onclick="resetGame()">重置比賽</button>
+                    <button class="btn-dark" onclick="setTimer()">設定時間</button>
                 </div>
-                <button class="btn-fs" onclick="toggleFullscreen()">📺 全螢幕鎖定</button>
+                <div style="display: flex; gap: 1vmin;">
+                    <button class="btn-dark" onclick="resetGame()">重置比賽</button>
+                    <button class="btn-fs" onclick="toggleFullscreen()">📺 全螢幕</button>
+                </div>
             </div>
         </div>
 
@@ -145,8 +148,8 @@
                 <button class="btn-minus" onclick="updateScore('guest', -1)">-1 分</button>
                 <button class="btn-foul" onclick="updateFoul('guest', 1)">犯規 +1</button>
                 <button class="btn-dark" onclick="updateFoul('guest', -1)">-1</button>
-                <button class="btn-to" onclick="updateTO('guest', -1)">使用暫停</button>
-                <button class="btn-dark" onclick="updateTO('guest', 1)">+1</button>
+                <button class="btn-to" onclick="updateTO('guest', 1)">暫停 +1</button>
+                <button class="btn-dark" onclick="updateTO('guest', -1)">-1</button>
             </div>
         </div>
     </div>
@@ -156,8 +159,8 @@
     // 預設比賽時間為 12 分鐘 (720秒)
     const DEFAULT_TIME = 12 * 60;
     let data = {
-        home: { score: 0, fouls: 0, to: 3 },
-        guest: { score: 0, fouls: 0, to: 3 },
+        home: { score: 0, fouls: 0, to: 0 },
+        guest: { score: 0, fouls: 0, to: 0 },
         period: 1,
         timeRemaining: DEFAULT_TIME
     };
@@ -211,17 +214,14 @@
         document.getElementById('game-timer').innerText = formattedTime;
     }
 
-    // 將開始與暫停合併為一顆按鈕，節省畫面空間
     function toggleTimer() {
         let btn = document.getElementById('btn-timer');
         if (isRunning) {
-            // 執行暫停
             clearInterval(timerInterval);
             isRunning = false;
             btn.innerText = "開始計時";
             btn.className = "btn-start";
         } else {
-            // 執行開始
             if (data.timeRemaining <= 0) return;
             isRunning = true;
             btn.innerText = "暫停計時";
@@ -241,12 +241,26 @@
         }
     }
 
+    function setTimer() {
+        if (isRunning) toggleTimer();
+        let mins = prompt("請輸入單節比賽時間 (分鐘)：", "12");
+        if (mins !== null) {
+            let parsedMins = parseInt(mins);
+            if (!isNaN(parsedMins) && parsedMins > 0) {
+                data.timeRemaining = parsedMins * 60;
+                updateTimerDisplay();
+            } else {
+                alert("請輸入有效的數字！");
+            }
+        }
+    }
+
     function resetGame() {
         if(confirm("確定要重置整場比賽資料嗎？")) {
-            if(isRunning) toggleTimer(); // 確保計時器停下
+            if(isRunning) toggleTimer();
             data = {
-                home: { score: 0, fouls: 0, to: 3 },
-                guest: { score: 0, fouls: 0, to: 3 },
+                home: { score: 0, fouls: 0, to: 0 },
+                guest: { score: 0, fouls: 0, to: 0 },
                 period: 1,
                 timeRemaining: DEFAULT_TIME
             };
