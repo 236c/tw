@@ -275,14 +275,14 @@
             if (config.id.includes('off')) { 
                 let num = parseInt(config.text);
                 left = 450 - (num * 90) + 17.5; 
-                top = -27.5; 
+                top = 0; // 改為 0，剛好對齊上方邊線
             } else if (config.id.includes('def')) { 
                 let num = parseInt(config.text);
                 left = 450 + ((num - 1) * 90) + 17.5; 
-                top = -27.5; 
+                top = 0; // 改為 0，剛好對齊上方邊線
             } else { 
                 left = 426.5; 
-                top = 251.5;  
+                top = 251.5;  // 籃球維持在中央
             }
             
             el.style.left = left + 'px'; el.style.top = top + 'px';
