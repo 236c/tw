@@ -187,9 +187,9 @@
         </div>
 
         <div class="sidebar-group border-bottom-0 pb-0">
-            <button class="btn btn-success w-100 mb-2 py-2" id="fullscreenBtn" onclick="toggleFullScreen(this)">🔲 全螢幕模式</button>
             <button class="btn btn-danger w-100 mb-2 py-2" onclick="clearLines(this)">🧹 清除畫布</button>
             <button class="btn btn-dark w-100 mb-2 py-2" onclick="resetBoard(this)">🔄 全部重置</button>
+            <button class="btn btn-success w-100 mb-0 py-2" id="fullscreenBtn" onclick="toggleFullScreen(this)">🔲 全螢幕模式</button>
         </div>
     </aside>
 
@@ -250,20 +250,18 @@
     // 全螢幕切換功能
     function toggleFullScreen(btn) {
         if (!document.fullscreenElement) {
-            // 請求進入全螢幕
             document.documentElement.requestFullscreen().catch((err) => {
                 console.warn(`無法切換至全螢幕模式：${err.message}`);
             });
         } else {
-            // 退出全螢幕
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             }
         }
-        if (btn) btn.blur(); // 點擊後取消焦點
+        if (btn) btn.blur(); 
     }
 
-    // 監聽全螢幕狀態改變，同步更新按鈕文字與顏色
+    // 監聽全螢幕狀態改變
     document.addEventListener('fullscreenchange', () => {
         const btn = document.getElementById('fullscreenBtn');
         if (document.fullscreenElement) {
@@ -273,7 +271,6 @@
             btn.innerHTML = '🔲 全螢幕模式';
             btn.classList.replace('btn-warning', 'btn-success');
         }
-        // 全螢幕切換後稍微延遲重新計算版面縮放，確保滿版
         setTimeout(resizeBoard, 100);
     });
 
