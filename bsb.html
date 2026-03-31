@@ -4,233 +4,196 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>專業籃球記分板</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #222;
-            color: #fff;
-            font-family: 'Arial', sans-serif;
-            /* 避免網頁出現多餘的滾動條 */
-            overflow-x: hidden; 
-        }
-        .scoreboard-card {
-            background-color: #000;
-            border: 2px solid #444;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-        }
-        .score-text {
-            font-size: 120px;
-            font-weight: bold;
-            color: #ff3333;
-            line-height: 1;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        .timer-text {
-            font-size: 80px;
-            font-weight: bold;
-            color: #ffcc00;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        .label-text {
-            font-size: 1.2rem;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .sub-data {
-            font-size: 40px;
-            color: #ff9900;
-            font-weight: bold;
-        }
-        .control-panel {
-            background-color: #333;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
+        /* 重置預設邊距，禁止選取文字與滑動 */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; user-select: none; }
+        body { background-color: #111; color: #fff; overflow: hidden; width: 100vw; height: 100vh; }
+        
+        /* 應用主體：彈性排版撐滿全螢幕 */
+        #app { display: flex; flex-direction: column; width: 100%; height: 100%; padding: 1.5vmin; gap: 1.5vmin; }
+        
         /* ======= 強制橫向顯示的 CSS 魔法 ======= */
         @media screen and (orientation: portrait) {
-            body {
+            #app {
                 transform: rotate(-90deg);
-                transform-origin: left top;
+                transform-origin: top left;
                 width: 100vh;
                 height: 100vw;
                 position: absolute;
                 top: 100%;
                 left: 0;
-                overflow-y: auto;
-            }
-            .container {
-                max-width: 95vw;
-                padding-bottom: 20px;
             }
         }
+
+        /* --- 上半部：記分板 (佔 45% 高度) --- */
+        .scoreboard { 
+            display: flex; flex: 0.45; background-color: #000; border: 2px solid #444; 
+            border-radius: 12px; box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        }
+        .score-box { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .center-box { flex: 0.8; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 2px solid #333; border-right: 2px solid #333; }
+        
+        .team-name { font-size: 3.5vmin; color: #aaa; letter-spacing: 2px; }
+        .score { font-size: 22vmin; font-weight: bold; color: #ff3333; line-height: 1; font-family: 'Courier New', monospace; }
+        .timer { font-size: 16vmin; font-weight: bold; color: #ffcc00; line-height: 1; font-family: 'Courier New', monospace; }
+        
+        .sub-info { display: flex; width: 80%; justify-content: space-around; margin-top: 1vmin; }
+        .sub-item { display: flex; flex-direction: column; align-items: center; }
+        .sub-label { font-size: 2.5vmin; color: #aaa; }
+        .sub-val { font-size: 6vmin; color: #ff9900; font-weight: bold; }
+
+        /* --- 下半部：控制台 (佔 55% 高度) --- */
+        .controls { display: flex; flex: 0.55; gap: 1.5vmin; }
+        
+        /* 左、中、右三個控制區塊 */
+        .ctrl-panel { 
+            flex: 1; background-color: #222; border-radius: 12px; padding: 1.5vmin; 
+            display: flex; flex-direction: column; align-items: center; 
+        }
+        .center-panel { flex: 0.8; } /* 中間稍微窄一點 */
+
+        .team-title { font-size: 3vmin; color: #fff; margin-bottom: 1vmin; border-bottom: 1px solid #555; width: 100%; text-align: center; padding-bottom: 0.5vmin; }
+        
+        /* 按鈕網格排版 */
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1vmin; width: 100%; height: 100%; }
+        .btn-grid-center { display: grid; grid-template-columns: 1fr; grid-template-rows: 2fr 1fr 1fr; gap: 1vmin; width: 100%; height: 100%; }
+        
+        button { 
+            border: none; border-radius: 8px; font-weight: bold; font-size: 3vmin; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
+            transition: 0.1s;
+        }
+        button:active { transform: scale(0.95); opacity: 0.8; } /* 點擊回饋 */
+
+        /* 各種按鈕顏色設定 */
+        .btn-home-score { background-color: #0d6efd; color: white; }
+        .btn-guest-score { background-color: #dc3545; color: white; }
+        .btn-minus { background-color: #555; color: white; }
+        .btn-foul { background-color: #fd7e14; color: white; }
+        .btn-to { background-color: #0dcaf0; color: #000; }
+        .btn-dark { background-color: #333; color: white; border: 1px solid #666; }
+        .btn-start { background-color: #198754; color: white; font-size: 4.5vmin; }
+        .btn-stop { background-color: #dc3545; color: white; font-size: 4.5vmin; }
+        .btn-fs { background-color: #222; color: #ffcc00; border: 2px solid #ffcc00; }
     </style>
 </head>
 <body>
 
-<div class="container mt-4">
-    <div class="scoreboard-card text-center">
-        <div class="row align-items-center">
-            <div class="col-4">
-                <div class="label-text mb-2">主隊 HOME</div>
-                <div class="score-text" id="home-score">0</div>
-                <div class="row mt-3">
-                    <div class="col-6">
-                        <div class="label-text">犯規</div>
-                        <div class="sub-data" id="home-fouls">0</div>
-                    </div>
-                    <div class="col-6">
-                        <div class="label-text">暫停</div>
-                        <div class="sub-data" id="home-to">3</div>
-                    </div>
-                </div>
+<div id="app">
+    <div class="scoreboard">
+        <div class="score-box">
+            <div class="team-name">主隊 HOME</div>
+            <div class="score" id="home-score">0</div>
+            <div class="sub-info">
+                <div class="sub-item"><span class="sub-label">犯規</span><span class="sub-val" id="home-fouls">0</span></div>
+                <div class="sub-item"><span class="sub-label">暫停</span><span class="sub-val" id="home-to">3</span></div>
             </div>
+        </div>
 
-            <div class="col-4">
-                <div class="label-text">比賽時間</div>
-                <div class="timer-text" id="game-timer">12:00</div>
-                
-                <div class="mt-4">
-                    <div class="label-text">節數 PERIOD</div>
-                    <div class="score-text" style="font-size: 60px; color: #00ff00;" id="period">1</div>
-                </div>
+        <div class="center-box">
+            <div class="team-name">比賽時間</div>
+            <div class="timer" id="game-timer">12:00</div>
+            <div class="sub-item mt-2">
+                <span class="sub-label">節數 PERIOD</span>
+                <span class="sub-val" style="color: #00ff00; font-size: 7vmin;" id="period">1</span>
             </div>
+        </div>
 
-            <div class="col-4">
-                <div class="label-text mb-2">客隊 GUEST</div>
-                <div class="score-text" id="guest-score">0</div>
-                <div class="row mt-3">
-                    <div class="col-6">
-                        <div class="label-text">犯規</div>
-                        <div class="sub-data" id="guest-fouls">0</div>
-                    </div>
-                    <div class="col-6">
-                        <div class="label-text">暫停</div>
-                        <div class="sub-data" id="guest-to">3</div>
-                    </div>
-                </div>
+        <div class="score-box">
+            <div class="team-name">客隊 GUEST</div>
+            <div class="score" id="guest-score">0</div>
+            <div class="sub-info">
+                <div class="sub-item"><span class="sub-label">犯規</span><span class="sub-val" id="guest-fouls">0</span></div>
+                <div class="sub-item"><span class="sub-label">暫停</span><span class="sub-val" id="guest-to">3</span></div>
             </div>
         </div>
     </div>
 
-    <div class="control-panel">
-        <h4 class="text-center mb-4">控制台</h4>
-        
-        <div class="row mb-4 bg-dark p-3 rounded align-items-center">
-            <div class="col-md-4 text-center">
-                <button class="btn btn-success btn-lg m-1" onclick="startTimer()">開始</button>
-                <button class="btn btn-danger btn-lg m-1" onclick="stopTimer()">暫停計時</button>
-            </div>
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text">設定分鐘數</span>
-                    <input type="number" id="set-minutes" class="form-control" value="12" min="1" max="60">
-                    <button class="btn btn-primary" onclick="setTimer()">設定</button>
-                </div>
-            </div>
-            <div class="col-md-4 text-center">
-                <button class="btn btn-outline-light m-1" onclick="changePeriod(1)">下一節</button>
-                <button class="btn btn-outline-warning m-1" onclick="resetGame()">重置</button>
-                <button class="btn btn-outline-info m-1" onclick="toggleFullscreen()">📺 全螢幕</button>
+    <div class="controls">
+        <div class="ctrl-panel">
+            <div class="team-title">主隊控制</div>
+            <div class="btn-grid">
+                <button class="btn-home-score" onclick="updateScore('home', 1)">+1 分</button>
+                <button class="btn-home-score" onclick="updateScore('home', 2)">+2 分</button>
+                <button class="btn-home-score" onclick="updateScore('home', 3)">+3 分</button>
+                <button class="btn-minus" onclick="updateScore('home', -1)">-1 分</button>
+                <button class="btn-foul" onclick="updateFoul('home', 1)">犯規 +1</button>
+                <button class="btn-dark" onclick="updateFoul('home', -1)">-1</button>
+                <button class="btn-to" onclick="updateTO('home', -1)">使用暫停</button>
+                <button class="btn-dark" onclick="updateTO('home', 1)">+1</button>
             </div>
         </div>
 
-        <div class="row text-center">
-            <div class="col-md-5 bg-dark p-3 rounded">
-                <h5>主隊控制</h5>
-                <hr>
-                <div class="mb-3">
-                    <button class="btn btn-primary m-1" onclick="updateScore('home', 1)">+1 分</button>
-                    <button class="btn btn-primary m-1" onclick="updateScore('home', 2)">+2 分</button>
-                    <button class="btn btn-primary m-1" onclick="updateScore('home', 3)">+3 分</button>
-                    <button class="btn btn-secondary m-1" onclick="updateScore('home', -1)">-1 分</button>
+        <div class="ctrl-panel center-panel">
+            <div class="team-title">系統控制</div>
+            <div class="btn-grid-center">
+                <button class="btn-start" id="btn-timer" onclick="toggleTimer()">開始計時</button>
+                <div style="display: flex; gap: 1vmin;">
+                    <button class="btn-dark" onclick="changePeriod(1)">下一節</button>
+                    <button class="btn-dark" onclick="resetGame()">重置比賽</button>
                 </div>
-                <div>
-                    <button class="btn btn-warning m-1" onclick="updateFoul('home', 1)">犯規 +1</button>
-                    <button class="btn btn-outline-warning m-1" onclick="updateFoul('home', -1)">-1</button>
-                    <button class="btn btn-info m-1" onclick="updateTO('home', -1)">使用暫停</button>
-                    <button class="btn btn-outline-info m-1" onclick="updateTO('home', 1)">+1</button>
-                </div>
+                <button class="btn-fs" onclick="toggleFullscreen()">📺 全螢幕鎖定</button>
             </div>
+        </div>
 
-            <div class="col-md-2 d-flex align-items-center justify-content-center">
-                <h2 class="text-muted">VS</h2>
-            </div>
-
-            <div class="col-md-5 bg-dark p-3 rounded">
-                <h5>客隊控制</h5>
-                <hr>
-                <div class="mb-3">
-                    <button class="btn btn-danger m-1" onclick="updateScore('guest', 1)">+1 分</button>
-                    <button class="btn btn-danger m-1" onclick="updateScore('guest', 2)">+2 分</button>
-                    <button class="btn btn-danger m-1" onclick="updateScore('guest', 3)">+3 分</button>
-                    <button class="btn btn-secondary m-1" onclick="updateScore('guest', -1)">-1 分</button>
-                </div>
-                <div>
-                    <button class="btn btn-warning m-1" onclick="updateFoul('guest', 1)">犯規 +1</button>
-                    <button class="btn btn-outline-warning m-1" onclick="updateFoul('guest', -1)">-1</button>
-                    <button class="btn btn-info m-1" onclick="updateTO('guest', -1)">使用暫停</button>
-                    <button class="btn btn-outline-info m-1" onclick="updateTO('guest', 1)">+1</button>
-                </div>
+        <div class="ctrl-panel">
+            <div class="team-title">客隊控制</div>
+            <div class="btn-grid">
+                <button class="btn-guest-score" onclick="updateScore('guest', 1)">+1 分</button>
+                <button class="btn-guest-score" onclick="updateScore('guest', 2)">+2 分</button>
+                <button class="btn-guest-score" onclick="updateScore('guest', 3)">+3 分</button>
+                <button class="btn-minus" onclick="updateScore('guest', -1)">-1 分</button>
+                <button class="btn-foul" onclick="updateFoul('guest', 1)">犯規 +1</button>
+                <button class="btn-dark" onclick="updateFoul('guest', -1)">-1</button>
+                <button class="btn-to" onclick="updateTO('guest', -1)">使用暫停</button>
+                <button class="btn-dark" onclick="updateTO('guest', 1)">+1</button>
             </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-    // 初始變數
+    // 預設比賽時間為 12 分鐘 (720秒)
+    const DEFAULT_TIME = 12 * 60;
     let data = {
         home: { score: 0, fouls: 0, to: 3 },
         guest: { score: 0, fouls: 0, to: 3 },
         period: 1,
-        timeRemaining: 12 * 60 // 預設 12 分鐘轉換為秒
+        timeRemaining: DEFAULT_TIME
     };
     
     let timerInterval = null;
     let isRunning = false;
 
-    // 更新顯示畫面
     function render() {
         document.getElementById('home-score').innerText = data.home.score;
         document.getElementById('home-fouls').innerText = data.home.fouls;
         document.getElementById('home-to').innerText = data.home.to;
-
         document.getElementById('guest-score').innerText = data.guest.score;
         document.getElementById('guest-fouls').innerText = data.guest.fouls;
         document.getElementById('guest-to').innerText = data.guest.to;
-
         document.getElementById('period').innerText = data.period;
         updateTimerDisplay();
     }
 
-    // 分數控制
     function updateScore(team, points) {
         data[team].score += points;
         if (data[team].score < 0) data[team].score = 0; 
         render();
     }
 
-    // 犯規控制
     function updateFoul(team, val) {
         data[team].fouls += val;
         if (data[team].fouls < 0) data[team].fouls = 0;
         render();
     }
 
-    // 暫停控制
     function updateTO(team, val) {
         data[team].to += val;
         if (data[team].to < 0) data[team].to = 0;
         render();
     }
 
-    // 節數控制
     function changePeriod(val) {
         data.period += val;
         if (data.period > 4) data.period = 'OT'; 
@@ -239,83 +202,71 @@
         render();
     }
 
-    // --- 計時器邏輯 ---
     function updateTimerDisplay() {
         let minutes = Math.floor(data.timeRemaining / 60);
         let seconds = data.timeRemaining % 60;
-        
         let formattedTime = 
             (minutes < 10 ? "0" + minutes : minutes) + ":" + 
             (seconds < 10 ? "0" + seconds : seconds);
-            
         document.getElementById('game-timer').innerText = formattedTime;
     }
 
-    function startTimer() {
-        if (isRunning || data.timeRemaining <= 0) return;
-        isRunning = true;
-        timerInterval = setInterval(() => {
-            if (data.timeRemaining > 0) {
-                data.timeRemaining--;
-                updateTimerDisplay();
-            } else {
-                stopTimer();
-                alert("時間到！"); 
-            }
-        }, 1000);
-    }
-
-    function stopTimer() {
-        isRunning = false;
-        clearInterval(timerInterval);
-    }
-
-    function setTimer() {
-        stopTimer();
-        let mins = parseInt(document.getElementById('set-minutes').value);
-        if (isNaN(mins) || mins < 1) mins = 12;
-        data.timeRemaining = mins * 60;
-        updateTimerDisplay();
+    // 將開始與暫停合併為一顆按鈕，節省畫面空間
+    function toggleTimer() {
+        let btn = document.getElementById('btn-timer');
+        if (isRunning) {
+            // 執行暫停
+            clearInterval(timerInterval);
+            isRunning = false;
+            btn.innerText = "開始計時";
+            btn.className = "btn-start";
+        } else {
+            // 執行開始
+            if (data.timeRemaining <= 0) return;
+            isRunning = true;
+            btn.innerText = "暫停計時";
+            btn.className = "btn-stop";
+            timerInterval = setInterval(() => {
+                if (data.timeRemaining > 0) {
+                    data.timeRemaining--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    btn.innerText = "開始計時";
+                    btn.className = "btn-start";
+                    alert("時間到！"); 
+                }
+            }, 1000);
+        }
     }
 
     function resetGame() {
         if(confirm("確定要重置整場比賽資料嗎？")) {
-            stopTimer();
+            if(isRunning) toggleTimer(); // 確保計時器停下
             data = {
                 home: { score: 0, fouls: 0, to: 3 },
                 guest: { score: 0, fouls: 0, to: 3 },
                 period: 1,
-                timeRemaining: parseInt(document.getElementById('set-minutes').value) * 60 || 12 * 60
+                timeRemaining: DEFAULT_TIME
             };
             render();
         }
     }
 
-    // --- 全螢幕與鎖定橫向邏輯 ---
     function toggleFullscreen() {
         let elem = document.documentElement;
-        
         if (!document.fullscreenElement) {
-            // 進入全螢幕
             if (elem.requestFullscreen) {
                 elem.requestFullscreen().then(() => {
-                    // 嘗試鎖定螢幕為橫向
                     if (screen.orientation && screen.orientation.lock) {
-                        screen.orientation.lock('landscape').catch(err => {
-                            console.log("螢幕旋轉鎖定失敗或不支援:", err);
-                        });
+                        screen.orientation.lock('landscape').catch(e => console.log(e));
                     }
-                }).catch(err => {
-                    console.log(`全螢幕請求失敗: ${err.message}`);
-                });
+                }).catch(e => console.log(e));
             }
         } else {
-            // 退出全螢幕
             if (document.exitFullscreen) {
                 document.exitFullscreen();
-                if (screen.orientation && screen.orientation.unlock) {
-                    screen.orientation.unlock();
-                }
             }
         }
     }
