@@ -57,6 +57,8 @@
         @media (hover: none) {
             .btn-danger:hover, .btn-danger:focus { background-color: #dc3545 !important; }
             .btn-dark:hover, .btn-dark:focus { background-color: #212529 !important; }
+            .btn-success:hover, .btn-success:focus { background-color: #198754 !important; }
+            .btn-warning:hover, .btn-warning:focus { background-color: #ffc107 !important; }
         }
 
         .board-wrapper {
@@ -115,7 +117,6 @@
             touch-action: none; 
         }
         
-        /* 增加觸控感應區，但「球」不需要太大以免蓋過球員 */
         .flag::after {
             content: '';
             position: absolute;
@@ -127,7 +128,6 @@
         .flag.offense { background-color: #4da6ff; color: white; border-color: #0059b3; } 
         .flag.defense { background-color: #ff4d4d; color: white; border-color: #b30000; } 
         
-        /* 籃球：z-index 高於球員，確保在上方且優先被點擊 */
         .flag.ball { 
             background-color: #ff9900; 
             border-color: #cc7a00; 
@@ -141,10 +141,9 @@
         #penColorPicker { width: 25px; height: 25px; padding: 0; border: none; background: transparent; cursor: pointer; }
         #penColorPicker::-webkit-color-swatch { border: 2px solid #ccc; border-radius: 4px; }
 
-        /* 強制橫向排版 (當設備物理狀態為直向時觸發) */
         @media screen and (orientation: portrait) {
             html, body {
-                position: fixed; /* 防止滑動回彈 */
+                position: fixed; 
                 width: 100%;
                 height: 100%;
             }
@@ -152,10 +151,8 @@
                 position: absolute;
                 top: 50%;
                 left: 50%;
-                /* 顛倒寬高來填滿螢幕 */
                 width: 100dvh;
                 height: 100vw;
-                /* 旋轉 90 度並置中對齊 */
                 transform: translate(-50%, -50%) rotate(90deg);
                 transform-origin: center center;
             }
@@ -190,6 +187,7 @@
         </div>
 
         <div class="sidebar-group border-bottom-0 pb-0">
+            <button class="btn btn-success w-100 mb-2 py-2" id="fullscreenBtn" onclick="toggleFullScreen(this)">🔲 全螢幕模式</button>
             <button class="btn btn-danger w-100 mb-2 py-2" onclick="clearLines(this)">🧹 清除畫布</button>
             <button class="btn btn-dark w-100 mb-2 py-2" onclick="resetBoard(this)">🔄 全部重置</button>
         </div>
@@ -249,30 +247,56 @@
         window.addEventListener('resize', resizeBoard);
     }
 
+    // 全螢幕切換功能
+    function toggleFullScreen(btn) {
+        if (!document.fullscreenElement) {
+            // 請求進入全螢幕
+            document.documentElement.requestFullscreen().catch((err) => {
+                console.warn(`無法切換至全螢幕模式：${err.message}`);
+            });
+        } else {
+            // 退出全螢幕
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+        if (btn) btn.blur(); // 點擊後取消焦點
+    }
+
+    // 監聽全螢幕狀態改變，同步更新按鈕文字與顏色
+    document.addEventListener('fullscreenchange', () => {
+        const btn = document.getElementById('fullscreenBtn');
+        if (document.fullscreenElement) {
+            btn.innerHTML = '🔳 退出全螢幕';
+            btn.classList.replace('btn-success', 'btn-warning');
+        } else {
+            btn.innerHTML = '🔲 全螢幕模式';
+            btn.classList.replace('btn-warning', 'btn-success');
+        }
+        // 全螢幕切換後稍微延遲重新計算版面縮放，確保滿版
+        setTimeout(resizeBoard, 100);
+    });
+
     function resizeBoard() {
         scaleFactor = Math.min((boardWrapper.clientWidth) / 920, (boardWrapper.clientHeight) / 570); 
         board.style.transform = `scale(${scaleFactor})`;
     }
 
-    // 偵測目前設備是否為直向
     function isPortrait() {
         return window.innerHeight > window.innerWidth;
     }
 
-    // 更新版的座標抓取：若為直向，自動轉換 X 與 Y
     function getPointerPos(e) {
         let event = e.touches ? e.touches[0] : e;
         let px = event.clientX;
         let py = event.clientY;
         
         if (isPortrait()) {
-            // 將物理座標映射到旋轉 90 度後的邏輯座標
             return { x: py, y: window.innerWidth - px };
         }
         return { x: px, y: py };
     }
 
-    // 計算畫布在旋轉狀態下的正確相對位置
     function getCanvasRect() {
         const rect = canvas.getBoundingClientRect();
         if (isPortrait()) {
@@ -297,11 +321,10 @@
         board.style.borderColor = t.border;
         document.querySelectorAll('.court-svg-elem').forEach(el => el.setAttribute('stroke', t.line));
         
-        // 依據不同主題設定預設畫筆顏色
         if (themeKey === 'blue' || themeKey === 'street' || themeKey === 'dark' || themeKey === 'lioneers') {
-            penColorPicker.value = '#afff00'; // RGB(175, 255, 0)
+            penColorPicker.value = '#afff00'; 
         } else {
-            penColorPicker.value = '#333333'; // classic
+            penColorPicker.value = '#333333'; 
         }
     }
 
@@ -320,14 +343,14 @@
             if (config.id.includes('off')) { 
                 let num = parseInt(config.text);
                 left = 450 - (num * 90) + 17.5; 
-                top = 0; // 改為 0，剛好對齊上方邊線
+                top = 0; 
             } else if (config.id.includes('def')) { 
                 let num = parseInt(config.text);
                 left = 450 + ((num - 1) * 90) + 17.5; 
-                top = 0; // 改為 0，剛好對齊上方邊線
+                top = 0; 
             } else { 
                 left = 426.5; 
-                top = 251.5;  // 籃球維持在中央
+                top = 251.5; 
             }
             
             el.style.left = left + 'px'; el.style.top = top + 'px';
@@ -385,7 +408,7 @@
         e.preventDefault();
         isDrawing = true;
         let pos = getPointerPos(e);
-        const rect = getCanvasRect(); // 使用新的定位函數
+        const rect = getCanvasRect(); 
         ctx.beginPath();
         ctx.moveTo((pos.x - rect.left) / scaleFactor, (pos.y - rect.top) / scaleFactor);
     }
@@ -396,7 +419,7 @@
                 e.preventDefault();
                 let pos = getPointerPos(e);
                 ctx.strokeStyle = penColorPicker.value; 
-                const rect = getCanvasRect(); // 使用新的定位函數
+                const rect = getCanvasRect(); 
                 ctx.lineTo((pos.x - rect.left) / scaleFactor, (pos.y - rect.top) / scaleFactor);
                 ctx.stroke();
             }
