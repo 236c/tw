@@ -38,10 +38,10 @@
             display: flex;
             width: 100%;
             gap: 1.5vmin;
-            min-height: 0; /* 防止子元素撐破父容器 */
+            min-height: 0; 
         }
         
-        #top-row { flex: 1.3; } /* 上半部分配稍微多一點高度 */
+        #top-row { flex: 1.3; } 
         #bottom-row { flex: 1; }
 
         .panel {
@@ -52,17 +52,16 @@
             display: flex;
             flex-direction: column;
             padding: 2vmin;
-            min-width: 0; /* 防止水平破版 */
+            min-width: 0; 
         }
 
         /* 各區塊比例 */
         .panel-score { flex: 1; background-color: #050505; border: 2px solid #222; }
         .panel-time { flex: 1; justify-content: center; align-items: center; position: relative; }
         .panel-ctrl { flex: 1; }
-        .panel-sys { flex: 0.8; } /* 系統控制區稍微窄一點 */
+        .panel-sys { flex: 0.8; } 
 
-        /* === 雙重限制字體演算法 (防止被裁切) === */
-        /* 使用 min(vmax, vmin) 確保不論視窗多極端，字體都在安全範圍內 */
+        /* === 雙重限制字體演算法 === */
         .score-text { font-size: min(13vmax, 28vmin); line-height: 0.95; color: #ff3333; }
         .timer-text { font-size: min(10vmax, 22vmin); line-height: 0.95; color: #ffcc00; }
         .period-text { font-size: min(4vmax, 9vmin); color: #00ff66; margin-top: 1vmin;}
@@ -109,7 +108,7 @@
         /* 系統區特殊按鈕 */
         .btn-timer-main { flex: 2 !important; font-size: min(2.5vmax, 5.5vmin) !important; }
 
-        /* === 手機直向時強制旋轉佈局 (維持不變) === */
+        /* === 手機直向時強制旋轉佈局 === */
         @media screen and (orientation: portrait) {
             #app {
                 position: absolute !important;
@@ -120,9 +119,19 @@
                 transform: translate(-50%, -50%) rotate(90deg) !important;
             }
         }
+
+        /* 新增：防止全螢幕閃爍的轉場黑幕 */
+        #fade-overlay {
+            position: fixed; top: 0; left: 0; width: 100dvw; height: 100dvh;
+            background-color: #000; z-index: 9999;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
     </style>
 </head>
 <body>
+
+<div id="fade-overlay"></div>
 
 <div id="app">
     <div id="top-row" class="layout-row">
@@ -214,6 +223,21 @@
     </div>
 </div>
 
+<div class="modal fade" id="timeUpModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-panel border-warning text-light text-center">
+      <div class="modal-body py-5">
+        <i class="bi bi-bell-fill text-warning" style="font-size: 5rem;"></i>
+        <h1 class="display-3 fw-bold text-danger mt-3 digital-font">00:00</h1>
+        <h2 class="text-warning fw-bold mt-2">時間到！</h2>
+      </div>
+      <div class="modal-footer border-0 justify-content-center pb-4">
+        <button type="button" class="btn btn-warning px-5 py-2 fs-3 text-dark fw-bold" data-bs-dismiss="modal" style="width: auto;">確認</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="timerModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content glass-panel border-secondary text-light">
@@ -243,7 +267,7 @@
         </div>
       </div>
       <div class="modal-footer border-secondary">
-        <button type="button" class="btn btn-success w-100 fs-4" data-bs-dismiss="modal">完成設定</button>
+        <button type="button" class="btn btn-success w-100 fs-4" style="width: 100%;" data-bs-dismiss="modal">完成設定</button>
       </div>
     </div>
   </div>
@@ -278,6 +302,29 @@
     
     let timerInterval = null;
     let isRunning = false;
+
+    function playBuzzer() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+
+            osc.type = 'sawtooth'; 
+            osc.frequency.setValueAtTime(350, ctx.currentTime);
+            
+            gainNode.gain.setValueAtTime(1, ctx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+
+            osc.start();
+            osc.stop(ctx.currentTime + 1.5);
+        } catch (e) {
+            console.log("瀏覽器不支援音效或需要手動解鎖", e);
+        }
+    }
 
     function render() {
         document.getElementById('home-score').innerText = data.home.score;
@@ -357,13 +404,19 @@
                 if (data.timeRemaining > 0) {
                     data.timeRemaining--;
                     updateTimerDisplay();
-                } else {
-                    clearInterval(timerInterval);
-                    isRunning = false;
-                    btn.classList.remove('btn-danger');
-                    btn.classList.add('btn-success');
-                    icon.className = "bi bi-play-fill";
-                    label.innerText = "開始計時";
+                    
+                    if (data.timeRemaining === 0) {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        btn.classList.remove('btn-danger');
+                        btn.classList.add('btn-success');
+                        icon.className = "bi bi-play-fill";
+                        label.innerText = "開始計時";
+                        
+                        playBuzzer();
+                        var timeUpModal = new bootstrap.Modal(document.getElementById('timeUpModal'));
+                        timeUpModal.show();
+                    }
                 }
             }, 1000);
         }
@@ -404,22 +457,46 @@
         render();
     }
 
+    // --- 修改過的全螢幕函數：加入黑幕防閃爍 ---
     function toggleFullscreen() {
         let elem = document.documentElement;
+        let fade = document.getElementById('fade-overlay');
+
         if (!document.fullscreenElement) {
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen().then(() => {
-                    if (screen.orientation && screen.orientation.lock) {
-                        if (!screen.orientation.type.startsWith('landscape')) {
-                            screen.orientation.lock('landscape').catch(e => console.log(e));
+            // 步驟一：淡入黑幕遮擋原本的畫面
+            fade.style.opacity = 1;
+            
+            // 步驟二：等黑幕完全蓋住後 (約 300ms) 再執行系統操作
+            setTimeout(() => {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen().then(() => {
+                        // 鎖定為橫向
+                        if (screen.orientation && screen.orientation.lock) {
+                            if (!screen.orientation.type.startsWith('landscape')) {
+                                screen.orientation.lock('landscape').catch(e => console.log(e));
+                            }
                         }
-                    }
-                }).catch(e => console.log(e));
-            }
+                        // 步驟三：給系統一點時間處理轉向，然後再淡出黑幕
+                        setTimeout(() => { fade.style.opacity = 0; }, 500);
+                    }).catch(e => {
+                        console.log(e);
+                        fade.style.opacity = 0; // 若失敗也要解除黑幕
+                    });
+                }
+            }, 300);
         } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            }
+            // 退出全螢幕一樣加上轉場
+            fade.style.opacity = 1;
+            setTimeout(() => {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().then(() => {
+                        if (screen.orientation && screen.orientation.unlock) {
+                            screen.orientation.unlock();
+                        }
+                        setTimeout(() => { fade.style.opacity = 0; }, 400);
+                    });
+                }
+            }, 300);
         }
     }
 
