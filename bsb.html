@@ -11,105 +11,125 @@
 
     <style>
         /* 基礎重置與防滑動 */
-        * { user-select: none; }
+        * { user-select: none; box-sizing: border-box; }
         body, html { 
-            height: 100%; width: 100%; overflow: hidden; 
+            height: 100dvh; width: 100dvw; overflow: hidden; 
             background-color: #0a0a0c; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            position: relative;
+            position: fixed; top: 0; left: 0; margin: 0; padding: 0;
         }
 
-        /* 數位面板字體 - 移除發光，改為加粗實心 */
+        /* 數位面板字體設定 */
         .digital-font { 
             font-family: 'Share Tech Mono', monospace; 
             font-weight: 700; 
         }
-        .score-text {
-            font-size: 20vmin;
-            line-height: 0.9;
-            color: #ff3333;
-        }
-        .timer-text {
-            font-size: 16vmin;
-            line-height: 0.9;
-            color: #ffcc00;
-        }
-        .period-text {
-            font-size: 8vmin;
-            color: #00ff66;
-        }
-        .sub-val-text {
-            font-size: 5vmin;
-            color: #ff9900;
-        }
 
-        /* 區塊面板樣式 */
-        .glass-panel {
+        /* === 全新彈性框架佈局 === */
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100dvh;
+            width: 100dvw;
+            padding: 1.5vmin;
+            gap: 1.5vmin;
+        }
+        
+        .layout-row {
+            display: flex;
+            width: 100%;
+            gap: 1.5vmin;
+            min-height: 0; /* 防止子元素撐破父容器 */
+        }
+        
+        #top-row { flex: 1.3; } /* 上半部分配稍微多一點高度 */
+        #bottom-row { flex: 1; }
+
+        .panel {
             background: linear-gradient(145deg, #16181c, #0e0f11);
             border: 1px solid #2a2d35;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            padding: 2vmin;
+            min-width: 0; /* 防止水平破版 */
         }
-        
-        .score-box { background-color: #000; border-radius: 12px; border: 2px solid #222; }
-        
-        /* 標籤樣式 */
-        .team-label { font-size: 2.5vmin; letter-spacing: 4px; color: #8892b0; font-weight: 600; }
-        .sub-label { font-size: 1.8vmin; color: #6c757d; text-transform: uppercase; letter-spacing: 1px;}
 
-        /* 控制區按鈕網格 */
+        /* 各區塊比例 */
+        .panel-score { flex: 1; background-color: #050505; border: 2px solid #222; }
+        .panel-time { flex: 1; justify-content: center; align-items: center; position: relative; }
+        .panel-ctrl { flex: 1; }
+        .panel-sys { flex: 0.8; } /* 系統控制區稍微窄一點 */
+
+        /* === 雙重限制字體演算法 (防止被裁切) === */
+        /* 使用 min(vmax, vmin) 確保不論視窗多極端，字體都在安全範圍內 */
+        .score-text { font-size: min(13vmax, 28vmin); line-height: 0.95; color: #ff3333; }
+        .timer-text { font-size: min(10vmax, 22vmin); line-height: 0.95; color: #ffcc00; }
+        .period-text { font-size: min(4vmax, 9vmin); color: #00ff66; margin-top: 1vmin;}
+        .sub-val-text { font-size: min(3vmax, 7vmin); line-height: 1; color: #ff9900; }
+        
+        .team-label { font-size: min(1.8vmax, 4vmin); letter-spacing: 0.3vmax; color: #8892b0; font-weight: 600; text-align: center; }
+        .sub-label { font-size: min(1.2vmax, 2.5vmin); color: #6c757d; letter-spacing: 1px; margin-bottom: 0.5vmin; }
+
+        /* === 控制區按鈕網格 === */
         .btn-grid { 
             display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 0.8vmin; 
-            height: 100%;
+            grid-template-columns: 1fr 1fr; 
+            gap: 1vmin; 
+            flex: 1; 
+            min-height: 0;
         }
         .btn-grid-sys {
-            display: grid;
-            grid-template-columns: 1fr;
-            grid-template-rows: 2fr 1fr 1fr;
-            gap: 0.8vmin;
-            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1vmin;
+            flex: 1;
+            min-height: 0;
+        }
+        .btn-sys-row {
+            display: flex;
+            gap: 1vmin;
+            flex: 1;
         }
 
-        /* 客製化按鈕覆蓋 - 字體放大到 3.5vmin 提升手機閱讀性 */
-        .btn { font-size: 3.5vmin; font-weight: 600; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.15s ease;}
+        /* 客製化按鈕覆蓋 */
+        .btn { 
+            font-size: min(1.8vmax, 4vmin); 
+            font-weight: 600; border-radius: 8px; 
+            display: flex; align-items: center; justify-content: center; gap: 0.5vmin; 
+            transition: transform 0.1s ease;
+            padding: 0; width: 100%; height: 100%;
+        }
         .btn:active { transform: scale(0.96); }
         .btn-score-home { background-color: #0d6efd; color: white; border: none; }
         .btn-score-home:hover { background-color: #0b5ed7; color: white; }
         .btn-score-guest { background-color: #dc3545; color: white; border: none; }
         .btn-score-guest:hover { background-color: #bb2d3b; color: white; }
+        
+        /* 系統區特殊按鈕 */
+        .btn-timer-main { flex: 2 !important; font-size: min(2.5vmax, 5.5vmin) !important; }
 
-        /* === 手機直向時強制旋轉佈局 === */
+        /* === 手機直向時強制旋轉佈局 (維持不變) === */
         @media screen and (orientation: portrait) {
             #app {
                 position: absolute !important;
                 top: 50% !important;
                 left: 50% !important;
-                width: 100vh !important;
-                height: 100vw !important;
+                width: 100dvh !important;
+                height: 100dvw !important;
                 transform: translate(-50%, -50%) rotate(90deg) !important;
             }
-            
-            .score-text { font-size: 20vmax; }
-            .timer-text { font-size: 16vmax; }
-            .period-text { font-size: 8vmax; }
-            .sub-val-text { font-size: 5vmax; }
-            .team-label { font-size: 2.5vmax; }
-            .sub-label { font-size: 1.8vmax; }
-            /* 直向模式字體同步放大為 3.5vmax */
-            .btn { font-size: 3.5vmax; }
         }
     </style>
 </head>
 <body>
 
-<div id="app" class="container-fluid h-100 p-2 d-flex flex-column gap-2">
-    
-    <div class="row flex-grow-1 m-0 glass-panel p-2">
-        <div class="col-4 d-flex flex-column h-100 score-box p-3 position-relative">
-            <div class="team-label text-center mb-auto">主隊 HOME</div>
+<div id="app">
+    <div id="top-row" class="layout-row">
+        <div class="panel panel-score">
+            <div class="team-label mb-auto">主隊 HOME</div>
             <div class="digital-font score-text text-center" id="home-score">0</div>
-            <div class="d-flex justify-content-between mt-auto px-4">
+            <div class="d-flex justify-content-between mt-auto px-2">
                 <div class="text-center">
                     <div class="sub-label">犯規 FOULS</div>
                     <div class="digital-font sub-val-text" id="home-fouls">0</div>
@@ -121,19 +141,19 @@
             </div>
         </div>
 
-        <div class="col-4 d-flex flex-column h-100 justify-content-center align-items-center position-relative">
-            <div class="team-label mb-2">比賽時間 GAME CLOCK</div>
+        <div class="panel panel-time">
+            <div class="team-label">比賽時間 GAME CLOCK</div>
             <div class="digital-font timer-text" id="game-timer">12:00</div>
-            <div class="mt-3 text-center">
+            <div class="mt-2 text-center">
                 <div class="sub-label">節數 PERIOD</div>
                 <div class="digital-font period-text" id="period">1</div>
             </div>
         </div>
 
-        <div class="col-4 d-flex flex-column h-100 score-box p-3 position-relative">
-            <div class="team-label text-center mb-auto">客隊 GUEST</div>
+        <div class="panel panel-score">
+            <div class="team-label mb-auto">客隊 GUEST</div>
             <div class="digital-font score-text text-center" id="guest-score">0</div>
-            <div class="d-flex justify-content-between mt-auto px-4">
+            <div class="d-flex justify-content-between mt-auto px-2">
                 <div class="text-center">
                     <div class="sub-label">暫停 T.O.</div>
                     <div class="digital-font sub-val-text" id="guest-to">0</div>
@@ -146,9 +166,9 @@
         </div>
     </div>
 
-    <div class="row h-50 m-0 gap-2">
-        <div class="col glass-panel p-2 d-flex flex-column">
-            <div class="team-label text-center mb-2 text-primary border-bottom border-secondary pb-1"><i class="bi bi-shield-fill"></i> 主隊控制</div>
+    <div id="bottom-row" class="layout-row">
+        <div class="panel panel-ctrl">
+            <div class="team-label text-primary border-bottom border-secondary pb-1 mb-2"><i class="bi bi-shield-fill"></i> 主隊控制</div>
             <div class="btn-grid">
                 <button class="btn btn-score-home" onclick="updateScore('home', 1)">+1 分</button>
                 <button class="btn btn-score-home" onclick="updateScore('home', 2)">+2 分</button>
@@ -161,25 +181,25 @@
             </div>
         </div>
 
-        <div class="col-3 glass-panel p-2 d-flex flex-column">
-            <div class="team-label text-center mb-2 text-light border-bottom border-secondary pb-1"><i class="bi bi-cpu-fill"></i> 系統控制</div>
+        <div class="panel panel-sys">
+            <div class="team-label text-light border-bottom border-secondary pb-1 mb-2"><i class="bi bi-cpu-fill"></i> 系統控制</div>
             <div class="btn-grid-sys">
-                <button class="btn btn-success shadow-lg" id="btn-timer" onclick="toggleTimer()">
+                <button class="btn btn-success shadow-lg btn-timer-main" id="btn-timer" onclick="toggleTimer()">
                     <i class="bi bi-play-fill" id="timer-icon"></i> <span id="timer-text-label">開始計時</span>
                 </button>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-light w-100" onclick="changePeriod(1)">下一節</button>
-                    <button class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#timerModal" onclick="syncModalTimer()"><i class="bi bi-clock-history"></i> 設時</button>
+                <div class="btn-sys-row">
+                    <button class="btn btn-outline-light" onclick="changePeriod(1)">下一節</button>
+                    <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#timerModal" onclick="syncModalTimer()"><i class="bi bi-clock-history"></i> 設時</button>
                 </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#resetModal"><i class="bi bi-arrow-counterclockwise"></i> 重置</button>
-                    <button class="btn btn-outline-warning w-100" onclick="toggleFullscreen()"><i class="bi bi-arrows-fullscreen"></i> 全螢幕</button>
+                <div class="btn-sys-row">
+                    <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#resetModal"><i class="bi bi-arrow-counterclockwise"></i> 重置</button>
+                    <button class="btn btn-outline-warning" onclick="toggleFullscreen()"><i class="bi bi-arrows-fullscreen"></i> 全螢幕</button>
                 </div>
             </div>
         </div>
 
-        <div class="col glass-panel p-2 d-flex flex-column">
-            <div class="team-label text-center mb-2 text-danger border-bottom border-secondary pb-1"><i class="bi bi-shield-fill"></i> 客隊控制</div>
+        <div class="panel panel-ctrl">
+            <div class="team-label text-danger border-bottom border-secondary pb-1 mb-2"><i class="bi bi-shield-fill"></i> 客隊控制</div>
             <div class="btn-grid">
                 <button class="btn btn-score-guest" onclick="updateScore('guest', 1)">+1 分</button>
                 <button class="btn btn-score-guest" onclick="updateScore('guest', 2)">+2 分</button>
@@ -206,20 +226,20 @@
         
         <div class="row g-2 px-4">
             <div class="col-6">
-                <button class="btn btn-outline-light w-100 py-3" onclick="adjustTime(60)">+1 分鐘</button>
+                <button class="btn btn-outline-light w-100 py-3 fs-5" onclick="adjustTime(60)">+1 分鐘</button>
             </div>
             <div class="col-6">
-                <button class="btn btn-outline-light w-100 py-3" onclick="adjustTime(-60)">-1 分鐘</button>
+                <button class="btn btn-outline-light w-100 py-3 fs-5" onclick="adjustTime(-60)">-1 分鐘</button>
             </div>
             <div class="col-6">
-                <button class="btn btn-outline-secondary w-100 py-3" onclick="adjustTime(1)">+1 秒鐘</button>
+                <button class="btn btn-outline-secondary w-100 py-3 fs-5" onclick="adjustTime(1)">+1 秒鐘</button>
             </div>
             <div class="col-6">
-                <button class="btn btn-outline-secondary w-100 py-3" onclick="adjustTime(-1)">-1 秒鐘</button>
+                <button class="btn btn-outline-secondary w-100 py-3 fs-5" onclick="adjustTime(-1)">-1 秒鐘</button>
             </div>
         </div>
         <div class="mt-3">
-            <button class="btn btn-primary w-100 py-2" onclick="adjustTime(12*60, true)">預設 12 分鐘</button>
+            <button class="btn btn-primary w-100 py-2 fs-5" onclick="adjustTime(12*60, true)">預設 12 分鐘</button>
         </div>
       </div>
       <div class="modal-footer border-secondary">
