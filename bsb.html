@@ -119,19 +119,9 @@
                 transform: translate(-50%, -50%) rotate(90deg) !important;
             }
         }
-
-        /* 新增：防止全螢幕閃爍的轉場黑幕 */
-        #fade-overlay {
-            position: fixed; top: 0; left: 0; width: 100dvw; height: 100dvh;
-            background-color: #000; z-index: 9999;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
     </style>
 </head>
 <body>
-
-<div id="fade-overlay"></div>
 
 <div id="app">
     <div id="top-row" class="layout-row">
@@ -303,6 +293,7 @@
     let timerInterval = null;
     let isRunning = false;
 
+    // --- 新增：使用 Web Audio API 產生蜂鳴器音效 ---
     function playBuzzer() {
         try {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -310,9 +301,11 @@
             const osc = ctx.createOscillator();
             const gainNode = ctx.createGain();
 
+            // 鋸齒波聽起來比較像比賽蜂鳴器
             osc.type = 'sawtooth'; 
             osc.frequency.setValueAtTime(350, ctx.currentTime);
             
+            // 設定音量衰減，總長 1.5 秒
             gainNode.gain.setValueAtTime(1, ctx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
 
@@ -405,6 +398,7 @@
                     data.timeRemaining--;
                     updateTimerDisplay();
                     
+                    // --- 新增：倒數到 0 時觸發提示 ---
                     if (data.timeRemaining === 0) {
                         clearInterval(timerInterval);
                         isRunning = false;
@@ -413,7 +407,10 @@
                         icon.className = "bi bi-play-fill";
                         label.innerText = "開始計時";
                         
+                        // 播放蜂鳴器音效
                         playBuzzer();
+                        
+                        // 彈出時間到視窗
                         var timeUpModal = new bootstrap.Modal(document.getElementById('timeUpModal'));
                         timeUpModal.show();
                     }
@@ -457,46 +454,22 @@
         render();
     }
 
-    // --- 修改過的全螢幕函數：加入黑幕防閃爍 ---
     function toggleFullscreen() {
         let elem = document.documentElement;
-        let fade = document.getElementById('fade-overlay');
-
         if (!document.fullscreenElement) {
-            // 步驟一：淡入黑幕遮擋原本的畫面
-            fade.style.opacity = 1;
-            
-            // 步驟二：等黑幕完全蓋住後 (約 300ms) 再執行系統操作
-            setTimeout(() => {
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen().then(() => {
-                        // 鎖定為橫向
-                        if (screen.orientation && screen.orientation.lock) {
-                            if (!screen.orientation.type.startsWith('landscape')) {
-                                screen.orientation.lock('landscape').catch(e => console.log(e));
-                            }
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().then(() => {
+                    if (screen.orientation && screen.orientation.lock) {
+                        if (!screen.orientation.type.startsWith('landscape')) {
+                            screen.orientation.lock('landscape').catch(e => console.log(e));
                         }
-                        // 步驟三：給系統一點時間處理轉向，然後再淡出黑幕
-                        setTimeout(() => { fade.style.opacity = 0; }, 500);
-                    }).catch(e => {
-                        console.log(e);
-                        fade.style.opacity = 0; // 若失敗也要解除黑幕
-                    });
-                }
-            }, 300);
+                    }
+                }).catch(e => console.log(e));
+            }
         } else {
-            // 退出全螢幕一樣加上轉場
-            fade.style.opacity = 1;
-            setTimeout(() => {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen().then(() => {
-                        if (screen.orientation && screen.orientation.unlock) {
-                            screen.orientation.unlock();
-                        }
-                        setTimeout(() => { fade.style.opacity = 0; }, 400);
-                    });
-                }
-            }, 300);
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
         }
     }
 
