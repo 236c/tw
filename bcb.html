@@ -99,15 +99,15 @@
         /* 棋幟與球 */
         .flag {
             position: absolute;
-            width: 55px;
-            height: 55px; 
+            width: 65px; /* 加大 10px */
+            height: 65px; /* 加大 10px */
             box-sizing: border-box; 
             border-radius: 50%;
             background-color: #fff;
             border: 3px solid #000;
             color: #000;
             font-weight: bold; 
-            font-size: 26px; 
+            font-size: 30px; /* 字體稍微加大配合尺寸 */
             display: flex; align-items: center; justify-content: center;
             cursor: grab; 
             z-index: 10;
@@ -131,9 +131,9 @@
         .flag.ball { 
             background-color: #ff9900; 
             border-color: #cc7a00; 
-            width: 47px; 
-            height: 47px; 
-            font-size: 37px; 
+            width: 57px; /* 加大 10px */
+            height: 57px; /* 加大 10px */
+            font-size: 42px; /* 字體稍微加大配合尺寸 */
             z-index: 20; 
         } 
 
@@ -338,17 +338,17 @@
             let top, left;
             
             if (config.id.includes('off')) { 
-                // 進攻方(藍)：改到右邊，離中線(450)往右 15px
+                // 進攻方(藍)：右邊
                 left = 465; 
                 top = 5; 
             } else if (config.id.includes('def')) { 
-                // 防守方(紅)：改到左邊，離中線(450)往左退開 15px
+                // 防守方(紅)：左邊
                 left = 380; 
                 top = 5; 
             } else { 
                 // 籃球保持在正中央
-                left = 426.5; 
-                top = 251.5; 
+                left = 421.5; // 配合籃球變大，中心點微調
+                top = 246.5; 
             }
             
             el.style.left = left + 'px'; el.style.top = top + 'px';
@@ -383,11 +383,13 @@
             isCarryingBall = false;
             const ballEl = document.getElementById('ball');
             
+            // 配合棋子變大 (65/2=32.5, 57/2=28.5)，重新計算中心點距離
             const dist = Math.hypot(
-                (activeFlag.offsetLeft + 27.5) - (ballEl.offsetLeft + 23.5),
-                (activeFlag.offsetTop + 27.5) - (ballEl.offsetTop + 23.5)
+                (activeFlag.offsetLeft + 32.5) - (ballEl.offsetLeft + 28.5),
+                (activeFlag.offsetTop + 32.5) - (ballEl.offsetTop + 28.5)
             );
-            if (dist < 62) { 
+            // 放寬吸附判定距離到 72
+            if (dist < 72) { 
                 isCarryingBall = true;
                 carryOffsetX = ballEl.offsetLeft - activeFlag.offsetLeft;
                 carryOffsetY = ballEl.offsetTop - activeFlag.offsetTop;
