@@ -108,6 +108,27 @@
         /* 系統區特殊按鈕 */
         .btn-timer-main { flex: 2 !important; font-size: min(2.5vmax, 5.5vmin) !important; }
 
+        /* === 修復手機端所有按鈕 Hover 卡色的問題 === */
+        @media (hover: none) {
+            /* 1. Outline 空心按鈕還原 */
+            .btn-outline-secondary:hover { color: #6c757d !important; background-color: transparent !important; }
+            .btn-outline-warning:hover { color: #ffc107 !important; background-color: transparent !important; }
+            .btn-outline-info:hover { color: #0dcaf0 !important; background-color: transparent !important; }
+            .btn-outline-light:hover { color: #f8f9fa !important; background-color: transparent !important; }
+            .btn-outline-danger:hover { color: #dc3545 !important; background-color: transparent !important; }
+            
+            /* 2. 實心按鈕還原 (避免按下後變深色卡住) */
+            .btn-warning:hover { background-color: #ffc107 !important; color: #000 !important; border-color: #ffc107 !important; }
+            .btn-info:hover { background-color: #0dcaf0 !important; color: #000 !important; border-color: #0dcaf0 !important; }
+            .btn-success:hover { background-color: #198754 !important; color: #fff !important; border-color: #198754 !important; }
+            .btn-primary:hover { background-color: #0d6efd !important; color: #fff !important; border-color: #0d6efd !important; }
+            .btn-danger:hover { background-color: #dc3545 !important; color: #fff !important; border-color: #dc3545 !important; }
+            
+            /* 3. 客製化主客隊計分按鈕還原 */
+            .btn-score-home:hover { background-color: #0d6efd !important; color: white !important; }
+            .btn-score-guest:hover { background-color: #dc3545 !important; color: white !important; }
+        }
+
         /* === 手機直向時強制旋轉佈局 === */
         @media screen and (orientation: portrait) {
             #app {
@@ -293,7 +314,6 @@
     let timerInterval = null;
     let isRunning = false;
 
-    // --- 新增：使用 Web Audio API 產生蜂鳴器音效 ---
     function playBuzzer() {
         try {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -301,11 +321,9 @@
             const osc = ctx.createOscillator();
             const gainNode = ctx.createGain();
 
-            // 鋸齒波聽起來比較像比賽蜂鳴器
             osc.type = 'sawtooth'; 
             osc.frequency.setValueAtTime(350, ctx.currentTime);
             
-            // 設定音量衰減，總長 1.5 秒
             gainNode.gain.setValueAtTime(1, ctx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
 
@@ -398,7 +416,6 @@
                     data.timeRemaining--;
                     updateTimerDisplay();
                     
-                    // --- 新增：倒數到 0 時觸發提示 ---
                     if (data.timeRemaining === 0) {
                         clearInterval(timerInterval);
                         isRunning = false;
@@ -407,10 +424,8 @@
                         icon.className = "bi bi-play-fill";
                         label.innerText = "開始計時";
                         
-                        // 播放蜂鳴器音效
                         playBuzzer();
                         
-                        // 彈出時間到視窗
                         var timeUpModal = new bootstrap.Modal(document.getElementById('timeUpModal'));
                         timeUpModal.show();
                     }
