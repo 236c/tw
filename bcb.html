@@ -338,12 +338,12 @@
             let top, left;
             
             if (config.id.includes('off')) { 
-                // 進攻方(藍)：貼齊上方邊緣(top=0)，離中線(450)往左退開 15px
-                left = 380; 
+                // 進攻方(藍)：改到右邊，離中線(450)往右 15px
+                left = 465; 
                 top = 5; 
             } else if (config.id.includes('def')) { 
-                // 防守方(紅)：貼齊上方邊緣(top=0)，離中線(450)往右退開 15px
-                left = 465; 
+                // 防守方(紅)：改到左邊，離中線(450)往左退開 15px
+                left = 380; 
                 top = 5; 
             } else { 
                 // 籃球保持在正中央
