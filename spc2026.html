@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026暑假行事曆規劃工具</title>
+    <title>暑假行事曆規劃工具</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -70,7 +70,7 @@
 <body>
 
 <div class="container py-4">
-    <h2 class="text-center mb-4 fw-bold">📅 2026暑期計畫行事曆</h2>
+    <h2 class="text-center mb-4 fw-bold">📅 暑期計畫行事曆</h2>
     
     <div class="toolbar d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -146,22 +146,22 @@
     ];
 
     let defaultData = {
+        "2026-07-06": { text: "暑期籃球集訓", icon: "🏀", bgColor: "#fd7e14", textColor: "#ffffff" },
+        "2026-07-20": { text: "C# 與 API 專案", icon: "💻", bgColor: "#6f42c1", textColor: "#ffffff" },
+        "2026-08-01": { text: "花東家庭旅遊", icon: "🚗", bgColor: "#198754", textColor: "#ffffff" }
     };
 
     let eventData = {};
     const modalInstance = new bootstrap.Modal(document.getElementById('eventModal'));
-    
-    // 宣告 Flatpickr 實例變數
     let fpInstance; 
 
     document.addEventListener("DOMContentLoaded", () => {
         initUI(); 
         
-        // 初始化 Flatpickr 日期選擇器
         fpInstance = flatpickr("#dateRange", {
-            mode: "range",        // 開啟區間選擇模式
-            dateFormat: "Y-m-d",  // 設定日期格式
-            locale: "zh_tw"       // 使用繁體中文
+            mode: "range",
+            dateFormat: "Y-m-d",
+            locale: "zh_tw"
         });
 
         const savedData = localStorage.getItem("summerPlanData");
@@ -243,8 +243,11 @@
         let currentDay = 1;
         let row = document.createElement('tr');
 
+        // 【修正點 1】月初補空白格改用 createElement
         for (let i = 0; i < startOffset; i++) {
-            row.innerHTML += `<td class="empty-cell"></td>`;
+            const emptyTd = document.createElement('td');
+            emptyTd.className = 'empty-cell';
+            row.appendChild(emptyTd);
         }
 
         for (let i = startOffset; i < 7; i++) {
@@ -260,7 +263,10 @@
                     row.appendChild(createDayCell(currentDay, monthPrefix, i));
                     currentDay++;
                 } else {
-                    row.innerHTML += `<td class="empty-cell"></td>`;
+                    // 【修正點 2】月底補空白格改用 createElement
+                    const emptyTd = document.createElement('td');
+                    emptyTd.className = 'empty-cell';
+                    row.appendChild(emptyTd);
                 }
             }
             tbody.appendChild(row);
@@ -311,8 +317,6 @@
     }
 
     function openModal(dateStr) {
-        // 更新：將選中的日期設定給 Flatpickr
-        // 如果只傳入一個日期，它預設就是那一天；使用者點開後可以自己再拉區間
         fpInstance.setDate([dateStr, dateStr]);
         
         let dayEvent = eventData[dateStr];
@@ -355,13 +359,10 @@
     }
 
     function saveEvent() {
-        // 更新：從 Flatpickr 取得選取的日期陣列
         const selectedDates = fpInstance.selectedDates;
         if (selectedDates.length === 0) return alert("請選擇日期！");
 
-        // 將選取的日期轉回字串格式 (YYYY-MM-DD)
         const startStr = flatpickr.formatDate(selectedDates[0], "Y-m-d");
-        // 如果只點擊了一天，長度會是 1，結束日期就等於開始日期
         const endStr = selectedDates.length > 1 ? flatpickr.formatDate(selectedDates[1], "Y-m-d") : startStr;
 
         const text = document.getElementById('eventText').value.trim();
