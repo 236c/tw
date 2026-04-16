@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>籃球數據戰情室</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; color: #333333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 50px; }
+        .card-custom { background-color: #ffffff; border: 1px solid #e0e4e8; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .text-accent { color: #0d6efd; }
+        .text-eff { color: #198754; }
+        .text-warning-custom { color: #f59f00; }
+        .stat-label { font-size: 0.85rem; color: #6c757d; font-weight: 500; }
+        .tooltip-trigger { cursor: help; border-bottom: 1px dashed #adb5bd; display: inline-block; margin-bottom: 5px; font-weight: 700; color: #495057; transition: color 0.2s; }
+        .tooltip-trigger:hover { color: #0d6efd; border-bottom-color: #0d6efd; }
+        
+        .circular-chart { position: relative; width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(#f59f00 var(--p), #e9ecef 0deg); display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        .circular-chart::before { content: ""; position: absolute; width: 48px; height: 48px; border-radius: 50%; background-color: #ffffff; }
+        .circular-chart-value { position: relative; font-weight: 800; font-size: 0.9rem; color: #212529; }
+        
+        .leader-card { background: linear-gradient(to bottom, #ffffff, #e9ecef); border: 1px solid #dee2e6; border-radius: 10px; padding: 10px; text-align: center; position: relative; overflow: hidden; flex: 1; }
+        .leader-silhouette { width: 60px; height: 60px; background-color: #ced4da; border-radius: 50%; margin: 0 auto 5px auto; mask-image: radial-gradient(circle, black 60%, transparent 60%); -webkit-mask-image: radial-gradient(circle, black 60%, transparent 60%); }
+        .leader-crown { position: absolute; top: 10px; left: 10px; font-size: 1.2rem; }
+        .leader-stat-name { font-size: 0.8rem; color: #6c757d; font-weight: bold;}
+        .leader-stat-val { font-size: 1.6rem; font-weight: 900; color: #212529; line-height: 1; margin: 5px 0;}
+        .leader-player-name { font-size: 0.9rem; font-weight: bold; margin-bottom: 0;}
+        .leader-player-num { font-size: 0.8rem; color: #adb5bd;}
+        
+        .bar-container { background-color: #e9ecef; border-radius: 6px; height: 16px; width: 100%; margin-top: 5px; overflow: hidden; }
+        .bar-fill-player { background-color: #dc3545; height: 100%; width: 0%; transition: width 2s cubic-bezier(0.1, 0.95, 0.2, 1); }
+        .bar-fill-team { background-color: #adb5bd; height: 100%; width: 0%; transition: width 2s cubic-bezier(0.1, 0.95, 0.2, 1); }
+
+        .player-link { cursor: pointer; color: #0d6efd; transition: color 0.2s; }
+        .player-link:hover { color: #0a58ca; text-decoration: underline; }
+
+        .roster-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; text-align: center; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; background: #fff; }
+        .roster-card:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .roster-card .actions { position: absolute; top: 5px; right: 5px; opacity: 0; transition: opacity 0.2s; }
+        .roster-card:hover .actions { opacity: 1; }
+        .roster-avatar { width: 70px; height: 70px; background: #e9ecef; border-radius: 8px; margin: 0 auto 10px auto; display: flex; align-items: flex-end; justify-content: center; overflow: hidden;}
+
+        /* 標題編輯提示常駐顯示 (方便觸控設備) */
+        #appTitleDisplay { cursor: pointer; transition: opacity 0.2s; }
+        #appTitleDisplay:hover { opacity: 0.8; }
+        #appTitleDisplay::after { content: ' ✏️'; font-size: 0.6em; vertical-align: super; opacity: 0.6; }
+    </style>
+</head>
+<body>
+
+<div class="container py-4">
+    
+    <div class="row mb-3 position-relative" style="z-index: 1050;">
+        <div class="col-12">
+            <div class="d-flex flex-wrap justify-content-between align-items-center bg-white p-2 rounded shadow-sm border">
+                <div class="d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown">⚙️ 設定</button>
+                        <ul class="dropdown-menu shadow">
+                            <li><button class="dropdown-item text-primary" onclick="exportData()">💾 匯出備份 (JSON)</button></li>
+                            <li><button class="dropdown-item" onclick="document.getElementById('importFile').click()">📂 匯入資料</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item text-danger" onclick="clearData()">🗑️ 清除所有資料</button></li>
+                        </ul>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                    </div>
+                    
+                    <ul class="nav nav-pills" id="viewTabs">
+                        <li class="nav-item me-2"><button class="nav-link px-3" onclick="switchView('management')">👥 球員管理</button></li>
+                        <li class="nav-item me-2"><button class="nav-link active px-3" onclick="switchView('team')">🏀 球隊總覽</button></li>
+                        <li class="nav-item"><button class="nav-link px-3" onclick="switchView('individual')">👤 個人分析</button></li>
+                    </ul>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0 pe-2">
+                    <label class="fw-bold text-secondary text-nowrap m-0">📊 分析範圍：</label>
+                    <div class="input-group input-group-sm" style="flex-wrap: nowrap;">
+                        <select class="form-select border-primary fw-bold" id="sessionFilter" style="min-width: 150px;" onchange="updateFilter()">
+                            <option value="ALL">所有場次 (賽季總計)</option>
+                        </select>
+                        <button class="btn btn-outline-primary" type="button" id="editSessionBtn" onclick="editCurrentSession()" title="重新命名此賽事" style="display: none;">✏️</button>
+                        <button class="btn btn-outline-danger" type="button" id="deleteSessionBtn" onclick="deleteCurrentSession()" title="刪除整場賽事" style="display: none;">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4" id="topOverviewSection">
+        <div class="col-lg-7 mb-3 mb-lg-0">
+            <div class="card card-custom h-100 p-3">
+                <div class="d-flex justify-content-between align-items-end border-bottom pb-2 mb-3">
+                    <h4 class="fw-bold m-0" id="appTitleDisplay" onclick="editAppTitle()" title="點擊修改名稱"><span class="text-accent">B-BALL</span> 數據中心</h4>
+                    <h6 class="fw-bold text-dark m-0 pb-1" id="advancedStatsTitle">所有場次戰績分析</h6>
+                </div>
+                <div class="d-flex justify-content-between text-center align-items-end flex-wrap gap-2 px-2" id="advancedStatsContainer"></div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="d-flex justify-content-between h-100 gap-2" id="leaderboardsContainer"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card card-custom p-4 sticky-top" style="top: 20px;">
+                <div class="border-bottom pb-2 mb-3">
+                    <h5 class="fw-bold text-dark m-0">📝 新增比賽數據</h5>
+                </div>
+
+                <form id="dataForm" onsubmit="addGameData(event)">
+                    <div class="mb-3">
+                        <label class="form-label stat-label">場次 / 賽事名稱</label>
+                        <input type="text" class="form-control bg-light" id="sessionName" placeholder="例如：2026 夏季聯賽" required list="sessionSuggestions">
+                        <datalist id="sessionSuggestions"></datalist>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label stat-label">選擇球員</label>
+                        <select class="form-select bg-light" id="playerSelect" required></select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6"><label class="form-label stat-label">2分球命中</label><input type="number" class="form-control" id="fg2m" min="0" placeholder="0"></div>
+                        <div class="col-6"><label class="form-label stat-label">2分球出手</label><input type="number" class="form-control" id="fg2a" min="0" placeholder="0"></div>
+                        <div class="col-6"><label class="form-label stat-label">3分球命中</label><input type="number" class="form-control" id="fg3m" min="0" placeholder="0"></div>
+                        <div class="col-6"><label class="form-label stat-label">3分球出手</label><input type="number" class="form-control" id="fg3a" min="0" placeholder="0"></div>
+                        <div class="col-6"><label class="form-label stat-label">罰球命中</label><input type="number" class="form-control" id="ftm" min="0" placeholder="0"></div>
+                        <div class="col-6"><label class="form-label stat-label">罰球出手</label><input type="number" class="form-control" id="fta" min="0" placeholder="0"></div>
+                    </div>
+                    <div class="row g-2 mb-4">
+                        <div class="col-4"><label class="form-label stat-label">進攻籃板</label><input type="number" class="form-control" id="oreb" min="0" placeholder="0"></div>
+                        <div class="col-4"><label class="form-label stat-label">防守籃板</label><input type="number" class="form-control" id="dreb" min="0" placeholder="0"></div>
+                        <div class="col-4"><label class="form-label stat-label">助攻</label><input type="number" class="form-control" id="ast" min="0" placeholder="0"></div>
+                        <div class="col-4"><label class="form-label stat-label">抄截</label><input type="number" class="form-control" id="stl" min="0" placeholder="0"></div>
+                        <div class="col-4"><label class="form-label stat-label">阻攻</label><input type="number" class="form-control" id="blk" min="0" placeholder="0"></div>
+                        <div class="col-4"><label class="form-label stat-label">失誤</label><input type="number" class="form-control" id="tov" min="0" placeholder="0"></div>
+                        <div class="col-4"><label class="form-label stat-label">犯規</label><input type="number" class="form-control" id="pf" min="0" placeholder="0"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold" id="submitBtn">➕ 新增紀錄</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div id="individualView" style="display: none;">
+                <div class="card card-custom p-4 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h2 class="fw-bold text-dark mb-0 d-inline-block me-2" id="displayPlayerName">載入中...</h2>
+                            <span class="badge bg-secondary fs-6 align-text-bottom" id="displayPlayerNumber">#0</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="fs-2 text-eff fw-bold" id="anim-ind-eff">0.0</span><br>
+                            <span class="stat-label tooltip-trigger" data-bs-toggle="tooltip" title="效率值 (Efficiency)：綜合評估球場貢獻。公式為 (得分+籃板+助攻+抄截+阻攻) - (投籃失手+罰球失手+失誤)">EFF</span>
+                        </div>
+                    </div>
+                    <div class="row text-center mb-4 g-3">
+                        <div class="col-4"><div class="p-3 bg-light rounded"><h3 class="stat-value text-primary" id="anim-ind-pts">0.0</h3><span class="stat-label tooltip-trigger" data-bs-toggle="tooltip" title="得分 (Points)">PTS</span></div></div>
+                        <div class="col-4"><div class="p-3 bg-light rounded"><h3 class="stat-value" id="anim-ind-reb">0.0</h3><span class="stat-label tooltip-trigger" data-bs-toggle="tooltip" title="總籃板 (Rebounds)">REB</span></div></div>
+                        <div class="col-4"><div class="p-3 bg-light rounded"><h3 class="stat-value" id="anim-ind-ast">0.0</h3><span class="stat-label tooltip-trigger" data-bs-toggle="tooltip" title="助攻 (Assists)">AST</span></div></div>
+                    </div>
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">個人 vs 團隊平均比較</h6>
+                    <div id="comparisonCharts"></div>
+                </div>
+
+                <div class="card card-custom p-3">
+                    <h6 class="fw-bold text-dark mb-3">📋 出賽紀錄表</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm text-center align-middle" style="white-space: nowrap;">
+                            <thead>
+                                <tr>
+                                    <th class="text-start">賽事場次</th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="得分 (Points)">PTS</span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="效率值 (Efficiency)">EFF</span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="兩分球 進球 / 出手 / 命中率">2分球<br><small class="text-muted fw-normal">進/出/%</small></span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="三分球 進球 / 出手 / 命中率">3分球<br><small class="text-muted fw-normal">進/出/%</small></span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="罰球 進球 / 出手 / 命中率">罰球<br><small class="text-muted fw-normal">進/出/%</small></span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="籃板 (進攻 / 防守 / 總計)">籃板<br><small class="text-muted fw-normal">攻/守/總</small></span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="助攻 (Assists)">AST</span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="抄截 (Steals)">STL</span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="阻攻/蓋火鍋 (Blocks)">BLK</span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="失誤 (Turnovers)">TOV</span></th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="playerGameLog"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="teamView">
+                <div class="card card-custom p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <h5 class="fw-bold text-dark m-0">📊 全隊戰力統計表</h5>
+                        <span id="teamStatsSessionName" class="badge bg-light text-primary border ms-3 fs-6 align-middle">所有場次 (賽季總計)</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center align-middle" style="white-space: nowrap;">
+                            <thead>
+                                <tr>
+                                    <th>背號</th><th class="text-start">球員</th><th>場次</th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均得分">PTS</span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均效率值">EFF</span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="總兩分球 進球 / 出手 / 命中率">2分球<br><small class="text-muted fw-normal">進/出/%</small></span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="總三分球 進球 / 出手 / 命中率">3分球<br><small class="text-muted fw-normal">進/出/%</small></span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="總罰球 進球 / 出手 / 命中率">罰球<br><small class="text-muted fw-normal">進/出/%</small></span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="總籃板 (進攻 / 防守 / 總計)">籃板<br><small class="text-muted fw-normal">攻/守/總</small></span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均助攻">AST</span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均抄截">STL</span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均阻攻">BLK</span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均失誤">TOV</span></th>
+                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均犯規">PF</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="teamStatsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="managementView" style="display: none;">
+                <div class="card card-custom p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                        <h5 class="fw-bold text-dark m-0">👥 現役球員名單</h5>
+                        <button class="btn btn-primary fw-bold" onclick="openPlayerProfileModal()">➕ 新增球員</button>
+                    </div>
+                    <div class="row g-3" id="playerRosterGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editGameModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title fw-bold">✏️ 編輯賽事數據</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <form id="editDataForm" onsubmit="saveEditData(event)">
+            <input type="hidden" id="editPlayerId"><input type="hidden" id="editGameId">
+            <div class="mb-3"><label class="form-label stat-label">場次名稱</label><input type="text" class="form-control" id="editSessionName" required></div>
+            <div class="row g-2 mb-3">
+                <div class="col-4"><label class="form-label stat-label">2分命中</label><input type="number" class="form-control" id="e_fg2m" min="0" placeholder="0"></div>
+                <div class="col-4"><label class="form-label stat-label">2分出手</label><input type="number" class="form-control" id="e_fg2a" min="0" placeholder="0"></div>
+                <div class="col-4"><label class="form-label stat-label">失誤 (TOV)</label><input type="number" class="form-control" id="e_tov" min="0" placeholder="0"></div>
+                <div class="col-4"><label class="form-label stat-label">3分命中</label><input type="number" class="form-control" id="e_fg3m" min="0" placeholder="0"></div>
+                <div class="col-4"><label class="form-label stat-label">3分出手</label><input type="number" class="form-control" id="e_fg3a" min="0" placeholder="0"></div>
+                <div class="col-4"><label class="form-label stat-label">犯規 (PF)</label><input type="number" class="form-control" id="e_pf" min="0" placeholder="0"></div>
+                <div class="col-4"><label class="form-label stat-label">罰球命中</label><input type="number" class="form-control" id="e_ftm" min="0" placeholder="0"></div>
+                <div class="col-4"><label class="form-label stat-label">罰球出手</label><input type="number" class="form-control" id="e_fta" min="0" placeholder="0"></div>
+                <div class="col-4"><label class="form-label stat-label">助攻 (AST)</label><input type="number" class="form-control" id="e_ast" min="0" placeholder="0"></div>
+                <div class="col-4"><label class="form-label stat-label">進攻籃板</label><input type="number" class="form-control" id="e_oreb" min="0" placeholder="0"></div>
+                <div class="col-4"><label class="form-label stat-label">防守籃板</label><input type="number" class="form-control" id="e_dreb" min="0" placeholder="0"></div>
+                <div class="col-4"><label class="form-label stat-label">抄截 (STL)</label><input type="number" class="form-control" id="e_stl" min="0" placeholder="0"></div>
+                <div class="col-4 offset-8"><label class="form-label stat-label">阻攻 (BLK)</label><input type="number" class="form-control" id="e_blk" min="0" placeholder="0"></div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-4"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button><button type="submit" class="btn btn-primary fw-bold">💾 儲存</button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="playerProfileModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title fw-bold" id="playerProfileModalTitle">新增球員</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <input type="hidden" id="profilePlayerId">
+        <div class="mb-3"><label class="form-label fw-bold">球員姓名</label><input type="text" id="profileName" class="form-control" required></div>
+        <div class="mb-4"><label class="form-label fw-bold">背號</label><input type="text" id="profileNumber" class="form-control" required></div>
+        <button class="btn btn-primary w-100 fw-bold" onclick="savePlayerProfile()">💾 儲存球員</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const defaultDB = [
+        { id: 1, name: '赤木剛憲', number: '4', games: [] },
+        { id: 2, name: '宮城良田', number: '7', games: [] },
+        { id: 3, name: '櫻木花道', number: '10', games: [] },
+        { id: 4, name: '流川楓', number: '11', games: [] },
+        { id: 5, name: '三井壽', number: '14', games: [] }
+    ];
+
+    let db = [];
+    let currentPlayerId = null;
+    let currentFilter = 'ALL';
+    let editModalInstance = null;
+    let playerProfileModalInstance = null;
+    let animTimers = {};
+    
+    const statDict = { pts: '得分 (Points)', reb: '總籃板 (Rebounds)', ast: '助攻 (Assists)', stl: '抄截 (Steals)', blk: '阻攻/蓋火鍋 (Blocks)' };
+
+    document.addEventListener("DOMContentLoaded", () => {
+        editModalInstance = new bootstrap.Modal(document.getElementById('editGameModal'));
+        playerProfileModalInstance = new bootstrap.Modal(document.getElementById('playerProfileModal'));
+        
+        loadAppTitle(); 
+        loadData(); 
+        updatePlayerSelect();
+        updateSessionOptions();
+        renderDashboard();
+
+        switchView('team');
+
+        document.getElementById('playerSelect').addEventListener('change', (e) => {
+            currentPlayerId = parseInt(e.target.value);
+            renderDashboard();
+        });
+    });
+
+    function loadAppTitle() {
+        const savedTitle = localStorage.getItem('bball_custom_title');
+        const displayEl = document.getElementById('appTitleDisplay');
+        if (savedTitle) {
+            displayEl.innerText = savedTitle;
+        } else {
+            displayEl.innerHTML = '<span class="text-accent">B-BALL</span> 數據中心';
+        }
+    }
+
+    function editAppTitle() {
+        const currentTitle = localStorage.getItem('bball_custom_title') || 'B-BALL 數據中心';
+        const newTitle = prompt('請設定新的名稱 (留空則恢復預設)：', currentTitle);
+        if (newTitle !== null) {
+            if (newTitle.trim() === '') {
+                localStorage.removeItem('bball_custom_title');
+            } else {
+                localStorage.setItem('bball_custom_title', newTitle.trim());
+            }
+            loadAppTitle();
+        }
+    }
+
+    function initTooltips() {
+        document.querySelectorAll('.tooltip-trigger').forEach(el => {
+            const instance = bootstrap.Tooltip.getInstance(el);
+            if (instance) instance.dispose();
+        });
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        [...tooltipTriggerList].map(t => new bootstrap.Tooltip(t));
+    }
+
+    function getShootingStr(made, attempted) {
+        if (attempted === 0) return `${made} / ${attempted} / <span class="text-danger fw-bold">-</span>`;
+        const pct = Math.round((made / attempted) * 100);
+        return `${made} / ${attempted} / <span class="text-danger fw-bold">${pct}%</span>`;
+    }
+
+    function runSuspenseAnimation(elId, targetVal, formatDecimals = 0, suffix = '', donutId = null) {
+        if(animTimers[elId]) clearTimeout(animTimers[elId]);
+        const el = document.getElementById(elId);
+        if(!el) return;
+
+        const targetNum = parseFloat(targetVal);
+        if (isNaN(targetNum) || targetNum === 0) {
+            el.innerText = (0).toFixed(formatDecimals) + suffix;
+            if(donutId) document.getElementById(donutId).style.setProperty('--p', '0%');
+            return;
+        }
+
+        let currentNum = 0;
+        const minStep = Math.pow(10, -formatDecimals);
+
+        function step() {
+            if(!document.getElementById(elId)) return; 
+            const distance = targetNum - currentNum;
+            const remainingSteps = Math.round(distance / minStep);
+            
+            let stepAmt = minStep;
+            if (remainingSteps > 30) { stepAmt = Math.floor(remainingSteps / 15) * minStep; if (stepAmt < minStep) stepAmt = minStep; }
+
+            currentNum += stepAmt;
+            currentNum = Math.round(currentNum * Math.pow(10, formatDecimals)) / Math.pow(10, formatDecimals);
+            if (currentNum > targetNum) currentNum = targetNum;
+
+            el.innerText = currentNum.toFixed(formatDecimals) + suffix;
+            if(donutId) { const dEl = document.getElementById(donutId); if(dEl) dEl.style.setProperty('--p', currentNum + '%'); }
+
+            if (currentNum < targetNum) {
+                let delay = 30; 
+                if (remainingSteps <= 5) delay = 250 + (5 - remainingSteps) * 80; 
+                else if (remainingSteps <= 15) delay = 80; 
+                else if (remainingSteps <= 30) delay = 40; 
+                animTimers[elId] = setTimeout(step, delay);
+            }
+        }
+        step();
+    }
+
+    function saveData() { localStorage.setItem('bball_db_v7', JSON.stringify(db)); }
+    function loadData() {
+        const saved = localStorage.getItem('bball_db_v7');
+        if (saved) { try { db = JSON.parse(saved); } catch(e) { db = JSON.parse(JSON.stringify(defaultDB)); } } 
+        else { db = JSON.parse(JSON.stringify(defaultDB)); }
+        db.forEach(p => p.games.forEach(g => { if(!g.id) g.id = 'g_' + Math.random().toString(36).substr(2, 9); }));
+        if(db.length > 0) currentPlayerId = db[0].id;
+    }
+
+    function updateFilter() { 
+        currentFilter = document.getElementById('sessionFilter').value; 
+        
+        const isAll = (currentFilter === 'ALL');
+        document.getElementById('editSessionBtn').style.display = isAll ? 'none' : 'block';
+        document.getElementById('deleteSessionBtn').style.display = isAll ? 'none' : 'block';
+        
+        switchView('team');
+        renderDashboard(); 
+    }
+
+    function updateSessionOptions() {
+        const sessions = new Set();
+        db.forEach(p => p.games.forEach(g => sessions.add(g.sessionName)));
+        const filterSelect = document.getElementById('sessionFilter');
+        const dataList = document.getElementById('sessionSuggestions');
+        filterSelect.innerHTML = '<option value="ALL">所有場次 (賽季總計)</option>';
+        dataList.innerHTML = '';
+        sessions.forEach(s => { filterSelect.innerHTML += `<option value="${s}">${s}</option>`; dataList.innerHTML += `<option value="${s}">`; });
+        
+        if (currentFilter !== 'ALL' && !sessions.has(currentFilter)) {
+            currentFilter = 'ALL';
+        }
+        filterSelect.value = currentFilter;
+
+        const isAll = (currentFilter === 'ALL');
+        document.getElementById('editSessionBtn').style.display = isAll ? 'none' : 'block';
+        document.getElementById('deleteSessionBtn').style.display = isAll ? 'none' : 'block';
+    }
+
+    function editCurrentSession() {
+        if (currentFilter === 'ALL') return;
+        const newName = prompt('請輸入新的賽事名稱：', currentFilter);
+        if (newName !== null && newName.trim() !== '' && newName.trim() !== currentFilter) {
+            const finalName = newName.trim();
+            db.forEach(p => {
+                p.games.forEach(g => {
+                    if (g.sessionName === currentFilter) {
+                        g.sessionName = finalName;
+                    }
+                });
+            });
+            currentFilter = finalName;
+            saveData();
+            updateSessionOptions();
+            renderDashboard();
+        }
+    }
+
+    function deleteCurrentSession() {
+        if (currentFilter === 'ALL') return;
+        if (confirm(`警告：確定要刪除「${currentFilter}」整場賽事嗎？\n這將會移除所有球員在該賽事的數據，且無法復原！`)) {
+            db.forEach(p => {
+                p.games = p.games.filter(g => g.sessionName !== currentFilter);
+            });
+            currentFilter = 'ALL';
+            saveData();
+            updateSessionOptions();
+            renderDashboard();
+        }
+    }
+
+    function getFilteredGames(games) { return currentFilter === 'ALL' ? games : games.filter(g => g.sessionName === currentFilter); }
+
+    function calculateAdvancedData(g) {
+        g.pts = (g.fg2m * 2) + (g.fg3m * 3) + g.ftm;
+        g.reb = g.oreb + g.dreb;
+        const fgMissed = (g.fg2a + g.fg3a) - (g.fg2m + g.fg3m);
+        const ftMissed = g.fta - g.ftm;
+        g.eff = (g.pts + g.reb + g.ast + g.stl + g.blk) - (fgMissed + ftMissed + g.tov);
+        return g;
+    }
+
+    function addGameData(e) {
+        e.preventDefault();
+        if(db.length === 0) return alert("請先新增球員！");
+        const getVal = (id) => parseInt(document.getElementById(id).value) || 0;
+        
+        // 取得剛剛輸入的賽事名稱
+        const newSession = document.getElementById('sessionName').value.trim();
+        if (!newSession) return alert("請輸入賽事名稱！");
+
+        // 準備要寫入的數據物件
+        let newGameData = {
+            id: 'g_' + Math.random().toString(36).substr(2, 9), // 預設給一個新 ID
+            sessionName: newSession, 
+            date: new Date().toLocaleDateString(),
+            fg2m: getVal('fg2m'), fg2a: getVal('fg2a'), fg3m: getVal('fg3m'), fg3a: getVal('fg3a'),
+            ftm: getVal('ftm'), fta: getVal('fta'), oreb: getVal('oreb'), dreb: getVal('dreb'),
+            ast: getVal('ast'), stl: getVal('stl'), blk: getVal('blk'), tov: getVal('tov'), pf: getVal('pf')
+        };
+        newGameData = calculateAdvancedData(newGameData);
+        
+        const playerIndex = db.findIndex(p => p.id === currentPlayerId);
+        const player = db[playerIndex];
+
+        // --- 核心修改：檢查是否已有同賽事資料 ---
+        const existingGameIndex = player.games.findIndex(g => g.sessionName === newSession);
+
+        if (existingGameIndex !== -1) {
+            // 找到同名賽事，執行覆蓋（保留原本的資料 ID，避免影響其他關聯）
+            newGameData.id = player.games[existingGameIndex].id; 
+            player.games[existingGameIndex] = newGameData;
+            
+            // 可選：跳出提示讓使用者知道是「覆蓋」而不是「新增」
+            // alert(`${player.name} 在「${newSession}」的數據已更新覆蓋！`);
+        } else {
+            // 找不到同名賽事，執行正常新增
+            player.games.push(newGameData);
+        }
+        
+        saveData(); 
+        
+        // 將全域分析範圍設定為剛剛操作的賽事
+        currentFilter = newSession; 
+        updateSessionOptions(); 
+        
+        // 清空輸入框數字
+        document.querySelectorAll('#dataForm input[type="number"]').forEach(i => i.value = ''); 
+        
+        // 切換畫面與重新渲染
+        switchView('team'); 
+        renderDashboard();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openEditModal(playerId, gameId) {
+        const game = db.find(p => p.id === playerId).games.find(g => g.id === gameId);
+        if(!game) return;
+        document.getElementById('editPlayerId').value = playerId; document.getElementById('editGameId').value = gameId;
+        document.getElementById('editSessionName').value = game.sessionName;
+        ['fg2m', 'fg2a', 'fg3m', 'fg3a', 'ftm', 'fta', 'oreb', 'dreb', 'ast', 'stl', 'blk', 'tov', 'pf'].forEach(k => document.getElementById('e_'+k).value = game[k]);
+        editModalInstance.show();
+    }
+    function saveEditData(e) {
+        e.preventDefault();
+        const pId = parseInt(document.getElementById('editPlayerId').value);
+        let game = db.find(p => p.id === pId).games.find(g => g.id === document.getElementById('editGameId').value);
+        game.sessionName = document.getElementById('editSessionName').value;
+        ['fg2m', 'fg2a', 'fg3m', 'fg3a', 'ftm', 'fta', 'oreb', 'dreb', 'ast', 'stl', 'blk', 'tov', 'pf'].forEach(k => game[k] = parseInt(document.getElementById('e_'+k).value) || 0);
+        calculateAdvancedData(game);
+        saveData(); updateSessionOptions(); editModalInstance.hide(); renderDashboard();
+    }
+    function deleteGame(playerId, gameId) {
+        if(confirm("確定刪除此比賽數據？")) {
+            const player = db.find(p => p.id === playerId);
+            player.games = player.games.filter(g => g.id !== gameId);
+            saveData(); updateSessionOptions(); renderDashboard();
+        }
+    }
+
+    function updatePlayerSelect() {
+        const sel = document.getElementById('playerSelect'); sel.innerHTML = '';
+        if(db.length === 0) { sel.innerHTML = '<option value="">(無球員)</option>'; document.getElementById('submitBtn').disabled = true; return; }
+        document.getElementById('submitBtn').disabled = false;
+        db.forEach(p => sel.innerHTML += `<option value="${p.id}">${p.name} (#${p.number})</option>`);
+        if(db.find(p => p.id === currentPlayerId)) sel.value = currentPlayerId;
+        else { currentPlayerId = db[0].id; sel.value = currentPlayerId; }
+    }
+
+    function renderPlayerRoster() {
+        const grid = document.getElementById('playerRosterGrid');
+        if(db.length === 0) { grid.innerHTML = '<div class="col-12 text-center text-muted py-5">目前無任何球員，請點擊右上角新增。</div>'; return; }
+        
+        grid.innerHTML = db.map(p => `
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="roster-card" onclick="goToPlayer(${p.id})">
+                    <div class="actions">
+                        <button class="btn btn-sm btn-light border p-1 me-1" onclick="openPlayerProfileModal(${p.id}, event)" title="編輯">✏️</button>
+                        <button class="btn btn-sm btn-danger p-1" onclick="deletePlayerProfile(${p.id}, event)" title="刪除">🗑️</button>
+                    </div>
+                    <div class="roster-avatar">
+                        <svg viewBox="0 0 24 24" fill="#ced4da" style="width: 60px; height: 60px;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+                    <div class="fw-bold text-dark fs-6">${p.name}</div>
+                    <div class="text-secondary small">#${p.number}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openPlayerProfileModal(id = null, event = null) {
+        if(event) event.stopPropagation();
+        document.getElementById('playerProfileModalTitle').innerText = id ? '✏️ 編輯球員' : '➕ 新增球員';
+        if(id) {
+            const p = db.find(x => x.id === id);
+            document.getElementById('profilePlayerId').value = p.id;
+            document.getElementById('profileName').value = p.name;
+            document.getElementById('profileNumber').value = p.number;
+        } else {
+            document.getElementById('profilePlayerId').value = '';
+            document.getElementById('profileName').value = '';
+            document.getElementById('profileNumber').value = '';
+        }
+        playerProfileModalInstance.show();
+    }
+
+    function savePlayerProfile() {
+        const idVal = document.getElementById('profilePlayerId').value;
+        const name = document.getElementById('profileName').value.trim();
+        const number = document.getElementById('profileNumber').value.trim();
+        if(!name || !number) return alert("姓名與背號不得為空！");
+
+        if(idVal) {
+            const p = db.find(x => x.id === parseInt(idVal)); p.name = name; p.number = number;
+        } else {
+            const newPlayer = { id: Date.now(), name: name, number: number, games: [] };
+            db.push(newPlayer);
+            if(db.length === 1) currentPlayerId = newPlayer.id;
+        }
+        saveData(); updatePlayerSelect(); renderDashboard();
+        playerProfileModalInstance.hide();
+    }
+
+    function deletePlayerProfile(id, event) {
+        event.stopPropagation();
+        if(confirm("警告：這將會連同該球員的所有比賽紀錄一併刪除，確定嗎？")) {
+            db = db.filter(p => p.id !== id);
+            if(currentPlayerId === id) currentPlayerId = db.length > 0 ? db[0].id : null;
+            saveData(); updatePlayerSelect(); renderDashboard();
+        }
+    }
+
+    function goToPlayer(id) {
+        currentPlayerId = id; document.getElementById('playerSelect').value = id;
+        switchView('individual'); renderDashboard(); window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderAdvancedHeader() {
+        const teamTitleEl = document.getElementById('teamStatsSessionName');
+
+        if(db.length === 0) { 
+            document.getElementById('advancedStatsContainer').innerHTML = ''; 
+            document.getElementById('leaderboardsContainer').innerHTML = ''; 
+            if(teamTitleEl) teamTitleEl.innerText = '所有場次 (賽季總計)';
+            return; 
+        }
+        
+        document.getElementById('advancedStatsTitle').innerText = currentFilter === 'ALL' ? '賽季總計戰績分析' : `${currentFilter} 戰績分析`;
+        if(teamTitleEl) teamTitleEl.innerText = currentFilter === 'ALL' ? '所有場次 (賽季總計)' : currentFilter;
+
+        let tPOSS=0, tFG2M=0, tFG2A=0, tFG3M=0, tFG3A=0, tFTM=0, tFTA=0, tOREB=0, tDREB=0, tTOV=0, tGames=0;
+        let playerStats = [];
+        db.forEach(p => {
+            const games = getFilteredGames(p.games);
+            let pPts=0, pReb=0, pAst=0;
+            games.forEach(g => {
+                tFG2M+=g.fg2m; tFG2A+=g.fg2a; tFG3M+=g.fg3m; tFG3A+=g.fg3a; tFTM+=g.ftm; tFTA+=g.fta; tOREB+=g.oreb; tDREB+=g.dreb; tTOV+=g.tov; tGames++;
+                pPts+=g.pts; pReb+=g.reb; pAst+=g.ast;
+            });
+            if(games.length > 0) playerStats.push({ name: p.name, num: p.number, pts: (pPts/games.length), reb: (pReb/games.length), ast: (pAst/games.length) });
+        });
+
+        const FGA = tFG2A + tFG3A;
+        const totalPoss = FGA + 0.44 * tFTA - tOREB + tTOV; 
+        const avgPoss = tGames > 0 ? (totalPoss / (tGames / db.filter(p=>getFilteredGames(p.games).length>0).length)).toFixed(1) : 0;
+        const efg = FGA > 0 ? Math.round(((tFG2M + 1.5 * tFG3M) / FGA) * 100) : 0;
+        const orebPct = (tOREB + tDREB) > 0 ? Math.round((tOREB / (tOREB + tDREB)) * 100) : 0; 
+        const drebPct = (tOREB + tDREB) > 0 ? Math.round((tDREB / (tOREB + tDREB)) * 100) : 0; 
+        const ftr = FGA > 0 ? Math.round((tFTA / FGA) * 100) : 0;
+        const tovPct = totalPoss > 0 ? Math.round((tTOV / totalPoss) * 100) : 0;
+
+        document.getElementById('advancedStatsContainer').innerHTML = `
+            <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="單場平均進攻回合數">POSS</span><div class="fs-2 fw-bold text-dark lh-1 mt-2" id="anim-adv-poss">0.0</div></div>
+            <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="實質命中率 (eFG%)：將三分球多一分的價值列入計算">EFG</span><div class="circular-chart mt-1" id="donut-efg" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-efg">0%</span></div></div>
+            <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="進攻籃板率 (OREB%)：全隊抓下的進攻籃板比例">OREB</span><div class="circular-chart mt-1" id="donut-oreb" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-oreb">0%</span></div></div>
+            <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="防守籃板率 (DREB%)：全隊抓下的防守籃板比例">DREB</span><div class="circular-chart mt-1" id="donut-dreb" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-dreb">0%</span></div></div>
+            <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="罰球率 (FTr)：罰球出手數與投籃出手數的比值，衡量買犯能力">FTr</span><div class="circular-chart mt-1" id="donut-ftr" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-ftr">0%</span></div></div>
+            <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="失誤率 (TOV%)：每次球權中發生失誤的機率">TOV</span><div class="circular-chart mt-1" id="donut-tov" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-tov">0%</span></div></div>
+        `;
+        
+        runSuspenseAnimation('anim-adv-poss', avgPoss, 1); runSuspenseAnimation('anim-adv-efg', efg, 0, '%', 'donut-efg'); runSuspenseAnimation('anim-adv-oreb', orebPct, 0, '%', 'donut-oreb'); runSuspenseAnimation('anim-adv-dreb', drebPct, 0, '%', 'donut-dreb'); runSuspenseAnimation('anim-adv-ftr', ftr, 0, '%', 'donut-ftr'); runSuspenseAnimation('anim-adv-tov', tovPct, 0, '%', 'donut-tov');
+
+        if(playerStats.length === 0) { 
+            document.getElementById('leaderboardsContainer').innerHTML = '<div class="text-muted p-3 w-100 text-center border rounded">該範圍內尚無數據</div>'; 
+            return; 
+        }
+
+        // --- 核心邏輯修改：若數據為 0 則不回傳球員 ---
+        const getTopPlayer = (statKey) => {
+            if (playerStats.length === 0) return null;
+            const top = playerStats.reduce((max, p) => p[statKey] > max[statKey] ? p : max, playerStats[0]);
+            return top[statKey] > 0 ? top : null;
+        };
+
+        const topPts = getTopPlayer('pts');
+        const topReb = getTopPlayer('reb');
+        const topAst = getTopPlayer('ast');
+
+        const createCard = (title, player, valId) => {
+            const nameDisplay = player ? player.name : '<span class="text-muted">尚無數據</span>';
+            const numDisplay = player ? `#${player.num}` : '--';
+            return `
+                <div class="leader-card">
+                    <span class="leader-crown text-warning-custom">👑</span>
+                    <div class="leader-silhouette"></div>
+                    <div class="leader-stat-name">${title}</div>
+                    <div class="leader-stat-val" id="${valId}">0.0</div>
+                    <div class="leader-player-name">${nameDisplay}</div>
+                    <div class="leader-player-num">${numDisplay}</div>
+                </div>`;
+        };
+
+        document.getElementById('leaderboardsContainer').innerHTML = 
+            createCard('得分王', topPts, 'anim-lead-pts') + 
+            createCard('籃板王', topReb, 'anim-lead-reb') + 
+            createCard('助攻王', topAst, 'anim-lead-ast');
+
+        runSuspenseAnimation('anim-lead-pts', topPts ? topPts.pts : 0, 1); 
+        runSuspenseAnimation('anim-lead-reb', topReb ? topReb.reb : 0, 1); 
+        runSuspenseAnimation('anim-lead-ast', topAst ? topAst.ast : 0, 1);
+    }
+
+    function renderDashboard() {
+        renderAdvancedHeader();
+        renderPlayerRoster();
+
+        if(db.length === 0) {
+            document.getElementById('displayPlayerName').innerText = '無球員資料';
+            document.getElementById('displayPlayerNumber').innerText = '#0';
+            ['pts','reb','ast','eff'].forEach(k=> document.getElementById('anim-ind-'+k).innerText = '0.0');
+            document.getElementById('comparisonCharts').innerHTML = ''; document.getElementById('playerGameLog').innerHTML = ''; document.getElementById('teamStatsTable').innerHTML = '';
+            initTooltips(); 
+            return;
+        }
+
+        const player = db.find(p => p.id === currentPlayerId);
+        const tGames = getFilteredGames(player.games);
+        
+        let pPts=0, pReb=0, pAst=0, pEff=0, pStl=0, pBlk=0, c=tGames.length;
+        tGames.forEach(g => { pPts+=g.pts; pReb+=g.reb; pAst+=g.ast; pEff+=g.eff; pStl+=g.stl; pBlk+=g.blk; });
+        
+        document.getElementById('displayPlayerName').innerText = player.name;
+        document.getElementById('displayPlayerNumber').innerText = `#${player.number}`;
+
+        runSuspenseAnimation('anim-ind-pts', c ? (pPts/c) : 0, 1); runSuspenseAnimation('anim-ind-reb', c ? (pReb/c) : 0, 1); runSuspenseAnimation('anim-ind-ast', c ? (pAst/c) : 0, 1); runSuspenseAnimation('anim-ind-eff', c ? (pEff/c) : 0, 1);
+
+        let tPts=0, tReb=0, tAst=0, tStl=0, tBlk=0, tGamesTotal=0;
+        db.forEach(p => getFilteredGames(p.games).forEach(g => { tPts+=g.pts; tReb+=g.reb; tAst+=g.ast; tStl+=g.stl; tBlk+=g.blk; tGamesTotal++; }));
+        
+        const chartsHtml = ['pts', 'reb', 'ast', 'stl', 'blk'].map(stat => {
+            const pVal = c ? eval('p'+stat.charAt(0).toUpperCase()+stat.slice(1))/c : 0; const tVal = tGamesTotal ? eval('t'+stat.charAt(0).toUpperCase()+stat.slice(1))/tGamesTotal : 0; const maxVal = Math.max(pVal, tVal, 5); 
+            const pWidth = (pVal / maxVal) * 100; const tWidth = (tVal / maxVal) * 100;
+            return `<div class="mb-3"><div class="d-flex justify-content-between stat-label mb-1"><span class="text-dark fw-bold tooltip-trigger" data-bs-toggle="tooltip" title="${statDict[stat]}">${stat.toUpperCase()}</span><span><span class="text-danger fw-bold">球員: <span id="anim-bar-p-${stat}">0.0</span></span> | <span class="text-secondary">團隊: <span id="anim-bar-t-${stat}">0.0</span></span></span></div><div class="bar-container d-flex flex-column"><div class="bar-fill-player" style="width: 0%;" data-target="${pWidth}%"></div><div class="bar-fill-team" style="width: 0%;" data-target="${tWidth}%"></div></div></div>`;
+        }).join('');
+        document.getElementById('comparisonCharts').innerHTML = chartsHtml;
+
+        ['pts', 'reb', 'ast', 'stl', 'blk'].forEach(stat => { runSuspenseAnimation(`anim-bar-p-${stat}`, c ? eval('p'+stat.charAt(0).toUpperCase()+stat.slice(1))/c : 0, 1); runSuspenseAnimation(`anim-bar-t-${stat}`, tGamesTotal ? eval('t'+stat.charAt(0).toUpperCase()+stat.slice(1))/tGamesTotal : 0, 1); });
+        setTimeout(() => { document.querySelectorAll('.bar-fill-player, .bar-fill-team').forEach(bar => { if(bar.dataset.target) bar.style.width = bar.dataset.target; }); }, 50);
+
+        const logHtml = [...tGames].reverse().map(g => `
+            <tr>
+                <td class="text-start fw-bold">${g.sessionName}</td>
+                <td class="text-primary fw-bold">${g.pts}</td>
+                <td class="text-eff fw-bold">${g.eff}</td>
+                <td>${getShootingStr(g.fg2m, g.fg2a)}</td>
+                <td>${getShootingStr(g.fg3m, g.fg3a)}</td>
+                <td>${getShootingStr(g.ftm, g.fta)}</td>
+                <td>${g.oreb} / ${g.dreb} / <span class="fw-bold">${g.reb}</span></td>
+                <td>${g.ast}</td><td>${g.stl}</td><td>${g.blk}</td><td>${g.tov}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-secondary action-btn me-1" onclick="openEditModal(${player.id}, '${g.id}')">修改</button>
+                    <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteGame(${player.id}, '${g.id}')">刪除</button>
+                </td>
+            </tr>
+        `).join('');
+        document.getElementById('playerGameLog').innerHTML = logHtml || '<tr><td colspan="12" class="text-muted py-4">尚無數據</td></tr>';
+
+        const teamHtml = db.map(p => {
+            const gms = getFilteredGames(p.games); if(gms.length === 0) return '';
+            
+            let sPts=0, sReb=0, sAst=0, sStl=0, sBlk=0, sEff=0;
+            let sFg2m=0, sFg2a=0, sFg3m=0, sFg3a=0, sFtm=0, sFta=0, sOreb=0, sDreb=0, sTov=0, sPf=0;
+            
+            gms.forEach(g => { 
+                sPts+=g.pts; sReb+=g.reb; sAst+=g.ast; sStl+=g.stl; sBlk+=g.blk; sEff+=g.eff; 
+                sFg2m+=g.fg2m; sFg2a+=g.fg2a; sFg3m+=g.fg3m; sFg3a+=g.fg3a; 
+                sFtm+=g.ftm; sFta+=g.fta; sOreb+=g.oreb; sDreb+=g.dreb; 
+                sTov+=g.tov; sPf+=g.pf;
+            });
+            const lc = gms.length;
+
+            return `<tr>
+                <td class="text-muted">#${p.number}</td>
+                <td class="text-start fw-bold"><span class="player-link" onclick="goToPlayer(${p.id})">${p.name}</span></td>
+                <td>${lc}</td>
+                <td class="text-primary fw-bold">${(sPts/lc).toFixed(1)}</td>
+                <td class="text-eff fw-bold">${(sEff/lc).toFixed(1)}</td>
+                <td>${getShootingStr(sFg2m, sFg2a)}</td>
+                <td>${getShootingStr(sFg3m, sFg3a)}</td>
+                <td>${getShootingStr(sFtm, sFta)}</td>
+                <td>${sOreb} / ${sDreb} / <span class="fw-bold">${sReb}</span></td>
+                <td>${(sAst/lc).toFixed(1)}</td>
+                <td>${(sStl/lc).toFixed(1)}</td>
+                <td>${(sBlk/lc).toFixed(1)}</td>
+                <td>${(sTov/lc).toFixed(1)}</td>
+                <td>${(sPf/lc).toFixed(1)}</td>
+            </tr>`;
+        }).join('');
+        document.getElementById('teamStatsTable').innerHTML = teamHtml || '<tr><td colspan="14" class="text-muted py-4">無球員參賽</td></tr>';
+
+        initTooltips();
+    }
+
+    function switchView(view) {
+        document.getElementById('individualView').style.display = view === 'individual' ? 'block' : 'none';
+        document.getElementById('teamView').style.display = view === 'team' ? 'block' : 'none';
+        document.getElementById('managementView').style.display = view === 'management' ? 'block' : 'none';
+        document.getElementById('topOverviewSection').style.display = view === 'management' ? 'none' : 'flex';
+        document.querySelectorAll('.nav-link').forEach((btn, i) => btn.classList.toggle('active', (i===0 && view==='management') || (i===1 && view==='team') || (i===2 && view==='individual')));
+    }
+
+    function exportData() { 
+        // 取得目前的自訂標題
+        const currentTitle = localStorage.getItem('bball_custom_title') || '';
+        
+        // 將標題和數據打包成一個物件
+        const exportObj = {
+            version: "1.1",
+            appTitle: currentTitle,
+            db: db
+        };
+        
+        const a = document.createElement('a'); 
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(exportObj, null, 2)], {type: "application/json"})); 
+        a.download = `BBALL_Data_${new Date().toISOString().slice(0,10)}.json`; 
+        a.click(); 
+    }
+
+    function importData(e) { 
+        const f = e.target.files[0]; 
+        if(!f) return; 
+        
+        const r = new FileReader(); 
+        r.onload = function(ev) { 
+            try { 
+                const d = JSON.parse(ev.target.result); 
+                
+                // 判斷：如果是舊版的純陣列格式
+                if (Array.isArray(d)) { 
+                    db = d; 
+                } 
+                // 判斷：如果是新版的物件格式 (包含 db 和 appTitle)
+                else if (d.db && Array.isArray(d.db)) {
+                    db = d.db;
+                    if (d.appTitle) {
+                        localStorage.setItem('bball_custom_title', d.appTitle);
+                    } else {
+                        localStorage.removeItem('bball_custom_title');
+                    }
+                    loadAppTitle(); // 重新載入標題顯示
+                } else {
+                    throw new Error("Invalid format");
+                }
+
+                if(db.length > 0) currentPlayerId = db[0].id; 
+                
+                saveData(); 
+                updatePlayerSelect(); 
+                updateSessionOptions(); 
+                renderDashboard(); 
+                alert('匯入成功！'); 
+                
+            } catch(err) {
+                alert('檔案格式錯誤，無法匯入！');
+            } 
+        }; 
+        r.readAsText(f); 
+        e.target.value = ''; // 重置 file input，讓同一個檔案可以重複選取
+    }
+
+    function clearData() { 
+        if(confirm("確定清除所有數據與球員名單？這將恢復預設狀態！")) { 
+            // 1. 清除 localStorage 中的數據庫
+            localStorage.removeItem('bball_db_v7'); 
+            // 2. 清除 localStorage 中的自訂標題
+            localStorage.removeItem('bball_custom_title'); 
+            
+            // 3. 恢復預設的球員資料與狀態
+            db = JSON.parse(JSON.stringify(defaultDB)); 
+            currentPlayerId = db[0].id; 
+            currentFilter = 'ALL'; 
+            
+            // 4. 強制重新載入標題
+            loadAppTitle(); 
+            
+            // 5. 更新所有畫面選項與圖表
+            updateSessionOptions(); 
+            updatePlayerSelect(); 
+            renderDashboard(); 
+
+            // 👇 新增這行：重置「新增比賽數據」的表單，清空場次名稱與所有輸入框
+            document.getElementById('dataForm').reset();
+        } 
+    }
+</script>
+</body>
+</html>
