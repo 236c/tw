@@ -54,31 +54,20 @@
            2. 日式質感風格覆寫 (Japanese Theme)
            ========================================= */
         body.theme-japanese {
-            background-color: #f2efe9;
-            color: #333130;
-            font-family: 'Noto Sans TC', Tahoma, Geneva, sans-serif;
+            background-color: #f2efe9; color: #333130; font-family: 'Noto Sans TC', Tahoma, Geneva, sans-serif;
             background-image: url('data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23e8e4db" fill-opacity="0.4" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3Ccircle cx="13" cy="13" r="3"/%3E%3C/g%3E%3C/svg%3E');
         }
-        
         .theme-japanese h1, .theme-japanese h2, .theme-japanese h3, .theme-japanese h4, .theme-japanese h5, .theme-japanese h6, 
         .theme-japanese .fw-bold, .theme-japanese .leader-stat-val, .theme-japanese .stat-value {
-            font-family: 'Noto Serif TC', serif;
-            font-weight: 700 !important;
-            color: #2b2927;
-            letter-spacing: 0.5px;
+            font-family: 'Noto Serif TC', serif; font-weight: 700 !important; color: #2b2927; letter-spacing: 0.5px;
         }
-
-        .theme-japanese .card-custom {
-            background-color: #faf9f5; border: 1px solid #dcd8ce; border-radius: 4px; box-shadow: 0 4px 15px rgba(40,35,30,0.03);
-        }
-
+        .theme-japanese .card-custom { background-color: #faf9f5; border: 1px solid #dcd8ce; border-radius: 4px; box-shadow: 0 4px 15px rgba(40,35,30,0.03); }
         .theme-japanese .text-primary { color: #2b3d4f !important; }
         .theme-japanese .bg-primary { background-color: #2b3d4f !important; }
         .theme-japanese .bg-white { background-color: #faf9f5 !important; }
         .theme-japanese .bg-light { background-color: #efece5 !important; }
         .theme-japanese .border { border-color: #dcd8ce !important; }
         .theme-japanese .border-bottom { border-bottom-color: #dcd8ce !important; }
-        
         .theme-japanese .text-accent { color: #8c3a3a; }
         .theme-japanese .text-eff { color: #4e6151; }
         .theme-japanese .text-warning-custom { color: #b08e51; }
@@ -92,60 +81,106 @@
         .theme-japanese .btn-outline-danger:hover { background-color: #8c3a3a; color: #fff; }
         .theme-japanese .btn-outline-secondary { color: #5a5652; border-color: #c0bcb3; border-radius: 2px; }
         
-        /* 標籤 Badge */
         .theme-japanese .badge { border-radius: 2px; font-family: 'Noto Sans TC', sans-serif; font-weight: 500; }
         .theme-japanese .badge.bg-secondary { background-color: #7a7671 !important; }
         .theme-japanese .badge.bg-light { background-color: #efece5 !important; border: 1px solid #dcd8ce !important; color: #2b3d4f !important; }
-
-        /* 表單控制 */
-        .theme-japanese .form-control, .theme-japanese .form-select { 
-            background-color: #faf9f5; border: 1px solid #c0bcb3; border-radius: 2px; color: #333130;
-        }
-        .theme-japanese .form-control:focus, .theme-japanese .form-select:focus { 
-            border-color: #b08e51; box-shadow: 0 0 0 0.2rem rgba(176, 142, 81, 0.2); 
-        }
-
-        /* 導覽列 Tabs */
+        .theme-japanese .form-control, .theme-japanese .form-select { background-color: #faf9f5; border: 1px solid #c0bcb3; border-radius: 2px; color: #333130; }
+        .theme-japanese .form-control:focus, .theme-japanese .form-select:focus { border-color: #b08e51; box-shadow: 0 0 0 0.2rem rgba(176, 142, 81, 0.2); }
         .theme-japanese .nav-pills .nav-link { color: #5a5652; border-radius: 2px; font-weight: 500; }
         .theme-japanese .nav-pills .nav-link.active { background-color: #2b3d4f; color: #faf9f5; }
         .theme-japanese .nav-pills .nav-link:hover:not(.active) { background-color: #e4dfd5; }
-
-        /* 表格設計 */
         .theme-japanese .table { color: #333130; }
         .theme-japanese .table-hover tbody tr:hover { background-color: #efece5; }
         .theme-japanese .table th { color: #5a5652; border-bottom: 2px solid #dcd8ce; font-family: 'Noto Serif TC', serif; font-weight: 700; }
         .theme-japanese .table td, .theme-japanese .table th { border-color: #e4dfd5; }
-
-        /* 圖表與視覺元素 */
         .theme-japanese .circular-chart { background: conic-gradient(#b08e51 var(--p), #e4dfd5 0deg); }
         .theme-japanese .circular-chart::before { background-color: #faf9f5; }
         .theme-japanese .circular-chart-value { color: #2b2927; font-family: 'Noto Sans TC'; }
-        
         .theme-japanese .bar-container { background-color: #e4dfd5; border-radius: 2px; }
         .theme-japanese .bar-fill-player { background-color: #8c3a3a; }
         .theme-japanese .bar-fill-team { background-color: #b0aba1; }
-
-        /* 排行榜卡片 */
         .theme-japanese .leader-card { background: #faf9f5; border: 1px solid #dcd8ce; border-radius: 4px; }
         .theme-japanese .leader-silhouette { width: 50px; height: 50px; background-color: #dcd8ce; border-radius: 2px; }
         .theme-japanese .leader-crown { color: #b08e51; top: 8px; left: 8px; font-size: 1.1rem; }
         .theme-japanese .leader-stat-name { color: #7a7671; }
         .theme-japanese .leader-player-num { color: #b0aba1; }
-
-        /* 球員名單卡片 */
         .theme-japanese .roster-card { border: 1px solid #dcd8ce; border-radius: 4px; background: #faf9f5; }
         .theme-japanese .roster-card:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(40,35,30,0.06); }
         .theme-japanese .roster-avatar { background: #e4dfd5; border-radius: 2px; }
         .theme-japanese .roster-avatar svg { fill: #b0aba1; }
-
-        /* 小工具提示虛線 */
         .theme-japanese .stat-label { color: #7a7671; }
         .theme-japanese .tooltip-trigger { border-bottom: 1px dashed #b0aba1; color: #5a5652; }
         .theme-japanese .tooltip-trigger:hover { color: #2b3d4f; border-bottom-color: #2b3d4f; }
-
-        /* Modal 視窗覆寫 */
         .theme-japanese .modal-content { border-radius: 4px; border: 1px solid #dcd8ce; background: #faf9f5; }
         .theme-japanese .modal-header { border-bottom-color: #dcd8ce; }
+
+        /* =========================================
+           3. 暗黑科技風格覆寫 (Dark Theme)
+           ========================================= */
+        body.theme-dark { background-color: #121212; color: #e0e0e0; background-image: none; }
+        
+        .theme-dark .bg-white, .theme-dark .card-custom { background-color: #1e1e1e !important; border-color: #333333 !important; }
+        .theme-dark .bg-light { background-color: #2b2b2b !important; } /* 替換淺色區塊為深灰 */
+        
+        .theme-dark .text-dark, .theme-dark h1, .theme-dark h2, .theme-dark h3, .theme-dark h4, .theme-dark h5, .theme-dark h6, 
+        .theme-dark .stat-value, .theme-dark .leader-stat-val { color: #ffffff !important; }
+        
+        .theme-dark .text-secondary, .theme-dark .text-muted, .theme-dark .stat-label { color: #aaaaaa !important; }
+        .theme-dark .border, .theme-dark .border-bottom { border-color: #333333 !important; }
+        
+        /* 選單與輸入框 */
+        .theme-dark .form-control, .theme-dark .form-select { background-color: #2b2b2b !important; border-color: #444444; color: #ffffff; }
+        .theme-dark .form-control:focus, .theme-dark .form-select:focus { border-color: #0d6efd; box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25); color: #ffffff; }
+        .theme-dark .form-control::placeholder { color: #777777; }
+
+        /* 下拉選單 */
+        .theme-dark .dropdown-menu { background-color: #2b2b2b; border-color: #444444; }
+        .theme-dark .dropdown-item { color: #e0e0e0; }
+        .theme-dark .dropdown-item:hover { background-color: #3a3a3a; color: #ffffff; }
+        .theme-dark .dropdown-header { color: #aaaaaa !important; }
+        .theme-dark .dropdown-divider { border-color: #444444; }
+        
+        /* 導覽列與標籤 */
+        .theme-dark .nav-pills .nav-link { color: #aaaaaa; }
+        .theme-dark .nav-pills .nav-link.active { background-color: #0d6efd; color: #ffffff; }
+        .theme-dark .nav-pills .nav-link:hover:not(.active) { background-color: #2b2b2b; color: #ffffff; }
+        .theme-dark .badge.bg-light { background-color: #2b2b2b !important; color: #e0e0e0 !important; border-color: #444444 !important; }
+        
+        /* 表格 */
+        .theme-dark table { --bs-table-color: #e0e0e0; --bs-table-bg: transparent; --bs-table-hover-color: #ffffff; --bs-table-hover-bg: rgba(255,255,255,0.05); }
+        .theme-dark .table th { color: #aaaaaa; border-bottom-color: #444444; }
+        .theme-dark .table td, .theme-dark .table th { border-color: #333333; }
+        
+        /* 按鈕 */
+        .theme-dark .btn-outline-secondary { color: #cccccc; border-color: #555555; }
+        .theme-dark .btn-outline-secondary:hover { background-color: #444444; color: #ffffff; border-color: #666666; }
+        .theme-dark .btn-close { filter: invert(1) grayscale(100%) brightness(200%); } /* 將彈窗的 X 變為白色 */
+
+        /* 圓餅圖 */
+        .theme-dark .circular-chart { background: conic-gradient(#f59f00 var(--p), #333333 0deg); }
+        .theme-dark .circular-chart::before { background-color: #1e1e1e; }
+        .theme-dark .circular-chart-value { color: #ffffff; }
+
+        /* 比較條狀圖 */
+        .theme-dark .bar-container { background-color: #333333; }
+
+        /* 排行榜卡片 */
+        .theme-dark .leader-card { background: #1e1e1e; border-color: #333333; }
+        .theme-dark .leader-silhouette { background-color: #333333; }
+        
+        /* 球員清單卡片 */
+        .theme-dark .roster-card { background: #1e1e1e; border-color: #333333; }
+        .theme-dark .roster-card:hover { background-color: #252525; box-shadow: 0 6px 12px rgba(0,0,0,0.5); }
+        .theme-dark .roster-avatar { background-color: #2b2b2b; }
+        .theme-dark .roster-avatar svg { fill: #555555; }
+
+        /* tooltip 虛線 */
+        .theme-dark .tooltip-trigger { border-bottom-color: #555555; color: #cccccc; }
+        .theme-dark .tooltip-trigger:hover { color: #0d6efd; border-bottom-color: #0d6efd; }
+        
+        /* Modal 視窗覆寫 */
+        .theme-dark .modal-content { border-color: #444; background: #1e1e1e; }
+        .theme-dark .modal-header { border-bottom-color: #444; }
     </style>
 </head>
 <body>
@@ -179,6 +214,7 @@
                     <button class="btn btn-sm btn-outline-primary dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown">🎨 介面風格</button>
                     <ul class="dropdown-menu dropdown-menu-end shadow">
                         <li><button class="dropdown-item" onclick="setTheme('default')">🏀 現代預設</button></li>
+                        <li><button class="dropdown-item" onclick="setTheme('dark')">🌙 暗黑風格</button></li>
                         <li><button class="dropdown-item" onclick="setTheme('japanese')">🍵 日式質感</button></li>
                     </ul>
                 </div>
@@ -354,7 +390,7 @@
       <div class="modal-body">
         <form id="editDataForm" onsubmit="saveEditData(event)">
             <input type="hidden" id="editPlayerId"><input type="hidden" id="editGameId">
-            <div class="mb-3"><label class="form-label stat-label">場次名稱</label><input type="text" class="form-control" id="editSessionName" required></div>
+            <div class="mb-3"><label class="form-label stat-label">場次名稱</label><input type="text" class="form-control bg-light" id="editSessionName" required></div>
             <div class="row g-2 mb-3">
                 <div class="col-4"><label class="form-label stat-label">2分命中</label><input type="number" class="form-control" id="e_fg2m" min="0" placeholder="0"></div>
                 <div class="col-4"><label class="form-label stat-label">2分出手</label><input type="number" class="form-control" id="e_fg2a" min="0" placeholder="0"></div>
@@ -380,11 +416,11 @@
 <div class="modal fade" id="playerProfileModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-sm modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header border-bottom"><h5 class="modal-title fw-bold" id="playerProfileModalTitle">新增球員</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header"><h5 class="modal-title fw-bold" id="playerProfileModalTitle">新增球員</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
         <input type="hidden" id="profilePlayerId">
-        <div class="mb-3"><label class="form-label fw-bold">球員姓名</label><input type="text" id="profileName" class="form-control" required></div>
-        <div class="mb-4"><label class="form-label fw-bold">背號</label><input type="text" id="profileNumber" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label fw-bold stat-label">球員姓名</label><input type="text" id="profileName" class="form-control bg-light" required></div>
+        <div class="mb-4"><label class="form-label fw-bold stat-label">背號</label><input type="text" id="profileNumber" class="form-control bg-light" required></div>
         <button class="btn btn-primary w-100 fw-bold" onclick="savePlayerProfile()">💾 儲存球員</button>
       </div>
     </div>
@@ -436,10 +472,12 @@
     }
 
     function setTheme(theme) {
-        if (theme === 'japanese') {
-            document.body.classList.add('theme-japanese');
-        } else {
-            document.body.classList.remove('theme-japanese');
+        // 先移除所有額外的風格 class
+        document.body.classList.remove('theme-japanese', 'theme-dark');
+        
+        // 依據選擇加上對應的 class
+        if (theme !== 'default') {
+            document.body.classList.add('theme-' + theme);
         }
         localStorage.setItem('bball_theme', theme);
     }
@@ -890,7 +928,6 @@
         ['pts', 'reb', 'ast', 'stl', 'blk'].forEach(stat => { runSuspenseAnimation(`anim-bar-p-${stat}`, c ? eval('p'+stat.charAt(0).toUpperCase()+stat.slice(1))/c : 0, 1); runSuspenseAnimation(`anim-bar-t-${stat}`, tGamesTotal ? eval('t'+stat.charAt(0).toUpperCase()+stat.slice(1))/tGamesTotal : 0, 1); });
         setTimeout(() => { document.querySelectorAll('.bar-fill-player, .bar-fill-team').forEach(bar => { if(bar.dataset.target) bar.style.width = bar.dataset.target; }); }, 50);
 
-        // 純文字顯示賽事場次
         const logHtml = [...tGames].reverse().map(g => `
             <tr>
                 <td class="text-start fw-bold" style="color: #5a5652;">${g.sessionName}</td>
@@ -945,7 +982,7 @@
 
             return `<tr>
                 <td class="text-muted">#${p.number}</td>
-                <td class="text-start fw-bold"><span class="text-primary" style="cursor:pointer;" onclick="goToPlayer(${p.id})">${p.name}</span></td>
+                <td class="text-start fw-bold"><span class="player-link text-primary" onclick="goToPlayer(${p.id})">${p.name}</span></td>
                 ${isAllSessions ? `<td>${lc}</td>` : ''}
                 <td class="text-primary fw-bold stat-value">${(sPts/lc).toFixed(1)}</td>
                 <td class="text-eff fw-bold stat-value">${(sEff/lc).toFixed(1)}</td>
