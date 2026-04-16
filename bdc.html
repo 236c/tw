@@ -40,10 +40,9 @@
         .roster-card:hover .actions { opacity: 1; }
         .roster-avatar { width: 70px; height: 70px; background: #e9ecef; border-radius: 8px; margin: 0 auto 10px auto; display: flex; align-items: flex-end; justify-content: center; overflow: hidden;}
 
-        /* 標題編輯提示常駐顯示 (方便觸控設備) */
         #appTitleDisplay { cursor: pointer; transition: opacity 0.2s; }
         #appTitleDisplay:hover { opacity: 0.8; }
-        #appTitleDisplay::after { content: ' ✏️'; font-size: 0.6em; vertical-align: super; opacity: 0.6; }
+        #appTitleDisplay::after { content: ' \270F\FE0F'; font-size: 0.6em; vertical-align: super; opacity: 0.6; }
     </style>
 </head>
 <body>
@@ -196,22 +195,8 @@
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover text-center align-middle" style="white-space: nowrap;">
-                            <thead>
-                                <tr>
-                                    <th>背號</th><th class="text-start">球員</th><th>場次</th>
-                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均得分">PTS</span></th>
-                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均效率值">EFF</span></th>
-                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="總兩分球 進球 / 出手 / 命中率">2分球<br><small class="text-muted fw-normal">進/出/%</small></span></th>
-                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="總三分球 進球 / 出手 / 命中率">3分球<br><small class="text-muted fw-normal">進/出/%</small></span></th>
-                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="總罰球 進球 / 出手 / 命中率">罰球<br><small class="text-muted fw-normal">進/出/%</small></span></th>
-                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="總籃板 (進攻 / 防守 / 總計)">籃板<br><small class="text-muted fw-normal">攻/守/總</small></span></th>
-                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均助攻">AST</span></th>
-                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均抄截">STL</span></th>
-                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均阻攻">BLK</span></th>
-                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均失誤">TOV</span></th>
-                                    <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均犯規">PF</span></th>
-                                </tr>
-                            </thead>
+                            <thead id="teamStatsTableHead">
+                                </thead>
                             <tbody id="teamStatsTable"></tbody>
                         </table>
                     </div>
@@ -478,13 +463,11 @@
         if(db.length === 0) return alert("請先新增球員！");
         const getVal = (id) => parseInt(document.getElementById(id).value) || 0;
         
-        // 取得剛剛輸入的賽事名稱
         const newSession = document.getElementById('sessionName').value.trim();
         if (!newSession) return alert("請輸入賽事名稱！");
 
-        // 準備要寫入的數據物件
         let newGameData = {
-            id: 'g_' + Math.random().toString(36).substr(2, 9), // 預設給一個新 ID
+            id: 'g_' + Math.random().toString(36).substr(2, 9), 
             sessionName: newSession, 
             date: new Date().toLocaleDateString(),
             fg2m: getVal('fg2m'), fg2a: getVal('fg2a'), fg3m: getVal('fg3m'), fg3a: getVal('fg3a'),
@@ -496,31 +479,19 @@
         const playerIndex = db.findIndex(p => p.id === currentPlayerId);
         const player = db[playerIndex];
 
-        // --- 核心修改：檢查是否已有同賽事資料 ---
         const existingGameIndex = player.games.findIndex(g => g.sessionName === newSession);
 
         if (existingGameIndex !== -1) {
-            // 找到同名賽事，執行覆蓋（保留原本的資料 ID，避免影響其他關聯）
             newGameData.id = player.games[existingGameIndex].id; 
             player.games[existingGameIndex] = newGameData;
-            
-            // 可選：跳出提示讓使用者知道是「覆蓋」而不是「新增」
-            // alert(`${player.name} 在「${newSession}」的數據已更新覆蓋！`);
         } else {
-            // 找不到同名賽事，執行正常新增
             player.games.push(newGameData);
         }
         
         saveData(); 
-        
-        // 將全域分析範圍設定為剛剛操作的賽事
         currentFilter = newSession; 
         updateSessionOptions(); 
-        
-        // 清空輸入框數字
         document.querySelectorAll('#dataForm input[type="number"]').forEach(i => i.value = ''); 
-        
-        // 切換畫面與重新渲染
         switchView('team'); 
         renderDashboard();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -655,21 +626,32 @@
 
         const FGA = tFG2A + tFG3A;
         const totalPoss = FGA + 0.44 * tFTA - tOREB + tTOV; 
-        const avgPoss = tGames > 0 ? (totalPoss / (tGames / db.filter(p=>getFilteredGames(p.games).length>0).length)).toFixed(1) : 0;
+
+        // [修正區塊] 取得不重複的賽事場次數量，用來正確計算平均進攻回合
+        const uniqueSessions = new Set();
+        db.forEach(p => {
+            getFilteredGames(p.games).forEach(g => uniqueSessions.add(g.sessionName));
+        });
+        const teamGamesCount = uniqueSessions.size;
+        const avgPoss = teamGamesCount > 0 ? (totalPoss / teamGamesCount).toFixed(1) : 0;
+        // [修正結束]
+
         const efg = FGA > 0 ? Math.round(((tFG2M + 1.5 * tFG3M) / FGA) * 100) : 0;
         const orebPct = (tOREB + tDREB) > 0 ? Math.round((tOREB / (tOREB + tDREB)) * 100) : 0; 
         const drebPct = (tOREB + tDREB) > 0 ? Math.round((tDREB / (tOREB + tDREB)) * 100) : 0; 
         const ftr = FGA > 0 ? Math.round((tFTA / FGA) * 100) : 0;
         const tovPct = totalPoss > 0 ? Math.round((tTOV / totalPoss) * 100) : 0;
 
+        // [修正區塊] 更新 OREB 與 DREB 的 tooltip 敘述
         document.getElementById('advancedStatsContainer').innerHTML = `
             <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="單場平均進攻回合數">POSS</span><div class="fs-2 fw-bold text-dark lh-1 mt-2" id="anim-adv-poss">0.0</div></div>
             <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="實質命中率 (eFG%)：將三分球多一分的價值列入計算">EFG</span><div class="circular-chart mt-1" id="donut-efg" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-efg">0%</span></div></div>
-            <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="進攻籃板率 (OREB%)：全隊抓下的進攻籃板比例">OREB</span><div class="circular-chart mt-1" id="donut-oreb" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-oreb">0%</span></div></div>
-            <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="防守籃板率 (DREB%)：全隊抓下的防守籃板比例">DREB</span><div class="circular-chart mt-1" id="donut-dreb" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-dreb">0%</span></div></div>
+            <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="進攻籃板佔比 (OREB%)：本隊所有籃板中，進攻籃板所佔的比例">OREB</span><div class="circular-chart mt-1" id="donut-oreb" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-oreb">0%</span></div></div>
+            <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="防守籃板佔比 (DREB%)：本隊所有籃板中，防守籃板所佔的比例">DREB</span><div class="circular-chart mt-1" id="donut-dreb" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-dreb">0%</span></div></div>
             <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="罰球率 (FTr)：罰球出手數與投籃出手數的比值，衡量買犯能力">FTr</span><div class="circular-chart mt-1" id="donut-ftr" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-ftr">0%</span></div></div>
             <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="失誤率 (TOV%)：每次球權中發生失誤的機率">TOV</span><div class="circular-chart mt-1" id="donut-tov" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-tov">0%</span></div></div>
         `;
+        // [修正結束]
         
         runSuspenseAnimation('anim-adv-poss', avgPoss, 1); runSuspenseAnimation('anim-adv-efg', efg, 0, '%', 'donut-efg'); runSuspenseAnimation('anim-adv-oreb', orebPct, 0, '%', 'donut-oreb'); runSuspenseAnimation('anim-adv-dreb', drebPct, 0, '%', 'donut-dreb'); runSuspenseAnimation('anim-adv-ftr', ftr, 0, '%', 'donut-ftr'); runSuspenseAnimation('anim-adv-tov', tovPct, 0, '%', 'donut-tov');
 
@@ -678,7 +660,6 @@
             return; 
         }
 
-        // --- 核心邏輯修改：若數據為 0 則不回傳球員 ---
         const getTopPlayer = (statKey) => {
             if (playerStats.length === 0) return null;
             const top = playerStats.reduce((max, p) => p[statKey] > max[statKey] ? p : max, playerStats[0]);
@@ -768,6 +749,26 @@
         `).join('');
         document.getElementById('playerGameLog').innerHTML = logHtml || '<tr><td colspan="12" class="text-muted py-4">尚無數據</td></tr>';
 
+        // --- 動態處理全隊戰力統計表 ---
+        const isAllSessions = (currentFilter === 'ALL');
+        const teamStatsHead = `
+            <tr>
+                <th>背號</th><th class="text-start">球員</th>
+                ${isAllSessions ? '<th>場次</th>' : ''}
+                <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均得分">PTS</span></th>
+                <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均效率值">EFF</span></th>
+                <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="總兩分球 進球 / 出手 / 命中率">2分球<br><small class="text-muted fw-normal">進/出/%</small></span></th>
+                <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="總三分球 進球 / 出手 / 命中率">3分球<br><small class="text-muted fw-normal">進/出/%</small></span></th>
+                <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="總罰球 進球 / 出手 / 命中率">罰球<br><small class="text-muted fw-normal">進/出/%</small></span></th>
+                <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="總籃板 (進攻 / 防守 / 總計)">籃板<br><small class="text-muted fw-normal">攻/守/總</small></span></th>
+                <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均助攻">AST</span></th>
+                <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均抄截">STL</span></th>
+                <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均阻攻">BLK</span></th>
+                <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均失誤">TOV</span></th>
+                <th><span class="tooltip-trigger" data-bs-toggle="tooltip" title="平均犯規">PF</span></th>
+            </tr>`;
+        document.getElementById('teamStatsTableHead').innerHTML = teamStatsHead;
+
         const teamHtml = db.map(p => {
             const gms = getFilteredGames(p.games); if(gms.length === 0) return '';
             
@@ -785,7 +786,7 @@
             return `<tr>
                 <td class="text-muted">#${p.number}</td>
                 <td class="text-start fw-bold"><span class="player-link" onclick="goToPlayer(${p.id})">${p.name}</span></td>
-                <td>${lc}</td>
+                ${isAllSessions ? `<td>${lc}</td>` : ''}
                 <td class="text-primary fw-bold">${(sPts/lc).toFixed(1)}</td>
                 <td class="text-eff fw-bold">${(sEff/lc).toFixed(1)}</td>
                 <td>${getShootingStr(sFg2m, sFg2a)}</td>
@@ -799,7 +800,7 @@
                 <td>${(sPf/lc).toFixed(1)}</td>
             </tr>`;
         }).join('');
-        document.getElementById('teamStatsTable').innerHTML = teamHtml || '<tr><td colspan="14" class="text-muted py-4">無球員參賽</td></tr>';
+        document.getElementById('teamStatsTable').innerHTML = teamHtml || '<tr><td colspan="15" class="text-muted py-4">無球員參賽</td></tr>';
 
         initTooltips();
     }
@@ -813,16 +814,8 @@
     }
 
     function exportData() { 
-        // 取得目前的自訂標題
         const currentTitle = localStorage.getItem('bball_custom_title') || '';
-        
-        // 將標題和數據打包成一個物件
-        const exportObj = {
-            version: "1.1",
-            appTitle: currentTitle,
-            db: db
-        };
-        
+        const exportObj = { version: "1.1", appTitle: currentTitle, db: db };
         const a = document.createElement('a'); 
         a.href = URL.createObjectURL(new Blob([JSON.stringify(exportObj, null, 2)], {type: "application/json"})); 
         a.download = `BBALL_Data_${new Date().toISOString().slice(0,10)}.json`; 
@@ -832,66 +825,37 @@
     function importData(e) { 
         const f = e.target.files[0]; 
         if(!f) return; 
-        
         const r = new FileReader(); 
         r.onload = function(ev) { 
             try { 
                 const d = JSON.parse(ev.target.result); 
-                
-                // 判斷：如果是舊版的純陣列格式
-                if (Array.isArray(d)) { 
-                    db = d; 
-                } 
-                // 判斷：如果是新版的物件格式 (包含 db 和 appTitle)
+                if (Array.isArray(d)) { db = d; } 
                 else if (d.db && Array.isArray(d.db)) {
                     db = d.db;
-                    if (d.appTitle) {
-                        localStorage.setItem('bball_custom_title', d.appTitle);
-                    } else {
-                        localStorage.removeItem('bball_custom_title');
-                    }
-                    loadAppTitle(); // 重新載入標題顯示
-                } else {
-                    throw new Error("Invalid format");
-                }
-
+                    if (d.appTitle) { localStorage.setItem('bball_custom_title', d.appTitle); } 
+                    else { localStorage.removeItem('bball_custom_title'); }
+                    loadAppTitle();
+                } else { throw new Error("Invalid format"); }
                 if(db.length > 0) currentPlayerId = db[0].id; 
-                
-                saveData(); 
-                updatePlayerSelect(); 
-                updateSessionOptions(); 
-                renderDashboard(); 
+                saveData(); updatePlayerSelect(); updateSessionOptions(); renderDashboard(); 
                 alert('匯入成功！'); 
-                
-            } catch(err) {
-                alert('檔案格式錯誤，無法匯入！');
-            } 
+            } catch(err) { alert('檔案格式錯誤，無法匯入！'); } 
         }; 
         r.readAsText(f); 
-        e.target.value = ''; // 重置 file input，讓同一個檔案可以重複選取
+        e.target.value = ''; 
     }
 
     function clearData() { 
         if(confirm("確定清除所有數據與球員名單？這將恢復預設狀態！")) { 
-            // 1. 清除 localStorage 中的數據庫
             localStorage.removeItem('bball_db_v7'); 
-            // 2. 清除 localStorage 中的自訂標題
             localStorage.removeItem('bball_custom_title'); 
-            
-            // 3. 恢復預設的球員資料與狀態
             db = JSON.parse(JSON.stringify(defaultDB)); 
             currentPlayerId = db[0].id; 
             currentFilter = 'ALL'; 
-            
-            // 4. 強制重新載入標題
             loadAppTitle(); 
-            
-            // 5. 更新所有畫面選項與圖表
             updateSessionOptions(); 
             updatePlayerSelect(); 
             renderDashboard(); 
-
-            // 👇 新增這行：重置「新增比賽數據」的表單，清空場次名稱與所有輸入框
             document.getElementById('dataForm').reset();
         } 
     }
