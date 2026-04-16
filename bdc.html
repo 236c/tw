@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>籃球數據戰情室</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        body { background-color: #f4f6f9; color: #333333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 50px; }
-        .card-custom { background-color: #ffffff; border: 1px solid #e0e4e8; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        /* =========================================
+           1. 基礎預設風格 (Default Theme)
+           ========================================= */
+        body { background-color: #f4f6f9; color: #333333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-bottom: 50px; transition: background-color 0.3s; }
+        .card-custom { background-color: #ffffff; border: 1px solid #e0e4e8; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; transition: all 0.3s; }
         .text-accent { color: #0d6efd; }
         .text-eff { color: #198754; }
         .text-warning-custom { color: #f59f00; }
@@ -15,11 +20,11 @@
         .tooltip-trigger { cursor: help; border-bottom: 1px dashed #adb5bd; display: inline-block; margin-bottom: 5px; font-weight: 700; color: #495057; transition: color 0.2s; }
         .tooltip-trigger:hover { color: #0d6efd; border-bottom-color: #0d6efd; }
         
-        .circular-chart { position: relative; width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(#f59f00 var(--p), #e9ecef 0deg); display: flex; align-items: center; justify-content: center; margin: 0 auto; }
-        .circular-chart::before { content: ""; position: absolute; width: 48px; height: 48px; border-radius: 50%; background-color: #ffffff; }
+        .circular-chart { position: relative; width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(#f59f00 var(--p), #e9ecef 0deg); display: flex; align-items: center; justify-content: center; margin: 0 auto; transition: background 0.3s; }
+        .circular-chart::before { content: ""; position: absolute; width: 48px; height: 48px; border-radius: 50%; background-color: #ffffff; transition: background-color 0.3s; }
         .circular-chart-value { position: relative; font-weight: 800; font-size: 0.9rem; color: #212529; }
         
-        .leader-card { background: linear-gradient(to bottom, #ffffff, #e9ecef); border: 1px solid #dee2e6; border-radius: 10px; padding: 10px; text-align: center; position: relative; overflow: hidden; flex: 1; }
+        .leader-card { background: linear-gradient(to bottom, #ffffff, #e9ecef); border: 1px solid #dee2e6; border-radius: 10px; padding: 10px; text-align: center; position: relative; overflow: hidden; flex: 1; transition: all 0.3s; }
         .leader-silhouette { width: 60px; height: 60px; background-color: #ced4da; border-radius: 50%; margin: 0 auto 5px auto; mask-image: radial-gradient(circle, black 60%, transparent 60%); -webkit-mask-image: radial-gradient(circle, black 60%, transparent 60%); }
         .leader-crown { position: absolute; top: 10px; left: 10px; font-size: 1.2rem; }
         .leader-stat-name { font-size: 0.8rem; color: #6c757d; font-weight: bold;}
@@ -27,22 +32,120 @@
         .leader-player-name { font-size: 0.9rem; font-weight: bold; margin-bottom: 0;}
         .leader-player-num { font-size: 0.8rem; color: #adb5bd;}
         
-        .bar-container { background-color: #e9ecef; border-radius: 6px; height: 16px; width: 100%; margin-top: 5px; overflow: hidden; }
-        .bar-fill-player { background-color: #dc3545; height: 100%; width: 0%; transition: width 2s cubic-bezier(0.1, 0.95, 0.2, 1); }
-        .bar-fill-team { background-color: #adb5bd; height: 100%; width: 0%; transition: width 2s cubic-bezier(0.1, 0.95, 0.2, 1); }
+        .bar-container { background-color: #e9ecef; border-radius: 6px; height: 16px; width: 100%; margin-top: 5px; overflow: hidden; transition: background-color 0.3s; }
+        .bar-fill-player { background-color: #dc3545; height: 100%; width: 0%; transition: width 2s cubic-bezier(0.1, 0.95, 0.2, 1), background-color 0.3s; }
+        .bar-fill-team { background-color: #adb5bd; height: 100%; width: 0%; transition: width 2s cubic-bezier(0.1, 0.95, 0.2, 1), background-color 0.3s; }
 
         .player-link { cursor: pointer; color: #0d6efd; transition: color 0.2s; }
         .player-link:hover { color: #0a58ca; text-decoration: underline; }
 
-        .roster-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; text-align: center; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; background: #fff; }
+        .roster-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; text-align: center; position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s; background: #fff; }
         .roster-card:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
         .roster-card .actions { position: absolute; top: 5px; right: 5px; opacity: 0; transition: opacity 0.2s; }
         .roster-card:hover .actions { opacity: 1; }
-        .roster-avatar { width: 70px; height: 70px; background: #e9ecef; border-radius: 8px; margin: 0 auto 10px auto; display: flex; align-items: flex-end; justify-content: center; overflow: hidden;}
+        .roster-avatar { width: 70px; height: 70px; background: #e9ecef; border-radius: 8px; margin: 0 auto 10px auto; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; transition: background-color 0.3s;}
+        .roster-avatar svg { width: 60px; height: 60px; fill: #ced4da; transition: fill 0.3s; }
 
         #appTitleDisplay { cursor: pointer; transition: opacity 0.2s; }
         #appTitleDisplay:hover { opacity: 0.8; }
         #appTitleDisplay::after { content: ' \270F\FE0F'; font-size: 0.6em; vertical-align: super; opacity: 0.6; }
+
+        /* =========================================
+           2. 日式質感風格覆寫 (Japanese Theme)
+           ========================================= */
+        body.theme-japanese {
+            background-color: #f2efe9;
+            color: #333130;
+            font-family: 'Noto Sans TC', Tahoma, Geneva, sans-serif;
+            background-image: url('data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23e8e4db" fill-opacity="0.4" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3Ccircle cx="13" cy="13" r="3"/%3E%3C/g%3E%3C/svg%3E');
+        }
+        
+        .theme-japanese h1, .theme-japanese h2, .theme-japanese h3, .theme-japanese h4, .theme-japanese h5, .theme-japanese h6, 
+        .theme-japanese .fw-bold, .theme-japanese .leader-stat-val, .theme-japanese .stat-value {
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700 !important;
+            color: #2b2927;
+            letter-spacing: 0.5px;
+        }
+
+        .theme-japanese .card-custom {
+            background-color: #faf9f5; border: 1px solid #dcd8ce; border-radius: 4px; box-shadow: 0 4px 15px rgba(40,35,30,0.03);
+        }
+
+        .theme-japanese .text-primary { color: #2b3d4f !important; }
+        .theme-japanese .bg-primary { background-color: #2b3d4f !important; }
+        .theme-japanese .bg-white { background-color: #faf9f5 !important; }
+        .theme-japanese .bg-light { background-color: #efece5 !important; }
+        .theme-japanese .border { border-color: #dcd8ce !important; }
+        .theme-japanese .border-bottom { border-bottom-color: #dcd8ce !important; }
+        
+        .theme-japanese .text-accent { color: #8c3a3a; }
+        .theme-japanese .text-eff { color: #4e6151; }
+        .theme-japanese .text-warning-custom { color: #b08e51; }
+
+        /* 按鈕設計：強制覆蓋文字顏色，避免暗字 */
+        .theme-japanese .btn-primary { background-color: #2b3d4f !important; border-color: #2b3d4f !important; border-radius: 2px; color: #faf9f5 !important; }
+        .theme-japanese .btn-primary:hover { background-color: #1e2b38 !important; border-color: #1e2b38 !important; color: #ffffff !important; }
+        .theme-japanese .btn-outline-primary { color: #2b3d4f; border-color: #2b3d4f; border-radius: 2px; }
+        .theme-japanese .btn-outline-primary:hover { background-color: #2b3d4f; color: #fff; }
+        .theme-japanese .btn-outline-danger { color: #8c3a3a; border-color: #8c3a3a; border-radius: 2px; }
+        .theme-japanese .btn-outline-danger:hover { background-color: #8c3a3a; color: #fff; }
+        .theme-japanese .btn-outline-secondary { color: #5a5652; border-color: #c0bcb3; border-radius: 2px; }
+        
+        /* 標籤 Badge */
+        .theme-japanese .badge { border-radius: 2px; font-family: 'Noto Sans TC', sans-serif; font-weight: 500; }
+        .theme-japanese .badge.bg-secondary { background-color: #7a7671 !important; }
+        .theme-japanese .badge.bg-light { background-color: #efece5 !important; border: 1px solid #dcd8ce !important; color: #2b3d4f !important; }
+
+        /* 表單控制 */
+        .theme-japanese .form-control, .theme-japanese .form-select { 
+            background-color: #faf9f5; border: 1px solid #c0bcb3; border-radius: 2px; color: #333130;
+        }
+        .theme-japanese .form-control:focus, .theme-japanese .form-select:focus { 
+            border-color: #b08e51; box-shadow: 0 0 0 0.2rem rgba(176, 142, 81, 0.2); 
+        }
+
+        /* 導覽列 Tabs */
+        .theme-japanese .nav-pills .nav-link { color: #5a5652; border-radius: 2px; font-weight: 500; }
+        .theme-japanese .nav-pills .nav-link.active { background-color: #2b3d4f; color: #faf9f5; }
+        .theme-japanese .nav-pills .nav-link:hover:not(.active) { background-color: #e4dfd5; }
+
+        /* 表格設計 */
+        .theme-japanese .table { color: #333130; }
+        .theme-japanese .table-hover tbody tr:hover { background-color: #efece5; }
+        .theme-japanese .table th { color: #5a5652; border-bottom: 2px solid #dcd8ce; font-family: 'Noto Serif TC', serif; font-weight: 700; }
+        .theme-japanese .table td, .theme-japanese .table th { border-color: #e4dfd5; }
+
+        /* 圖表與視覺元素 */
+        .theme-japanese .circular-chart { background: conic-gradient(#b08e51 var(--p), #e4dfd5 0deg); }
+        .theme-japanese .circular-chart::before { background-color: #faf9f5; }
+        .theme-japanese .circular-chart-value { color: #2b2927; font-family: 'Noto Sans TC'; }
+        
+        .theme-japanese .bar-container { background-color: #e4dfd5; border-radius: 2px; }
+        .theme-japanese .bar-fill-player { background-color: #8c3a3a; }
+        .theme-japanese .bar-fill-team { background-color: #b0aba1; }
+
+        /* 排行榜卡片 */
+        .theme-japanese .leader-card { background: #faf9f5; border: 1px solid #dcd8ce; border-radius: 4px; }
+        .theme-japanese .leader-silhouette { width: 50px; height: 50px; background-color: #dcd8ce; border-radius: 2px; }
+        .theme-japanese .leader-crown { color: #b08e51; top: 8px; left: 8px; font-size: 1.1rem; }
+        .theme-japanese .leader-stat-name { color: #7a7671; }
+        .theme-japanese .leader-player-num { color: #b0aba1; }
+
+        /* 球員名單卡片 */
+        .theme-japanese .roster-card { border: 1px solid #dcd8ce; border-radius: 4px; background: #faf9f5; }
+        .theme-japanese .roster-card:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(40,35,30,0.06); }
+        .theme-japanese .roster-avatar { background: #e4dfd5; border-radius: 2px; }
+        .theme-japanese .roster-avatar svg { fill: #b0aba1; }
+
+        /* 小工具提示虛線 */
+        .theme-japanese .stat-label { color: #7a7671; }
+        .theme-japanese .tooltip-trigger { border-bottom: 1px dashed #b0aba1; color: #5a5652; }
+        .theme-japanese .tooltip-trigger:hover { color: #2b3d4f; border-bottom-color: #2b3d4f; }
+
+        /* Modal 視窗覆寫 */
+        .theme-japanese .modal-content { border-radius: 4px; border: 1px solid #dcd8ce; background: #faf9f5; }
+        .theme-japanese .modal-header { border-bottom-color: #dcd8ce; }
     </style>
 </head>
 <body>
@@ -51,9 +154,10 @@
     
     <div class="row mb-3 position-relative" style="z-index: 1050;">
         <div class="col-12">
-            <div class="d-flex flex-wrap justify-content-between align-items-center bg-white p-2 rounded shadow-sm border">
-                <div class="d-flex align-items-center">
-                    <div class="dropdown me-3">
+            <div class="d-flex flex-wrap align-items-center justify-content-between bg-white p-2 rounded shadow-sm border gap-2">
+                
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    <div class="dropdown">
                         <button class="btn btn-sm btn-outline-secondary dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown">⚙️ 設定</button>
                         <ul class="dropdown-menu shadow">
                             <li><button class="dropdown-item text-primary" onclick="exportData()">💾 匯出備份 (JSON)</button></li>
@@ -71,24 +175,22 @@
                     </ul>
                 </div>
 
-                <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0 pe-2">
-                    <label class="fw-bold text-secondary text-nowrap m-0">📊 分析範圍：</label>
-                    <div class="input-group input-group-sm" style="flex-wrap: nowrap;">
-                        <select class="form-select border-primary fw-bold" id="sessionFilter" style="min-width: 150px;" onchange="updateFilter()">
-                            <option value="ALL">所有場次 (賽季總計)</option>
-                        </select>
-                        <button class="btn btn-outline-primary" type="button" id="editSessionBtn" onclick="editCurrentSession()" title="重新命名此賽事" style="display: none;">✏️</button>
-                        <button class="btn btn-outline-danger" type="button" id="deleteSessionBtn" onclick="deleteCurrentSession()" title="刪除整場賽事" style="display: none;">🗑️</button>
-                    </div>
+                <div class="dropdown ms-auto">
+                    <button class="btn btn-sm btn-outline-primary dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown">🎨 介面風格</button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <li><button class="dropdown-item" onclick="setTheme('default')">🏀 現代預設</button></li>
+                        <li><button class="dropdown-item" onclick="setTheme('japanese')">🍵 日式質感</button></li>
+                    </ul>
                 </div>
+
             </div>
         </div>
     </div>
 
     <div class="row mb-4" id="topOverviewSection">
         <div class="col-lg-7 mb-3 mb-lg-0">
-            <div class="card card-custom h-100 p-3">
-                <div class="d-flex justify-content-between align-items-end border-bottom pb-2 mb-3">
+            <div class="card card-custom h-100 p-4">
+                <div class="d-flex justify-content-between align-items-end border-bottom pb-2 mb-4">
                     <h4 class="fw-bold m-0" id="appTitleDisplay" onclick="editAppTitle()" title="點擊修改名稱"><span class="text-accent">B-BALL</span> 數據中心</h4>
                     <h6 class="fw-bold text-dark m-0 pb-1" id="advancedStatsTitle">所有場次戰績分析</h6>
                 </div>
@@ -141,28 +243,22 @@
 
         <div class="col-lg-8">
             <div id="individualView" style="display: none;">
-                <div class="card card-custom p-4 mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <h2 class="fw-bold text-dark mb-0 d-inline-block me-2" id="displayPlayerName">載入中...</h2>
-                            <span class="badge bg-secondary fs-6 align-text-bottom" id="displayPlayerNumber">#0</span>
-                        </div>
-                        <div class="text-end">
-                            <span class="fs-2 text-eff fw-bold" id="anim-ind-eff">0.0</span><br>
-                            <span class="stat-label tooltip-trigger" data-bs-toggle="tooltip" title="效率值 (Efficiency)：綜合評估球場貢獻。公式為 (得分+籃板+助攻+抄截+阻攻) - (投籃失手+罰球失手+失誤)">EFF</span>
+                
+                <div class="card card-custom p-3 mb-3">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+                        <h6 class="fw-bold text-dark m-0">📋 出賽紀錄表</h6>
+                        
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-bold text-secondary text-nowrap m-0 small">分析範圍：</span>
+                            <div class="input-group input-group-sm" style="flex-wrap: nowrap;">
+                                <select class="form-select border-primary fw-bold session-filter-select" onchange="updateFilter(this.value)" style="min-width: 150px;">
+                                    <option value="ALL">所有場次 (賽季總計)</option>
+                                </select>
+                                <button class="btn btn-outline-primary edit-session-btn" type="button" onclick="editCurrentSession()" title="重新命名此賽事" style="display: none;">✏️</button>
+                                <button class="btn btn-outline-danger delete-session-btn" type="button" onclick="deleteCurrentSession()" title="刪除整場賽事" style="display: none;">🗑️</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="row text-center mb-4 g-3">
-                        <div class="col-4"><div class="p-3 bg-light rounded"><h3 class="stat-value text-primary" id="anim-ind-pts">0.0</h3><span class="stat-label tooltip-trigger" data-bs-toggle="tooltip" title="得分 (Points)">PTS</span></div></div>
-                        <div class="col-4"><div class="p-3 bg-light rounded"><h3 class="stat-value" id="anim-ind-reb">0.0</h3><span class="stat-label tooltip-trigger" data-bs-toggle="tooltip" title="總籃板 (Rebounds)">REB</span></div></div>
-                        <div class="col-4"><div class="p-3 bg-light rounded"><h3 class="stat-value" id="anim-ind-ast">0.0</h3><span class="stat-label tooltip-trigger" data-bs-toggle="tooltip" title="助攻 (Assists)">AST</span></div></div>
-                    </div>
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">個人 vs 團隊平均比較</h6>
-                    <div id="comparisonCharts"></div>
-                </div>
-
-                <div class="card card-custom p-3">
-                    <h6 class="fw-bold text-dark mb-3">📋 出賽紀錄表</h6>
                     <div class="table-responsive">
                         <table class="table table-hover table-sm text-center align-middle" style="white-space: nowrap;">
                             <thead>
@@ -185,14 +281,49 @@
                         </table>
                     </div>
                 </div>
+
+                <div class="card card-custom p-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start mb-3 gap-2 border-bottom pb-3">
+                        <div>
+                            <div>
+                                <h2 class="fw-bold text-dark mb-0 d-inline-block me-2" id="displayPlayerName">載入中...</h2>
+                                <span class="badge bg-secondary fs-6 align-text-bottom" id="displayPlayerNumber">#0</span>
+                                <span id="indGameLogSessionName" class="badge bg-light text-primary border ms-2 fs-6 align-text-bottom">所有場次 (賽季總計)</span>
+                            </div>
+                        </div>
+                        <div class="text-end mt-1">
+                            <span class="fs-2 text-eff fw-bold" id="anim-ind-eff">0.0</span><br>
+                            <span class="stat-label tooltip-trigger" data-bs-toggle="tooltip" title="效率值 (Efficiency)：綜合評估球場貢獻。公式為 (得分+籃板+助攻+抄截+阻攻) - (投籃失手+罰球失手+失誤)">EFF</span>
+                        </div>
+                    </div>
+                    <div class="row text-center mb-4 g-3">
+                        <div class="col-4"><div class="p-3 bg-light rounded"><h3 class="stat-value text-primary" id="anim-ind-pts">0.0</h3><span class="stat-label tooltip-trigger" data-bs-toggle="tooltip" title="得分 (Points)">PTS</span></div></div>
+                        <div class="col-4"><div class="p-3 bg-light rounded"><h3 class="stat-value" id="anim-ind-reb">0.0</h3><span class="stat-label tooltip-trigger" data-bs-toggle="tooltip" title="總籃板 (Rebounds)">REB</span></div></div>
+                        <div class="col-4"><div class="p-3 bg-light rounded"><h3 class="stat-value" id="anim-ind-ast">0.0</h3><span class="stat-label tooltip-trigger" data-bs-toggle="tooltip" title="助攻 (Assists)">AST</span></div></div>
+                    </div>
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">個人 vs 團隊平均比較</h6>
+                    <div id="comparisonCharts"></div>
+                </div>
+
             </div>
 
             <div id="teamView">
                 <div class="card card-custom p-4">
-                    <div class="d-flex align-items-center mb-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
                         <h5 class="fw-bold text-dark m-0">📊 全隊戰力統計表</h5>
-                        <span id="teamStatsSessionName" class="badge bg-light text-primary border ms-3 fs-6 align-middle">所有場次 (賽季總計)</span>
+                        
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="fw-bold text-secondary text-nowrap m-0">分析範圍：</label>
+                            <div class="input-group input-group-sm" style="flex-wrap: nowrap;">
+                                <select class="form-select border-primary fw-bold session-filter-select" onchange="updateFilter(this.value)" style="min-width: 150px;">
+                                    <option value="ALL">所有場次 (賽季總計)</option>
+                                </select>
+                                <button class="btn btn-outline-primary edit-session-btn" type="button" onclick="editCurrentSession()" title="重新命名此賽事" style="display: none;">✏️</button>
+                                <button class="btn btn-outline-danger delete-session-btn" type="button" onclick="deleteCurrentSession()" title="刪除整場賽事" style="display: none;">🗑️</button>
+                            </div>
+                        </div>
                     </div>
+                    
                     <div class="table-responsive">
                         <table class="table table-hover text-center align-middle" style="white-space: nowrap;">
                             <thead id="teamStatsTableHead">
@@ -239,7 +370,7 @@
                 <div class="col-4"><label class="form-label stat-label">抄截 (STL)</label><input type="number" class="form-control" id="e_stl" min="0" placeholder="0"></div>
                 <div class="col-4 offset-8"><label class="form-label stat-label">阻攻 (BLK)</label><input type="number" class="form-control" id="e_blk" min="0" placeholder="0"></div>
             </div>
-            <div class="d-flex justify-content-end gap-2 mt-4"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button><button type="submit" class="btn btn-primary fw-bold">💾 儲存</button></div>
+            <div class="d-flex justify-content-end gap-2 mt-4"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button><button type="submit" class="btn btn-primary fw-bold">💾 儲存</button></div>
         </form>
       </div>
     </div>
@@ -249,7 +380,7 @@
 <div class="modal fade" id="playerProfileModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-sm modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title fw-bold" id="playerProfileModalTitle">新增球員</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header border-bottom"><h5 class="modal-title fw-bold" id="playerProfileModalTitle">新增球員</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
         <input type="hidden" id="profilePlayerId">
         <div class="mb-3"><label class="form-label fw-bold">球員姓名</label><input type="text" id="profileName" class="form-control" required></div>
@@ -283,6 +414,7 @@
         editModalInstance = new bootstrap.Modal(document.getElementById('editGameModal'));
         playerProfileModalInstance = new bootstrap.Modal(document.getElementById('playerProfileModal'));
         
+        loadTheme(); // 讀取並套用儲存的風格
         loadAppTitle(); 
         loadData(); 
         updatePlayerSelect();
@@ -296,6 +428,22 @@
             renderDashboard();
         });
     });
+
+    // --- 風格切換功能 ---
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('bball_theme') || 'default';
+        setTheme(savedTheme);
+    }
+
+    function setTheme(theme) {
+        if (theme === 'japanese') {
+            document.body.classList.add('theme-japanese');
+        } else {
+            document.body.classList.remove('theme-japanese');
+        }
+        localStorage.setItem('bball_theme', theme);
+    }
+    // --------------------
 
     function loadAppTitle() {
         const savedTitle = localStorage.getItem('bball_custom_title');
@@ -385,34 +533,49 @@
         if(db.length > 0) currentPlayerId = db[0].id;
     }
 
-    function updateFilter() { 
-        currentFilter = document.getElementById('sessionFilter').value; 
+    // 更新選單值的通用函數
+    function updateFilter(val) { 
+        if (val !== undefined) {
+            currentFilter = val;
+        } else {
+            const firstSelect = document.querySelector('.session-filter-select');
+            if (firstSelect) currentFilter = firstSelect.value;
+        }
         
+        // 同步畫面上所有的選單
+        document.querySelectorAll('.session-filter-select').forEach(sel => sel.value = currentFilter);
+
         const isAll = (currentFilter === 'ALL');
-        document.getElementById('editSessionBtn').style.display = isAll ? 'none' : 'block';
-        document.getElementById('deleteSessionBtn').style.display = isAll ? 'none' : 'block';
+        document.querySelectorAll('.edit-session-btn').forEach(btn => btn.style.display = isAll ? 'none' : 'block');
+        document.querySelectorAll('.delete-session-btn').forEach(btn => btn.style.display = isAll ? 'none' : 'block');
         
-        switchView('team');
         renderDashboard(); 
     }
 
     function updateSessionOptions() {
         const sessions = new Set();
         db.forEach(p => p.games.forEach(g => sessions.add(g.sessionName)));
-        const filterSelect = document.getElementById('sessionFilter');
+        
+        let optionsHtml = '<option value="ALL">所有場次 (賽季總計)</option>';
+        sessions.forEach(s => { optionsHtml += `<option value="${s}">${s}</option>`; });
+        
         const dataList = document.getElementById('sessionSuggestions');
-        filterSelect.innerHTML = '<option value="ALL">所有場次 (賽季總計)</option>';
         dataList.innerHTML = '';
-        sessions.forEach(s => { filterSelect.innerHTML += `<option value="${s}">${s}</option>`; dataList.innerHTML += `<option value="${s}">`; });
+        sessions.forEach(s => { dataList.innerHTML += `<option value="${s}">`; });
         
         if (currentFilter !== 'ALL' && !sessions.has(currentFilter)) {
             currentFilter = 'ALL';
         }
-        filterSelect.value = currentFilter;
+        
+        // 同步更新所有選單的選項
+        document.querySelectorAll('.session-filter-select').forEach(sel => {
+            sel.innerHTML = optionsHtml;
+            sel.value = currentFilter;
+        });
 
         const isAll = (currentFilter === 'ALL');
-        document.getElementById('editSessionBtn').style.display = isAll ? 'none' : 'block';
-        document.getElementById('deleteSessionBtn').style.display = isAll ? 'none' : 'block';
+        document.querySelectorAll('.edit-session-btn').forEach(btn => btn.style.display = isAll ? 'none' : 'block');
+        document.querySelectorAll('.delete-session-btn').forEach(btn => btn.style.display = isAll ? 'none' : 'block');
     }
 
     function editCurrentSession() {
@@ -539,11 +702,11 @@
             <div class="col-6 col-md-4 col-lg-3">
                 <div class="roster-card" onclick="goToPlayer(${p.id})">
                     <div class="actions">
-                        <button class="btn btn-sm btn-light border p-1 me-1" onclick="openPlayerProfileModal(${p.id}, event)" title="編輯">✏️</button>
-                        <button class="btn btn-sm btn-danger p-1" onclick="deletePlayerProfile(${p.id}, event)" title="刪除">🗑️</button>
+                        <button class="btn btn-sm btn-outline-secondary p-1 me-1" onclick="openPlayerProfileModal(${p.id}, event)" title="編輯">✏️</button>
+                        <button class="btn btn-sm btn-outline-danger p-1" onclick="deletePlayerProfile(${p.id}, event)" title="刪除">🗑️</button>
                     </div>
                     <div class="roster-avatar">
-                        <svg viewBox="0 0 24 24" fill="#ced4da" style="width: 60px; height: 60px;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                     </div>
                     <div class="fw-bold text-dark fs-6">${p.name}</div>
                     <div class="text-secondary small">#${p.number}</div>
@@ -600,17 +763,17 @@
     }
 
     function renderAdvancedHeader() {
-        const teamTitleEl = document.getElementById('teamStatsSessionName');
+        const indTitleEl = document.getElementById('indGameLogSessionName');
 
         if(db.length === 0) { 
             document.getElementById('advancedStatsContainer').innerHTML = ''; 
             document.getElementById('leaderboardsContainer').innerHTML = ''; 
-            if(teamTitleEl) teamTitleEl.innerText = '所有場次 (賽季總計)';
+            if(indTitleEl) indTitleEl.innerText = '所有場次 (賽季總計)';
             return; 
         }
         
         document.getElementById('advancedStatsTitle').innerText = currentFilter === 'ALL' ? '賽季總計戰績分析' : `${currentFilter} 戰績分析`;
-        if(teamTitleEl) teamTitleEl.innerText = currentFilter === 'ALL' ? '所有場次 (賽季總計)' : currentFilter;
+        if(indTitleEl) indTitleEl.innerText = currentFilter === 'ALL' ? '所有場次 (賽季總計)' : currentFilter;
 
         let tPOSS=0, tFG2M=0, tFG2A=0, tFG3M=0, tFG3A=0, tFTM=0, tFTA=0, tOREB=0, tDREB=0, tTOV=0, tGames=0;
         let playerStats = [];
@@ -627,14 +790,12 @@
         const FGA = tFG2A + tFG3A;
         const totalPoss = FGA + 0.44 * tFTA - tOREB + tTOV; 
 
-        // [修正區塊] 取得不重複的賽事場次數量，用來正確計算平均進攻回合
         const uniqueSessions = new Set();
         db.forEach(p => {
             getFilteredGames(p.games).forEach(g => uniqueSessions.add(g.sessionName));
         });
         const teamGamesCount = uniqueSessions.size;
         const avgPoss = teamGamesCount > 0 ? (totalPoss / teamGamesCount).toFixed(1) : 0;
-        // [修正結束]
 
         const efg = FGA > 0 ? Math.round(((tFG2M + 1.5 * tFG3M) / FGA) * 100) : 0;
         const orebPct = (tOREB + tDREB) > 0 ? Math.round((tOREB / (tOREB + tDREB)) * 100) : 0; 
@@ -642,7 +803,6 @@
         const ftr = FGA > 0 ? Math.round((tFTA / FGA) * 100) : 0;
         const tovPct = totalPoss > 0 ? Math.round((tTOV / totalPoss) * 100) : 0;
 
-        // [修正區塊] 更新 OREB 與 DREB 的 tooltip 敘述
         document.getElementById('advancedStatsContainer').innerHTML = `
             <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="單場平均進攻回合數">POSS</span><div class="fs-2 fw-bold text-dark lh-1 mt-2" id="anim-adv-poss">0.0</div></div>
             <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="實質命中率 (eFG%)：將三分球多一分的價值列入計算">EFG</span><div class="circular-chart mt-1" id="donut-efg" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-efg">0%</span></div></div>
@@ -651,7 +811,6 @@
             <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="罰球率 (FTr)：罰球出手數與投籃出手數的比值，衡量買犯能力">FTr</span><div class="circular-chart mt-1" id="donut-ftr" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-ftr">0%</span></div></div>
             <div><span class="tooltip-trigger" data-bs-toggle="tooltip" title="失誤率 (TOV%)：每次球權中發生失誤的機率">TOV</span><div class="circular-chart mt-1" id="donut-tov" style="--p: 0%"><span class="circular-chart-value" id="anim-adv-tov">0%</span></div></div>
         `;
-        // [修正結束]
         
         runSuspenseAnimation('anim-adv-poss', avgPoss, 1); runSuspenseAnimation('anim-adv-efg', efg, 0, '%', 'donut-efg'); runSuspenseAnimation('anim-adv-oreb', orebPct, 0, '%', 'donut-oreb'); runSuspenseAnimation('anim-adv-dreb', drebPct, 0, '%', 'donut-dreb'); runSuspenseAnimation('anim-adv-ftr', ftr, 0, '%', 'donut-ftr'); runSuspenseAnimation('anim-adv-tov', tovPct, 0, '%', 'donut-tov');
 
@@ -731,19 +890,20 @@
         ['pts', 'reb', 'ast', 'stl', 'blk'].forEach(stat => { runSuspenseAnimation(`anim-bar-p-${stat}`, c ? eval('p'+stat.charAt(0).toUpperCase()+stat.slice(1))/c : 0, 1); runSuspenseAnimation(`anim-bar-t-${stat}`, tGamesTotal ? eval('t'+stat.charAt(0).toUpperCase()+stat.slice(1))/tGamesTotal : 0, 1); });
         setTimeout(() => { document.querySelectorAll('.bar-fill-player, .bar-fill-team').forEach(bar => { if(bar.dataset.target) bar.style.width = bar.dataset.target; }); }, 50);
 
+        // 純文字顯示賽事場次
         const logHtml = [...tGames].reverse().map(g => `
             <tr>
-                <td class="text-start fw-bold">${g.sessionName}</td>
-                <td class="text-primary fw-bold">${g.pts}</td>
-                <td class="text-eff fw-bold">${g.eff}</td>
+                <td class="text-start fw-bold" style="color: #5a5652;">${g.sessionName}</td>
+                <td class="text-primary fw-bold stat-value">${g.pts}</td>
+                <td class="text-eff fw-bold stat-value">${g.eff}</td>
                 <td>${getShootingStr(g.fg2m, g.fg2a)}</td>
                 <td>${getShootingStr(g.fg3m, g.fg3a)}</td>
                 <td>${getShootingStr(g.ftm, g.fta)}</td>
-                <td>${g.oreb} / ${g.dreb} / <span class="fw-bold">${g.reb}</span></td>
+                <td>${g.oreb} / ${g.dreb} / <span class="fw-bold text-dark">${g.reb}</span></td>
                 <td>${g.ast}</td><td>${g.stl}</td><td>${g.blk}</td><td>${g.tov}</td>
                 <td>
-                    <button class="btn btn-sm btn-outline-secondary action-btn me-1" onclick="openEditModal(${player.id}, '${g.id}')">修改</button>
-                    <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteGame(${player.id}, '${g.id}')">刪除</button>
+                    <button class="btn btn-sm btn-outline-secondary me-1" onclick="openEditModal(${player.id}, '${g.id}')">修改</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteGame(${player.id}, '${g.id}')">刪除</button>
                 </td>
             </tr>
         `).join('');
@@ -785,14 +945,14 @@
 
             return `<tr>
                 <td class="text-muted">#${p.number}</td>
-                <td class="text-start fw-bold"><span class="player-link" onclick="goToPlayer(${p.id})">${p.name}</span></td>
+                <td class="text-start fw-bold"><span class="text-primary" style="cursor:pointer;" onclick="goToPlayer(${p.id})">${p.name}</span></td>
                 ${isAllSessions ? `<td>${lc}</td>` : ''}
-                <td class="text-primary fw-bold">${(sPts/lc).toFixed(1)}</td>
-                <td class="text-eff fw-bold">${(sEff/lc).toFixed(1)}</td>
+                <td class="text-primary fw-bold stat-value">${(sPts/lc).toFixed(1)}</td>
+                <td class="text-eff fw-bold stat-value">${(sEff/lc).toFixed(1)}</td>
                 <td>${getShootingStr(sFg2m, sFg2a)}</td>
                 <td>${getShootingStr(sFg3m, sFg3a)}</td>
                 <td>${getShootingStr(sFtm, sFta)}</td>
-                <td>${sOreb} / ${sDreb} / <span class="fw-bold">${sReb}</span></td>
+                <td>${sOreb} / ${sDreb} / <span class="fw-bold text-dark">${sReb}</span></td>
                 <td>${(sAst/lc).toFixed(1)}</td>
                 <td>${(sStl/lc).toFixed(1)}</td>
                 <td>${(sBlk/lc).toFixed(1)}</td>
