@@ -4,9 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>商務行事曆 & 全域記事本</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
     <style>
         /* ================= 佈景主題定義 ================= */
         :root {
@@ -119,7 +124,7 @@
 
         .event-chip {
             font-size: 0.85rem; font-weight: 500; padding: 4px 8px; border-radius: 6px; 
-            color: #202124; /* 深色文字搭配粉彩背景 */
+            color: #202124; 
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px;
             box-shadow: 0 1px 2px var(--chip-shadow); transition: all 0.1s;
         }
@@ -137,16 +142,22 @@
         .swal2-title { color: var(--text-main) !important; }
         .swal2-html-container { color: var(--text-muted) !important; }
 
-        /* ================= 新版選擇器樣式 (圓形彩色圖示與深淺選色) ================= */
-        .icon-selector, .color-selector { display: flex; flex-wrap: wrap; gap: 10px; }
-        
         /* 隱藏 Radio input */
         .icon-selector input[type="radio"], .color-selector input[type="radio"] { display: none; }
 
-        /* 圖示選擇器 */
+        /* ================= 新版選擇器樣式 (圖示兩排陣列) ================= */
+        .icon-selector { 
+            display: grid; 
+            grid-template-columns: repeat(8, 1fr); 
+            gap: 8px; 
+        }
+        
         .icon-selector label { 
+            width: 100%; 
+            aspect-ratio: 1; 
+            height: auto;
             display: inline-flex; align-items: center; justify-content: center; 
-            width: 44px; height: 44px; border: 1px solid var(--border-color); 
+            border: 1px solid var(--border-color); 
             border-radius: 50%; cursor: pointer; background: var(--bg-surface); 
             font-size: 1.4rem; transition: all 0.2s ease;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
@@ -158,24 +169,23 @@
             transform: scale(1.1);
         }
 
-        /* 顏色選擇器 - 完美對應附圖質感 */
+        /* 顏色選擇器 */
+        .color-selector { display: flex; flex-wrap: wrap; gap: 10px; }
         .color-selector label { 
             width: 36px; height: 36px; border-radius: 50%; cursor: pointer; 
             border: 2px solid transparent; position: relative; 
             display: flex; align-items: center; justify-content: center;
             transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-            background-color: var(--base-color); /* 未選取時顯示淡色系 */
+            background-color: var(--base-color); 
         }
         .color-selector label:hover { transform: scale(1.1); }
         
-        /* 選取狀態：顏色加深、深灰外框、放大 */
         .color-selector input[type="radio"]:checked + label { 
-            background-color: var(--active-color); /* 選取時顏色加深 */
-            border: 2.5px solid #2d3748; /* 俐落的深灰色外框 */
+            background-color: var(--active-color); 
+            border: 2.5px solid #2d3748; 
             transform: scale(1.15); 
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
-        /* 選取時的白色打勾符號 */
         .color-selector input[type="radio"]:checked + label::after {
             content: '\2714'; 
             color: #ffffff; 
@@ -191,8 +201,10 @@
             .day-cell { min-height: 90px; padding: 4px; }
             .date-number { font-size: 0.8rem; text-align: center; }
             .swal2-actions { flex-direction: column; width: 100%; padding: 0 1em; }
+            /* 手機版按鈕依然保持垂直排列並拉滿寬度 */
             .swal2-actions button { width: 100%; margin: 4px 0 !important; }
-            .icon-selector label, .color-selector label { width: 34px; height: 34px; font-size: 1.1rem; }
+            .icon-selector label { font-size: 1.1rem; }
+            .color-selector label { width: 34px; height: 34px; }
         }
 
         /* ================= 列印專用排版 ================= */
@@ -279,9 +291,10 @@
             </div>
             <div class="modal-body p-4">
                 <input type="hidden" id="currentEditId">
-                <div class="row mb-4">
-                    <div class="col-6"><label class="form-label fw-bold opacity-75 small">開始日期</label><input type="date" class="form-control" id="startDate"></div>
-                    <div class="col-6"><label class="form-label fw-bold opacity-75 small">結束日期</label><input type="date" class="form-control" id="endDate"></div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold opacity-75 small">🗓️ 選擇日期區間：</label>
+                    <input type="text" class="form-control bg-white" id="dateRange" placeholder="選擇日期區間" readonly>
                 </div>
                 
                 <div class="mb-4">
@@ -295,11 +308,9 @@
                         <input type="radio" name="noteIcon" id="iconGame" value="🎮"><label for="iconGame" title="娛樂">🎮</label>
                         <input type="radio" name="noteIcon" id="iconRun" value="🏃"><label for="iconRun" title="運動">🏃</label>
                         <input type="radio" name="noteIcon" id="iconPlane" value="✈️"><label for="iconPlane" title="旅遊">✈️</label>
-                        <input type="radio" name="noteIcon" id="iconMusic" value="🎵"><label for="iconMusic" title="音樂">🎵</label>
+                        
                         <input type="radio" name="noteIcon" id="iconFood" value="🍽️"><label for="iconFood" title="餐飲">🍽️</label>
-                        <input type="radio" name="noteIcon" id="iconIdea" value="💡"><label for="iconIdea" title="想法">💡</label>
                         <input type="radio" name="noteIcon" id="iconSoccer" value="⚽"><label for="iconSoccer" title="足球">⚽</label>
-                        <input type="radio" name="noteIcon" id="iconHospital" value="🏥"><label for="iconHospital" title="就醫">🏥</label>
                         <input type="radio" name="noteIcon" id="iconExam" value="📝"><label for="iconExam" title="考試">📝</label>
                         <input type="radio" name="noteIcon" id="iconStudy" value="🏫"><label for="iconStudy" title="補習/上課">🏫</label>
                         <input type="radio" name="noteIcon" id="iconStar" value="⭐️"><label for="iconStar" title="重要">⭐️</label>
@@ -349,6 +360,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
+
 <script>
     const STORAGE_KEY = 'my_calendar_events_v4';
     const MEMO_KEY = 'my_calendar_memo_v4';
@@ -356,14 +370,29 @@
     let currentDate = new Date();
     let events = []; 
     let noteModal;
+    let dateRangePicker;
 
+    // 解決按鈕太緊密的問題：在 confirmButton 與 denyButton 加上 me-2 工具類別
     const swalWithBootstrapButtons = Swal.mixin({
-        customClass: { confirmButton: 'btn btn-primary-custom px-4', denyButton: 'btn btn-danger px-4', cancelButton: 'btn btn-secondary px-4' },
+        customClass: { 
+            confirmButton: 'btn btn-primary-custom px-4 me-2', 
+            denyButton: 'btn btn-danger px-4 me-2', 
+            cancelButton: 'btn btn-secondary px-4' 
+        },
         buttonsStyling: false
     });
 
     document.addEventListener('DOMContentLoaded', () => {
         noteModal = new bootstrap.Modal(document.getElementById('noteModal'));
+        
+        flatpickr.l10ns.zh_tw.rangeSeparator = " 至 "; 
+        dateRangePicker = flatpickr("#dateRange", {
+            mode: "range",
+            locale: "zh_tw",
+            dateFormat: "Y-m-d",
+            allowInput: true
+        });
+
         initTheme();
         loadNotesFromStorage();
         loadMemoFromStorage();
@@ -470,13 +499,12 @@
     function openModalForNew(dateString) {
         document.getElementById('modalTitle').textContent = '新增記事';
         document.getElementById('currentEditId').value = ''; 
-        document.getElementById('startDate').value = dateString;
-        document.getElementById('endDate').value = dateString;
-        document.getElementById('noteTextarea').value = '';
         
+        dateRangePicker.setDate([dateString, dateString]);
+        
+        document.getElementById('noteTextarea').value = '';
         document.getElementById('colorBlue').checked = true;
         document.getElementById('iconPin').checked = true;
-
         document.getElementById('deleteNoteBtn').style.display = 'none'; 
         noteModal.show();
     }
@@ -486,25 +514,16 @@
         if (!evt) return;
         document.getElementById('modalTitle').textContent = '編輯記事';
         document.getElementById('currentEditId').value = evt.id; 
-        document.getElementById('startDate').value = evt.start;
-        document.getElementById('endDate').value = evt.end || evt.start;
+        
+        dateRangePicker.setDate([evt.start, evt.end || evt.start]);
+        
         document.getElementById('noteTextarea').value = evt.text;
         
-        // 自動勾選已儲存的顏色，找不到時自動選預設藍色
         const colorRadio = document.querySelector(`input[name="noteColor"][value="${evt.color}"]`);
-        if(colorRadio) {
-            colorRadio.checked = true;
-        } else {
-            document.getElementById('colorBlue').checked = true;
-        }
+        if(colorRadio) { colorRadio.checked = true; } else { document.getElementById('colorBlue').checked = true; }
 
-        // 自動勾選已儲存的圖示，找不到對應圖示(舊資料)時選圖釘📌
         const iconRadio = document.querySelector(`input[name="noteIcon"][value="${evt.icon}"]`);
-        if(iconRadio) {
-            iconRadio.checked = true;
-        } else {
-            document.getElementById('iconPin').checked = true; 
-        }
+        if(iconRadio) { iconRadio.checked = true; } else { document.getElementById('iconPin').checked = true; }
 
         document.getElementById('deleteNoteBtn').style.display = 'block'; 
         noteModal.show();
@@ -519,40 +538,36 @@
         document.getElementById('sideMemoArea').oninput = saveMemoToStorage;
         document.getElementById('printBtn').onclick = () => window.print();
 
-        document.getElementById('startDate').addEventListener('change', function() {
-            const endDateInput = document.getElementById('endDate');
-            if (!endDateInput.value || endDateInput.value < this.value) {
-                endDateInput.value = this.value;
-            }
-        });
-
         const calendarContainer = document.getElementById('calendarContainer');
         let wheelTimeout;
         calendarContainer.addEventListener('wheel', (e) => {
             e.preventDefault();
             if (wheelTimeout) return;
             
-            if (e.deltaY > 0) {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-            } else {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-            }
+            if (e.deltaY > 0) { currentDate.setMonth(currentDate.getMonth() + 1); } 
+            else { currentDate.setMonth(currentDate.getMonth() - 1); }
             renderCalendar();
             
-            wheelTimeout = setTimeout(() => {
-                wheelTimeout = null;
-            }, 400); 
+            wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 400); 
         }, { passive: false });
 
         document.getElementById('saveNoteBtn').onclick = () => {
             const id = document.getElementById('currentEditId').value;
-            const start = document.getElementById('startDate').value;
-            const end = document.getElementById('endDate').value || start;
+            
+            const selectedDates = dateRangePicker.selectedDates;
+            if (!selectedDates || selectedDates.length === 0) {
+                return swalWithBootstrapButtons.fire({ icon: 'warning', text: '請選擇日期區間' });
+            }
+            
+            const start = flatpickr.formatDate(selectedDates[0], "Y-m-d");
+            const end = selectedDates.length > 1 ? flatpickr.formatDate(selectedDates[1], "Y-m-d") : start;
+            
             const text = document.getElementById('noteTextarea').value.trim();
             const color = document.querySelector('input[name="noteColor"]:checked').value;
             const icon = document.querySelector('input[name="noteIcon"]:checked').value;
             
             if (!text) return swalWithBootstrapButtons.fire({ icon: 'warning', text: '請輸入內容' });
+            
             if (id) {
                 const index = events.findIndex(e => e.id === id);
                 events[index] = { id, start, end, text, color, icon };
@@ -617,29 +632,18 @@
                             }
                         }).then((result) => {
                             const newEvents = isArray ? importedData : importedData.events;
-                            
                             if (result.isConfirmed) {
                                 events = events.concat(newEvents);
-                                if (!isArray && importedData.memo) {
-                                    document.getElementById('sideMemoArea').value = importedData.memo;
-                                    saveMemoToStorage();
-                                }
+                                if (!isArray && importedData.memo) { document.getElementById('sideMemoArea').value = importedData.memo; saveMemoToStorage(); }
                                 saveNotesToStorage(); renderCalendar();
                             } else if (result.isDenied) {
                                 events = newEvents;
-                                if (!isArray && importedData.memo !== undefined) {
-                                    document.getElementById('sideMemoArea').value = importedData.memo;
-                                    saveMemoToStorage();
-                                }
+                                if (!isArray && importedData.memo !== undefined) { document.getElementById('sideMemoArea').value = importedData.memo; saveMemoToStorage(); }
                                 saveNotesToStorage(); renderCalendar();
                             }
                         });
-                    } else {
-                        swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '無效的檔案格式！(需為陣列格式)', confirmButtonText: '了解' });
-                    }
-                } catch (error) {
-                    swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '讀取檔案失敗或檔案已損毀！', confirmButtonText: '了解' });
-                }
+                    } else { swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '無效的檔案格式！(需為陣列格式)', confirmButtonText: '了解' }); }
+                } catch (error) { swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '讀取檔案失敗或檔案已損毀！', confirmButtonText: '了解' }); }
                 importInput.value = ''; 
             };
             reader.readAsText(file);
@@ -650,7 +654,6 @@
                 swalWithBootstrapButtons.fire({ icon: 'info', title: '提示', text: '目前沒有任何資料可以清除。', confirmButtonText: '了解' });
                 return;
             }
-            
             swalWithBootstrapButtons.fire({
                 title: '⚠️ 嚴重警告',
                 html: '確定要清除「所有」行事曆資料嗎？<br><br><b class="text-danger">此動作無法復原！</b><br>建議您先使用「匯出」功能備份資料。',
@@ -662,11 +665,9 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    events = [];
-                    localStorage.removeItem(MEMO_KEY);
+                    events = []; localStorage.removeItem(MEMO_KEY);
                     document.getElementById('sideMemoArea').value = "";
-                    saveNotesToStorage();
-                    renderCalendar();
+                    saveNotesToStorage(); renderCalendar();
                 }
             });
         });
