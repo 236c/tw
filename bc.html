@@ -109,7 +109,7 @@
             background-color: var(--bg-surface); min-height: 140px; padding: 8px; cursor: pointer;
             border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
             position: relative; display: flex; flex-direction: column; gap: 4px;
-            min-width: 0; /* CRITICAL: 確保 Grid 不會被長文字撐破 */
+            min-width: 0; /* 確保 Grid 不會被長文字撐破 */
         }
         .day-cell:nth-child(7n) { border-right: none; }
         .day-cell:hover { background-color: var(--bg-header); }
@@ -123,19 +123,21 @@
 
         .date-number { font-weight: 500; color: var(--text-muted); margin-bottom: 6px; font-size: 0.9rem; text-align: right; padding-right: 4px; }
 
-        /* 行程標籤樣式更新：文字截斷與排版修正 */
+        /* ================= 行程標籤樣式 ================= */
         .event-chip {
-            font-size: 0.85rem; font-weight: 500; padding: 4px 8px; border-radius: 6px; 
-            color: #202124; 
+            font-size: 0.85rem; 
+            font-weight: normal !important;
+            padding: 4px 8px; 
+            border-radius: 6px; 
             display: flex; align-items: center; gap: 6px;
             box-shadow: 0 1px 2px var(--chip-shadow); transition: all 0.1s;
             width: 100%;
-            overflow: hidden; /* 防止內容溢出 */
+            overflow: hidden; 
         }
         .event-chip:hover { opacity: 0.9; transform: translateY(-1px); }
         
         .event-chip .chip-icon {
-            flex-shrink: 0; /* 保證圖示絕對不會被擠壓變形 */
+            flex-shrink: 0; 
             font-size: 1.1em;
             line-height: 1;
         }
@@ -144,8 +146,8 @@
             white-space: nowrap; 
             overflow: hidden; 
             text-overflow: ellipsis; /* 文字過長顯示 ... */
-            font-weight: 600;
-            min-width: 0; /* CRITICAL: Flexbox 內截斷文字的關鍵 */
+            font-weight: normal !important;
+            min-width: 0; 
             flex: 1;
         }
 
@@ -156,61 +158,39 @@
             color: var(--text-main); font-size: 0.95rem; line-height: 1.6; resize: none; outline: none;
         }
 
-        /* SweetAlert2 樣式適配 */
+        /* ================= SweetAlert2 排版修正 ================= */
         .swal2-popup { background-color: var(--bg-surface) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); border-radius: 16px !important; }
         .swal2-title { color: var(--text-main) !important; }
         .swal2-html-container { color: var(--text-muted) !important; }
+        
+        /* 解決按鈕緊密問題：利用 flex gap 自動設定均勻間距 */
+        .swal2-actions { gap: 12px; }
+        .swal2-actions button { margin: 0 !important; } /* 清除原生 margin 避免與 gap 衝突 */
 
         /* 隱藏 Radio input */
         .icon-selector input[type="radio"], .color-selector input[type="radio"] { display: none; }
 
-        /* ================= 新版選擇器樣式 (圖示兩排陣列) ================= */
-        .icon-selector { 
-            display: grid; 
-            grid-template-columns: repeat(8, 1fr); 
-            gap: 8px; 
-        }
-        
+        /* 新版選擇器樣式 (圖示兩排陣列) */
+        .icon-selector { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
         .icon-selector label { 
-            width: 100%; 
-            aspect-ratio: 1; 
-            height: auto;
+            width: 100%; aspect-ratio: 1; height: auto;
             display: inline-flex; align-items: center; justify-content: center; 
-            border: 1px solid var(--border-color); 
-            border-radius: 50%; cursor: pointer; background: var(--bg-surface); 
-            font-size: 1.4rem; transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color); border-radius: 50%; cursor: pointer; 
+            background: var(--bg-surface); font-size: 1.4rem; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .icon-selector label:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .icon-selector input[type="radio"]:checked + label { 
-            background-color: var(--today-bg); border-color: var(--primary-color); 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
-            transform: scale(1.1);
-        }
+        .icon-selector input[type="radio"]:checked + label { background-color: var(--today-bg); border-color: var(--primary-color); box-shadow: 0 2px 8px rgba(0,0,0,0.1); transform: scale(1.1); }
 
         /* 顏色選擇器 */
         .color-selector { display: flex; flex-wrap: wrap; gap: 10px; }
         .color-selector label { 
-            width: 36px; height: 36px; border-radius: 50%; cursor: pointer; 
-            border: 2px solid transparent; position: relative; 
-            display: flex; align-items: center; justify-content: center;
-            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-            background-color: var(--base-color); 
+            width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; 
+            position: relative; display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s; background-color: var(--base-color); 
         }
         .color-selector label:hover { transform: scale(1.1); }
-        
-        .color-selector input[type="radio"]:checked + label { 
-            background-color: var(--active-color); 
-            border: 2.5px solid #2d3748; 
-            transform: scale(1.15); 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        .color-selector input[type="radio"]:checked + label::after {
-            content: '\2714'; 
-            color: #ffffff; 
-            font-size: 16px; 
-            font-weight: bold;
-        }
+        .color-selector input[type="radio"]:checked + label { background-color: var(--active-color); border: 2.5px solid #2d3748; transform: scale(1.15); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .color-selector input[type="radio"]:checked + label::after { content: '\2714'; color: #ffffff; font-size: 16px; font-weight: bold; }
 
         /* RWD */
         @media (max-width: 991px) { .day-cell { min-height: 110px; } #sideMemoArea { height: 300px; } }
@@ -219,14 +199,13 @@
             .day-header { font-size: 0.75rem; padding: 8px 4px; text-align: center; }
             .day-cell { min-height: 90px; padding: 4px; }
             .date-number { font-size: 0.8rem; text-align: center; }
-            .swal2-actions { flex-direction: column; width: 100%; padding: 0 1em; }
-            /* 手機版按鈕依然保持垂直排列並拉滿寬度 */
-            .swal2-actions button { width: 100%; margin: 4px 0 !important; }
+            .swal2-actions { flex-direction: column; width: 100%; padding: 0 1em; gap: 10px; }
+            .swal2-actions button { width: 100%; }
             .icon-selector label { font-size: 1.1rem; }
             .color-selector label { width: 34px; height: 34px; }
         }
 
-        /* ================= 列印專用排版 ================= */
+        /* 列印專用排版 */
         @media print {
             @page { size: landscape; margin: 10mm; } 
             body { background-color: #fff !important; color: #000 !important; }
@@ -268,6 +247,7 @@
             <button class="btn btn-custom-outline btn-sm" id="printBtn"><i class="bi bi-printer"></i> 列印</button>
             <button class="btn btn-custom-outline btn-sm" id="importBtn"><i class="bi bi-box-arrow-in-down"></i> 匯入</button>
             <button class="btn btn-custom-outline btn-sm" id="exportBtn"><i class="bi bi-box-arrow-up"></i> 匯出</button>
+            <button class="btn btn-outline-secondary btn-sm" id="deleteOldBtn"><i class="bi bi-calendar-minus"></i> 刪除舊紀錄</button>
             <button class="btn btn-outline-danger btn-sm" id="clearAllBtn"><i class="bi bi-trash3-fill"></i> 清空</button>
         </div>
     </div>
@@ -391,11 +371,11 @@
     let noteModal;
     let dateRangePicker;
 
-    // 解決按鈕太緊密的問題：在 confirmButton 與 denyButton 加上 me-2 工具類別
+    // 定義通用的 Swal 樣式，並移除 class 中的 margin（改由 css 的 gap 來處理按鈕間距）
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: { 
-            confirmButton: 'btn btn-primary-custom px-4 me-2', 
-            denyButton: 'btn btn-danger px-4 me-2', 
+            confirmButton: 'btn btn-primary-custom px-4', 
+            denyButton: 'btn btn-danger px-4', 
             cancelButton: 'btn btn-secondary px-4' 
         },
         buttonsStyling: false
@@ -453,6 +433,23 @@
 
     function generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2, 7); }
 
+    function getContrastTextColor(hexcolor) {
+        if (!hexcolor) return '#202124';
+        
+        hexcolor = hexcolor.trim().replace("#", "");
+        if (hexcolor.length === 3) {
+            hexcolor = hexcolor[0] + hexcolor[0] + hexcolor[1] + hexcolor[1] + hexcolor[2] + hexcolor[2];
+        }
+        if (hexcolor.length !== 6) return '#202124';
+
+        const r = parseInt(hexcolor.substr(0,2),16);
+        const g = parseInt(hexcolor.substr(2,2),16);
+        const b = parseInt(hexcolor.substr(4,2),16);
+        
+        const yiq = ((r*299) + (g*587) + (b*114)) / 1000;
+        return (yiq >= 190) ? '#202124' : '#ffffff';
+    }
+
     function renderCalendar() {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
@@ -489,7 +486,9 @@
             dayEvents.forEach(evt => {
                 const chip = document.createElement('div');
                 chip.className = 'event-chip';
+                
                 chip.style.backgroundColor = evt.color;
+                chip.style.color = getContrastTextColor(evt.color);
                 
                 let iconHtml = evt.icon;
                 if (evt.icon && evt.icon.startsWith('bi-')) {
@@ -498,7 +497,6 @@
                     iconHtml = `<span class="chip-icon">${evt.icon || '📌'}</span>`;
                 }
                 
-                // 加入了 title 屬性，即使文字變成刪節號，游標懸浮也能看見完整內容
                 chip.innerHTML = `${iconHtml} <span class="chip-text" title="${evt.text}">${evt.text}</span>`;
                 chip.onclick = (e) => { e.stopPropagation(); openModalForEdit(evt.id); };
                 cell.appendChild(chip);
@@ -597,14 +595,75 @@
             saveNotesToStorage(); renderCalendar(); noteModal.hide();
         };
 
+        // 單一記事刪除確認 (套用新版間距)
         document.getElementById('deleteNoteBtn').onclick = () => {
-            swalWithBootstrapButtons.fire({ title: '確定刪除？', icon: 'warning', showCancelButton: true, confirmButtonText: '確定' }).then((res) => {
+            swalWithBootstrapButtons.fire({ 
+                title: '確定刪除？', 
+                icon: 'warning', 
+                showCancelButton: true, 
+                confirmButtonText: '確定',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true /* 讓 Cancel 在右側，與截圖一致 */
+            }).then((res) => {
                 if (res.isConfirmed) {
                     events = events.filter(e => e.id !== document.getElementById('currentEditId').value);
                     saveNotesToStorage(); renderCalendar(); noteModal.hide();
                 }
             });
         };
+
+        document.getElementById('deleteOldBtn').addEventListener('click', () => {
+            if (events.length === 0) {
+                swalWithBootstrapButtons.fire({ icon: 'info', title: '提示', text: '目前沒有任何行程可以刪除。', confirmButtonText: '了解' });
+                return;
+            }
+
+            swalWithBootstrapButtons.fire({
+                title: '刪除舊紀錄',
+                html: '<p class="text-muted mb-3">請選擇日期，系統將會清除<br><b>該日期之前</b>的所有行程紀錄。</p><input type="text" id="cutoffDateInput" class="form-control text-center mx-auto bg-white" style="max-width: 200px; cursor: pointer;" readonly placeholder="選擇日期">',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '確定清除',
+                cancelButtonText: '取消',
+                reverseButtons: true, // 讓取消在右邊
+                didOpen: () => {
+                    flatpickr("#cutoffDateInput", {
+                        locale: "zh_tw",
+                        dateFormat: "Y-m-d",
+                        defaultDate: new Date()
+                    });
+                },
+                preConfirm: () => {
+                    const cutoffDate = document.getElementById('cutoffDateInput').value;
+                    if (!cutoffDate) {
+                        Swal.showValidationMessage('請先選擇一個日期');
+                    }
+                    return cutoffDate;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const cutoffDate = result.value;
+                    const originalCount = events.length;
+                    
+                    events = events.filter(e => {
+                        const eventEnd = e.end || e.start;
+                        return eventEnd >= cutoffDate; 
+                    });
+                    
+                    const deletedCount = originalCount - events.length;
+                    
+                    saveNotesToStorage();
+                    renderCalendar();
+                    
+                    swalWithBootstrapButtons.fire({
+                        icon: 'success',
+                        title: '清除完成',
+                        text: `已成功刪除了 ${deletedCount} 筆舊紀錄。`,
+                        confirmButtonText: '了解'
+                    });
+                }
+            });
+        });
 
         document.getElementById('exportBtn').onclick = () => {
             const dataStr = JSON.stringify({ events, memo: localStorage.getItem(MEMO_KEY) }, null, 2);
@@ -646,9 +705,9 @@
                             denyButtonText: '<i class="bi bi-exclamation-triangle"></i> 清除並完全覆寫',
                             cancelButtonText: '取消',
                             customClass: { 
-                                confirmButton: 'btn btn-primary-custom m-1', 
-                                denyButton: 'btn btn-danger m-1', 
-                                cancelButton: 'btn btn-secondary m-1' 
+                                confirmButton: 'btn btn-primary-custom', 
+                                denyButton: 'btn btn-danger', 
+                                cancelButton: 'btn btn-secondary' 
                             }
                         }).then((result) => {
                             const newEvents = isArray ? importedData : importedData.events;
@@ -669,25 +728,49 @@
             reader.readAsText(file);
         });
 
+        // ================= 更新：清空資料的雙重確認與排版修正 =================
         document.getElementById('clearAllBtn').addEventListener('click', () => {
             if (events.length === 0 && !document.getElementById('sideMemoArea').value) {
                 swalWithBootstrapButtons.fire({ icon: 'info', title: '提示', text: '目前沒有任何資料可以清除。', confirmButtonText: '了解' });
                 return;
             }
+            
+            // 第一層確認 (嚴重警告)
             swalWithBootstrapButtons.fire({
-                title: '⚠️ 嚴重警告',
-                html: '確定要清除「所有」行事曆資料嗎？<br><br><b class="text-danger">此動作無法復原！</b><br>建議您先使用「匯出」功能備份資料。',
-                icon: 'warning',
+                title: '<span class="text-warning">⚠️</span> 嚴重警告',
+                html: '確定要清除「所有」行事曆資料嗎？<br><br><b class="text-danger fs-5">此動作無法復原！</b><br><span class="text-muted">建議您先使用「匯出」功能備份資料。</span>',
                 showCancelButton: true,
-                confirmButtonText: '<i class="bi bi-trash3-fill"></i> 是的，清空全部',
+                confirmButtonText: '<i class="bi bi-trash3"></i> 是的，清空全部',
                 cancelButtonText: '取消',
-                customClass: { confirmButton: 'btn btn-danger px-4', cancelButton: 'btn btn-secondary px-4 me-2' },
-                reverseButtons: true
+                customClass: { confirmButton: 'btn btn-danger px-4', cancelButton: 'btn btn-secondary px-4' },
+                reverseButtons: true // 讓 取消 在左邊
             }).then((result) => {
                 if (result.isConfirmed) {
-                    events = []; localStorage.removeItem(MEMO_KEY);
-                    document.getElementById('sideMemoArea').value = "";
-                    saveNotesToStorage(); renderCalendar();
+                    // 第二層確認 (最後確認)
+                    swalWithBootstrapButtons.fire({
+                        title: '<span class="text-danger">❌</span> 最後確認',
+                        html: '<span class="text-muted">資料一旦刪除就真的找不回來囉！確定要執行嗎？</span>',
+                        showCancelButton: true,
+                        confirmButtonText: '我非常確定，刪除！',
+                        cancelButtonText: '再想一下',
+                        customClass: { confirmButton: 'btn btn-danger px-4', cancelButton: 'btn btn-secondary px-4' },
+                        reverseButtons: true // 讓 再想一下 在左邊
+                    }).then((finalResult) => {
+                        if (finalResult.isConfirmed) {
+                            events = []; 
+                            localStorage.removeItem(MEMO_KEY);
+                            document.getElementById('sideMemoArea').value = "";
+                            saveNotesToStorage(); 
+                            renderCalendar();
+                            
+                            swalWithBootstrapButtons.fire({
+                                icon: 'success',
+                                title: '已清空',
+                                text: '所有資料已經成功清除。',
+                                confirmButtonText: '了解'
+                            });
+                        }
+                    });
                 }
             });
         });
