@@ -118,7 +118,8 @@
         .date-number { font-weight: 500; color: var(--text-muted); margin-bottom: 6px; font-size: 0.9rem; text-align: right; padding-right: 4px; }
 
         .event-chip {
-            font-size: 0.8rem; font-weight: 500; padding: 4px 8px; border-radius: 6px; color: #ffffff;
+            font-size: 0.85rem; font-weight: 500; padding: 4px 8px; border-radius: 6px; 
+            color: #202124; /* 深色文字搭配粉彩背景 */
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px;
             box-shadow: 0 1px 2px var(--chip-shadow); transition: all 0.1s;
         }
@@ -136,11 +137,51 @@
         .swal2-title { color: var(--text-main) !important; }
         .swal2-html-container { color: var(--text-muted) !important; }
 
-        .color-selector label { width: 28px; height: 28px; border-radius: 50%; margin-right: 12px; margin-bottom: 8px; cursor: pointer; border: 2px solid transparent; }
-        .icon-selector label { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 54px; height: 54px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; color: var(--text-muted); background: var(--bg-surface); margin-bottom: 8px; }
-        .icon-selector input[type="radio"]:checked + label { background-color: var(--bg-header); color: var(--text-main); border-color: var(--text-main); }
+        /* ================= 新版選擇器樣式 (圓形彩色圖示與深淺選色) ================= */
+        .icon-selector, .color-selector { display: flex; flex-wrap: wrap; gap: 10px; }
+        
+        /* 隱藏 Radio input */
         .icon-selector input[type="radio"], .color-selector input[type="radio"] { display: none; }
-        .color-selector input[type="radio"]:checked + label { transform: scale(1.15); box-shadow: 0 0 0 2px var(--bg-surface) inset, 0 0 0 2px var(--text-main); }
+
+        /* 圖示選擇器 */
+        .icon-selector label { 
+            display: inline-flex; align-items: center; justify-content: center; 
+            width: 44px; height: 44px; border: 1px solid var(--border-color); 
+            border-radius: 50%; cursor: pointer; background: var(--bg-surface); 
+            font-size: 1.4rem; transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .icon-selector label:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .icon-selector input[type="radio"]:checked + label { 
+            background-color: var(--today-bg); border-color: var(--primary-color); 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+            transform: scale(1.1);
+        }
+
+        /* 顏色選擇器 - 完美對應附圖質感 */
+        .color-selector label { 
+            width: 36px; height: 36px; border-radius: 50%; cursor: pointer; 
+            border: 2px solid transparent; position: relative; 
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+            background-color: var(--base-color); /* 未選取時顯示淡色系 */
+        }
+        .color-selector label:hover { transform: scale(1.1); }
+        
+        /* 選取狀態：顏色加深、深灰外框、放大 */
+        .color-selector input[type="radio"]:checked + label { 
+            background-color: var(--active-color); /* 選取時顏色加深 */
+            border: 2.5px solid #2d3748; /* 俐落的深灰色外框 */
+            transform: scale(1.15); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        /* 選取時的白色打勾符號 */
+        .color-selector input[type="radio"]:checked + label::after {
+            content: '\2714'; 
+            color: #ffffff; 
+            font-size: 16px; 
+            font-weight: bold;
+        }
 
         /* RWD */
         @media (max-width: 991px) { .day-cell { min-height: 110px; } #sideMemoArea { height: 300px; } }
@@ -151,30 +192,23 @@
             .date-number { font-size: 0.8rem; text-align: center; }
             .swal2-actions { flex-direction: column; width: 100%; padding: 0 1em; }
             .swal2-actions button { width: 100%; margin: 4px 0 !important; }
+            .icon-selector label, .color-selector label { width: 34px; height: 34px; font-size: 1.1rem; }
         }
 
         /* ================= 列印專用排版 ================= */
         @media print {
             @page { size: landscape; margin: 10mm; } 
             body { background-color: #fff !important; color: #000 !important; }
-            
             .btn, .theme-selector-wrapper, #importFile { display: none !important; }
             .dashboard-header { justify-content: center !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
             .month-title { font-size: 2rem; border-bottom: 2px solid #000; padding-bottom: 5px; }
-
             .calendar-wrapper { box-shadow: none !important; border: 2px solid #000 !important; }
             .day-cell { border-right: 1px solid #ccc !important; border-bottom: 1px solid #ccc !important; min-height: 100px; }
             .day-header { border-right: 1px solid #000 !important; border-bottom: 2px solid #000 !important; background-color: #f1f5f9 !important; color: #000 !important; }
             .day-cell.empty { background-color: #f8fafc !important; }
-
-            .event-chip, .date-number, .day-cell.today .date-number { 
-                -webkit-print-color-adjust: exact !important; 
-                print-color-adjust: exact !important; 
-            }
-
+            .event-chip, .date-number, .day-cell.today .date-number { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .col-lg-9 { width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; margin-bottom: 20px;}
             .col-lg-3 { width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; page-break-inside: avoid; }
-            
             .memo-wrapper { box-shadow: none !important; border: 1px solid #000 !important; }
             #sideMemoArea { height: auto !important; min-height: 150px; overflow: visible !important; resize: none; border-top: 1px solid #000; }
         }
@@ -249,31 +283,62 @@
                     <div class="col-6"><label class="form-label fw-bold opacity-75 small">開始日期</label><input type="date" class="form-control" id="startDate"></div>
                     <div class="col-6"><label class="form-label fw-bold opacity-75 small">結束日期</label><input type="date" class="form-control" id="endDate"></div>
                 </div>
+                
                 <div class="mb-4">
-                    <label class="form-label fw-bold opacity-75 small">標籤顏色</label>
-                    <div class="color-selector" id="colorPicker">
-                        <input type="radio" name="noteColor" id="colorGray" value="#64748b" checked><label for="colorGray" style="background-color: #64748b;"></label>
-                        <input type="radio" name="noteColor" id="colorBlue" value="#2563eb"><label for="colorBlue" style="background-color: #2563eb;"></label>
-                        <input type="radio" name="noteColor" id="colorGreen" value="#059669"><label for="colorGreen" style="background-color: #059669;"></label>
-                        <input type="radio" name="noteColor" id="colorRed" value="#dc2626"><label for="colorRed" style="background-color: #dc2626;"></label>
-                        <input type="radio" name="noteColor" id="colorOrange" value="#ea580c"><label for="colorOrange" style="background-color: #ea580c;"></label>
-                        <input type="radio" name="noteColor" id="colorPurple" value="#7c3aed"><label for="colorPurple" style="background-color: #7c3aed;"></label>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="form-label fw-bold opacity-75 small">標籤圖示</label>
+                    <label class="form-label fw-bold opacity-75 small">選擇圖示：</label>
                     <div class="icon-selector" id="iconPicker">
-                        <input type="radio" name="noteIcon" id="iconCheck" value="bi-check-circle-fill" checked><label for="iconCheck"><i class="bi bi-check-circle-fill fs-5"></i><span>一般</span></label>
-                        <input type="radio" name="noteIcon" id="iconStar" value="bi-star-fill"><label for="iconStar"><i class="bi bi-star-fill fs-5"></i><span>重要</span></label>
-                        <input type="radio" name="noteIcon" id="iconCup" value="bi-cup-hot-fill"><label for="iconCup"><i class="bi bi-cup-hot-fill fs-5"></i><span>餐飲</span></label>
-                        <input type="radio" name="noteIcon" id="iconDribbble" value="bi-dribbble"><label for="iconDribbble"><i class="bi bi-dribbble fs-5"></i><span>運動</span></label>
-                        <input type="radio" name="noteIcon" id="iconAirplane" value="bi-airplane-fill"><label for="iconAirplane"><i class="bi bi-airplane-fill fs-5"></i><span>旅遊</span></label>
-                        <input type="radio" name="noteIcon" id="iconClock" value="bi-clock-fill"><label for="iconClock"><i class="bi bi-clock-fill fs-5"></i><span>時間</span></label>
-                        <input type="radio" name="noteIcon" id="iconPeople" value="bi-people-fill"><label for="iconPeople"><i class="bi bi-people-fill fs-5"></i><span>聚會</span></label>
-                        <input type="radio" name="noteIcon" id="iconShop" value="bi-cart-fill"><label for="iconShop"><i class="bi bi-cart-fill fs-5"></i><span>購物</span></label>
+                        <input type="radio" name="noteIcon" id="iconPin" value="📌" checked><label for="iconPin" title="一般">📌</label>
+                        <input type="radio" name="noteIcon" id="iconBasketball" value="🏀"><label for="iconBasketball" title="籃球">🏀</label>
+                        <input type="radio" name="noteIcon" id="iconCar" value="🚗"><label for="iconCar" title="交通">🚗</label>
+                        <input type="radio" name="noteIcon" id="iconComputer" value="💻"><label for="iconComputer" title="工作">💻</label>
+                        <input type="radio" name="noteIcon" id="iconBook" value="📖"><label for="iconBook" title="閱讀">📖</label>
+                        <input type="radio" name="noteIcon" id="iconGame" value="🎮"><label for="iconGame" title="娛樂">🎮</label>
+                        <input type="radio" name="noteIcon" id="iconRun" value="🏃"><label for="iconRun" title="運動">🏃</label>
+                        <input type="radio" name="noteIcon" id="iconPlane" value="✈️"><label for="iconPlane" title="旅遊">✈️</label>
+                        <input type="radio" name="noteIcon" id="iconMusic" value="🎵"><label for="iconMusic" title="音樂">🎵</label>
+                        <input type="radio" name="noteIcon" id="iconFood" value="🍽️"><label for="iconFood" title="餐飲">🍽️</label>
+                        <input type="radio" name="noteIcon" id="iconIdea" value="💡"><label for="iconIdea" title="想法">💡</label>
+                        <input type="radio" name="noteIcon" id="iconSoccer" value="⚽"><label for="iconSoccer" title="足球">⚽</label>
+                        <input type="radio" name="noteIcon" id="iconHospital" value="🏥"><label for="iconHospital" title="就醫">🏥</label>
+                        <input type="radio" name="noteIcon" id="iconExam" value="📝"><label for="iconExam" title="考試">📝</label>
+                        <input type="radio" name="noteIcon" id="iconStudy" value="🏫"><label for="iconStudy" title="補習/上課">🏫</label>
+                        <input type="radio" name="noteIcon" id="iconStar" value="⭐️"><label for="iconStar" title="重要">⭐️</label>
+                        <input type="radio" name="noteIcon" id="iconClock" value="⏰"><label for="iconClock" title="時間">⏰</label>
+                        <input type="radio" name="noteIcon" id="iconPeople" value="👥"><label for="iconPeople" title="聚會">👥</label>
+                        <input type="radio" name="noteIcon" id="iconShop" value="🛒"><label for="iconShop" title="購物">🛒</label>
                     </div>
                 </div>
-                <textarea class="form-control" id="noteTextarea" rows="3" placeholder="請輸入行程或記事內容..."></textarea>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold opacity-75 small">選擇顏色：</label>
+                    <div class="color-selector" id="colorPicker">
+                        <input type="radio" name="noteColor" id="colorBlue" value="#8ab4f8" checked>
+                        <label for="colorBlue" style="--base-color: #8ab4f8; --active-color: #1a73e8;" title="藍色"></label>
+
+                        <input type="radio" name="noteColor" id="colorMint" value="#81c995">
+                        <label for="colorMint" style="--base-color: #81c995; --active-color: #188038;" title="綠色"></label>
+
+                        <input type="radio" name="noteColor" id="colorPink" value="#f28b82">
+                        <label for="colorPink" style="--base-color: #f28b82; --active-color: #d93025;" title="紅色"></label>
+
+                        <input type="radio" name="noteColor" id="colorYellow" value="#fde293">
+                        <label for="colorYellow" style="--base-color: #fde293; --active-color: #f9ab00;" title="黃色"></label>
+
+                        <input type="radio" name="noteColor" id="colorCyan" value="#78d9ec">
+                        <label for="colorCyan" style="--base-color: #78d9ec; --active-color: #12b5cb;" title="青色"></label>
+
+                        <input type="radio" name="noteColor" id="colorPurple" value="#c5a5e3">
+                        <label for="colorPurple" style="--base-color: #c5a5e3; --active-color: #9334e6;" title="紫色"></label>
+
+                        <input type="radio" name="noteColor" id="colorOrange" value="#fcad70">
+                        <label for="colorOrange" style="--base-color: #fcad70; --active-color: #e65100;" title="橘色"></label>
+
+                        <input type="radio" name="noteColor" id="colorGray" value="#9aa0a6">
+                        <label for="colorGray" style="--base-color: #9aa0a6; --active-color: #5f6368;" title="灰色"></label>
+                    </div>
+                </div>
+                
+                <textarea class="form-control" id="noteTextarea" rows="3" placeholder="請輸入行程內容..."></textarea>
             </div>
             <div class="modal-footer d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-danger btn-sm" id="deleteNoteBtn" style="display: none;">刪除</button>
@@ -377,7 +442,15 @@
                 const chip = document.createElement('div');
                 chip.className = 'event-chip';
                 chip.style.backgroundColor = evt.color;
-                chip.innerHTML = `<i class="bi ${evt.icon}"></i> <span>${evt.text}</span>`;
+                
+                let iconHtml = evt.icon;
+                if (evt.icon && evt.icon.startsWith('bi-')) {
+                    iconHtml = `<i class="bi ${evt.icon}"></i>`;
+                } else {
+                    iconHtml = `<span style="font-size: 1.1em; line-height: 1;">${evt.icon || '📌'}</span>`;
+                }
+                
+                chip.innerHTML = `${iconHtml} <span style="text-overflow: ellipsis; overflow: hidden; font-weight: 600;">${evt.text}</span>`;
                 chip.onclick = (e) => { e.stopPropagation(); openModalForEdit(evt.id); };
                 cell.appendChild(chip);
             });
@@ -398,9 +471,12 @@
         document.getElementById('modalTitle').textContent = '新增記事';
         document.getElementById('currentEditId').value = ''; 
         document.getElementById('startDate').value = dateString;
-        // ================= 更新：結束日期預設與開始日期相同 =================
         document.getElementById('endDate').value = dateString;
         document.getElementById('noteTextarea').value = '';
+        
+        document.getElementById('colorBlue').checked = true;
+        document.getElementById('iconPin').checked = true;
+
         document.getElementById('deleteNoteBtn').style.display = 'none'; 
         noteModal.show();
     }
@@ -411,9 +487,25 @@
         document.getElementById('modalTitle').textContent = '編輯記事';
         document.getElementById('currentEditId').value = evt.id; 
         document.getElementById('startDate').value = evt.start;
-        // ================= 更新：編輯時若結束日期為空，預設填入開始日期 =================
         document.getElementById('endDate').value = evt.end || evt.start;
         document.getElementById('noteTextarea').value = evt.text;
+        
+        // 自動勾選已儲存的顏色，找不到時自動選預設藍色
+        const colorRadio = document.querySelector(`input[name="noteColor"][value="${evt.color}"]`);
+        if(colorRadio) {
+            colorRadio.checked = true;
+        } else {
+            document.getElementById('colorBlue').checked = true;
+        }
+
+        // 自動勾選已儲存的圖示，找不到對應圖示(舊資料)時選圖釘📌
+        const iconRadio = document.querySelector(`input[name="noteIcon"][value="${evt.icon}"]`);
+        if(iconRadio) {
+            iconRadio.checked = true;
+        } else {
+            document.getElementById('iconPin').checked = true; 
+        }
+
         document.getElementById('deleteNoteBtn').style.display = 'block'; 
         noteModal.show();
     }
@@ -427,10 +519,8 @@
         document.getElementById('sideMemoArea').oninput = saveMemoToStorage;
         document.getElementById('printBtn').onclick = () => window.print();
 
-        // ================= 新增：當開始日期改變時，自動同步結束日期 =================
         document.getElementById('startDate').addEventListener('change', function() {
             const endDateInput = document.getElementById('endDate');
-            // 如果結束日期為空，或是結束日期比新的開始日期還要早，就自動同步
             if (!endDateInput.value || endDateInput.value < this.value) {
                 endDateInput.value = this.value;
             }
