@@ -209,7 +209,7 @@
 
     <div class="row g-3 px-2">
         <div class="col-lg-9 order-1">
-            <div class="calendar-wrapper">
+            <div class="calendar-wrapper" id="calendarContainer">
                 <div class="calendar-grid" id="calendarHeader">
                     <div class="day-header">週一</div>
                     <div class="day-header">週二</div>
@@ -292,7 +292,7 @@
     let events = []; 
     let noteModal;
 
-    const swalStyled = Swal.mixin({
+    const swalWithBootstrapButtons = Swal.mixin({
         customClass: { confirmButton: 'btn btn-primary-custom px-4', denyButton: 'btn btn-danger px-4', cancelButton: 'btn btn-secondary px-4' },
         buttonsStyling: false
     });
@@ -425,6 +425,32 @@
         document.getElementById('sideMemoArea').oninput = saveMemoToStorage;
         document.getElementById('printBtn').onclick = () => window.print();
 
+        // ================= 新增：滑鼠滾輪切換月份功能 =================
+        const calendarContainer = document.getElementById('calendarContainer');
+        let wheelTimeout;
+        calendarContainer.addEventListener('wheel', (e) => {
+            // 防止頁面跟著上下滾動 (維持在日曆區塊)
+            e.preventDefault();
+            
+            // 節流控制：避免滾動一次跳好幾個月
+            if (wheelTimeout) return;
+            
+            if (e.deltaY > 0) {
+                // 往下滾：切換到下個月
+                currentDate.setMonth(currentDate.getMonth() + 1);
+            } else {
+                // 往上滾：切換到上個月
+                currentDate.setMonth(currentDate.getMonth() - 1);
+            }
+            renderCalendar();
+            
+            // 鎖定 400 毫秒後才能再次觸發滾輪切換
+            wheelTimeout = setTimeout(() => {
+                wheelTimeout = null;
+            }, 400); 
+        }, { passive: false });
+
+        // 儲存與刪除功能
         document.getElementById('saveNoteBtn').onclick = () => {
             const id = document.getElementById('currentEditId').value;
             const start = document.getElementById('startDate').value;
@@ -433,7 +459,7 @@
             const color = document.querySelector('input[name="noteColor"]:checked').value;
             const icon = document.querySelector('input[name="noteIcon"]:checked').value;
             
-            if (!text) return swalStyled.fire({ icon: 'warning', text: '請輸入內容' });
+            if (!text) return swalWithBootstrapButtons.fire({ icon: 'warning', text: '請輸入內容' });
             if (id) {
                 const index = events.findIndex(e => e.id === id);
                 events[index] = { id, start, end, text, color, icon };
@@ -444,7 +470,7 @@
         };
 
         document.getElementById('deleteNoteBtn').onclick = () => {
-            swalStyled.fire({ title: '確定刪除？', icon: 'warning', showCancelButton: true, confirmButtonText: '確定' }).then((res) => {
+            swalWithBootstrapButtons.fire({ title: '確定刪除？', icon: 'warning', showCancelButton: true, confirmButtonText: '確定' }).then((res) => {
                 if (res.isConfirmed) {
                     events = events.filter(e => e.id !== document.getElementById('currentEditId').value);
                     saveNotesToStorage(); renderCalendar(); noteModal.hide();
@@ -461,10 +487,11 @@
             a.click(); URL.revokeObjectURL(url);
         };
 
-        // ================= 更新後的匯入功能 =================
-        document.getElementById('importBtn').onclick = () => document.getElementById('importFile').click();
+        // 匯入功能 (使用自訂訊息)
+        const importInput = document.getElementById('importFile');
+        document.getElementById('importBtn').onclick = () => importInput.click();
         
-        document.getElementById('importFile').addEventListener('change', (event) => {
+        importInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (!file) return;
 
@@ -472,11 +499,10 @@
             reader.onload = (e) => {
                 try {
                     const importedData = JSON.parse(e.target.result);
-                    const isArray = Array.isArray(importedData); // 判斷是否為純陣列(舊版)或物件(含memo的新版)
+                    const isArray = Array.isArray(importedData);
                     
-                    // 若匯入的是有效格式 (舊版陣列或新版包含 events 陣列的物件)
                     if (isArray || (importedData && Array.isArray(importedData.events))) {
-                        swalStyled.fire({
+                        swalWithBootstrapButtons.fire({
                             title: '匯入資料',
                             text: "您希望如何處理現有的行事曆資料？",
                             icon: 'question',
@@ -510,24 +536,24 @@
                             }
                         });
                     } else {
-                        swalStyled.fire({ icon: 'error', title: '錯誤', text: '無效的檔案格式！(需為陣列格式)', confirmButtonText: '了解' });
+                        swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '無效的檔案格式！(需為陣列格式)', confirmButtonText: '了解' });
                     }
                 } catch (error) {
-                    swalStyled.fire({ icon: 'error', title: '錯誤', text: '讀取檔案失敗或檔案已損毀！', confirmButtonText: '了解' });
+                    swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '讀取檔案失敗或檔案已損毀！', confirmButtonText: '了解' });
                 }
-                event.target.value = ''; 
+                importInput.value = ''; 
             };
             reader.readAsText(file);
         });
 
-        // ================= 更新後的清空功能 =================
+        // 清空功能 (使用自訂訊息)
         document.getElementById('clearAllBtn').addEventListener('click', () => {
             if (events.length === 0 && !document.getElementById('sideMemoArea').value) {
-                swalStyled.fire({ icon: 'info', title: '提示', text: '目前沒有任何資料可以清除。', confirmButtonText: '了解' });
+                swalWithBootstrapButtons.fire({ icon: 'info', title: '提示', text: '目前沒有任何資料可以清除。', confirmButtonText: '了解' });
                 return;
             }
             
-            swalStyled.fire({
+            swalWithBootstrapButtons.fire({
                 title: '⚠️ 嚴重警告',
                 html: '確定要清除「所有」行事曆資料嗎？<br><br><b class="text-danger">此動作無法復原！</b><br>建議您先使用「匯出」功能備份資料。',
                 icon: 'warning',
