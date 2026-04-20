@@ -398,7 +398,8 @@
         document.getElementById('modalTitle').textContent = '新增記事';
         document.getElementById('currentEditId').value = ''; 
         document.getElementById('startDate').value = dateString;
-        document.getElementById('endDate').value = '';
+        // ================= 更新：結束日期預設與開始日期相同 =================
+        document.getElementById('endDate').value = dateString;
         document.getElementById('noteTextarea').value = '';
         document.getElementById('deleteNoteBtn').style.display = 'none'; 
         noteModal.show();
@@ -410,7 +411,8 @@
         document.getElementById('modalTitle').textContent = '編輯記事';
         document.getElementById('currentEditId').value = evt.id; 
         document.getElementById('startDate').value = evt.start;
-        document.getElementById('endDate').value = (evt.start === evt.end) ? '' : evt.end;
+        // ================= 更新：編輯時若結束日期為空，預設填入開始日期 =================
+        document.getElementById('endDate').value = evt.end || evt.start;
         document.getElementById('noteTextarea').value = evt.text;
         document.getElementById('deleteNoteBtn').style.display = 'block'; 
         noteModal.show();
@@ -425,32 +427,33 @@
         document.getElementById('sideMemoArea').oninput = saveMemoToStorage;
         document.getElementById('printBtn').onclick = () => window.print();
 
-        // ================= 新增：滑鼠滾輪切換月份功能 =================
+        // ================= 新增：當開始日期改變時，自動同步結束日期 =================
+        document.getElementById('startDate').addEventListener('change', function() {
+            const endDateInput = document.getElementById('endDate');
+            // 如果結束日期為空，或是結束日期比新的開始日期還要早，就自動同步
+            if (!endDateInput.value || endDateInput.value < this.value) {
+                endDateInput.value = this.value;
+            }
+        });
+
         const calendarContainer = document.getElementById('calendarContainer');
         let wheelTimeout;
         calendarContainer.addEventListener('wheel', (e) => {
-            // 防止頁面跟著上下滾動 (維持在日曆區塊)
             e.preventDefault();
-            
-            // 節流控制：避免滾動一次跳好幾個月
             if (wheelTimeout) return;
             
             if (e.deltaY > 0) {
-                // 往下滾：切換到下個月
                 currentDate.setMonth(currentDate.getMonth() + 1);
             } else {
-                // 往上滾：切換到上個月
                 currentDate.setMonth(currentDate.getMonth() - 1);
             }
             renderCalendar();
             
-            // 鎖定 400 毫秒後才能再次觸發滾輪切換
             wheelTimeout = setTimeout(() => {
                 wheelTimeout = null;
             }, 400); 
         }, { passive: false });
 
-        // 儲存與刪除功能
         document.getElementById('saveNoteBtn').onclick = () => {
             const id = document.getElementById('currentEditId').value;
             const start = document.getElementById('startDate').value;
@@ -483,11 +486,17 @@
             const blob = new Blob([dataStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = `Calendar_Backup.json`;
+            
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            
+            a.href = url; 
+            a.download = `BC_${yyyy}-${mm}-${dd}.json`;
             a.click(); URL.revokeObjectURL(url);
         };
 
-        // 匯入功能 (使用自訂訊息)
         const importInput = document.getElementById('importFile');
         document.getElementById('importBtn').onclick = () => importInput.click();
         
@@ -546,7 +555,6 @@
             reader.readAsText(file);
         });
 
-        // 清空功能 (使用自訂訊息)
         document.getElementById('clearAllBtn').addEventListener('click', () => {
             if (events.length === 0 && !document.getElementById('sideMemoArea').value) {
                 swalWithBootstrapButtons.fire({ icon: 'info', title: '提示', text: '目前沒有任何資料可以清除。', confirmButtonText: '了解' });
