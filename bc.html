@@ -109,6 +109,7 @@
             background-color: var(--bg-surface); min-height: 140px; padding: 8px; cursor: pointer;
             border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
             position: relative; display: flex; flex-direction: column; gap: 4px;
+            min-width: 0; /* CRITICAL: 確保 Grid 不會被長文字撐破 */
         }
         .day-cell:nth-child(7n) { border-right: none; }
         .day-cell:hover { background-color: var(--bg-header); }
@@ -122,13 +123,31 @@
 
         .date-number { font-weight: 500; color: var(--text-muted); margin-bottom: 6px; font-size: 0.9rem; text-align: right; padding-right: 4px; }
 
+        /* 行程標籤樣式更新：文字截斷與排版修正 */
         .event-chip {
             font-size: 0.85rem; font-weight: 500; padding: 4px 8px; border-radius: 6px; 
             color: #202124; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px;
+            display: flex; align-items: center; gap: 6px;
             box-shadow: 0 1px 2px var(--chip-shadow); transition: all 0.1s;
+            width: 100%;
+            overflow: hidden; /* 防止內容溢出 */
         }
         .event-chip:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        .event-chip .chip-icon {
+            flex-shrink: 0; /* 保證圖示絕對不會被擠壓變形 */
+            font-size: 1.1em;
+            line-height: 1;
+        }
+        
+        .event-chip .chip-text {
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; /* 文字過長顯示 ... */
+            font-weight: 600;
+            min-width: 0; /* CRITICAL: Flexbox 內截斷文字的關鍵 */
+            flex: 1;
+        }
 
         /* 側邊記事本樣式 */
         .memo-header { border-bottom: 1px solid var(--border-color); padding: 12px 16px; background-color: var(--bg-header); }
@@ -474,12 +493,13 @@
                 
                 let iconHtml = evt.icon;
                 if (evt.icon && evt.icon.startsWith('bi-')) {
-                    iconHtml = `<i class="bi ${evt.icon}"></i>`;
+                    iconHtml = `<i class="bi ${evt.icon} chip-icon"></i>`;
                 } else {
-                    iconHtml = `<span style="font-size: 1.1em; line-height: 1;">${evt.icon || '📌'}</span>`;
+                    iconHtml = `<span class="chip-icon">${evt.icon || '📌'}</span>`;
                 }
                 
-                chip.innerHTML = `${iconHtml} <span style="text-overflow: ellipsis; overflow: hidden; font-weight: 600;">${evt.text}</span>`;
+                // 加入了 title 屬性，即使文字變成刪節號，游標懸浮也能看見完整內容
+                chip.innerHTML = `${iconHtml} <span class="chip-text" title="${evt.text}">${evt.text}</span>`;
                 chip.onclick = (e) => { e.stopPropagation(); openModalForEdit(evt.id); };
                 cell.appendChild(chip);
             });
