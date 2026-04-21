@@ -13,92 +13,109 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
     <style>
-        /* ================= 佈景主題定義 ================= */
+        /* ================= 佈景主題定義 (對比度增強版) ================= */
         :root {
             --bg-body: #f8fafc;
             --bg-surface: #ffffff;
-            --bg-header: #f8fafc;
-            --border-color: #e2e8f0;
-            --text-main: #334155;
-            --text-muted: #64748b;
+            --bg-header: #f1f5f9; 
+            --border-color: #cbd5e1; 
+            --text-main: #1e293b; 
+            --text-muted: #475569; 
             --primary-color: #2563eb;
             --today-bg: #eff6ff;
             --weekend-sat: #059669;
             --weekend-sun: #dc2626;
-            --chip-shadow: rgba(0,0,0,0.05);
+            --chip-shadow: rgba(0,0,0,0.08);
         }
 
         body.theme-dark {
             --bg-body: #0f172a;
             --bg-surface: #1e293b;
-            --bg-header: #0f172a;
-            --border-color: #334155;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-header: #0b1120;
+            --border-color: #475569;
+            --text-main: #ffffff; 
+            --text-muted: #cbd5e1;
             --primary-color: #3b82f6;
             --today-bg: #172554;
             --weekend-sat: #34d399;
             --weekend-sun: #f87171;
-            --chip-shadow: rgba(0,0,0,0.2);
+            --chip-shadow: rgba(0,0,0,0.3);
         }
 
         body.theme-japanese {
             --bg-body: #f4f1eb;
             --bg-surface: #ffffff;
-            --bg-header: #f9f8f6;
-            --border-color: #e2dfd8;
-            --text-main: #3d3b38;
-            --text-muted: #73706b;
+            --bg-header: #eeebea;
+            --border-color: #d6d3cb;
+            --text-main: #2b2a27;
+            --text-muted: #5c5a57;
             --primary-color: #627264;
             --today-bg: #eaf0eb;
             --weekend-sat: #556b2f;
             --weekend-sun: #8b4513;
-            --chip-shadow: rgba(0,0,0,0.04);
+            --chip-shadow: rgba(0,0,0,0.06);
         }
 
         body.theme-sakura {
             --bg-body: #fff0f5;
             --bg-surface: #ffffff;
-            --bg-header: #fff5f8;
-            --border-color: #fbcce0;
-            --text-main: #5c4d52;
-            --text-muted: #9d848a;
+            --bg-header: #ffe8f0;
+            --border-color: #f7b2ce;
+            --text-main: #4a3c41;
+            --text-muted: #8a7077;
             --primary-color: #e57399;
             --today-bg: #fff0f5;
             --weekend-sat: #6b8e23;
             --weekend-sun: #d6336c;
-            --chip-shadow: rgba(229,115,153,0.1);
+            --chip-shadow: rgba(229,115,153,0.15);
         }
 
-        /* ================= 核心樣式 ================= */
+        /* 新增：綠意清新風格 */
+        body.theme-fresh {
+            --bg-body: #f2f7f4;
+            --bg-surface: #ffffff;
+            --bg-header: #e8f0ec;
+            --border-color: #d1e0d7;
+            --text-main: #2c3f35;
+            --text-muted: #668070;
+            --primary-color: #329961;
+            --today-bg: #e6f2eb;
+            --weekend-sat: #4a8c2a;
+            --weekend-sun: #c75c4e;
+            --chip-shadow: rgba(50, 153, 97, 0.15);
+        }
+
+        /* ================= 核心樣式 (字體優化) ================= */
         body {
             background-color: var(--bg-body);
-            font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Segoe UI", Roboto, Arial, sans-serif;
             color: var(--text-main);
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            letter-spacing: 0.02em; 
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .dashboard-header { max-width: 1400px; margin: 2rem auto 1rem; padding: 0 1rem; }
-        .month-title { font-weight: 700; font-size: 1.5rem; color: var(--text-main); letter-spacing: 0.5px; min-width: 160px; }
+        .month-title { font-weight: 700; font-size: 1.6rem; color: var(--text-main); letter-spacing: 1px; min-width: 160px; }
 
         .btn-custom-outline {
             border: 1px solid var(--border-color); color: var(--text-main); background: var(--bg-surface);
-            box-shadow: 0 1px 2px var(--chip-shadow); transition: all 0.2s;
+            box-shadow: 0 1px 2px var(--chip-shadow); transition: all 0.2s; font-weight: 600;
         }
         .btn-custom-outline:hover { background: var(--bg-header); border-color: var(--text-muted); color: var(--text-main); }
-        .btn-primary-custom { background-color: var(--primary-color); border-color: var(--primary-color); color: #fff; }
+        .btn-primary-custom { background-color: var(--primary-color); border-color: var(--primary-color); color: #fff; font-weight: 600; }
 
         /* 卡片容器 */
         .calendar-wrapper, .memo-wrapper {
-            background-color: var(--bg-surface); border-radius: 12px; box-shadow: 0 4px 15px var(--chip-shadow);
+            background-color: var(--bg-surface); border-radius: 12px; box-shadow: 0 4px 20px var(--chip-shadow);
             border: 1px solid var(--border-color); height: 100%; transition: all 0.3s ease;
         }
 
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
 
         .day-header {
-            font-weight: 600; font-size: 0.85rem; color: var(--text-muted); text-align: right; padding: 12px 16px;
+            font-weight: 700; font-size: 0.9rem; color: var(--text-muted); text-align: right; padding: 12px 16px;
             background-color: var(--bg-header); border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color);
         }
         .day-header:nth-child(7n) { border-right: none; }
@@ -108,69 +125,69 @@
         .day-cell {
             background-color: var(--bg-surface); min-height: 140px; padding: 8px; cursor: pointer;
             border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
-            position: relative; display: flex; flex-direction: column; gap: 4px;
-            min-width: 0; /* 確保 Grid 不會被長文字撐破 */
+            position: relative; display: flex; flex-direction: column; gap: 5px;
+            min-width: 0; 
         }
         .day-cell:nth-child(7n) { border-right: none; }
         .day-cell:hover { background-color: var(--bg-header); }
         .day-cell.empty { background-color: var(--bg-body); cursor: default; }
 
-        .day-cell.today { background-color: var(--today-bg); box-shadow: inset 0 0 0 1px var(--primary-color); z-index: 1; }
+        .day-cell.today { background-color: var(--today-bg); box-shadow: inset 0 0 0 1.5px var(--primary-color); z-index: 1; }
         .day-cell.today .date-number {
             background-color: var(--primary-color); color: #ffffff; border-radius: 50%;
-            width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; margin-left: auto;
+            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-left: auto;
+            font-weight: 700;
         }
 
-        .date-number { font-weight: 500; color: var(--text-muted); margin-bottom: 6px; font-size: 0.9rem; text-align: right; padding-right: 4px; }
+        .date-number { font-weight: 600; color: var(--text-muted); margin-bottom: 6px; font-size: 0.95rem; text-align: right; padding-right: 4px; }
 
-        /* ================= 行程標籤樣式 ================= */
+        /* ================= 行程標籤樣式 (極致清晰版) ================= */
         .event-chip {
-            font-size: 0.85rem; 
-            font-weight: normal !important;
-            padding: 4px 8px; 
+            font-size: 0.9rem; 
+            font-weight: 600 !important; 
+            padding: 5px 8px; 
             border-radius: 6px; 
             display: flex; align-items: center; gap: 6px;
-            box-shadow: 0 1px 2px var(--chip-shadow); transition: all 0.1s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.15s ease;
             width: 100%;
             overflow: hidden; 
+            letter-spacing: 0.03em; 
         }
-        .event-chip:hover { opacity: 0.9; transform: translateY(-1px); }
+        .event-chip:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 3px 6px rgba(0,0,0,0.15); }
         
         .event-chip .chip-icon {
             flex-shrink: 0; 
-            font-size: 1.1em;
+            font-size: 1.15em;
             line-height: 1;
         }
         
         .event-chip .chip-text {
             white-space: nowrap; 
             overflow: hidden; 
-            text-overflow: ellipsis; /* 文字過長顯示 ... */
-            font-weight: normal !important;
+            text-overflow: ellipsis; 
             min-width: 0; 
             flex: 1;
         }
 
         /* 側邊記事本樣式 */
-        .memo-header { border-bottom: 1px solid var(--border-color); padding: 12px 16px; background-color: var(--bg-header); }
+        .memo-header { border-bottom: 1px solid var(--border-color); padding: 14px 16px; background-color: var(--bg-header); }
         #sideMemoArea {
             width: 100%; height: 600px; border: none; padding: 16px; background-color: transparent;
-            color: var(--text-main); font-size: 0.95rem; line-height: 1.6; resize: none; outline: none;
+            color: var(--text-main); font-size: 1rem; line-height: 1.7; resize: none; outline: none;
+            font-weight: 500;
         }
 
         /* ================= SweetAlert2 排版修正 ================= */
         .swal2-popup { background-color: var(--bg-surface) !important; color: var(--text-main) !important; border: 1px solid var(--border-color); border-radius: 16px !important; }
-        .swal2-title { color: var(--text-main) !important; }
-        .swal2-html-container { color: var(--text-muted) !important; }
-        
-        /* 解決按鈕緊密問題：利用 flex gap 自動設定均勻間距 */
+        .swal2-title { color: var(--text-main) !important; font-weight: 700 !important; }
+        .swal2-html-container { color: var(--text-muted) !important; font-weight: 500; }
         .swal2-actions { gap: 12px; }
-        .swal2-actions button { margin: 0 !important; } /* 清除原生 margin 避免與 gap 衝突 */
+        .swal2-actions button { margin: 0 !important; font-weight: 600 !important; letter-spacing: 0.5px; }
 
         /* 隱藏 Radio input */
         .icon-selector input[type="radio"], .color-selector input[type="radio"] { display: none; }
 
-        /* 新版選擇器樣式 (圖示兩排陣列) */
+        /* 新版選擇器樣式 */
         .icon-selector { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
         .icon-selector label { 
             width: 100%; aspect-ratio: 1; height: auto;
@@ -178,49 +195,50 @@
             border: 1px solid var(--border-color); border-radius: 50%; cursor: pointer; 
             background: var(--bg-surface); font-size: 1.4rem; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        .icon-selector label:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .icon-selector input[type="radio"]:checked + label { background-color: var(--today-bg); border-color: var(--primary-color); box-shadow: 0 2px 8px rgba(0,0,0,0.1); transform: scale(1.1); }
+        .icon-selector label:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-color: var(--text-muted); }
+        .icon-selector input[type="radio"]:checked + label { background-color: var(--today-bg); border-color: var(--primary-color); box-shadow: 0 2px 8px rgba(0,0,0,0.15); transform: scale(1.1); }
 
         /* 顏色選擇器 */
-        .color-selector { display: flex; flex-wrap: wrap; gap: 10px; }
+        .color-selector { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; width: 100%; }
         .color-selector label { 
-            width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; 
+            width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(0,0,0,0.1); 
             position: relative; display: flex; align-items: center; justify-content: center;
-            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s; background-color: var(--base-color); 
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; background-color: var(--base-color); 
         }
-        .color-selector label:hover { transform: scale(1.1); }
-        .color-selector input[type="radio"]:checked + label { background-color: var(--active-color); border: 2.5px solid #2d3748; transform: scale(1.15); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-        .color-selector input[type="radio"]:checked + label::after { content: '\2714'; color: #ffffff; font-size: 16px; font-weight: bold; }
+        .color-selector label:hover { transform: scale(1.1); box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .color-selector input[type="radio"]:checked + label { border: 2.5px solid #1e293b; transform: scale(1.15); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .color-selector input[type="radio"]:checked + label::after { content: '\2714'; color: #ffffff; font-size: 16px; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
 
         /* RWD */
         @media (max-width: 991px) { .day-cell { min-height: 110px; } #sideMemoArea { height: 300px; } }
         @media (max-width: 768px) {
             .dashboard-header { flex-direction: column; gap: 16px; align-items: stretch !important; }
-            .day-header { font-size: 0.75rem; padding: 8px 4px; text-align: center; }
-            .day-cell { min-height: 90px; padding: 4px; }
-            .date-number { font-size: 0.8rem; text-align: center; }
+            .day-header { font-size: 0.8rem; padding: 8px 4px; text-align: center; }
+            .day-cell { min-height: 90px; padding: 4px; gap: 3px; }
+            .date-number { font-size: 0.85rem; text-align: center; margin-bottom: 3px; }
             .swal2-actions { flex-direction: column; width: 100%; padding: 0 1em; gap: 10px; }
             .swal2-actions button { width: 100%; }
-            .icon-selector label { font-size: 1.1rem; }
+            .icon-selector label { font-size: 1.2rem; }
             .color-selector label { width: 34px; height: 34px; }
+            .color-selector { justify-content: center; gap: 10px; }
         }
 
         /* 列印專用排版 */
         @media print {
             @page { size: landscape; margin: 10mm; } 
-            body { background-color: #fff !important; color: #000 !important; }
+            body { background-color: #fff !important; color: #000 !important; font-family: "Microsoft JhengHei", Arial, sans-serif !important; }
             .btn, .theme-selector-wrapper, #importFile { display: none !important; }
             .dashboard-header { justify-content: center !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
             .month-title { font-size: 2rem; border-bottom: 2px solid #000; padding-bottom: 5px; }
             .calendar-wrapper { box-shadow: none !important; border: 2px solid #000 !important; }
             .day-cell { border-right: 1px solid #ccc !important; border-bottom: 1px solid #ccc !important; min-height: 100px; }
-            .day-header { border-right: 1px solid #000 !important; border-bottom: 2px solid #000 !important; background-color: #f1f5f9 !important; color: #000 !important; }
+            .day-header { border-right: 1px solid #000 !important; border-bottom: 2px solid #000 !important; background-color: #f1f5f9 !important; color: #000 !important; font-weight: bold !important; }
             .day-cell.empty { background-color: #f8fafc !important; }
             .event-chip, .date-number, .day-cell.today .date-number { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .col-lg-9 { width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; margin-bottom: 20px;}
             .col-lg-3 { width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; page-break-inside: avoid; }
             .memo-wrapper { box-shadow: none !important; border: 1px solid #000 !important; }
-            #sideMemoArea { height: auto !important; min-height: 150px; overflow: visible !important; resize: none; border-top: 1px solid #000; }
+            #sideMemoArea { height: auto !important; min-height: 150px; overflow: visible !important; resize: none; border-top: 1px solid #000; font-weight: bold; }
         }
     </style>
 </head>
@@ -232,23 +250,24 @@
             <button class="btn btn-custom-outline btn-sm px-3" id="prevMonth"><i class="bi bi-chevron-left"></i></button>
             <h4 class="m-0 month-title text-center" id="monthYearDisplay">載入中...</h4>
             <button class="btn btn-custom-outline btn-sm px-3" id="nextMonth"><i class="bi bi-chevron-right"></i></button>
-            <button class="btn btn-primary-custom btn-sm ms-2 px-3 fw-medium text-white" id="todayBtn">今天</button>
+            <button class="btn btn-primary-custom btn-sm ms-2 px-3 text-white" id="todayBtn">今天</button>
         </div>
         <div class="d-flex gap-2 align-items-center flex-wrap">
             <div class="theme-selector-wrapper me-lg-2">
-                <select class="form-select form-select-sm shadow-none" id="themeSelector" style="min-width: 130px; border-color: var(--border-color); background-color: var(--bg-surface); color: var(--text-main);">
+                <select class="form-select form-select-sm shadow-none fw-bold" id="themeSelector" style="min-width: 130px; border-color: var(--border-color); background-color: var(--bg-surface); color: var(--text-main);">
                     <option value="theme-default">👔 商務預設</option>
-                    <option value="theme-dark">🌙 暗黑風格</option>
-                    <option value="theme-japanese">🍵 日式簡約</option>
+                    <option value="theme-fresh">🌿 綠意清新</option>
                     <option value="theme-sakura">🌸 櫻花浪漫</option>
+                    <option value="theme-japanese">🍵 日式簡約</option>
+                    <option value="theme-dark">🌙 暗黑風格</option>
                 </select>
             </div>
             <input type="file" id="importFile" accept=".json" class="d-none">
             <button class="btn btn-custom-outline btn-sm" id="printBtn"><i class="bi bi-printer"></i> 列印</button>
             <button class="btn btn-custom-outline btn-sm" id="importBtn"><i class="bi bi-box-arrow-in-down"></i> 匯入</button>
             <button class="btn btn-custom-outline btn-sm" id="exportBtn"><i class="bi bi-box-arrow-up"></i> 匯出</button>
-            <button class="btn btn-outline-secondary btn-sm" id="deleteOldBtn"><i class="bi bi-calendar-minus"></i> 刪除舊紀錄</button>
-            <button class="btn btn-outline-danger btn-sm" id="clearAllBtn"><i class="bi bi-trash3-fill"></i> 清空</button>
+            <button class="btn btn-outline-secondary btn-sm fw-bold" id="deleteOldBtn"><i class="bi bi-calendar-minus"></i> 刪除舊紀錄</button>
+            <button class="btn btn-outline-danger btn-sm fw-bold" id="clearAllBtn"><i class="bi bi-trash3-fill"></i> 清空</button>
         </div>
     </div>
 
@@ -271,9 +290,9 @@
         <div class="col-lg-3 order-lg-2 order-2 mb-4">
             <div class="memo-wrapper">
                 <div class="memo-header d-flex align-items-center">
-                    <i class="bi bi-journal-text me-2 text-primary"></i>
-                    <h6 class="m-0 fw-bold">全域記事 Memo</h6>
-                    <small class="ms-auto text-muted" id="saveStatus">已儲存</small>
+                    <i class="bi bi-journal-text me-2 fs-5" style="color: var(--primary-color);"></i>
+                    <h6 class="m-0 fw-bold letter-spacing-1">全域記事 Memo</h6>
+                    <small class="ms-auto text-muted fw-bold" id="saveStatus">已儲存</small>
                 </div>
                 <textarea id="sideMemoArea" placeholder="在此記錄您的臨時想法或待辦事項...內容會自動儲存。"></textarea>
             </div>
@@ -293,7 +312,7 @@
                 
                 <div class="mb-4">
                     <label class="form-label fw-bold opacity-75 small">🗓️ 選擇日期區間：</label>
-                    <input type="text" class="form-control bg-white" id="dateRange" placeholder="選擇日期區間" readonly>
+                    <input type="text" class="form-control bg-white fw-bold text-dark" id="dateRange" placeholder="選擇日期區間" readonly>
                 </div>
                 
                 <div class="mb-4">
@@ -313,7 +332,7 @@
                         <input type="radio" name="noteIcon" id="iconExam" value="📝"><label for="iconExam" title="考試">📝</label>
                         <input type="radio" name="noteIcon" id="iconStudy" value="🏫"><label for="iconStudy" title="補習/上課">🏫</label>
                         <input type="radio" name="noteIcon" id="iconStar" value="⭐️"><label for="iconStar" title="重要">⭐️</label>
-                        <input type="radio" name="noteIcon" id="iconClock" value="⏰"><label for="iconClock" title="時間">⏰</label>
+                        <input type="radio" name="noteIcon" id="iconSleep" value="💤"><label for="iconSleep" title="休息">💤</label>
                         <input type="radio" name="noteIcon" id="iconPeople" value="👥"><label for="iconPeople" title="聚會">👥</label>
                         <input type="radio" name="noteIcon" id="iconShop" value="🛒"><label for="iconShop" title="購物">🛒</label>
                     </div>
@@ -323,36 +342,42 @@
                     <label class="form-label fw-bold opacity-75 small">選擇顏色：</label>
                     <div class="color-selector" id="colorPicker">
                         <input type="radio" name="noteColor" id="colorBlue" value="#8ab4f8" checked>
-                        <label for="colorBlue" style="--base-color: #8ab4f8; --active-color: #1a73e8;" title="藍色"></label>
+                        <label for="colorBlue" style="--base-color: #8ab4f8;" title="藍色"></label>
 
                         <input type="radio" name="noteColor" id="colorMint" value="#81c995">
-                        <label for="colorMint" style="--base-color: #81c995; --active-color: #188038;" title="綠色"></label>
+                        <label for="colorMint" style="--base-color: #81c995;" title="綠色"></label>
 
                         <input type="radio" name="noteColor" id="colorPink" value="#f28b82">
-                        <label for="colorPink" style="--base-color: #f28b82; --active-color: #d93025;" title="紅色"></label>
+                        <label for="colorPink" style="--base-color: #f28b82;" title="紅色"></label>
 
                         <input type="radio" name="noteColor" id="colorYellow" value="#fde293">
-                        <label for="colorYellow" style="--base-color: #fde293; --active-color: #f9ab00;" title="黃色"></label>
+                        <label for="colorYellow" style="--base-color: #fde293;" title="黃色"></label>
 
                         <input type="radio" name="noteColor" id="colorCyan" value="#78d9ec">
-                        <label for="colorCyan" style="--base-color: #78d9ec; --active-color: #12b5cb;" title="青色"></label>
+                        <label for="colorCyan" style="--base-color: #78d9ec;" title="青色"></label>
 
                         <input type="radio" name="noteColor" id="colorPurple" value="#c5a5e3">
-                        <label for="colorPurple" style="--base-color: #c5a5e3; --active-color: #9334e6;" title="紫色"></label>
+                        <label for="colorPurple" style="--base-color: #c5a5e3;" title="紫色"></label>
 
                         <input type="radio" name="noteColor" id="colorOrange" value="#fcad70">
-                        <label for="colorOrange" style="--base-color: #fcad70; --active-color: #e65100;" title="橘色"></label>
+                        <label for="colorOrange" style="--base-color: #fcad70;" title="橘色"></label>
 
                         <input type="radio" name="noteColor" id="colorGray" value="#9aa0a6">
-                        <label for="colorGray" style="--base-color: #9aa0a6; --active-color: #5f6368;" title="灰色"></label>
+                        <label for="colorGray" style="--base-color: #9aa0a6;" title="灰色"></label>
+                        
+                        <input type="radio" name="noteColor" id="colorIndigo" value="#9fa8da">
+                        <label for="colorIndigo" style="--base-color: #9fa8da;" title="靛色"></label>
+
+                        <input type="radio" name="noteColor" id="colorBrown" value="#bcaaa4">
+                        <label for="colorBrown" style="--base-color: #bcaaa4;" title="棕色"></label>
                     </div>
                 </div>
                 
-                <textarea class="form-control" id="noteTextarea" rows="3" placeholder="請輸入行程內容..."></textarea>
+                <textarea class="form-control fw-bold text-dark" id="noteTextarea" rows="3" placeholder="請輸入行程內容..."></textarea>
             </div>
             <div class="modal-footer d-flex justify-content-between">
-                <button type="button" class="btn btn-outline-danger btn-sm" id="deleteNoteBtn" style="display: none;">刪除</button>
-                <div class="ms-auto"><button type="button" class="btn btn-secondary btn-sm me-2" data-bs-dismiss="modal">取消</button><button type="button" class="btn btn-primary-custom btn-sm px-4" id="saveNoteBtn">儲存</button></div>
+                <button type="button" class="btn btn-outline-danger btn-sm fw-bold" id="deleteNoteBtn" style="display: none;">刪除</button>
+                <div class="ms-auto"><button type="button" class="btn btn-secondary btn-sm me-2 fw-bold" data-bs-dismiss="modal">取消</button><button type="button" class="btn btn-primary-custom btn-sm px-4" id="saveNoteBtn">儲存</button></div>
             </div>
         </div>
     </div>
@@ -371,7 +396,6 @@
     let noteModal;
     let dateRangePicker;
 
-    // 定義通用的 Swal 樣式，並移除 class 中的 margin（改由 css 的 gap 來處理按鈕間距）
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: { 
             confirmButton: 'btn btn-primary-custom px-4', 
@@ -434,20 +458,20 @@
     function generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2, 7); }
 
     function getContrastTextColor(hexcolor) {
-        if (!hexcolor) return '#202124';
+        if (!hexcolor) return '#111827'; 
         
         hexcolor = hexcolor.trim().replace("#", "");
         if (hexcolor.length === 3) {
             hexcolor = hexcolor[0] + hexcolor[0] + hexcolor[1] + hexcolor[1] + hexcolor[2] + hexcolor[2];
         }
-        if (hexcolor.length !== 6) return '#202124';
+        if (hexcolor.length !== 6) return '#111827';
 
         const r = parseInt(hexcolor.substr(0,2),16);
         const g = parseInt(hexcolor.substr(2,2),16);
         const b = parseInt(hexcolor.substr(4,2),16);
         
         const yiq = ((r*299) + (g*587) + (b*114)) / 1000;
-        return (yiq >= 190) ? '#202124' : '#ffffff';
+        return (yiq >= 150) ? '#111827' : '#ffffff'; 
     }
 
     function renderCalendar() {
@@ -566,8 +590,32 @@
             else { currentDate.setMonth(currentDate.getMonth() - 1); }
             renderCalendar();
             
-            wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 10); 
+            wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 100); 
         }, { passive: false });
+
+        let touchstartX = 0;
+        let touchendX = 0;
+
+        calendarContainer.addEventListener('touchstart', (e) => {
+            touchstartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        calendarContainer.addEventListener('touchend', (e) => {
+            touchendX = e.changedTouches[0].screenX;
+            handleGesture();
+        }, { passive: true });
+
+        function handleGesture() {
+            const swipeThreshold = 50; 
+            if (touchstartX - touchendX > swipeThreshold) {
+                currentDate.setMonth(currentDate.getMonth() + 1); 
+                renderCalendar();
+            }
+            if (touchendX - touchstartX > swipeThreshold) {
+                currentDate.setMonth(currentDate.getMonth() - 1); 
+                renderCalendar();
+            }
+        }
 
         document.getElementById('saveNoteBtn').onclick = () => {
             const id = document.getElementById('currentEditId').value;
@@ -595,7 +643,6 @@
             saveNotesToStorage(); renderCalendar(); noteModal.hide();
         };
 
-        // 單一記事刪除確認 (套用新版間距)
         document.getElementById('deleteNoteBtn').onclick = () => {
             swalWithBootstrapButtons.fire({ 
                 title: '確定刪除？', 
@@ -603,7 +650,7 @@
                 showCancelButton: true, 
                 confirmButtonText: '確定',
                 cancelButtonText: 'Cancel',
-                reverseButtons: true /* 讓 Cancel 在右側，與截圖一致 */
+                reverseButtons: true
             }).then((res) => {
                 if (res.isConfirmed) {
                     events = events.filter(e => e.id !== document.getElementById('currentEditId').value);
@@ -620,12 +667,12 @@
 
             swalWithBootstrapButtons.fire({
                 title: '刪除舊紀錄',
-                html: '<p class="text-muted mb-3">請選擇日期，系統將會清除<br><b>該日期之前</b>的所有行程紀錄。</p><input type="text" id="cutoffDateInput" class="form-control text-center mx-auto bg-white" style="max-width: 200px; cursor: pointer;" readonly placeholder="選擇日期">',
+                html: '<p class="text-muted mb-3 fw-bold">請選擇日期，系統將會清除<br><b class="text-dark">該日期之前</b>的所有行程紀錄。</p><input type="text" id="cutoffDateInput" class="form-control text-center mx-auto bg-white fw-bold text-dark" style="max-width: 200px; cursor: pointer;" readonly placeholder="選擇日期">',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: '確定清除',
                 cancelButtonText: '取消',
-                reverseButtons: true, // 讓取消在右邊
+                reverseButtons: true,
                 didOpen: () => {
                     flatpickr("#cutoffDateInput", {
                         locale: "zh_tw",
@@ -635,9 +682,7 @@
                 },
                 preConfirm: () => {
                     const cutoffDate = document.getElementById('cutoffDateInput').value;
-                    if (!cutoffDate) {
-                        Swal.showValidationMessage('請先選擇一個日期');
-                    }
+                    if (!cutoffDate) { Swal.showValidationMessage('請先選擇一個日期'); }
                     return cutoffDate;
                 }
             }).then((result) => {
@@ -651,15 +696,10 @@
                     });
                     
                     const deletedCount = originalCount - events.length;
-                    
-                    saveNotesToStorage();
-                    renderCalendar();
+                    saveNotesToStorage(); renderCalendar();
                     
                     swalWithBootstrapButtons.fire({
-                        icon: 'success',
-                        title: '清除完成',
-                        text: `已成功刪除了 ${deletedCount} 筆舊紀錄。`,
-                        confirmButtonText: '了解'
+                        icon: 'success', title: '清除完成', text: `已成功刪除了 ${deletedCount} 筆舊紀錄。`, confirmButtonText: '了解'
                     });
                 }
             });
@@ -676,8 +716,7 @@
             const mm = String(today.getMonth() + 1).padStart(2, '0');
             const dd = String(today.getDate()).padStart(2, '0');
             
-            a.href = url; 
-            a.download = `BC_${yyyy}-${mm}-${dd}.json`;
+            a.href = url; a.download = `BC_${yyyy}-${mm}-${dd}.json`;
             a.click(); URL.revokeObjectURL(url);
         };
 
@@ -699,16 +738,11 @@
                             title: '匯入資料',
                             text: "您希望如何處理現有的行事曆資料？",
                             icon: 'question',
-                            showDenyButton: true,
-                            showCancelButton: true,
+                            showDenyButton: true, showCancelButton: true,
                             confirmButtonText: '<i class="bi bi-plus-circle"></i> 合併至現有資料',
                             denyButtonText: '<i class="bi bi-exclamation-triangle"></i> 清除並完全覆寫',
                             cancelButtonText: '取消',
-                            customClass: { 
-                                confirmButton: 'btn btn-primary-custom', 
-                                denyButton: 'btn btn-danger', 
-                                cancelButton: 'btn btn-secondary' 
-                            }
+                            customClass: { confirmButton: 'btn btn-primary-custom', denyButton: 'btn btn-danger', cancelButton: 'btn btn-secondary' }
                         }).then((result) => {
                             const newEvents = isArray ? importedData : importedData.events;
                             if (result.isConfirmed) {
@@ -728,47 +762,33 @@
             reader.readAsText(file);
         });
 
-        // ================= 更新：清空資料的雙重確認與排版修正 =================
         document.getElementById('clearAllBtn').addEventListener('click', () => {
             if (events.length === 0 && !document.getElementById('sideMemoArea').value) {
                 swalWithBootstrapButtons.fire({ icon: 'info', title: '提示', text: '目前沒有任何資料可以清除。', confirmButtonText: '了解' });
                 return;
             }
             
-            // 第一層確認 (嚴重警告)
             swalWithBootstrapButtons.fire({
                 title: '<span class="text-warning">⚠️</span> 嚴重警告',
-                html: '確定要清除「所有」行事曆資料嗎？<br><br><b class="text-danger fs-5">此動作無法復原！</b><br><span class="text-muted">建議您先使用「匯出」功能備份資料。</span>',
-                showCancelButton: true,
-                confirmButtonText: '<i class="bi bi-trash3"></i> 是的，清空全部',
-                cancelButtonText: '取消',
+                html: '<span class="fw-bold">確定要清除「所有」行事曆資料嗎？</span><br><br><b class="text-danger fs-5">此動作無法復原！</b><br><span class="text-muted small">建議您先使用「匯出」功能備份資料。</span>',
+                showCancelButton: true, confirmButtonText: '<i class="bi bi-trash3"></i> 是的，清空全部', cancelButtonText: '取消',
                 customClass: { confirmButton: 'btn btn-danger px-4', cancelButton: 'btn btn-secondary px-4' },
-                reverseButtons: true // 讓 取消 在左邊
+                reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // 第二層確認 (最後確認)
                     swalWithBootstrapButtons.fire({
                         title: '<span class="text-danger">❌</span> 最後確認',
-                        html: '<span class="text-muted">資料一旦刪除就真的找不回來囉！確定要執行嗎？</span>',
-                        showCancelButton: true,
-                        confirmButtonText: '我非常確定，刪除！',
-                        cancelButtonText: '再想一下',
+                        html: '<span class="text-muted fw-bold">資料一旦刪除就真的找不回來囉！確定要執行嗎？</span>',
+                        showCancelButton: true, confirmButtonText: '我非常確定，刪除！', cancelButtonText: '再想一下',
                         customClass: { confirmButton: 'btn btn-danger px-4', cancelButton: 'btn btn-secondary px-4' },
-                        reverseButtons: true // 讓 再想一下 在左邊
+                        reverseButtons: true
                     }).then((finalResult) => {
                         if (finalResult.isConfirmed) {
                             events = []; 
                             localStorage.removeItem(MEMO_KEY);
                             document.getElementById('sideMemoArea').value = "";
-                            saveNotesToStorage(); 
-                            renderCalendar();
-                            
-                            swalWithBootstrapButtons.fire({
-                                icon: 'success',
-                                title: '已清空',
-                                text: '所有資料已經成功清除。',
-                                confirmButtonText: '了解'
-                            });
+                            saveNotesToStorage(); renderCalendar();
+                            swalWithBootstrapButtons.fire({ icon: 'success', title: '已清空', text: '所有資料已經成功清除。', confirmButtonText: '了解' });
                         }
                     });
                 }
