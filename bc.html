@@ -145,8 +145,13 @@
         .day-header.weekend-sat { color: var(--weekend-sat); }
         .day-header.weekend-sun { color: var(--weekend-sun); }
 
+        /* ================= 修改格子樣式 ================= */
         .day-cell {
-            background-color: var(--bg-surface); min-height: 140px; padding: 8px; cursor: pointer;
+            background-color: var(--bg-surface); 
+            min-height: 140px; 
+            max-height: 140px; /* 限制最大高度 */
+            overflow: hidden;  /* 超出部分直接隱藏，不顯示卷軸 */
+            padding: 8px; cursor: pointer;
             border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
             position: relative; display: flex; flex-direction: column; gap: 5px;
             min-width: 0; 
@@ -170,11 +175,11 @@
         }
         /* ==================================================== */
 
-        /* 行程標籤樣式 (極致清晰版) */
+        /* 行程標籤樣式 (字體縮小與單一事件換行版) */
         .event-chip {
-            font-size: 0.9rem; 
+            font-size: 0.8rem; /* 字體改小 */
             font-weight: 600 !important; 
-            padding: 5px 8px; 
+            padding: 4px 6px; /* 稍微縮小內邊距 */
             border-radius: 6px; 
             display: flex; align-items: center; gap: 6px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.15s ease;
@@ -184,8 +189,23 @@
         }
         .event-chip:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 3px 6px rgba(0,0,0,0.15); }
         
-        .event-chip .chip-icon { flex-shrink: 0; font-size: 1.15em; line-height: 1; }
+        .event-chip .chip-icon { flex-shrink: 0; font-size: 1.1em; line-height: 1; }
+        
+        /* 預設多個事件時：單行截斷加省略號 */
         .event-chip .chip-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1; }
+
+        /* 當天只有單一事件時的樣式 (多行截斷) */
+        .event-chip.single-event { align-items: flex-start; }
+        .event-chip.single-event .chip-text {
+            white-space: normal; 
+            word-break: break-word; 
+            
+            /* CSS 多行截斷技巧 */
+            display: -webkit-box;
+            -webkit-line-clamp: 4; /* 最多允許 4 行，超過自動加上 ... */
+            -webkit-box-orient: vertical;
+            overflow: hidden; 
+        }
 
         /* 側邊記事本樣式 */
         .memo-header { border-bottom: 1px solid var(--border-color); padding: 14px 16px; background-color: var(--bg-header); }
@@ -227,12 +247,12 @@
         .color-selector input[type="radio"]:checked + label { border: 2.5px solid #1e293b; transform: scale(1.15); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .color-selector input[type="radio"]:checked + label::after { content: '\2714'; color: #ffffff; font-size: 16px; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
 
-        /* RWD */
-        @media (max-width: 991px) { .day-cell { min-height: 110px; } #sideMemoArea { height: 300px; } }
+        /* RWD 媒體查詢 */
+        @media (max-width: 991px) { .day-cell { min-height: 110px; max-height: 110px; } #sideMemoArea { height: 300px; } }
         @media (max-width: 768px) {
             .dashboard-header { flex-direction: column; gap: 16px; align-items: stretch !important; }
             .day-header { font-size: 0.8rem; padding: 8px 4px; text-align: center; }
-            .day-cell { min-height: 90px; padding: 4px; gap: 3px; }
+            .day-cell { min-height: 90px; max-height: 90px; padding: 4px; gap: 3px; }
             .date-number { font-size: 0.85rem; text-align: center; margin-bottom: 3px; }
             .swal2-actions { flex-direction: column; width: 100%; padding: 0 1em; gap: 10px; }
             .swal2-actions button { width: 100%; }
@@ -249,7 +269,11 @@
             .dashboard-header { justify-content: center !important; margin: 0 0 10px 0 !important; padding: 0 !important; }
             .month-title { font-size: 2rem; border-bottom: 2px solid #000; padding-bottom: 5px; }
             .calendar-wrapper { box-shadow: none !important; border: 2px solid #000 !important; }
-            .day-cell { border-right: 1px solid #ccc !important; border-bottom: 1px solid #ccc !important; min-height: 100px; }
+            
+            /* 列印時解除高度限制，確保所有字體都能印出來 */
+            .day-cell { border-right: 1px solid #ccc !important; border-bottom: 1px solid #ccc !important; min-height: 100px; max-height: none !important; overflow: visible !important; }
+            .event-chip.single-event .chip-text { display: block; -webkit-line-clamp: unset; } /* 取消列印時的截斷 */
+            
             .day-header { border-right: 1px solid #000 !important; border-bottom: 2px solid #000 !important; background-color: #f1f5f9 !important; color: #000 !important; font-weight: bold !important; }
             .day-cell.empty { background-color: #f8fafc !important; }
             .event-chip, .date-number, .day-cell.today .date-number { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -330,7 +354,7 @@
                 
                 <div class="mb-4">
                     <label class="form-label fw-bold opacity-75 small">🗓️ 選擇日期區間：</label>
-                    <input type="text" class="form-control bg-white fw-bold text-dark" id="dateRange" placeholder="選擇日期區間" readonly>
+                    <input type="text" class="form-control fw-bold" id="dateRange" placeholder="選擇日期區間" readonly>
                 </div>
                 
                 <div class="mb-4">
@@ -391,7 +415,7 @@
                     </div>
                 </div>
                 
-                <textarea class="form-control fw-bold text-dark" id="noteTextarea" rows="3" placeholder="請輸入行程內容..."></textarea>
+                <textarea class="form-control fw-bold" id="noteTextarea" rows="3" placeholder="請輸入行程內容..."></textarea>
             </div>
             <div class="modal-footer d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-danger btn-sm fw-bold" id="deleteNoteBtn" style="display: none;">刪除</button>
@@ -525,9 +549,14 @@
             cell.appendChild(dateNum);
 
             const dayEvents = events.filter(evt => dateString >= evt.start && dateString <= (evt.end || evt.start));
+            
+            // 判斷當天是否只有一個事件
+            const isSingleEvent = dayEvents.length === 1;
+
             dayEvents.forEach(evt => {
                 const chip = document.createElement('div');
-                chip.className = 'event-chip';
+                // 若只有一個事件，加上 single-event 以觸發換行樣式
+                chip.className = 'event-chip' + (isSingleEvent ? ' single-event' : '');
                 
                 chip.style.backgroundColor = evt.color;
                 chip.style.color = getContrastTextColor(evt.color);
