@@ -236,8 +236,8 @@
         .icon-selector label:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-color: var(--text-muted); }
         .icon-selector input[type="radio"]:checked + label { background-color: var(--today-bg); border-color: var(--primary-color); box-shadow: 0 2px 8px rgba(0,0,0,0.15); transform: scale(1.1); }
 
-        /* 顏色選擇器 */
-        .color-selector { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; width: 100%; }
+        /* 顏色選擇器 - 修正為靠左對齊並設定間隔 */
+        .color-selector { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 12px; width: 100%; }
         .color-selector label { 
             width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(0,0,0,0.1); 
             position: relative; display: flex; align-items: center; justify-content: center;
@@ -258,7 +258,7 @@
             .swal2-actions button { width: 100%; }
             .icon-selector label { font-size: 1.2rem; }
             .color-selector label { width: 34px; height: 34px; }
-            .color-selector { justify-content: center; gap: 10px; }
+            .color-selector { justify-content: flex-start; gap: 10px; }
         }
 
         /* 列印專用排版 */
@@ -383,35 +383,47 @@
                 <div class="mb-4">
                     <label class="form-label fw-bold opacity-75 small">選擇顏色：</label>
                     <div class="color-selector" id="colorPicker">
-                        <input type="radio" name="noteColor" id="colorBlue" value="#8ab4f8" checked>
-                        <label for="colorBlue" style="--base-color: #8ab4f8;" title="藍色"></label>
+                        <input type="radio" name="noteColor" id="colorDarkRed" value="#b91c1c" checked>
+                        <label for="colorDarkRed" style="--base-color: #b91c1c;" title="深紅"></label>
 
-                        <input type="radio" name="noteColor" id="colorMint" value="#81c995">
-                        <label for="colorMint" style="--base-color: #81c995;" title="綠色"></label>
+                        <input type="radio" name="noteColor" id="colorLightRed" value="#fca5a5">
+                        <label for="colorLightRed" style="--base-color: #fca5a5;" title="淡紅"></label>
 
-                        <input type="radio" name="noteColor" id="colorPink" value="#f28b82">
-                        <label for="colorPink" style="--base-color: #f28b82;" title="紅色"></label>
+                        <input type="radio" name="noteColor" id="colorDarkGreen" value="#15803d">
+                        <label for="colorDarkGreen" style="--base-color: #15803d;" title="深綠"></label>
 
-                        <input type="radio" name="noteColor" id="colorYellow" value="#fde293">
-                        <label for="colorYellow" style="--base-color: #fde293;" title="黃色"></label>
+                        <input type="radio" name="noteColor" id="colorLightGreen" value="#86efac">
+                        <label for="colorLightGreen" style="--base-color: #86efac;" title="淡綠"></label>
 
-                        <input type="radio" name="noteColor" id="colorCyan" value="#78d9ec">
-                        <label for="colorCyan" style="--base-color: #78d9ec;" title="青色"></label>
+                        <input type="radio" name="noteColor" id="colorDarkBlue" value="#1d4ed8">
+                        <label for="colorDarkBlue" style="--base-color: #1d4ed8;" title="深藍"></label>
 
-                        <input type="radio" name="noteColor" id="colorPurple" value="#c5a5e3">
-                        <label for="colorPurple" style="--base-color: #c5a5e3;" title="紫色"></label>
+                        <input type="radio" name="noteColor" id="colorLightBlue" value="#93c5fd">
+                        <label for="colorLightBlue" style="--base-color: #93c5fd;" title="淡藍"></label>
 
-                        <input type="radio" name="noteColor" id="colorOrange" value="#fcad70">
-                        <label for="colorOrange" style="--base-color: #fcad70;" title="橘色"></label>
+                        <input type="radio" name="noteColor" id="colorDarkYellow" value="#ca8a04">
+                        <label for="colorDarkYellow" style="--base-color: #ca8a04;" title="深黃"></label>
 
-                        <input type="radio" name="noteColor" id="colorGray" value="#9aa0a6">
-                        <label for="colorGray" style="--base-color: #9aa0a6;" title="灰色"></label>
-                        
-                        <input type="radio" name="noteColor" id="colorIndigo" value="#9fa8da">
-                        <label for="colorIndigo" style="--base-color: #9fa8da;" title="靛色"></label>
+                        <input type="radio" name="noteColor" id="colorLightYellow" value="#fef08a">
+                        <label for="colorLightYellow" style="--base-color: #fef08a;" title="淡黃"></label>
 
-                        <input type="radio" name="noteColor" id="colorBrown" value="#bcaaa4">
-                        <label for="colorBrown" style="--base-color: #bcaaa4;" title="棕色"></label>
+                        <input type="radio" name="noteColor" id="colorDarkPurple" value="#7e22ce">
+                        <label for="colorDarkPurple" style="--base-color: #7e22ce;" title="深紫"></label>
+
+                        <input type="radio" name="noteColor" id="colorLightPurple" value="#d8b4fe">
+                        <label for="colorLightPurple" style="--base-color: #d8b4fe;" title="淡紫"></label>
+
+                        <input type="radio" name="noteColor" id="colorDarkPink" value="#be185d">
+                        <label for="colorDarkPink" style="--base-color: #be185d;" title="深粉紅"></label>
+
+                        <input type="radio" name="noteColor" id="colorLightPink" value="#f9a8d4">
+                        <label for="colorLightPink" style="--base-color: #f9a8d4;" title="淡粉紅"></label>
+
+                        <input type="radio" name="noteColor" id="colorBlack" value="#171717">
+                        <label for="colorBlack" style="--base-color: #171717;" title="黑"></label>
+
+                        <input type="radio" name="noteColor" id="colorGray" value="#9ca3af">
+                        <label for="colorGray" style="--base-color: #9ca3af;" title="灰"></label>
                     </div>
                 </div>
                 
@@ -592,7 +604,7 @@
         dateRangePicker.setDate([dateString, dateString]);
         
         document.getElementById('noteTextarea').value = '';
-        document.getElementById('colorBlue').checked = true;
+        document.getElementById('colorDarkRed').checked = true;
         document.getElementById('iconPin').checked = true;
         document.getElementById('deleteNoteBtn').style.display = 'none'; 
         noteModal.show();
@@ -609,7 +621,7 @@
         document.getElementById('noteTextarea').value = evt.text;
         
         const colorRadio = document.querySelector(`input[name="noteColor"][value="${evt.color}"]`);
-        if(colorRadio) { colorRadio.checked = true; } else { document.getElementById('colorBlue').checked = true; }
+        if(colorRadio) { colorRadio.checked = true; } else { document.getElementById('colorDarkRed').checked = true; }
 
         const iconRadio = document.querySelector(`input[name="noteIcon"][value="${evt.icon}"]`);
         if(iconRadio) { iconRadio.checked = true; } else { document.getElementById('iconPin').checked = true; }
