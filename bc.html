@@ -130,9 +130,29 @@
         }
 
         /* 卡片容器 */
-        .calendar-wrapper, .memo-wrapper {
+        .calendar-wrapper {
             background-color: var(--bg-surface); border-radius: 12px; box-shadow: 0 4px 20px var(--chip-shadow);
             border: 1px solid var(--border-color); height: 100%; transition: all 0.3s ease;
+        }
+
+        .memo-wrapper {
+            background-color: var(--bg-surface); border-radius: 12px; box-shadow: 0 4px 20px var(--chip-shadow);
+            border: 1px solid var(--border-color); height: 100%; transition: all 0.3s ease;
+            display: flex;             
+            flex-direction: column;    
+            padding: 16px;             
+        }
+
+        #sideMemoArea {
+            flex: 1;                   
+            width: 100%;               
+            resize: none;              
+            border: none;              
+            outline: none;             
+            background-color: transparent;
+            color: var(--text-main);
+            margin-top: 12px;          
+            line-height: 1.6;
         }
 
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
@@ -208,30 +228,39 @@
             overflow: hidden; 
         }
 
-        /* 🌟 螢光特效：駭客綠 (柔和呼吸版) */
+        /* 🌟 凸顯特效：金屬質感掃光 */
         .event-chip.highlight-border {
-            /* 邊框稍微加點透明度，降低生硬感 */
-            border: 1px solid rgba(57, 255, 20, 0.8) !important;
-            /* 動畫時間拉長到 1.2 秒，變成緩慢的呼吸效果 */
-            animation: neon-pulse-green-soft 1.2s ease-in-out infinite alternate;
+            border: 1.5px solid rgba(255, 255, 255, 0.5) !important;
             position: relative;
             z-index: 5;
+            overflow: hidden !important; /* 確保掃光不會超出標籤範圍 */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        @keyframes neon-pulse-green-soft {
-            0% { 
-                /* 基礎狀態：幾乎只有微微的邊緣發光 */
-                box-shadow: 0 0 2px rgba(57, 255, 20, 0.4), 
-                            0 0 4px rgba(57, 255, 20, 0.1), 
-                            inset 0 0 2px rgba(57, 255, 20, 0.1); 
-            }
-            100% { 
-                /* 最亮狀態：加入微弱白光提升亮度，外圍用帶透明度的深綠色暈染 */
-                box-shadow: 0 0 4px rgba(255, 255, 255, 0.4), 
-                            0 0 8px rgba(57, 255, 20, 0.6), 
-                            0 0 12px rgba(0, 200, 83, 0.3), 
-                            inset 0 0 4px rgba(57, 255, 20, 0.3); 
-            }
+        /* 製作那道白色的反光 */
+        .event-chip.highlight-border::after {
+            content: '';
+            position: absolute;
+            top: 0; 
+            left: -100%;
+            width: 60%; 
+            height: 100%;
+            /* 反光漸層：透明 -> 半透明白 -> 透明 */
+            background: linear-gradient(
+                to right, 
+                rgba(255, 255, 255, 0) 0%, 
+                rgba(255, 255, 255, 0.6) 50%, 
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: skewX(-25deg); /* 讓光束傾斜 */
+            animation: shimmer-sweep 3s infinite;
+            pointer-events: none; /* 避免干擾點擊 */
+        }
+
+        @keyframes shimmer-sweep {
+            0% { left: -150%; }
+            30% { left: 150%; } /* 光掃過去 */
+            100% { left: 150%; } /* 停頓一下再重新掃 */
         }
 
         /* SweetAlert2 排版修正 */
@@ -267,7 +296,7 @@
         .color-selector input[type="radio"]:checked + label::after { content: '\2714'; color: #ffffff; font-size: 16px; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
 
         /* RWD 媒體查詢 */
-        @media (max-width: 991px) { .day-cell { min-height: 110px; max-height: 110px; } #sideMemoArea { height: 300px; } }
+        @media (max-width: 991px) { .day-cell { min-height: 110px; max-height: 110px; } .memo-wrapper { min-height: 400px; } }
         @media (max-width: 768px) {
             .dashboard-header { flex-direction: column; gap: 16px; align-items: stretch !important; }
             .day-header { font-size: 0.8rem; padding: 8px 4px; text-align: center; }
@@ -450,9 +479,9 @@
                 <textarea class="form-control fw-bold mb-3" id="noteTextarea" rows="3" placeholder="請輸入行程內容..."></textarea>
                 
                 <div class="form-check form-switch mt-2">
-                    <input class="form-check-input" type="checkbox" role="switch" id="highlightCheckbox">
-                    <label class="form-check-label fw-bold opacity-75 small" for="highlightCheckbox" style="cursor: pointer;">✨ 啟用螢光邊框 (特別標註重要行程)</label>
-                </div>
+					<input class="form-check-input" type="checkbox" role="switch" id="highlightCheckbox">
+					<label class="form-check-label fw-bold opacity-75 small" for="highlightCheckbox" style="cursor: pointer;">✨ 啟用金屬掃光 (凸顯高質感重要行程)</label>
+				</div>
 
             </div>
             <div class="modal-footer d-flex justify-content-between">
