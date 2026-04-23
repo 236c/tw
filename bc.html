@@ -87,6 +87,7 @@
         /* ================= 核心樣式 ================= */
         body {
             background-color: var(--bg-body);
+            /* 套用 test.html 指定字型 */
             font-family: "Segoe UI", system-ui, Roboto, sans-serif;
             color: var(--text-main);
             -webkit-font-smoothing: antialiased;
@@ -97,7 +98,7 @@
 
         .btn { white-space: nowrap !important; }
 
-        /* 🔥 頂部 Navbar - 三區塊對齊 🔥 */
+        /* 🔥 頂部 Navbar - 三區塊對齊 (左標題、中控制、右按鈕) 🔥 */
 		.top-navbar {
 			background-color: var(--bg-surface); border-bottom: 1px solid var(--border-color);
 			padding: 4px 24px; display: flex; justify-content: space-between; align-items: center;
@@ -110,6 +111,7 @@
 
         .app-title { color: var(--primary-color); font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: 8px; text-decoration: none; margin: 0; }
 
+        /* 按鈕共用樣式 */
         .btn-custom-outline {
             border: 1px solid var(--border-color); color: var(--text-main); background: var(--bg-surface);
             box-shadow: 0 1px 2px var(--chip-shadow); transition: all 0.2s; font-weight: 600; padding: 6px 12px; 
@@ -123,7 +125,7 @@
         .btn-primary-custom:hover, .btn-primary-custom:focus { opacity: 0.9; box-shadow: none !important; outline: none !important; }
         .btn-primary-custom:active { transform: scale(0.96); opacity: 0.8 !important; }
 
-        /* ================= 行事曆主佈局 ================= */
+        /* ================= 行事曆主佈局 (從 test.html 引入) ================= */
         .calendar-container {
             display: grid;
             grid-template-columns: 1fr 340px;
@@ -133,31 +135,19 @@
             margin: 0 auto;
         }
 
-        /* ✨ 強制鎖定行事曆高度，讓畫面永不被裁切 */
-        @media (min-width: 993px) {
-            .calendar-container {
-                height: calc(100vh - 65px);
-                min-height: 600px;
-            }
-        }
-
+        /* 卡片容器 */
         .card-container {
             background-color: var(--bg-surface); border-radius: 12px; border: 1px solid var(--border-color); 
             height: 100%; overflow: hidden; box-shadow: 0 4px 20px var(--chip-shadow); display: flex; flex-direction: column;
         }
 
+        /* 行事曆內部排版 */
         .calendar-header-area { padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; background-color: var(--bg-header); border-bottom: 1px solid var(--border-color); }
         .month-title { font-weight: 700; font-size: 1.5rem; margin: 0; color: var(--text-main); min-width: 160px;}
 
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
 
-        #calendarBody { 
-            transition: opacity 0.3s ease, transform 0.3s ease; 
-            opacity: 1; transform: translateY(0); 
-            flex-grow: 1; 
-            grid-auto-rows: minmax(0, 1fr); /* 強制高度平分 */
-            min-height: 0; /* 防止內容撐破網格 */
-        }
+        #calendarBody { transition: opacity 0.3s ease, transform 0.3s ease; opacity: 1; transform: translateY(0); flex-grow: 1; }
         .calendar-transitioning { opacity: 0 !important; transform: translateY(10px) !important; }
 
         .day-header {
@@ -168,45 +158,32 @@
         .day-header.weekend-sat { color: var(--weekend-sat); }
         .day-header.weekend-sun { color: var(--weekend-sun); }
 
-        /* ✨ 絕對固定，無捲動效果，且釋放內部空間的格子 */
+        /* 加高格子 */
         .day-cell {
-            background-color: var(--bg-surface); 
-            min-height: 0; 
-            overflow: hidden; 
-            padding: 4px 6px; /* 縮小內距，幫行程爭取更多空間 */
-            cursor: pointer;
+            background-color: var(--bg-surface); min-height: 125px; /* 配合 test.html 高度 */ overflow: hidden; padding: 10px; cursor: pointer;
             border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
-            position: relative; display: flex; flex-direction: column; 
-            gap: 2px; /* 將行程之間的縫隙縮小 */
-            min-width: 0; 
+            position: relative; display: flex; flex-direction: column; gap: 5px; min-width: 0; 
         }
         .day-cell:nth-child(7n) { border-right: none; }
         .day-cell:hover { background-color: var(--bg-header); }
         .day-cell.empty { background-color: var(--bg-body); cursor: default; }
 
-        .date-number { font-weight: 600; color: var(--text-muted); margin-bottom: 2px; font-size: 0.95rem; text-align: left; padding-left: 2px; }
+        .date-number { font-weight: 600; color: var(--text-muted); margin-bottom: 6px; font-size: 0.95rem; text-align: left; padding-left: 4px; padding-top: 2px; }
 
         .day-cell.today { background-color: var(--today-bg); box-shadow: inset 0 3px 0 0 var(--primary-color); z-index: 1;}
         .day-cell.today .date-number { color: var(--primary-color); font-weight: 800; }
 
-        /* 行程標籤樣式 (動態壓縮版) */
+        /* 行程標籤樣式 */
         .event-chip {
-            font-size: 0.75rem; /* 稍微縮小字體以容納更多內容 */
-            font-weight: 600 !important; 
-            padding: 2px 6px; /* 壓扁上下 padding */
-            border-radius: 4px; /* 搭配較扁的標籤，稍微調整圓角 */
-            display: flex; align-items: center; gap: 4px; width: 100%; overflow: hidden; border: 1px solid transparent; 
+            font-size: 0.85rem; font-weight: 600 !important; padding: 4px 8px; border-radius: 6px; 
+            display: flex; align-items: center; gap: 6px; width: 100%; overflow: hidden; border: 1px solid transparent; 
             letter-spacing: 0.03em; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.15s ease;
-            flex-shrink: 1; /* ✨ 關鍵：當空間不足時，允許標籤高度動態壓縮 */
-            min-height: 18px; /* 確保再怎麼壓縮，都還有一點基本高度與可讀性 */
         }
         .event-chip:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 3px 6px rgba(0,0,0,0.15); }
         .event-chip .chip-icon { flex-shrink: 0; font-size: 1.1em; line-height: 1; }
         .event-chip .chip-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
-        
         .event-chip.single-event { align-items: flex-start; }
-        /* 當只有單一行程時，允許文字折行顯示更多細節 */
-        .event-chip.single-event .chip-text { white-space: normal; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .event-chip.single-event .chip-text { white-space: normal; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 
         .event-chip.highlight-border {
             border: 1.5px solid rgba(255, 255, 255, 0.5) !important; position: relative; z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -255,14 +232,37 @@
 
         @media (max-width: 992px) {
             .calendar-container { grid-template-columns: 1fr; }
-            .day-cell { min-height: 90px; }
+            .day-cell { min-height: 100px; max-height: 120px; padding: 6px; }
+        }
+
+        @media (max-width: 768px) {
+            .top-navbar { padding: 10px 14px; gap: 8px; }
+            .app-title { font-size: 1.15rem; }
+            #topAddEventBtn { padding: 6px 12px; font-size: 0.9rem; }
+            
+            #themeSelector { width: auto; max-width: 120px; font-size: 0.85rem; padding-right: 25px; }
+            .navbar-center .btn { padding: 4px 10px; font-size: 0.95rem; }
+
+            .calendar-header-area { padding: 14px; flex-direction: column; gap: 12px; align-items: stretch; }
+            .month-title { font-size: 1.35rem; text-align: center; }
+            .calendar-header-area .btn-group { width: 100%; display: flex; justify-content: center; }
+            
+            .day-header { font-size: 0.8rem; padding: 8px 0; }
+            .day-cell { min-height: 80px; max-height: 90px; padding: 4px; gap: 3px; }
+            .date-number { font-size: 0.85rem; margin-bottom: 2px; padding-left: 2px; }
+            .event-chip { padding: 2px 4px; font-size: 0.75rem; gap: 4px; border-radius: 4px; }
+            
+            .event-chip.single-event .chip-text { white-space: nowrap !important; display: block !important; text-overflow: ellipsis; overflow: hidden; }
+
+            .swal2-actions { flex-direction: column !important; width: 100% !important; }
+            .swal2-actions button { width: 100% !important; }
         }
 
         @media print {
             @page { size: landscape; margin: 10mm; } 
             body { background-color: #fff !important; color: #000 !important; }
             .top-navbar { display: none !important; }
-            .calendar-container { display: block !important; padding: 0 !important; height: auto !important; }
+            .calendar-container { display: block !important; padding: 0 !important; }
             .card-container { width: 100% !important; border: 2px solid #000 !important; box-shadow: none !important; margin-bottom: 20px; page-break-inside: avoid;}
             .day-cell { border-right: 1px solid #ccc !important; border-bottom: 1px solid #ccc !important; min-height: 100px; max-height: none !important; overflow: visible !important; }
             .event-chip.single-event .chip-text { display: block; -webkit-line-clamp: unset; white-space: normal; }
@@ -682,7 +682,7 @@
             currentDate = new Date(); renderCalendar(); e.target.blur(); 
         };
         
-        // 最乾淨順暢的滾輪切換月份邏輯
+        // 滾輪與滑動手勢
         const calendarContainer = document.getElementById('calendarContainer');
         let wheelTimeout;
         calendarContainer.addEventListener('wheel', (e) => {
