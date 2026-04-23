@@ -87,7 +87,6 @@
         /* ================= 核心樣式 ================= */
         body {
             background-color: var(--bg-body);
-            /* 套用 test.html 指定字型 */
             font-family: "Segoe UI", system-ui, Roboto, sans-serif;
             color: var(--text-main);
             -webkit-font-smoothing: antialiased;
@@ -125,7 +124,7 @@
         .btn-primary-custom:hover, .btn-primary-custom:focus { opacity: 0.9; box-shadow: none !important; outline: none !important; }
         .btn-primary-custom:active { transform: scale(0.96); opacity: 0.8 !important; }
 
-        /* ================= 行事曆主佈局 (從 test.html 引入) ================= */
+        /* ================= 行事曆主佈局 ================= */
         .calendar-container {
             display: grid;
             grid-template-columns: 1fr 340px;
@@ -160,7 +159,7 @@
 
         /* 加高格子 */
         .day-cell {
-            background-color: var(--bg-surface); min-height: 125px; /* 配合 test.html 高度 */ overflow: hidden; padding: 10px; cursor: pointer;
+            background-color: var(--bg-surface); min-height: 125px; overflow: hidden; padding: 10px; cursor: pointer;
             border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
             position: relative; display: flex; flex-direction: column; gap: 5px; min-width: 0; 
         }
@@ -257,18 +256,6 @@
             .swal2-actions { flex-direction: column !important; width: 100% !important; }
             .swal2-actions button { width: 100% !important; }
         }
-
-        @media print {
-            @page { size: landscape; margin: 10mm; } 
-            body { background-color: #fff !important; color: #000 !important; }
-            .top-navbar { display: none !important; }
-            .calendar-container { display: block !important; padding: 0 !important; }
-            .card-container { width: 100% !important; border: 2px solid #000 !important; box-shadow: none !important; margin-bottom: 20px; page-break-inside: avoid;}
-            .day-cell { border-right: 1px solid #ccc !important; border-bottom: 1px solid #ccc !important; min-height: 100px; max-height: none !important; overflow: visible !important; }
-            .event-chip.single-event .chip-text { display: block; -webkit-line-clamp: unset; white-space: normal; }
-            .day-header { border-right: 1px solid #000 !important; border-bottom: 2px solid #000 !important; color: #000 !important; font-weight: bold !important; background-color: #f1f5f9 !important;}
-            #sideMemoArea { height: auto !important; min-height: 150px; overflow: visible !important; border-top: 1px solid #000; font-weight: bold; }
-        }
     </style>
 </head>
 <body>
@@ -290,9 +277,6 @@
         </select>
         
         <div class="d-flex gap-1 flex-wrap align-items-center">
-            <button class="btn btn-custom-outline btn-sm d-flex align-items-center gap-1 px-2" id="printBtn" title="列印">
-                <i class="bi bi-printer"></i><span class="d-none d-xl-inline">列印</span>
-            </button>
             <button class="btn btn-custom-outline btn-sm d-flex align-items-center gap-1 px-2" id="importBtn" title="匯入資料">
                 <i class="bi bi-box-arrow-in-down"></i><span class="d-none d-xl-inline">匯入</span>
             </button>
@@ -717,7 +701,6 @@
         }
 
         document.getElementById('sideMemoArea').oninput = saveMemoToStorage;
-        document.getElementById('printBtn').onclick = () => window.print();
 
         document.getElementById('exportBtn').onclick = () => {
             const dataStr = JSON.stringify({ events, memo: localStorage.getItem(MEMO_KEY) }, null, 2);
