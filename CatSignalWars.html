@@ -65,15 +65,14 @@
             z-index: -1; pointer-events: none;
         }
 
-        /* 🌟 調整容器寬度與動態內距，完美支援電腦螢幕 🌟 */
         #game-container {
-            width: 95%; max-width: 1200px; background: var(--panel-bg);
+            width: 90%; max-width: 900px; background: var(--panel-bg);
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px;
-            padding: clamp(20px, 4vw, 50px) clamp(15px, 4vw, 50px); 
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            padding: 40px 30px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px); position: relative; box-sizing: border-box; will-change: transform;
         }
 
+        /* 🌟 遊戲開始選單遮罩 🌟 */
         #start-menu {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 17, 26, 0.7); backdrop-filter: blur(10px);
@@ -82,21 +81,20 @@
             transition: opacity 0.5s ease;
         }
 
-        /* 動態字體大小 */
         .title-main {
-            font-size: clamp(2.2rem, 6vw, 4.5rem); font-weight: 900; color: #fff;
+            font-size: 3.2rem; font-weight: 900; color: #fff;
             text-shadow: 0 0 20px var(--primary), 0 0 40px var(--primary), 0 5px 15px rgba(0,0,0,0.8);
             margin-bottom: 5px; text-align: center;
         }
 
         .title-sub {
-            font-size: clamp(1.3rem, 3vw, 2.2rem); color: var(--warning);
+            font-size: 1.8rem; color: var(--warning);
             text-shadow: 0 0 20px var(--danger), 0 0 40px var(--warning), 0 5px 15px rgba(0,0,0,0.8);
-            letter-spacing: clamp(6px, 1.5vw, 12px); margin-bottom: clamp(30px, 5vh, 60px); text-align: center;
+            letter-spacing: 12px; margin-bottom: 50px; text-align: center;
         }
 
         .blink-start {
-            font-size: clamp(1rem, 2vw, 1.5rem); font-weight: 900; color: var(--primary);
+            font-size: 1.2rem; font-weight: 900; color: var(--primary);
             letter-spacing: 4px; animation: blinkText 1.2s infinite alternate;
             text-shadow: 0 0 15px var(--primary);
         }
@@ -106,11 +104,11 @@
             100% { opacity: 1; text-shadow: 0 0 25px var(--primary), 0 0 40px #fff; }
         }
 
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: clamp(20px, 4vh, 40px); }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
         .fighter-info { width: 45%; }
         
         .name-tag { 
-            font-size: clamp(0.85rem, 2vw, 1.3rem); font-weight: 900; margin-bottom: 12px; letter-spacing: 1px;
+            font-size: 1.1rem; font-weight: 900; margin-bottom: 12px; letter-spacing: 1px;
             display: flex; justify-content: space-between; align-items: center;
         }
         #player-name { color: var(--primary); text-shadow: 0 0 15px rgba(0, 229, 255, 0.4); transition: color 0.3s, text-shadow 0.3s; }
@@ -120,34 +118,33 @@
         #p-wins { justify-content: flex-start; }
         #e-wins { justify-content: flex-end; }
         
-        .win-dot { width: clamp(7px, 1.5vw, 12px); height: clamp(7px, 1.5vw, 12px); border-radius: 50%; transition: all 0.3s ease; }
+        .win-dot { width: 10px; height: 10px; border-radius: 50%; transition: all 0.3s ease; }
         .win-dot.p-win { background: var(--primary); box-shadow: 0 0 10px var(--primary), inset 0 0 4px #fff; }
         .win-dot.e-win { background: var(--danger); box-shadow: 0 0 10px var(--danger), inset 0 0 4px #fff; }
 
-        /* 動態血條粗細 */
         .hp-track {
-            width: 100%; height: clamp(14px, 2.5vw, 24px); background: #11141c; border: 1px solid rgba(255, 255, 255, 0.05); 
-            border-radius: 12px; position: relative; overflow: hidden; box-shadow: inset 0 3px 6px rgba(0,0,0,0.6);
+            width: 100%; height: 18px; background: #11141c; border: 1px solid rgba(255, 255, 255, 0.05); 
+            border-radius: 10px; position: relative; overflow: hidden; box-shadow: inset 0 3px 6px rgba(0,0,0,0.6);
         }
         
         .hp-fill {
             height: 100%; width: 100%; transform-origin: left center; transform: scaleX(1);
             transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s, box-shadow 0.3s;
-            position: absolute; top: 0; left: 0; border-radius: 12px; will-change: transform;
+            position: absolute; top: 0; left: 0; border-radius: 10px; will-change: transform;
         }
         #player-hp .hp-fill { background: linear-gradient(90deg, #007bb5, var(--primary)); box-shadow: 0 0 15px rgba(0, 229, 255, 0.5); }
         #enemy-hp .hp-fill { background: linear-gradient(-90deg, #990022, var(--danger)); box-shadow: 0 0 15px rgba(255, 0, 85, 0.5); transform-origin: right center; right: 0; left: auto; }
 
-        .rage-container { display: flex; align-items: center; margin-top: 8px; width: clamp(90px, 15vw, 180px); }
-        .rage-label { font-size: clamp(0.55rem, 1vw, 0.75rem); font-weight: 900; color: #888; margin-right: 8px; letter-spacing: 1px; width: 35px; text-align: left; }
+        .rage-container { display: flex; align-items: center; margin-top: 8px; width: 140px; }
+        .rage-label { font-size: 0.65rem; font-weight: 900; color: #888; margin-right: 8px; letter-spacing: 1px; width: 35px; text-align: left; }
         
-        .rage-track { flex-grow: 1; height: clamp(4px, 1vw, 8px); background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 69, 0, 0.2); border-radius: 4px; position: relative; }
+        .rage-track { flex-grow: 1; height: 6px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 69, 0, 0.2); border-radius: 3px; position: relative; }
         
         .rage-fill {
             height: 100%; width: 100%; transform-origin: left center; transform: scaleX(0);
             background: linear-gradient(90deg, #8b0000, var(--rage)); box-shadow: 0 0 10px var(--rage);
             transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s, background 0.3s;
-            position: absolute; top: 0; left: 0; border-radius: 4px; will-change: transform;
+            position: absolute; top: 0; left: 0; border-radius: 3px; will-change: transform;
         }
         
         #enemy-rage-track { transform: scaleX(-1); }
@@ -171,11 +168,10 @@
         @keyframes fireFlicker { 0% { box-shadow: 0 -2px 8px #ff2a00, 0 -5px 15px #ff9d00, 0 0 25px #ffea00, inset 0 0 5px #fff; filter: brightness(1) contrast(1.2); } 100% { box-shadow: 0 -5px 15px #ff2a00, 0 -10px 25px #ff9d00, 0 0 45px #ffea00, inset 0 0 12px #fff; filter: brightness(1.5) contrast(1.5); } }
         @keyframes flameDance { 0% { background-position: 0 0; transform: scaleY(0.8) translateY(2px); opacity: 0.6; } 100% { background-position: 10px -5px; transform: scaleY(1.5) translateY(-2px); opacity: 1; } }
 
-        /* 動態戰鬥區塊高度與貓咪字體大小 */
-        .battle-arena { display: flex; justify-content: space-between; align-items: flex-end; height: clamp(120px, 20vh, 250px); margin-bottom: clamp(30px, 5vh, 60px); padding: 0 2vw; }
+        .battle-arena { display: flex; justify-content: space-between; align-items: flex-end; height: 160px; margin-bottom: 50px; padding: 0 20px; }
 
         .cat-entity {
-            font-family: 'Courier New', monospace; font-size: clamp(1.8rem, 7vw, 4.5rem); 
+            font-family: 'Courier New', monospace; font-size: clamp(1.5rem, 5vw, 3.5rem); 
             font-weight: bold; white-space: nowrap; text-shadow: 0 0 15px rgba(255,255,255,0.2);
             transition: text-shadow 0.3s, color 0.3s; will-change: transform;
         }
@@ -194,8 +190,8 @@
         .attack-super-ultimate-left { animation: superUltimateDashLeft 0.7s cubic-bezier(0.1, 1.5, 0.5, 1) forwards; color: var(--rage-max) !important; text-shadow: 0 0 30px var(--danger), 0 0 60px var(--danger), 0 0 90px var(--rage-max), 0 0 120px #fff !important; z-index: 99; position: relative; }
 
         @keyframes breathe { 0%, 100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(0,-10px,0); } }
-        @keyframes dashRight { 0%, 100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(clamp(50px, 10vw, 120px),0,0) scale(1.15); } }
-        @keyframes dashLeft { 0%, 100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(calc(clamp(50px, 10vw, 120px) * -1),0,0) scale(1.15); } }
+        @keyframes dashRight { 0%, 100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(90px,0,0) scale(1.15); } }
+        @keyframes dashLeft { 0%, 100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(-90px,0,0) scale(1.15); } }
         @keyframes containerShake { 10%, 90% { transform: translate3d(-3px, 0, 0); } 20%, 80% { transform: translate3d(5px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
         @keyframes hurtShake { 10%, 90% { transform: translate3d(-3px, 0, 0); } 20%, 80% { transform: translate3d(5px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
         @keyframes dodgeRight { 0%, 100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(60px,0,0) skewX(-15deg); } }
@@ -210,13 +206,12 @@
         #player-cat { color: #e0f7fa; }
         #enemy-cat { color: #ffebee; }
 
-        .qte-area { background: rgba(10, 12, 18, 0.6); border-radius: 12px; padding: clamp(20px, 4vw, 35px) 25px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 2px 10px rgba(0,0,0,0.3); position: relative; }
+        .qte-area { background: rgba(10, 12, 18, 0.6); border-radius: 12px; padding: 35px 25px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 2px 10px rgba(0,0,0,0.3); position: relative; }
 
-        #qte-instruction { font-size: clamp(0.9rem, 1.5vw, 1.3rem); font-weight: 700; margin-bottom: clamp(15px, 3vh, 25px); color: var(--primary); letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 15px rgba(0, 229, 255, 0.4); transition: color 0.3s; }
+        #qte-instruction { font-size: 1.1rem; font-weight: 700; margin-bottom: 25px; color: var(--primary); letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 15px rgba(0, 229, 255, 0.4); transition: color 0.3s; }
 
-        /* 動態節奏條高度 */
         .timing-bar-container {
-            width: 100%; height: clamp(28px, 4vh, 48px); border-radius: 6px; position: relative; border: 2px solid #222;
+            width: 100%; height: 36px; border-radius: 4px; position: relative; border: 2px solid #222;
             background: linear-gradient(90deg, #3a0000 0%, #660000 25%, #8a6b00 30%, #b88a00 42%, #00cc00 45%, var(--ultimate) 48.5%, #fff 50%, var(--ultimate) 51.5%, #00cc00 55%, #b88a00 58%, #8a6b00 70%, #660000 75%, #3a0000 100%);
         }
 
@@ -225,25 +220,24 @@
             background-image: repeating-linear-gradient(90deg, transparent, transparent 6px, #000 6px, #000 10px); z-index: 2; pointer-events: none;
         }
 
-        #scanner { position: absolute; height: 100%; width: clamp(10px, 1.5vw, 20px); background: #fff; box-shadow: 0 0 15px #fff, 0 0 30px var(--primary); top: 0; left: 0; z-index: 1; pointer-events: none; will-change: transform; border-radius: 4px; }
+        #scanner { position: absolute; height: 100%; width: 16px; background: #fff; box-shadow: 0 0 15px #fff, 0 0 30px var(--primary); top: 0; left: 0; z-index: 1; pointer-events: none; will-change: transform; }
         
-        /* 傷害數字與特效字體縮放 */
-        .float-text { position: absolute; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900; text-shadow: 0px 5px 15px rgba(0,0,0,0.5); pointer-events: none; animation: floatUp 1s cubic-bezier(0.25, 1, 0.5, 1) forwards; z-index: 100; white-space: nowrap; text-align: center; line-height: 1.2; }
+        .float-text { position: absolute; font-size: 2.2rem; font-weight: 900; text-shadow: 0px 5px 15px rgba(0,0,0,0.5); pointer-events: none; animation: floatUp 1s cubic-bezier(0.25, 1, 0.5, 1) forwards; z-index: 100; white-space: nowrap; text-align: center; line-height: 1.2; }
         .dmg-text { color: var(--danger); text-shadow: 0 0 15px var(--danger), 0 5px 15px rgba(0,0,0,0.8); }
         .heal-text { color: var(--success); text-shadow: 0 0 15px var(--success), 0 5px 15px rgba(0,0,0,0.8); }
         .miss-text { color: #78909c; font-style: italic; }
         .block-text { color: #29b6f6; text-shadow: 0 0 15px #03a9f4, 0 5px 15px rgba(0,0,0,0.8); }
-        .perfect-block-text { color: #e0f7fa; font-size: clamp(2.2rem, 5vw, 3.5rem); text-shadow: 0 0 20px #00bcd4, 0 0 40px #00bcd4, 0 5px 15px rgba(0,0,0,0.8); z-index: 102; }
+        .perfect-block-text { color: #e0f7fa; font-size: 2.5rem; text-shadow: 0 0 20px #00bcd4, 0 0 40px #00bcd4, 0 5px 15px rgba(0,0,0,0.8); z-index: 102; }
         
-        .ult-text { color: #fff; font-size: clamp(2.5rem, 6vw, 4.5rem); text-shadow: 0 0 25px var(--ultimate), 0 0 50px var(--ultimate), 0 10px 20px rgba(0,0,0,0.8); }
-        .super-ult-text { color: var(--rage-max); font-size: clamp(3rem, 8vw, 6rem); text-shadow: 0 0 30px var(--danger), 0 0 60px var(--danger), 0 10px 20px rgba(0,0,0,0.9); z-index: 105; }
-        .rage-bonus-text { font-size: clamp(0.9rem, 1.5vw, 1.3rem); color: var(--rage); text-shadow: 0 0 10px var(--rage); vertical-align: middle; margin-left: 10px; }
+        .ult-text { color: #fff; font-size: 3.5rem; text-shadow: 0 0 25px var(--ultimate), 0 0 50px var(--ultimate), 0 10px 20px rgba(0,0,0,0.8); }
+        .super-ult-text { color: var(--rage-max); font-size: 4.5rem; text-shadow: 0 0 30px var(--danger), 0 0 60px var(--danger), 0 10px 20px rgba(0,0,0,0.9); z-index: 105; }
+        .rage-bonus-text { font-size: 1.1rem; color: var(--rage); text-shadow: 0 0 10px var(--rage); vertical-align: middle; margin-left: 10px; }
 
         @keyframes floatUp { 0% { opacity: 1; transform: translate3d(0,0,0) scale(1.5); } 100% { opacity: 0; transform: translate3d(0,-80px,0) scale(1); } }
         @keyframes popCenter { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 15% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 85% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
         
         .center-announce {
-            position: fixed; top: 40%; left: 50%; font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 900; white-space: nowrap; pointer-events: none; z-index: 1000;
+            position: fixed; top: 40%; left: 50%; font-size: 3.5rem; font-weight: 900; white-space: nowrap; pointer-events: none; z-index: 1000;
             animation: popCenter 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards; text-align: center; line-height: 1.2;
         }
 
@@ -254,21 +248,42 @@
         @keyframes superScreenFlash { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
 
         #touch-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; cursor: pointer; }
-        .vs-tag { font-size: clamp(1rem, 2vw, 1.6rem); font-weight: 900; color: #455a64; width: 10%; text-align: center; letter-spacing: 2px; }
+        .vs-tag { font-size: 1.2rem; font-weight: 900; color: #455a64; width: 10%; text-align: center; letter-spacing: 2px; }
 
-        /* 手機與直立平板的專屬優化 */
-        @media (max-width: 768px) {
-            .name-tag { align-items: center; min-height: 20px; flex-direction: row !important; }
+        @media (max-width: 600px) {
+            #game-container { padding: 15px 12px; width: 96%; }
+            
+            /* 修正手機版標題大小 */
+            .title-main { font-size: 2.2rem; }
+            .title-sub { font-size: 1.3rem; letter-spacing: 6px; margin-bottom: 30px;}
+            .blink-start { font-size: 1rem; }
+
+            .name-tag { font-size: 0.75rem; align-items: center; margin-bottom: 8px; min-height: 20px; flex-direction: row !important; }
             #enemy-name { align-items: center; flex-direction: row-reverse !important; }
             .win-dots-container { margin-top: 0; gap: 4px; }
-            .vs-tag { width: auto; margin: 0 10px; }
+            .win-dot { width: 7px; height: 7px; }
 
-            body::before { display: none; /* 關閉手機版耗效能的背景動畫 */ }
+            .vs-tag { font-size: 0.9rem; width: auto; margin: 0 5px; }
+            .rage-container { width: 90px; }
+            .rage-label { font-size: 0.55rem; width: 25px; }
+
+            .cat-entity { font-size: clamp(1rem, 4vw, 1.8rem); }
+            .battle-arena { height: 90px; margin-bottom: 30px; padding: 0; }
+
+            .float-text { font-size: 1.5rem !important; }
+            .super-ult-text { font-size: 2rem !important; }
+            .ult-text { font-size: 1.8rem !important; }
+            .perfect-block-text { font-size: 1.8rem !important; }
+            #qte-instruction { font-size: 0.9rem; margin-bottom: 15px; }
+            .center-announce { font-size: 2.2rem; }
+
+            body::before { display: none; }
             .rage-max-anim::after { display: none; }
         }
     </style>
 </head>
 <body>
+
     <div id="touch-overlay"></div>
 
     <div id="game-container">
