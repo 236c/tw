@@ -8,16 +8,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 莫蘭迪日式清淡色票 */
+            /* 莫蘭迪基礎色票 */
             --bg-main: #fafafb;
             --bg-section: #f4f7f5;
-            --accent-green: #8fa898;
-            --accent-green-hover: #7a9483;
             
-            /* 文字顏色對比度 */
+            /* 分類專屬色 - 籃球 (青磁) */
+            --cls-basket: #8fa898;
+            --cls-basket-hover: #7a9483;
+            
+            /* 分類專屬色 - 計畫 (薄鼠) */
+            --cls-plan: #8da1b9;
+            --cls-plan-hover: #7389a3;
+            
+            /* 分類專屬色 - 遊戲 (琥珀/粉) */
+            --cls-game: #c6a49a;
+            --cls-game-hover: #b08d82;
+
+            /* 文字顏色 */
             --text-main: #2b2b2b;  
             --text-muted: #5e5e5e; 
-            
             --border-solid: #e0e0e0;
             --border-dashed: #c4c4c4;
         }
@@ -27,21 +36,19 @@
             font-family: 'Noto Sans TC', sans-serif;
             color: var(--text-main);
             letter-spacing: 0.05em;
-            /* 為了固定置頂的導覽列預留空間 */
             padding-top: 75px; 
             scroll-padding-top: 90px; 
             line-height: 1.6;
         }
 
-        /* 導覽列：改回固定置頂 (fixed-top) + 磨砂玻璃效果 */
+        /* 導覽列 */
         .navbar {
             background-color: rgba(255, 255, 255, 0.95) !important;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-solid);
             padding: 12px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02); /* 微小陰影提升立體感 */
-            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
         }
 
         .navbar-brand {
@@ -58,20 +65,19 @@
             transition: color 0.3s ease;
             letter-spacing: 1px;
         }
-        .nav-link:hover { color: var(--accent-green) !important; }
+        .nav-link:hover { color: var(--cls-basket) !important; }
 
         /* 標題區 */
         .hero-section {
             padding: 30px 0 40px;
             text-align: center;
-            position: relative;
         }
         .hero-section::before {
             content: '';
             display: block;
             width: 50px;
             height: 2px;
-            background-color: var(--accent-green);
+            background-color: var(--cls-basket);
             margin: 0 auto 20px;
         }
 
@@ -79,31 +85,18 @@
             font-weight: 700; 
             font-size: 2rem;
             letter-spacing: 6px;
-            color: var(--text-main);
         }
         
         .header-subtitle { 
             color: var(--text-muted); 
-            font-weight: 400; 
-            font-size: 1rem; 
             letter-spacing: 2px; 
             margin-top: 12px;
         }
 
-        /* 區塊背景變化 */
-        .section-tinted {
-            background-color: var(--bg-section);
-            border-top: 1px dashed var(--border-dashed);
-            border-bottom: 1px dashed var(--border-dashed);
-            padding-bottom: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        /* 分類標題 */
+        /* 區塊顏色區分 */
         .category-title {
             font-weight: 700;
             font-size: 1.2rem; 
-            color: var(--text-main);
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
@@ -114,25 +107,46 @@
             display: inline-block;
             width: 4px;
             height: 18px;
-            background-color: var(--accent-green);
             margin-right: 12px;
         }
+
+        /* 籃球配色 */
+        #basketball-tools .category-title::before { background-color: var(--cls-basket); }
+        #basketball-tools .icon-wrapper { color: var(--cls-basket); }
+
+        /* 計畫配色 */
+        #calendar-planning .category-title::before { background-color: var(--cls-plan); }
+        #calendar-planning .icon-wrapper { color: var(--cls-plan); }
+        .section-tinted {
+            background-color: #f0f4f8; /* 稍微偏藍的背景 */
+            border-top: 1px dashed var(--border-dashed);
+            border-bottom: 1px dashed var(--border-dashed);
+            padding-bottom: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* 遊戲配色 */
+        #gaming .category-title::before { background-color: var(--cls-game); }
+        #gaming .icon-wrapper { color: var(--cls-game); }
 
         /* 卡片設計 */
         .card { 
             border: 1px solid var(--border-solid); 
             border-radius: 4px;
             background: #ffffff;
-            box-shadow: none;
-            transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease; 
+            transition: all 0.3s ease; 
             height: 100%;
             padding: 1.5rem;
         }
         .card:hover { 
-            border-color: var(--accent-green);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
         }
+
+        /* 個別卡片懸停框線顏色 */
+        #basketball-tools .card:hover { border-color: var(--cls-basket); }
+        #calendar-planning .card:hover { border-color: var(--cls-plan); }
+        #gaming .card:hover { border-color: var(--cls-game); }
 
         .card-header-custom {
             display: flex;
@@ -151,30 +165,11 @@
             font-size: 1.2rem; 
             background-color: var(--bg-main);
             margin-right: 12px;
-            color: var(--accent-green);
         }
 
-        .card-title { 
-            font-weight: 700; 
-            color: var(--text-main); 
-            font-size: 1.1rem; 
-            margin: 0;
-            letter-spacing: 0.5px;
-        }
-
-        .dashed-divider {
-            border-top: 1px dashed var(--border-dashed);
-            margin: 0 0 16px 0;
-            opacity: 0.7;
-        }
-        
-        .card-text { 
-            color: var(--text-muted); 
-            font-size: 0.95rem; 
-            line-height: 1.7; 
-            font-weight: 400; 
-            margin-bottom: 24px;
-        }
+        .card-title { font-weight: 700; font-size: 1.1rem; margin: 0; }
+        .dashed-divider { border-top: 1px dashed var(--border-dashed); margin: 0 0 16px 0; opacity: 0.7; }
+        .card-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 24px; }
 
         /* 按鈕設計 */
         .btn-custom {
@@ -190,47 +185,19 @@
             text-decoration: none;
         }
 
-        /* 框線按鈕 */
-        .btn-outline-delicate { 
-            background-color: #ffffff; 
-            color: var(--text-main); 
-            border: 1px solid #b0b0b0; 
-        }
-        .btn-outline-delicate:hover { 
-            background-color: var(--bg-section); 
-            border-color: var(--accent-green);
-            color: var(--accent-green-hover);
-        }
+        /* 籃球與遊戲按鈕 - 框線 */
+        .btn-basket-outline { border: 1px solid #b0b0b0; color: var(--text-main); }
+        .btn-basket-outline:hover { border-color: var(--cls-basket); color: var(--cls-basket-hover); background: #f8faf9; }
 
-        /* 實色按鈕 */
-        .btn-solid-delicate {
-            background-color: var(--accent-green); 
-            color: #ffffff; 
-            border: 1px solid var(--accent-green);
-        }
-        .btn-solid-delicate:hover {
-            background-color: var(--accent-green-hover); 
-            border-color: var(--accent-green-hover);
-            color: #ffffff;
-        }
+        .btn-game-outline { border: 1px solid #b0b0b0; color: var(--text-main); }
+        .btn-game-outline:hover { border-color: var(--cls-game); color: var(--cls-game-hover); background: #faf9f8; }
 
-        /* 頁尾 */
-        footer { 
-            border-top: 1px solid var(--border-solid); 
-            color: var(--text-muted);
-            font-size: 0.85rem; 
-            font-weight: 400;
-            letter-spacing: 1px;
-            position: relative;
-        }
-        footer::before {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 0;
-            right: 0;
-            border-top: 1px dashed var(--border-dashed);
-        }
+        /* 計畫按鈕 - 實色 */
+        .btn-plan-solid { background-color: var(--cls-plan); color: #ffffff; border: 1px solid var(--cls-plan); }
+        .btn-plan-solid:hover { background-color: var(--cls-plan-hover); color: #ffffff; }
+
+        footer { border-top: 1px solid var(--border-solid); color: var(--text-muted); font-size: 0.85rem; position: relative; }
+        footer::before { content: ''; position: absolute; top: 2px; left: 0; right: 0; border-top: 1px dashed var(--border-dashed); }
     </style>
 </head>
 <body>
@@ -267,10 +234,9 @@
                 </div>
                 <div class="dashed-divider"></div>
                 <p class="card-text flex-grow-1">即時模擬進攻與防守佈置，提供教練與球員最直觀的戰術交流平台。</p>
-                <a href="https://236c.github.io/tw/bcb.html" class="btn-custom btn-outline-delicate" target="_blank">開啟工具</a>
+                <a href="https://236c.github.io/tw/bcb.html" class="btn-custom btn-basket-outline" target="_blank">開啟工具</a>
             </div>
         </div>
-
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card d-flex flex-column">
                 <div class="card-header-custom">
@@ -279,22 +245,9 @@
                 </div>
                 <div class="dashed-divider"></div>
                 <p class="card-text flex-grow-1">適用於專業賽事之計時與得分紀錄，操作簡便，精準掌握賽場節奏。</p>
-                <a href="https://236c.github.io/tw/bsb.html" class="btn-custom btn-outline-delicate" target="_blank">開啟工具</a>
+                <a href="https://236c.github.io/tw/bsb.html" class="btn-custom btn-basket-outline" target="_blank">開啟工具</a>
             </div>
         </div>
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card d-flex flex-column">
-                <div class="card-header-custom">
-                    <div class="icon-wrapper">📊</div>
-                    <h5 class="card-title">籃球數據中心</h5>
-                </div>
-                <div class="dashed-divider"></div>
-                <p class="card-text flex-grow-1">深度球員數據統計與賽後分析，協助團隊優化表現並制定訓練方針。</p>
-                <a href="https://236c.github.io/tw/bdc.html" class="btn-custom btn-outline-delicate" target="_blank">開啟工具</a>
-            </div>
-        </div>
-
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card d-flex flex-column">
                 <div class="card-header-custom">
@@ -303,7 +256,7 @@
                 </div>
                 <div class="dashed-divider"></div>
                 <p class="card-text flex-grow-1">PRO TACTICS BOARD：深度解析進攻跑位與戰術執行細節，提升球隊整體作戰能力。</p>
-                <a href="https://236c.github.io/tw/basketball-pro.html" class="btn-custom btn-outline-delicate" target="_blank">開啟工具</a>
+                <a href="https://236c.github.io/tw/basketball-pro.html" class="btn-custom btn-basket-outline" target="_blank">開啟工具</a>
             </div>
         </div>
     </div>
@@ -321,10 +274,9 @@
                     </div>
                     <div class="dashed-divider"></div>
                     <p class="card-text flex-grow-1">高效管理商務行程與全域記事本，讓工作與生活排程井然有序。</p>
-                    <a href="https://236c.github.io/tw/bc.html" class="btn-custom btn-solid-delicate" target="_blank">查看計畫</a>
+                    <a href="https://236c.github.io/tw/bc.html" class="btn-custom btn-plan-solid" target="_blank">查看計畫</a>
                 </div>
             </div>
-
             <div class="col-12 col-md-6">
                 <div class="card d-flex flex-column">
                     <div class="card-header-custom">
@@ -333,7 +285,7 @@
                     </div>
                     <div class="dashed-divider"></div>
                     <p class="card-text flex-grow-1">專屬 2026 年度暑期訓練時程總覽，精準掌握每一天的學習與進度。</p>
-                    <a href="https://236c.github.io/tw/spc2026.html" class="btn-custom btn-solid-delicate" target="_blank">查看計畫</a>
+                    <a href="https://236c.github.io/tw/spc2026.html" class="btn-custom btn-plan-solid" target="_blank">查看計畫</a>
                 </div>
             </div>
         </div>
@@ -343,7 +295,7 @@
 <div class="container mb-5" id="gaming">
     <h3 class="category-title">休閒娛樂</h3>
     <div class="row g-4">
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-md-6">
             <div class="card d-flex flex-column">
                 <div class="card-header-custom">
                     <div class="icon-wrapper">🐱</div>
@@ -351,7 +303,18 @@
                 </div>
                 <div class="dashed-divider"></div>
                 <p class="card-text flex-grow-1">進化覺醒：充滿趣味的互動小遊戲，在忙碌的排程中提供放鬆時刻。</p>
-                <a href="https://236c.github.io/tw/CatSignalWars.html" class="btn-custom btn-outline-delicate" target="_blank">開始遊戲</a>
+                <a href="https://236c.github.io/tw/CatSignalWars.html" class="btn-custom btn-game-outline" target="_blank">開始遊戲</a>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="card d-flex flex-column">
+                <div class="card-header-custom">
+                    <div class="icon-wrapper">♟️</div>
+                    <h5 class="card-title">典藏暗棋</h5>
+                </div>
+                <div class="dashed-divider"></div>
+                <p class="card-text flex-grow-1">經典博弈對戰：重溫傳統暗棋的智慧與樂趣，支持精美的棋盤介面與流暢體驗。</p>
+                <a href="https://236c.github.io/tw/Banqi.html" class="btn-custom btn-game-outline" target="_blank">進入對局</a>
             </div>
         </div>
     </div>
