@@ -8,18 +8,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 莫蘭迪日式清淡色票 - 調整文字顏色對比度 */
+            /* 莫蘭迪日式清淡色票 */
             --bg-main: #fafafb;
-            --bg-section: #f4f7f5; /* 極淡的薄荷綠背景 */
-            --accent-green: #8fa898; /* 莫蘭迪綠 */
+            --bg-section: #f4f7f5;
+            --accent-green: #8fa898;
             --accent-green-hover: #7a9483;
             
-            /* 加深文字顏色以提升易讀性 */
-            --text-main: #2b2b2b;  /* 深炭灰，取代原本較淺的 #4a4a4a */
-            --text-muted: #5e5e5e; /* 深灰色，取代原本過淺的 #888888 */
+            /* 文字顏色對比度 */
+            --text-main: #2b2b2b;  
+            --text-muted: #5e5e5e; 
             
-            --border-solid: #e0e0e0; /* 稍微加深實線邊框 */
-            --border-dashed: #c4c4c4; /* 稍微加深虛線邊框 */
+            --border-solid: #e0e0e0;
+            --border-dashed: #c4c4c4;
         }
 
         body { 
@@ -27,24 +27,21 @@
             font-family: 'Noto Sans TC', sans-serif;
             color: var(--text-main);
             letter-spacing: 0.05em;
-            scroll-padding-top: 70px; 
+            /* 為了固定置頂的導覽列預留空間 */
+            padding-top: 75px; 
+            scroll-padding-top: 90px; 
             line-height: 1.6;
         }
 
-        /* 導覽列 */
+        /* 導覽列：改回固定置頂 (fixed-top) + 磨砂玻璃效果 */
         .navbar {
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-solid);
             padding: 12px 0;
-            position: relative;
-        }
-        .navbar::after {
-            content: '';
-            position: absolute;
-            bottom: 2px;
-            left: 0;
-            right: 0;
-            border-bottom: 1px dashed var(--border-dashed);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02); /* 微小陰影提升立體感 */
+            transition: all 0.3s ease;
         }
 
         .navbar-brand {
@@ -56,7 +53,7 @@
 
         .nav-link {
             color: var(--text-muted) !important;
-            font-size: 0.95rem; /* 放大字體 */
+            font-size: 0.95rem;
             font-weight: 500;
             transition: color 0.3s ease;
             letter-spacing: 1px;
@@ -65,7 +62,7 @@
 
         /* 標題區 */
         .hero-section {
-            padding: 50px 0 40px;
+            padding: 30px 0 40px;
             text-align: center;
             position: relative;
         }
@@ -88,7 +85,7 @@
         .header-subtitle { 
             color: var(--text-muted); 
             font-weight: 400; 
-            font-size: 1rem; /* 放大字體 */
+            font-size: 1rem; 
             letter-spacing: 2px; 
             margin-top: 12px;
         }
@@ -105,7 +102,7 @@
         /* 分類標題 */
         .category-title {
             font-weight: 700;
-            font-size: 1.2rem; /* 放大字體 */
+            font-size: 1.2rem; 
             color: var(--text-main);
             margin-bottom: 1.5rem;
             display: flex;
@@ -134,7 +131,7 @@
         .card:hover { 
             border-color: var(--accent-green);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03); /* 加入極輕微陰影提升立體感 */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
         }
 
         .card-header-custom {
@@ -151,16 +148,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem; /* 放大圖示 */
+            font-size: 1.2rem; 
             background-color: var(--bg-main);
             margin-right: 12px;
             color: var(--accent-green);
         }
 
         .card-title { 
-            font-weight: 700; /* 加粗標題 */
+            font-weight: 700; 
             color: var(--text-main); 
-            font-size: 1.1rem; /* 放大字體 */
+            font-size: 1.1rem; 
             margin: 0;
             letter-spacing: 0.5px;
         }
@@ -173,9 +170,9 @@
         
         .card-text { 
             color: var(--text-muted); 
-            font-size: 0.95rem; /* 放大內文字體，原本0.8rem太小 */
+            font-size: 0.95rem; 
             line-height: 1.7; 
-            font-weight: 400; /* 加重字重 */
+            font-weight: 400; 
             margin-bottom: 24px;
         }
 
@@ -183,8 +180,8 @@
         .btn-custom {
             border-radius: 4px;
             font-weight: 500;
-            font-size: 0.95rem; /* 放大按鈕字體 */
-            padding: 10px 0; /* 增加按鈕高度 */
+            font-size: 0.95rem; 
+            padding: 10px 0; 
             letter-spacing: 1.5px;
             transition: all 0.3s;
             text-align: center;
@@ -197,7 +194,7 @@
         .btn-outline-delicate { 
             background-color: #ffffff; 
             color: var(--text-main); 
-            border: 1px solid #b0b0b0; /* 加深按鈕邊框以利辨識 */
+            border: 1px solid #b0b0b0; 
         }
         .btn-outline-delicate:hover { 
             background-color: var(--bg-section); 
@@ -221,7 +218,7 @@
         footer { 
             border-top: 1px solid var(--border-solid); 
             color: var(--text-muted);
-            font-size: 0.85rem; /* 放大字體 */
+            font-size: 0.85rem; 
             font-weight: 400;
             letter-spacing: 1px;
             position: relative;
@@ -238,7 +235,7 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg sticky-top">
+<nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
         <a class="navbar-brand" href="#">靜網</a>
         <button class="navbar-toggler border-0 shadow-none px-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
