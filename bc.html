@@ -469,7 +469,60 @@
         buttonsStyling: false
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
+    /* ================= IndexedDB 核心封裝 ================= */
+    const DB_NAME = 'BusinessCalendarDB';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'app_data';
+
+    function openDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onerror = (e) => reject("IndexedDB 連線錯誤: " + e.target.error);
+            request.onsuccess = (e) => resolve(e.target.result);
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME);
+                }
+            };
+        });
+    }
+
+    async function dbSet(key, value) {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, "readwrite");
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.put(value, key);
+            request.onsuccess = () => resolve();
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    async function dbGet(key) {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, "readonly");
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.get(key);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    async function dbRemove(key) {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, "readwrite");
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.delete(key);
+            request.onsuccess = () => resolve();
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    /* ================= 啟動與資料載入 ================= */
+    document.addEventListener('DOMContentLoaded', async () => {
         noteModal = new bootstrap.Modal(document.getElementById('noteModal'));
         
         flatpickr.l10ns.zh_tw.rangeSeparator = " 至 "; 
@@ -481,12 +534,16 @@
         });
 
         initTheme();
-        loadNotesFromStorage();
-        loadMemoFromStorage();
+        
+        // 使用 await 確保非同步資料載入完成後才渲染行事曆
+        await loadNotesFromDB();
+        await loadMemoFromDB();
+        
         renderCalendar();
         setupEventListeners();
     });
 
+    // 佈景主題屬於會立刻影響畫面的 UI 設定，保留使用 localStorage 防止載入閃爍 (FOUC)
     function initTheme() {
         const savedTheme = localStorage.getItem(THEME_KEY) || 'theme-default';
         document.getElementById('themeSelector').value = savedTheme;
@@ -506,21 +563,52 @@
         }
     }
 
-    function loadNotesFromStorage() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) { try { events = JSON.parse(stored); } catch (e) { events = []; } }
+    async function loadNotesFromDB() {
+        try {
+            let stored = await dbGet(STORAGE_KEY);
+            
+            // 無痛遷移：如果 DB 沒資料，但 localStorage 有舊資料，就執行搬移
+            if (!stored) {
+                const oldLocal = localStorage.getItem(STORAGE_KEY);
+                if (oldLocal) {
+                    stored = JSON.parse(oldLocal);
+                    await dbSet(STORAGE_KEY, stored);
+                    localStorage.removeItem(STORAGE_KEY); // 搬移後清理
+                }
+            }
+            events = stored ? stored : [];
+        } catch (e) {
+            console.error(e);
+            events = []; 
+        }
     }
 
-    function saveNotesToStorage() { localStorage.setItem(STORAGE_KEY, JSON.stringify(events)); }
-
-    function loadMemoFromStorage() {
-        const memo = localStorage.getItem(MEMO_KEY) || "";
-        document.getElementById('sideMemoArea').value = memo;
+    async function saveNotesToDB() { 
+        await dbSet(STORAGE_KEY, events); 
     }
 
-    function saveMemoToStorage() {
+    async function loadMemoFromDB() {
+        try {
+            let memo = await dbGet(MEMO_KEY);
+            
+            // 無痛遷移記事本
+            if (memo === undefined) {
+                const oldMemo = localStorage.getItem(MEMO_KEY);
+                if (oldMemo !== null) {
+                    memo = oldMemo;
+                    await dbSet(MEMO_KEY, memo);
+                    localStorage.removeItem(MEMO_KEY);
+                }
+            }
+            document.getElementById('sideMemoArea').value = memo || "";
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function saveMemoToDB() {
         const memo = document.getElementById('sideMemoArea').value;
-        localStorage.setItem(MEMO_KEY, memo);
+        await dbSet(MEMO_KEY, memo);
         const status = document.getElementById('saveStatus');
         status.textContent = "SAVING...";
         setTimeout(() => status.textContent = "AUTO-SAVE", 500);
@@ -700,10 +788,19 @@
             }
         }
 
-        document.getElementById('sideMemoArea').oninput = saveMemoToStorage;
+        // 優化全域記事本：加入防抖(Debounce)減少資料庫不必要的密集寫入
+        let memoDebounceTimer;
+        document.getElementById('sideMemoArea').oninput = () => {
+            clearTimeout(memoDebounceTimer);
+            document.getElementById('saveStatus').textContent = "TYPING...";
+            memoDebounceTimer = setTimeout(() => {
+                saveMemoToDB();
+            }, 800);
+        };
 
-        document.getElementById('exportBtn').onclick = () => {
-            const dataStr = JSON.stringify({ events, memo: localStorage.getItem(MEMO_KEY) }, null, 2);
+        document.getElementById('exportBtn').onclick = async () => {
+            const memo = await dbGet(MEMO_KEY);
+            const dataStr = JSON.stringify({ events, memo: memo || "" }, null, 2);
             const blob = new Blob([dataStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -742,16 +839,24 @@
                                 denyButton: 'btn btn-danger', 
                                 cancelButton: 'btn btn-secondary' 
                             }
-                        }).then((result) => {
+                        }).then(async (result) => { // 加入 async
                             const newEvents = isArray ? importedData : importedData.events;
                             if (result.isConfirmed) {
                                 events = events.concat(newEvents);
-                                if (!isArray && importedData.memo) { document.getElementById('sideMemoArea').value = importedData.memo; saveMemoToStorage(); }
-                                saveNotesToStorage(); renderCalendar();
+                                if (!isArray && importedData.memo) { 
+                                    document.getElementById('sideMemoArea').value = importedData.memo; 
+                                    await saveMemoToDB(); 
+                                }
+                                await saveNotesToDB(); 
+                                renderCalendar();
                             } else if (result.isDenied) {
                                 events = newEvents;
-                                if (!isArray && importedData.memo !== undefined) { document.getElementById('sideMemoArea').value = importedData.memo; saveMemoToStorage(); }
-                                saveNotesToStorage(); renderCalendar();
+                                if (!isArray && importedData.memo !== undefined) { 
+                                    document.getElementById('sideMemoArea').value = importedData.memo; 
+                                    await saveMemoToDB(); 
+                                }
+                                await saveNotesToDB(); 
+                                renderCalendar();
                             }
                         });
                     } else swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '無效的檔案格式！(需為陣列格式)', confirmButtonText: '了解' });
@@ -761,7 +866,7 @@
             reader.readAsText(file);
         });
 
-        document.getElementById('saveNoteBtn').onclick = () => {
+        document.getElementById('saveNoteBtn').onclick = async () => {
             const id = document.getElementById('currentEditId').value;
             const selectedDates = dateRangePicker.selectedDates;
             if (!selectedDates || selectedDates.length === 0) return swalWithBootstrapButtons.fire({ icon: 'warning', text: '請選擇日期區間' });
@@ -781,17 +886,21 @@
             } else {
                 events.push({ id: generateId(), start, end, text, color, icon, isHighlighted }); 
             }
-            saveNotesToStorage(); renderCalendar(); noteModal.hide();
+            await saveNotesToDB(); 
+            renderCalendar(); 
+            noteModal.hide();
         };
 
         document.getElementById('deleteNoteBtn').onclick = () => {
             swalWithBootstrapButtons.fire({ 
                 title: '確定刪除？', icon: 'warning', 
                 showCancelButton: true, confirmButtonText: '確定', cancelButtonText: '取消', reverseButtons: true
-            }).then((res) => {
+            }).then(async (res) => { // 加入 async
                 if (res.isConfirmed) {
                     events = events.filter(e => e.id !== document.getElementById('currentEditId').value);
-                    saveNotesToStorage(); renderCalendar(); noteModal.hide();
+                    await saveNotesToDB(); 
+                    renderCalendar(); 
+                    noteModal.hide();
                 }
             });
         };
@@ -809,13 +918,15 @@
                     if (!cutoffDate) Swal.showValidationMessage('請先選擇一個日期');
                     return cutoffDate;
                 }
-            }).then((result) => {
+            }).then(async (result) => { // 加入 async
                 if (result.isConfirmed) {
                     const cutoffDate = result.value;
                     const originalCount = events.length;
                     events = events.filter(e => { const eventEnd = e.end || e.start; return eventEnd >= cutoffDate; });
                     const deletedCount = originalCount - events.length;
-                    saveNotesToStorage(); renderCalendar();
+                    
+                    await saveNotesToDB(); 
+                    renderCalendar();
                     swalWithBootstrapButtons.fire({ icon: 'success', title: '清除完成', text: `已成功刪除了 ${deletedCount} 筆舊紀錄。`, confirmButtonText: '了解' });
                 }
             });
@@ -844,12 +955,14 @@
                         cancelButtonText: '再想一下',
                         customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-secondary' },
                         reverseButtons: true
-                    }).then((finalResult) => {
+                    }).then(async (finalResult) => { // 加入 async
                         if (finalResult.isConfirmed) {
                             events = []; 
-                            localStorage.removeItem(MEMO_KEY);
+                            await dbRemove(MEMO_KEY);
                             document.getElementById('sideMemoArea').value = "";
-                            saveNotesToStorage(); renderCalendar();
+                            
+                            await saveNotesToDB(); 
+                            renderCalendar();
                             swalWithBootstrapButtons.fire({ icon: 'success', title: '已清空', text: '所有資料已經成功清除。', confirmButtonText: '了解', customClass: { confirmButton: 'btn btn-primary' } });
                         }
                     });
