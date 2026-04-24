@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>喵星人訊號大戰：進化覺醒 (長血條 x 雙怒氣系統)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&family=Noto+Sans+TC:wght@500;700;900&display=swap');
+
+        :root {
+            --primary: #00e5ff;
+            --danger: #ff0055;
+            --success: #00e676;
+            --warning: #ffea00;
+            --ultimate: #d500f9;
+            --rage: #ff4500; 
+            --rage-max: #ffea00;
+            --bg-gradient-start: #0f111a;
+            --bg-gradient-end: #050608;
+            --panel-bg: rgba(20, 24, 34, 0.85);
+        }
+
+        body {
+            background: radial-gradient(circle at center, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: #eceff1;
+            font-family: 'Montserrat', 'Noto Sans TC', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            touch-action: manipulation; 
+            user-select: none;
+            -webkit-user-select: none;
+            position: relative;
+        }
+
+        /* 透視網格背景 */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 200%; height: 200%;
+            background-image: linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: gridMove 10s linear infinite;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px); }
+        }
+
+        /* 邊緣光暈 */
+        body::after {
+            content: "";
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 100%, rgba(255, 0, 85, 0.05) 0%, transparent 50%);
+            z-index: -1; pointer-events: none;
+        }
+
+        #game-container {
+            width: 90%;
+            max-width: 900px;
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;
+        }
+
+        .fighter-info { width: 45%; }
+        
+        .name-tag { 
+            font-size: 1.1rem; font-weight: 900; margin-bottom: 12px; letter-spacing: 1px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        #player-name { color: var(--primary); text-shadow: 0 0 15px rgba(0, 229, 255, 0.4); transition: color 0.3s, text-shadow 0.3s; }
+        #enemy-name { color: var(--danger); text-shadow: 0 0 15px rgba(255, 0, 85, 0.4); flex-direction: row-reverse; transition: color 0.3s, text-shadow 0.3s; }
+
+        .win-dots-container { display: flex; gap: 6px; flex-wrap: wrap; max-width: 50%; }
+        #p-wins { justify-content: flex-start; }
+        #e-wins { justify-content: flex-end; }
+        
+        .win-dot { width: 10px; height: 10px; border-radius: 50%; transition: all 0.3s ease; }
+        .win-dot.p-win { background: var(--primary); box-shadow: 0 0 10px var(--primary), inset 0 0 4px #fff; }
+        .win-dot.e-win { background: var(--danger); box-shadow: 0 0 10px var(--danger), inset 0 0 4px #fff; }
+
+        .hp-track {
+            width: 100%; height: 18px; 
+            background: #11141c; border: 1px solid rgba(255, 255, 255, 0.05); 
+            border-radius: 10px; position: relative; overflow: hidden;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.6);
+        }
+        .hp-fill {
+            height: 100%; width: 100%; 
+            transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s, box-shadow 0.3s;
+            position: absolute; top: 0; left: 0; border-radius: 10px;
+        }
+        #player-hp .hp-fill { background: linear-gradient(90deg, #007bb5, var(--primary)); box-shadow: 0 0 15px rgba(0, 229, 255, 0.5); }
+        #enemy-hp .hp-fill { background: linear-gradient(-90deg, #990022, var(--danger)); box-shadow: 0 0 15px rgba(255, 0, 85, 0.5); right: 0; left: auto; }
+
+        /* ======== 雙方怒氣條樣式 ======== */
+        .rage-container {
+            display: flex; align-items: center; margin-top: 8px; width: 140px; 
+        }
+        .rage-label {
+            font-size: 0.65rem; font-weight: 900; color: #888; margin-right: 8px; letter-spacing: 1px; width: 35px; text-align: left;
+        }
+        
+        /* 【關鍵修改】移除 overflow: hidden，讓火焰可以燒出軌道外！ */
+        .rage-track {
+            flex-grow: 1; height: 6px; 
+            background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 69, 0, 0.2); 
+            border-radius: 3px; position: relative; 
+        }
+        
+        .rage-fill {
+            height: 100%; width: 0%; 
+            background: linear-gradient(90deg, #8b0000, var(--rage)); 
+            box-shadow: 0 0 10px var(--rage);
+            transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s, background 0.3s;
+            position: absolute; top: 0; left: 0; border-radius: 3px;
+        }
+        
+        #enemy-rage-track { transform: scaleX(-1); }
+        
+        .rage-active { animation: pulseRage 0.5s infinite alternate; z-index: 5; }
+        @keyframes pulseRage { 
+            0% { box-shadow: 0 0 8px var(--rage); } 
+            100% { box-shadow: 0 0 20px var(--rage), 0 0 30px #ff0000; filter: brightness(1.2); } 
+        }
+        
+        /* ======== 覺醒火焰 (MAX RAGE) 動畫 ======== */
+        .rage-max-anim { 
+            /* 火焰核心漸層：白高溫 -> 黃 -> 橘紅 */
+            background: linear-gradient(90deg, #ffea00, #ff2a00, #ffffff, #ff5a00, #ffea00) !important;
+            background-size: 200% 100% !important;
+            
+            /* 暴走的火焰光暈，向外、向上擴散 */
+            box-shadow: 
+                0 -3px 10px rgba(255, 42, 0, 0.8), 
+                0 -6px 20px rgba(255, 157, 0, 0.8), 
+                0 0 40px rgba(255, 234, 0, 1),
+                inset 0 0 10px #ffffff !important;
+                
+            /* 邊框也變成燃燒狀態 */
+            border: 1px solid #ffea00 !important;
+            
+            animation: 
+                fireFlow 0.3s linear infinite,
+                fireFlicker 0.05s infinite alternate !important;
+            z-index: 10;
+        }
+
+        /* 火舌殘影 (利用偽元素製造向上竄燒的視覺) */
+        .rage-max-anim::after {
+            content: "";
+            position: absolute;
+            top: -10px; left: 0; width: 100%; height: 10px;
+            background: radial-gradient(ellipse at bottom, #ffea00 0%, #ff2a00 40%, transparent 70%);
+            background-size: 20px 10px;
+            background-repeat: repeat-x;
+            opacity: 0.8;
+            mix-blend-mode: screen;
+            animation: flameDance 0.2s infinite alternate;
+            pointer-events: none;
+        }
+
+        /* 背景流動：高溫能量竄動 */
+        @keyframes fireFlow { 
+            0% { background-position: 200% 0; } 
+            100% { background-position: -200% 0; } 
+        }
+
+        /* 高頻閃爍：模擬真實火焰的跳動感 (極短時間內的明暗切換) */
+        @keyframes fireFlicker { 
+            0% { 
+                box-shadow: 0 -2px 8px #ff2a00, 0 -5px 15px #ff9d00, 0 0 25px #ffea00, inset 0 0 5px #fff; 
+                filter: brightness(1) contrast(1.2);
+            } 
+            100% { 
+                box-shadow: 0 -5px 15px #ff2a00, 0 -10px 25px #ff9d00, 0 0 45px #ffea00, inset 0 0 12px #fff; 
+                filter: brightness(1.5) contrast(1.5);
+            } 
+        }
+
+        /* 火舌向上竄動的物理變化 */
+        @keyframes flameDance {
+            0% {
+                background-position: 0 0;
+                transform: scaleY(0.8) translateY(2px);
+                opacity: 0.6;
+            }
+            100% {
+                background-position: 10px -5px;
+                transform: scaleY(1.5) translateY(-2px);
+                opacity: 1;
+            }
+        }
+
+        .battle-arena {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            height: 160px; margin-bottom: 50px; padding: 0 20px;
+        }
+
+        .cat-entity {
+            font-family: 'Courier New', monospace; font-size: 3.5rem; font-weight: bold;
+            white-space: pre; text-shadow: 0 0 15px rgba(255,255,255,0.2);
+            transition: text-shadow 0.3s, color 0.3s;
+        }
+
+        .idle { animation: breathe 2.5s infinite ease-in-out; }
+        .attack-right { animation: dashRight 0.3s ease-out; }
+        .attack-left { animation: dashLeft 0.3s ease-out; }
+        .hurt { animation: shake 0.4s both; color: var(--danger) !important; text-shadow: 0 0 25px var(--danger), 0 0 50px var(--danger) !important; }
+        .evade-right { animation: dodgeRight 0.4s ease-out; opacity: 0.3; }
+        .evade-left { animation: dodgeLeft 0.4s ease-out; opacity: 0.3; }
+
+        .attack-ultimate { 
+            animation: ultimateDash 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; 
+            color: #fff !important; 
+            text-shadow: 0 0 25px var(--ultimate), 0 0 50px var(--ultimate), 0 0 70px #fff !important; 
+        }
+
+        /* 超必殺技專屬動畫 */
+        .attack-super-ultimate-right {
+            animation: superUltimateDashRight 0.7s cubic-bezier(0.1, 1.5, 0.5, 1) forwards;
+            color: var(--rage-max) !important;
+            text-shadow: 0 0 30px var(--danger), 0 0 60px var(--danger), 0 0 90px var(--rage-max), 0 0 120px #fff !important;
+            z-index: 99; position: relative;
+        }
+        .attack-super-ultimate-left {
+            animation: superUltimateDashLeft 0.7s cubic-bezier(0.1, 1.5, 0.5, 1) forwards;
+            color: var(--rage-max) !important;
+            text-shadow: 0 0 30px var(--danger), 0 0 60px var(--danger), 0 0 90px var(--rage-max), 0 0 120px #fff !important;
+            z-index: 99; position: relative;
+        }
+
+        @keyframes breathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes dashRight { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(90px) scale(1.15); } }
+        @keyframes dashLeft { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-90px) scale(1.15); } }
+        @keyframes shake { 10%, 90% { transform: translate3d(-3px, 0, 0); } 20%, 80% { transform: translate3d(5px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
+        @keyframes dodgeRight { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(60px) skewX(-15deg); } }
+        @keyframes dodgeLeft { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-60px) skewX(15deg); } }
+        
+        @keyframes ultimateDash { 
+            0% { transform: translateX(0) scale(1); } 
+            15% { transform: translateX(-40px) scale(1.2); } 
+            35% { transform: translateX(200px) scale(1.6) skewX(-20deg); } 
+            100% { transform: translateX(0) scale(1); } 
+        }
+
+        @keyframes superUltimateDashRight {
+            0% { transform: translateX(0) scale(1); }
+            10% { transform: translateX(-60px) scale(1.4) rotate(-5deg); filter: hue-rotate(90deg); }
+            35% { transform: translateX(260px) scale(2.2) skewX(-30deg); filter: hue-rotate(0deg); }
+            50% { transform: translateX(230px) scale(2) skewX(10deg); }
+            100% { transform: translateX(0) scale(1); }
+        }
+        
+        @keyframes superUltimateDashLeft {
+            0% { transform: translateX(0) scale(1); }
+            10% { transform: translateX(60px) scale(1.4) rotate(5deg); filter: hue-rotate(90deg); }
+            35% { transform: translateX(-260px) scale(2.2) skewX(30deg); filter: hue-rotate(0deg); }
+            50% { transform: translateX(-230px) scale(2) skewX(-10deg); }
+            100% { transform: translateX(0) scale(1); }
+        }
+
+        #player-cat { color: #e0f7fa; }
+        #enemy-cat { color: #ffebee; }
+
+        .qte-area {
+            background: rgba(10, 12, 18, 0.6); border-radius: 12px; padding: 35px 25px;
+            text-align: center; border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 2px 10px rgba(0,0,0,0.3); position: relative; 
+        }
+
+        #qte-instruction { 
+            font-size: 1.1rem; font-weight: 700; margin-bottom: 25px; 
+            color: var(--primary); letter-spacing: 3px; text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.4); transition: color 0.3s;
+        }
+
+        .timing-bar-container {
+            width: 100%; height: 36px; 
+            background: linear-gradient(90deg, 
+                #3a0000 0%, #660000 25%, #8a6b00 30%, #b88a00 42%, #00cc00 45%, 
+                var(--ultimate) 48.5%, #fff 50%, var(--ultimate) 51.5%, 
+                #00cc00 55%, #b88a00 58%, #8a6b00 70%, #660000 75%, #3a0000 100%
+            );
+            border-radius: 4px; position: relative; border: 2px solid #222;
+        }
+
+        .timing-bar-container::after {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 6px, #000 6px, #000 10px);
+            z-index: 2; pointer-events: none;
+        }
+
+        #scanner {
+            position: absolute; height: 100%; width: 16px; 
+            background: #fff; box-shadow: 0 0 15px #fff, 0 0 30px var(--primary);
+            top: 0; left: 0%; transform: translateX(-50%); z-index: 1; pointer-events: none;
+        }
+        
+        .float-text {
+            position: absolute; font-size: 2.2rem; font-weight: 900; 
+            text-shadow: 0px 5px 15px rgba(0,0,0,0.5); pointer-events: none;
+            animation: floatUp 1s cubic-bezier(0.25, 1, 0.5, 1) forwards; z-index: 100;
+            white-space: nowrap;
+        }
+        .dmg-text { color: var(--danger); text-shadow: 0 0 15px var(--danger), 0 5px 15px rgba(0,0,0,0.8); }
+        .heal-text { color: var(--success); text-shadow: 0 0 15px var(--success), 0 5px 15px rgba(0,0,0,0.8); }
+        .miss-text { color: #78909c; font-style: italic; }
+        .ult-text { color: #fff; font-size: 3.5rem; text-shadow: 0 0 25px var(--ultimate), 0 0 50px var(--ultimate), 0 10px 20px rgba(0,0,0,0.8); }
+        
+        .super-ult-text {
+            color: var(--rage-max); font-size: 4.5rem;
+            text-shadow: 0 0 30px var(--danger), 0 0 60px var(--danger), 0 10px 20px rgba(0,0,0,0.9);
+            z-index: 105;
+        }
+
+        .rage-bonus-text { font-size: 1.1rem; color: var(--rage); text-shadow: 0 0 10px var(--rage); vertical-align: middle; margin-left: 10px; }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1.5); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1); }
+        }
+
+        .flash-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9); z-index: 998; pointer-events: none;
+            animation: screenFlash 0.3s ease-out forwards;
+        }
+        @keyframes screenFlash { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
+
+        .super-flash-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 0, 50, 0.6); mix-blend-mode: hard-light; z-index: 998; pointer-events: none;
+            animation: superScreenFlash 0.5s ease-out forwards;
+        }
+        @keyframes superScreenFlash { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+
+        #touch-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; cursor: pointer;
+        }
+        
+        .vs-tag {
+            font-size: 1.2rem; font-weight: 900; color: #455a64; width: 10%; text-align: center; letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="touch-overlay"></div>
+
+    <div id="game-container">
+        <div class="header">
+            <div class="fighter-info">
+                <div class="name-tag" id="player-name">
+                    <span id="player-label">CYBER_MEOW</span>
+                    <div class="win-dots-container" id="p-wins"></div>
+                </div>
+                <div class="hp-track" id="player-hp"><div class="hp-fill"></div></div>
+                <div class="rage-container">
+                    <span class="rage-label" id="p-rage-text-label">RAGE</span>
+                    <div class="rage-track"><div class="rage-fill" id="player-rage"></div></div>
+                </div>
+            </div>
+            <div class="vs-tag">VS</div>
+            <div class="fighter-info">
+                <div class="name-tag" id="enemy-name">
+                    <span id="enemy-label">CPU_BOSS</span>
+                    <div class="win-dots-container" id="e-wins"></div>
+                </div>
+                <div class="hp-track" id="enemy-hp"><div class="hp-fill"></div></div>
+                <div class="rage-container" style="flex-direction: row-reverse;">
+                    <span class="rage-label" id="e-rage-text-label" style="text-align: right; margin-right: 0; margin-left: 8px;">RAGE</span>
+                    <div class="rage-track" id="enemy-rage-track"><div class="rage-fill" id="enemy-rage"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="battle-arena">
+            <div id="player-cat" class="cat-entity idle">\(=^･ω･^=)/</div>
+            <div id="enemy-cat" class="cat-entity idle">ฅ(ΦωΦ)ฅ</div>
+        </div>
+
+        <div class="qte-area">
+            <div id="qte-instruction">System Standby</div>
+            <div class="timing-bar-container">
+                <div id="scanner"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CAT_STATES = {
+            player: { 
+                idle: "\\(=^･ω･^=)/", 
+                attack: ["( ✧Д✧) ｶｯ!!", "(=｀ω´=)ง", "ฅ(๑*д*๑)ฅ", "(ΦωΦ)💢"], 
+                ultimate: ["(ง🔥Д🔥)ง 必殺!!", "☄️(=ΦωΦ=)☄️", "⚡(✧Д✧)⚡"],
+                super_ultimate: ["(╬ Ò ‸ Ó) 奧義!!", "✨(✧Д✧)✨ 滅", "☄️(ง🔥Д🔥)ง 瞬獄殺!!"], 
+                hurt: ["( >д<)💦", "( ⑙_⑙ )", "∑(O_O;)", "🙀"], 
+                evade: "彡(ﾟ▽ﾟ)彡", 
+                dead: "( x_x) 💀" 
+            },
+            enemy:  { 
+                idle: "ฅ(ΦωΦ)ฅ", 
+                attack: ["(ꐦ°᷄д°᷅)😾", "😾💢", "(=｀ェ´=)", "(ʘ̆_ʘ̆)"], 
+                super_ultimate: ["(╬ Ò ‸ Ó) 抹殺!!", "☠️(✧Д✧)☠️ 毀滅", "☄️(ง🔥Д🔥)ง 死!!"],
+                hurt: ["🙀(TωT)", "(×﹏×)", "( ºÄº )", "😿"], 
+                evade: "ﾐ(=ಠ_ಠ=)ﾐ", 
+                dead: "🪦(×_×)" 
+            }
+        };
+
+        let state = {
+            active: false, max_hp: 400, p_hp: 400, e_hp: 400, p_rage: 0, e_rage: 0,
+            p_wins: 0, e_wins: 0, 
+            scannerPos: 0, scannerSpeed: 1.6, scannerDir: 1, 
+            isAnimating: false, enemyTimer: null, canAttack: false,
+            cpuDmg: 20, cpuMissRate: 0.25, cpuDelayBase: 2000
+        };
+
+        const ui = {
+            p_hp_fill: document.querySelector('#player-hp .hp-fill'),
+            e_hp_fill: document.querySelector('#enemy-hp .hp-fill'),
+            p_rage_fill: document.getElementById('player-rage'),
+            e_rage_fill: document.getElementById('enemy-rage'),
+            p_label: document.getElementById('player-label'),
+            e_label: document.getElementById('enemy-label'),
+            p_rage_label: document.getElementById('p-rage-text-label'),
+            e_rage_label: document.getElementById('e-rage-text-label'),
+            p_cat: document.getElementById('player-cat'),
+            e_cat: document.getElementById('enemy-cat'),
+            p_wins: document.getElementById('p-wins'),
+            e_wins: document.getElementById('e-wins'),
+            scanner: document.getElementById('scanner'),
+            instruction: document.getElementById('qte-instruction')
+        };
+
+        let animationFrameId;
+
+        function handleInput(e) {
+            if (e.type === 'keydown' && e.code !== 'Space' && e.key !== 'Enter') return;
+            if (e.type === 'keydown') e.preventDefault(); 
+            if (!state.active) startGame();
+            else if (state.canAttack) evaluateHit();
+        }
+
+        document.getElementById('touch-overlay').addEventListener('pointerdown', handleInput);
+        window.addEventListener('keydown', handleInput);
+
+        function startGame() {
+            state.active = true; state.p_hp = state.max_hp; state.e_hp = state.max_hp; 
+            state.p_rage = 0; state.e_rage = 0;
+            
+            const totalRounds = state.p_wins + state.e_wins;
+            
+            state.scannerSpeed = 1.6 + (totalRounds * 0.1); 
+            state.cpuDmg = Math.min(60, 20 + (totalRounds * 4));
+            state.cpuMissRate = Math.max(0.05, 0.25 - (totalRounds * 0.03));
+            state.cpuDelayBase = Math.max(800, 2000 - (totalRounds * 200));
+
+            updateBars();
+            setCatState('player', 'idle'); setCatState('enemy', 'idle');
+            
+            ui.instruction.innerHTML = `ROUND ${totalRounds + 1} START`;
+            ui.instruction.style.color = "var(--primary)";
+            ui.instruction.style.textShadow = "0 0 15px rgba(0, 229, 255, 0.5)";
+            
+            state.canAttack = true; state.isAnimating = true;
+            loopScanner(); scheduleEnemyAttack();
+        }
+
+        function loopScanner() {
+            if (!state.isAnimating) return;
+            state.scannerPos += state.scannerSpeed * state.scannerDir;
+            if (state.scannerPos >= 100) { state.scannerPos = 100; state.scannerDir = -1; } 
+            else if (state.scannerPos <= 0) { state.scannerPos = 0; state.scannerDir = 1; }
+            ui.scanner.style.left = `${state.scannerPos}%`;
+            animationFrameId = requestAnimationFrame(loopScanner);
+        }
+
+        function evaluateHit() {
+            state.canAttack = false; state.isAnimating = false;
+            cancelAnimationFrame(animationFrameId);
+
+            const pos = state.scannerPos;
+            const distFromCenter = Math.abs(pos - 50);
+            
+            let hitType = "MISS", baseDmg = 0;
+
+            if (distFromCenter <= 1.5) {
+                if (state.p_rage >= 85) {
+                    hitType = "SUPER_ULTIMATE"; baseDmg = 99; 
+                } else {
+                    hitType = "ULTIMATE"; baseDmg = 45;
+                }
+            } else if (distFromCenter <= 25) {
+                let powerRatio = 1 - (distFromCenter / 25);
+                baseDmg = Math.floor(10 + 25 * powerRatio); 
+                hitType = (baseDmg >= 25) ? "PERFECT" : "HIT";
+            } else {
+                hitType = "MISS"; baseDmg = 0;
+            }
+
+            executePlayerAttack(hitType, baseDmg);
+        }
+
+        function triggerScreenFlash(isSuper = false) {
+            const flash = document.createElement('div');
+            flash.className = isSuper ? 'super-flash-overlay' : 'flash-overlay';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), isSuper ? 500 : 300);
+            
+            document.body.style.animation = isSuper ? "shake 0.1s 6" : "shake 0.1s 4";
+            setTimeout(() => document.body.style.animation = "", isSuper ? 600 : 400);
+        }
+
+        function executePlayerAttack(hitType, baseDmg) {
+            let animClass = 'attack-right';
+            let catAction = 'attack';
+            let impactDelay = 150; 
+            let resetDelay = 600;
+
+            let rageBonusDmg = 0;
+            if (hitType !== "MISS") {
+                rageBonusDmg = Math.floor(state.p_rage * 0.35);
+            }
+            let totalDmg = baseDmg + rageBonusDmg;
+
+            if (hitType === "SUPER_ULTIMATE") {
+                animClass = 'attack-super-ultimate-right';
+                catAction = 'super_ultimate';
+                impactDelay = 350; 
+                resetDelay = 1200; 
+                triggerScreenFlash(true); 
+            } else if (hitType === "ULTIMATE") {
+                animClass = 'attack-ultimate';
+                catAction = 'ultimate';
+                impactDelay = 250; 
+                resetDelay = 1000; 
+                triggerScreenFlash(false);
+            }
+
+            setCatState('player', catAction);
+            ui.p_cat.classList.remove('idle');
+            ui.p_cat.classList.add(animClass);
+
+            setTimeout(() => {
+                if (hitType === "MISS") {
+                    setCatState('enemy', 'evade');
+                    ui.e_cat.classList.remove('idle'); ui.e_cat.classList.add('evade-right');
+                    showFloatingTextHTML(ui.e_cat, "MISS", 'miss-text');
+                    ui.instruction.innerHTML = "TARGET MISSED";
+                    ui.instruction.style.color = "#78909c";
+                    ui.instruction.style.textShadow = "none";
+                } else {
+                    state.e_hp = Math.max(0, state.e_hp - totalDmg);
+                    
+                    let gainedRage = Math.floor(totalDmg * 0.6);
+                    state.e_rage = Math.min(100, state.e_rage + gainedRage);
+
+                    setCatState('enemy', 'hurt');
+                    ui.e_cat.classList.remove('idle'); ui.e_cat.classList.add('hurt');
+                    
+                    let dmgStr = `-${totalDmg}`;
+                    if(rageBonusDmg > 0) {
+                        dmgStr += ` <span class='rage-bonus-text'>[RAGE DMG +${rageBonusDmg}]</span>`;
+                    }
+                    dmgStr += `<br><span style="font-size:1.1rem; color:var(--warning); text-shadow:0 0 10px var(--warning);">⚡+${gainedRage} RAGE</span>`;
+
+                    if (hitType === "SUPER_ULTIMATE") {
+                        showFloatingTextHTML(ui.e_cat, `奧義 ${dmgStr}`, 'super-ult-text');
+                        ui.instruction.innerHTML = "SUPER ULTIMATE STRIKE!!!";
+                        ui.instruction.style.color = "var(--rage-max)";
+                        ui.instruction.style.textShadow = "0 0 20px var(--danger), 0 0 40px var(--rage-max)";
+                        state.p_rage = 0; 
+                    } else if (hitType === "ULTIMATE") {
+                        showFloatingTextHTML(ui.e_cat, `FATAL ${dmgStr}`, 'ult-text');
+                        ui.instruction.innerHTML = "ULTIMATE STRIKE";
+                        ui.instruction.style.color = "var(--ultimate)";
+                        ui.instruction.style.textShadow = "0 0 15px var(--ultimate)";
+                    } else if (hitType === "PERFECT") {
+                        showFloatingTextHTML(ui.e_cat, `CRIT ${dmgStr}`, 'dmg-text');
+                        ui.instruction.innerHTML = "PERFECT HIT";
+                        ui.instruction.style.color = "var(--success)";
+                        ui.instruction.style.textShadow = "0 0 15px var(--success)";
+                        if(state.p_hp < state.max_hp) { state.p_hp = Math.min(state.max_hp, state.p_hp + 10); showFloatingTextHTML(ui.p_cat, "+10", 'heal-text'); }
+                    } else {
+                        showFloatingTextHTML(ui.e_cat, dmgStr, 'dmg-text');
+                        ui.instruction.innerHTML = "HIT SECURED";
+                        ui.instruction.style.color = "var(--warning)";
+                        ui.instruction.style.textShadow = "0 0 10px rgba(255, 234, 0, 0.5)";
+                    }
+                    updateBars();
+                }
+                checkWinCondition();
+            }, impactDelay);
+
+            setTimeout(() => {
+                resetCatAnim('player', 'idle', animClass);
+                if (state.e_hp > 0) resetCatAnim('enemy', 'idle', hitType === "MISS" ? 'evade-right' : 'hurt');
+                
+                if (state.active) {
+                    state.isAnimating = true; state.canAttack = true; loopScanner();
+                    ui.instruction.innerHTML = "TAP TO STRIKE";
+                    ui.instruction.style.color = "var(--primary)";
+                    ui.instruction.style.textShadow = "0 0 15px rgba(0, 229, 255, 0.5)";
+                }
+            }, resetDelay);
+        }
+
+        function executeEnemyAttack() {
+            if (!state.active) return;
+            
+            let isSuper = false;
+            let baseDmg = state.cpuDmg;
+
+            if (state.e_rage >= 85) {
+                isSuper = true;
+                baseDmg = Math.floor(state.cpuDmg * 2.5); 
+                state.e_rage = 0; 
+            }
+
+            let isMiss = isSuper ? false : (Math.random() < state.cpuMissRate); 
+            let rageBonusDmg = isSuper ? 0 : Math.floor(state.e_rage * 0.35);
+            let totalDmg = baseDmg + rageBonusDmg;
+
+            setCatState('enemy', isSuper ? 'super_ultimate' : 'attack');
+            ui.e_cat.classList.remove('idle'); 
+            ui.e_cat.classList.add(isSuper ? 'attack-super-ultimate-left' : 'attack-left');
+
+            if (isSuper) triggerScreenFlash(true);
+
+            setTimeout(() => {
+                if (isMiss) {
+                    setCatState('player', 'evade');
+                    ui.p_cat.classList.remove('idle'); ui.p_cat.classList.add('evade-left');
+                    showFloatingTextHTML(ui.p_cat, "EVADED", 'heal-text');
+                } else {
+                    state.p_hp = Math.max(0, state.p_hp - totalDmg);
+                    
+                    let gainedRage = Math.floor(totalDmg * 0.6);
+                    state.p_rage = Math.min(100, state.p_rage + gainedRage);
+
+                    setCatState('player', 'hurt');
+                    ui.p_cat.classList.remove('idle'); ui.p_cat.classList.add('hurt');
+                    
+                    let dmgStr = `-${totalDmg}`;
+                    if(rageBonusDmg > 0 && !isSuper) {
+                        dmgStr += ` <span class='rage-bonus-text'>[RAGE DMG +${rageBonusDmg}]</span>`;
+                    }
+                    dmgStr += `<br><span style="font-size:1.1rem; color:var(--warning); text-shadow:0 0 10px var(--warning);">⚡+${gainedRage} RAGE</span>`;
+                    
+                    if (isSuper) {
+                        showFloatingTextHTML(ui.p_cat, `CPU 奧義 ${dmgStr}`, 'super-ult-text');
+                    } else {
+                        showFloatingTextHTML(ui.p_cat, dmgStr, 'dmg-text'); 
+                    }
+                    
+                    updateBars(); 
+                    
+                    document.body.style.animation = isSuper ? "shake 0.1s 6" : "shake 0.3s";
+                    setTimeout(() => document.body.style.animation = "", isSuper ? 600 : 300);
+                }
+                checkWinCondition();
+            }, isSuper ? 350 : 150);
+
+            setTimeout(() => {
+                resetCatAnim('enemy', 'idle', isSuper ? 'attack-super-ultimate-left' : 'attack-left');
+                if (state.p_hp > 0) resetCatAnim('player', 'idle', isMiss ? 'evade-left' : 'hurt');
+            }, isSuper ? 1200 : 600);
+
+            scheduleEnemyAttack();
+        }
+
+        function scheduleEnemyAttack() {
+            if (state.enemyTimer) clearTimeout(state.enemyTimer);
+            const nextAttackDelay = state.cpuDelayBase + (Math.random() * 1000);
+            state.enemyTimer = setTimeout(executeEnemyAttack, nextAttackDelay);
+        }
+
+        function updateBars() {
+            const p_hp_pct = (state.p_hp / state.max_hp) * 100;
+            const e_hp_pct = (state.e_hp / state.max_hp) * 100;
+
+            ui.p_hp_fill.style.width = p_hp_pct + "%";
+            ui.e_hp_fill.style.width = e_hp_pct + "%";
+            
+            ui.p_hp_fill.style.background = p_hp_pct <= 30 ? "linear-gradient(90deg, #990022, var(--danger))" : "linear-gradient(90deg, #007bb5, var(--primary))";
+            ui.p_hp_fill.style.boxShadow = p_hp_pct <= 30 ? "0 0 15px rgba(255, 0, 85, 0.5)" : "0 0 15px rgba(0, 229, 255, 0.5)";
+
+            ui.e_hp_fill.style.background = e_hp_pct <= 30 ? "linear-gradient(-90deg, #550011, #aa0022)" : "linear-gradient(-90deg, #990022, var(--danger))";
+            ui.e_hp_fill.style.boxShadow = e_hp_pct <= 30 ? "0 0 15px rgba(255, 0, 0, 0.8)" : "0 0 15px rgba(255, 0, 85, 0.5)";
+
+            ui.p_rage_fill.style.width = state.p_rage + "%";
+            ui.e_rage_fill.style.width = state.e_rage + "%";
+
+            // 玩家怒氣 UI 處理
+            if(state.p_rage >= 85) {
+                ui.p_rage_fill.classList.add('rage-max-anim');
+                ui.p_label.style.color = "var(--rage-max)";
+                ui.p_label.style.textShadow = "0 0 15px var(--danger), 0 0 30px var(--rage-max)";
+                ui.p_rage_label.innerText = "MAX";
+                ui.p_rage_label.style.color = "var(--rage-max)";
+                ui.p_rage_label.style.textShadow = "0 0 10px var(--danger)";
+                ui.p_cat.style.color = "#ffddcc";
+                ui.p_cat.style.textShadow = "0 0 20px var(--danger), 0 0 40px var(--rage-max)";
+            } else if(state.p_rage > 50) {
+                ui.p_rage_fill.classList.remove('rage-max-anim');
+                ui.p_rage_fill.classList.add('rage-active');
+                ui.p_label.style.color = "var(--rage)";
+                ui.p_label.style.textShadow = "0 0 15px var(--rage), 0 0 30px #ff0000";
+                ui.p_rage_label.innerText = "RAGE";
+                ui.p_rage_label.style.color = "var(--rage)";
+                ui.p_rage_label.style.textShadow = "0 0 10px var(--rage)";
+                ui.p_cat.style.color = "#ffddcc";
+                ui.p_cat.style.textShadow = "0 0 20px var(--rage), 0 0 40px #ff0000";
+            } else {
+                ui.p_rage_fill.classList.remove('rage-max-anim');
+                ui.p_rage_fill.classList.remove('rage-active');
+                ui.p_label.style.color = "var(--primary)";
+                ui.p_label.style.textShadow = "0 0 15px rgba(0, 229, 255, 0.4)";
+                ui.p_rage_label.innerText = "RAGE";
+                ui.p_rage_label.style.color = "#888";
+                ui.p_rage_label.style.textShadow = "none";
+                ui.p_cat.style.color = "#e0f7fa";
+                ui.p_cat.style.textShadow = "0 0 15px rgba(255,255,255,0.2)";
+            }
+
+            // CPU 怒氣 UI 處理
+            if(state.e_rage >= 85) {
+                ui.e_rage_fill.classList.add('rage-max-anim');
+                ui.e_label.style.color = "var(--rage-max)";
+                ui.e_label.style.textShadow = "0 0 15px var(--danger), 0 0 30px var(--rage-max)";
+                ui.e_rage_label.innerText = "MAX";
+                ui.e_rage_label.style.color = "var(--rage-max)";
+                ui.e_rage_label.style.textShadow = "0 0 10px var(--danger)";
+                ui.e_cat.style.color = "#ffddcc";
+                ui.e_cat.style.textShadow = "0 0 20px var(--danger), 0 0 40px var(--rage-max)";
+            } else if(state.e_rage > 50) {
+                ui.e_rage_fill.classList.remove('rage-max-anim');
+                ui.e_rage_fill.classList.add('rage-active');
+                ui.e_label.style.color = "var(--rage)";
+                ui.e_label.style.textShadow = "0 0 15px var(--rage), 0 0 30px #ff0000";
+                ui.e_rage_label.innerText = "RAGE";
+                ui.e_rage_label.style.color = "var(--rage)";
+                ui.e_rage_label.style.textShadow = "0 0 10px var(--rage)";
+                ui.e_cat.style.color = "#ffddcc";
+                ui.e_cat.style.textShadow = "0 0 20px var(--rage), 0 0 40px #ff0000";
+            } else {
+                ui.e_rage_fill.classList.remove('rage-max-anim');
+                ui.e_rage_fill.classList.remove('rage-active');
+                ui.e_label.style.color = "var(--danger)";
+                ui.e_label.style.textShadow = "0 0 15px rgba(255, 0, 85, 0.4)";
+                ui.e_rage_label.innerText = "RAGE";
+                ui.e_rage_label.style.color = "#888";
+                ui.e_rage_label.style.textShadow = "none";
+                ui.e_cat.style.color = "#ffebee";
+                ui.e_cat.style.textShadow = "0 0 15px rgba(255,255,255,0.2)";
+            }
+        }
+
+        function updateWinDots() {
+            ui.p_wins.innerHTML = "<div class='win-dot p-win'></div>".repeat(state.p_wins);
+            ui.e_wins.innerHTML = "<div class='win-dot e-win'></div>".repeat(state.e_wins);
+        }
+
+        function setCatState(role, action) {
+            let catFace = CAT_STATES[role][action];
+            if (Array.isArray(catFace)) {
+                catFace = catFace[Math.floor(Math.random() * catFace.length)];
+            }
+            ui[role === 'player' ? 'p_cat' : 'e_cat'].innerText = catFace;
+        }
+
+        function resetCatAnim(role, stateName, classToRemove) {
+            const el = ui[role === 'player' ? 'p_cat' : 'e_cat'];
+            setCatState(role, stateName);
+            el.classList.remove(classToRemove); el.classList.add('idle');
+        }
+
+        function showFloatingTextHTML(targetEl, htmlStr, className) {
+            const rect = targetEl.getBoundingClientRect();
+            const floatEl = document.createElement('div');
+            floatEl.className = `float-text ${className}`; floatEl.innerHTML = htmlStr;
+            floatEl.style.left = `${rect.left + rect.width / 2 + (Math.random() - 0.5) * 40}px`;
+            floatEl.style.top = `${rect.top}px`;
+            document.body.appendChild(floatEl);
+            setTimeout(() => floatEl.remove(), 1000);
+        }
+
+        function checkWinCondition() {
+            if (state.e_hp <= 0) gameOver(true);
+            else if (state.p_hp <= 0) gameOver(false);
+        }
+
+        function gameOver(playerWon) {
+            state.active = false; state.isAnimating = false; state.canAttack = false;
+            clearTimeout(state.enemyTimer); cancelAnimationFrame(animationFrameId);
+            ui.p_cat.className = "cat-entity"; ui.e_cat.className = "cat-entity";
+
+            if (playerWon) {
+                state.p_wins++;
+                updateWinDots();
+
+                setCatState('player', 'idle'); setCatState('enemy', 'dead');
+                ui.instruction.innerHTML = "VICTORY<br><span style='font-size:0.8rem; color:#eceff1; text-shadow:none; letter-spacing:1px; line-height: 2.5;'>TAP TO CONTINUE</span>";
+                ui.instruction.style.color = "var(--success)";
+                ui.instruction.style.textShadow = "0 0 20px var(--success)";
+            } else {
+                state.e_wins++;
+                updateWinDots();
+
+                setCatState('player', 'dead'); setCatState('enemy', 'idle');
+                ui.instruction.innerHTML = "SYSTEM DOWN<br><span style='font-size:0.8rem; color:#eceff1; text-shadow:none; letter-spacing:1px; line-height: 2.5;'>TAP TO RETRY</span>";
+                ui.instruction.style.color = "var(--danger)";
+                ui.instruction.style.textShadow = "0 0 20px var(--danger)";
+            }
+        }
+    </script>
+</body>
+</html>
