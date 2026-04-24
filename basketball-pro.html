@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Interactive Playbook</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        :root {
+            --court-wood: linear-gradient(135deg, #e2ae7a 0%, #c48b52 100%);
+            --court-line: rgba(255, 255, 255, 0.85);
+            --player-bg: linear-gradient(135deg, #2b5876 0%, #4e4376 100%);
+            --ball-color: radial-gradient(circle at 30% 30%, #ff9a44, #fc6076);
+        }
+
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333;
+            padding-bottom: 40px;
+        }
+
+        /* 標題與卡片樣式 */
+        .header-section {
+            padding: 30px 0 20px;
+        }
+        .header-title {
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #2c3e50;
+        }
+
+        /* 控制面板 */
+        .controls-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+        }
+
+        /* 籃球場地 (響應式核心) */
+        #court-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            aspect-ratio: 1.2; /* 保持半場比例 */
+            background: var(--court-wood);
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15), inset 0 0 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 4px solid #fff;
+        }
+
+        /* 場地標線 */
+        .line { position: absolute; box-sizing: border-box; }
+        
+        .paint {
+            top: 0; left: 34%; width: 32%; height: 45%;
+            border: 3px solid var(--court-line);
+            border-top: none;
+            background-color: rgba(255,255,255,0.05);
+        }
+        .free-throw-circle {
+            top: 45%; left: 50%; width: 22%; aspect-ratio: 1;
+            border: 3px solid var(--court-line);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .free-throw-circle-inner {
+            top: 45%; left: 50%; width: 22%; aspect-ratio: 1;
+            border: 3px dashed var(--court-line);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+        }
+        .three-point-line {
+            top: 0; left: 10%; width: 80%; height: 75%;
+            border: 3px solid var(--court-line);
+            border-radius: 0 0 50% 50%;
+            border-top: none;
+        }
+        .hoop {
+            top: 5%; left: 50%; width: 5%; aspect-ratio: 1;
+            border: 3px solid #e74c3c;
+            border-radius: 50%;
+            transform: translate(-50%, 0);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            z-index: 5;
+        }
+        .backboard {
+            top: 5%; left: 42%; width: 16%; height: 0;
+            border-top: 4px solid var(--court-line);
+        }
+
+        /* 實體：球員與球 (使用百分比定位與視窗單位) */
+        .player {
+            position: absolute;
+            width: clamp(24px, 5vw, 36px);
+            height: clamp(24px, 5vw, 36px);
+            background: var(--player-bg);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: clamp(12px, 2.5vw, 16px);
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.8);
+        }
+        .ball {
+            position: absolute;
+            width: clamp(14px, 3vw, 20px);
+            height: clamp(14px, 3vw, 20px);
+            background: var(--ball-color);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+        }
+
+        /* 三角形連線特效 */
+        #triangle-svg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 8;
+        }
+        .triangle-polygon {
+            fill: rgba(255, 215, 0, 0.15);
+            stroke: rgba(255, 215, 0, 0.8);
+            stroke-width: 2;
+            stroke-dasharray: 5, 5;
+            opacity: 0; /* 預設隱藏 */
+        }
+
+        /* 說明文字區 */
+        .desc-box {
+            background: #fff;
+            border-left: 5px solid #2b5876;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-top: 20px;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+        
+        /* 針對手機的按鈕調整 */
+        @media (max-width: 576px) {
+            .btn-group { display: flex; flex-direction: column; width: 100%; }
+            .btn-group .btn { border-radius: 8px !important; margin-bottom: 8px; border: 1px solid #dee2e6; }
+            .action-btns { display: flex; width: 100%; gap: 10px; }
+            .action-btns .btn { flex: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="text-center header-section">
+        <h1 class="header-title">PRO TACTICS BOARD</h1>
+        <p class="text-muted">互動式進攻戰術解析</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="controls-card d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="btnradio" id="btnPrinceton" autocomplete="off" checked onchange="setTactic('princeton')">
+                    <label class="btn btn-outline-dark" for="btnPrinceton">普林斯頓 (Princeton)</label>
+
+                    <input type="radio" class="btn-check" name="btnradio" id="btnTriangle" autocomplete="off" onchange="setTactic('triangle')">
+                    <label class="btn btn-outline-dark" for="btnTriangle">三角戰術 (Triangle)</label>
+
+                    <input type="radio" class="btn-check" name="btnradio" id="btnHorns" autocomplete="off" onchange="setTactic('horns')">
+                    <label class="btn btn-outline-dark" for="btnHorns">牛角戰術 (Horns)</label>
+                </div>
+                
+                <div class="action-btns">
+                    <button id="playBtn" class="btn btn-primary shadow-sm" onclick="playAnimation()">
+                        <i class="bi bi-play-fill"></i> 播放動畫
+                    </button>
+                    <button class="btn btn-light border shadow-sm" onclick="resetBoard()">重置</button>
+                </div>
+            </div>
+
+            <div id="court-container">
+                <svg id="triangle-svg">
+                    <polygon id="t-poly" class="triangle-polygon" points="0,0 0,0 0,0" />
+                </svg>
+
+                <div class="line paint"></div>
+                <div class="line free-throw-circle"></div>
+                <div class="line free-throw-circle-inner"></div>
+                <div class="line three-point-line"></div>
+                <div class="line backboard"></div>
+                <div class="line hoop"></div>
+
+                <div class="player" id="p1">1</div>
+                <div class="player" id="p2">2</div>
+                <div class="player" id="p3">3</div>
+                <div class="player" id="p4">4</div>
+                <div class="player" id="p5">5</div>
+                <div class="ball" id="ball"></div>
+            </div>
+
+            <div class="desc-box">
+                <strong class="text-dark d-block mb-1" id="tacticTitle">普林斯頓戰術 (Princeton Offense)</strong>
+                <span id="tacticDescription" class="text-muted">1號在弧頂將球傳給側翼3號後，立刻執行反跑空切 (Back-door cut) 直闖籃下。同時，4號為2號設立無球掩護拉開空間。最後由3號精準傳球給籃下的1號完成進攻。</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentTactic = 'princeton';
+    let currentAnimation = null;
+
+    // DOM 元素
+    const players = {
+        p1: document.getElementById('p1'),
+        p2: document.getElementById('p2'),
+        p3: document.getElementById('p3'),
+        p4: document.getElementById('p4'),
+        p5: document.getElementById('p5')
+    };
+    const ball = document.getElementById('ball');
+    const poly = document.getElementById('t-poly');
+    const title = document.getElementById('tacticTitle');
+    const desc = document.getElementById('tacticDescription');
+
+    // 戰術初始位置 (百分比佈局，完美適應 RWD)
+    const initPositions = {
+        princeton: {
+            p1: { left: 50, top: 85 }, // 弧頂
+            p2: { left: 15, top: 40 }, // 左翼
+            p3: { left: 85, top: 40 }, // 右翼
+            p4: { left: 35, top: 45 }, // 左高位
+            p5: { left: 65, top: 45 }, // 右高位
+            ball: { left: 50, top: 78 }
+        },
+        triangle: {
+            p1: { left: 50, top: 85 }, // 弧頂
+            p2: { left: 15, top: 45 }, // 弱邊翼
+            p3: { left: 85, top: 45 }, // 強邊翼
+            p4: { left: 30, top: 15 }, // 弱邊低位
+            p5: { left: 70, top: 15 }, // 強邊低位
+            ball: { left: 50, top: 78 }
+        },
+        horns: {
+            p1: { left: 50, top: 85 }, // 弧頂
+            p2: { left: 8, top: 10 },  // 左底角
+            p3: { left: 92, top: 10 }, // 右底角
+            p4: { left: 38, top: 42 }, // 左高位(牛角)
+            p5: { left: 62, top: 42 }, // 右高位(牛角)
+            ball: { left: 50, top: 78 }
+        }
+    };
+
+    function setTactic(tactic) {
+        currentTactic = tactic;
+        if (currentAnimation) currentAnimation.pause();
+        poly.style.opacity = 0; // 隱藏三角形連線
+        
+        const content = {
+            princeton: {
+                title: "普林斯頓戰術 (Princeton Offense)",
+                text: "1號在弧頂將球傳給側翼3號後，立刻執行反跑空切 (Back-door cut) 直闖籃下。同時，4號為2號設立無球掩護拉開空間。最後由3號精準傳球給籃下的1號完成進攻。"
+            },
+            triangle: {
+                title: "三角戰術 (Triangle Offense)",
+                text: "1號傳球給側翼3號後，順勢跑位至強邊底角，與3號、低位的5號形成進攻強邊的「三角空間」。利用此空間牽制防守，3號隨即將球塞給具備優勢的5號單打。"
+            },
+            horns: {
+                title: "牛角戰術 (Horns Offense)",
+                text: "4號與5號同時上前為弧頂的1號設立高位雙掩護。1號突破後，4號順下 (Roll) 往籃框切入，5號則外拉 (Pop) 至三分線外。1號根據防守者動向，將球傳給順下的4號。"
+            }
+        };
+
+        title.innerText = content[tactic].title;
+        desc.innerText = content[tactic].text;
+        resetBoard();
+    }
+
+    function resetBoard() {
+        if (currentAnimation) currentAnimation.pause();
+        poly.style.opacity = 0;
+        document.getElementById('playBtn').disabled = false;
+        
+        const pos = initPositions[currentTactic];
+        
+        // 瞬間歸位
+        anime.set([players.p1, players.p2, players.p3, players.p4, players.p5], {
+            left: el => pos[el.id].left + '%',
+            top: el => pos[el.id].top + '%'
+        });
+        anime.set(ball, { left: pos.ball.left + '%', top: pos.ball.top + '%' });
+    }
+
+    // 更新 SVG 三角形頂點 (取得元素的實際像素位置)
+    function updateTriangle() {
+        const court = document.getElementById('court-container');
+        const rect = court.getBoundingClientRect();
+        
+        // 取得 p1, p3, p5 轉為相對於 court 的百分比
+        const getPos = (p) => {
+            return `${p.style.left.replace('%','')}%, ${p.style.top.replace('%','')}%`;
+        };
+        
+        poly.setAttribute('points', `${getPos(players.p3)} ${getPos(players.p1)} ${getPos(players.p5)}`);
+    }
+
+    function playAnimation() {
+        resetBoard();
+        document.getElementById('playBtn').disabled = true;
+
+        const tl = anime.timeline({
+            easing: 'easeInOutSine',
+            complete: () => { document.getElementById('playBtn').disabled = false; }
+        });
+
+        if (currentTactic === 'princeton') {
+            tl.add({ targets: ball, left: '80%', top: '45%', duration: 500 }) // 傳球給3
+              .add({ targets: players.p1, top: '10%', duration: 1000 }, '+=200') // 1空切
+              .add({ targets: players.p4, left: '22%', duration: 800 }, '-=800') // 4幫2掩護
+              .add({ targets: players.p2, left: '35%', top: '25%', duration: 800 }, '-=400') // 2上提
+              .add({ targets: ball, left: '50%', top: '15%', duration: 500 }, '-=200'); // 3傳給1
+
+        } else if (currentTactic === 'triangle') {
+            tl.add({ targets: ball, left: '80%', top: '45%', duration: 500 }) // 傳球給3
+              .add({ targets: players.p1, left: '92%', top: '10%', duration: 1200, 
+                     update: updateTriangle // 動畫過程中持續更新座標
+                   }, '+=200') 
+              .add({ targets: poly, opacity: 1, duration: 300 }) // 顯示三角形
+              .add({ targets: ball, left: '70%', top: '20%', duration: 500 }, '+=500'); // 3傳給5
+
+        } else if (currentTactic === 'horns') {
+            tl.add({ targets: [players.p4, players.p5], top: '70%', duration: 800 }) // 雙掩護
+              .add({ targets: players.p1, left: '25%', top: '60%', duration: 800 }, '+=200') // 1突破
+              .add({ targets: ball, left: '25%', top: '65%', duration: 800 }, '-=800') // 球跟著1
+              .add({ targets: players.p4, left: '45%', top: '15%', duration: 1000 }, '+=100') // 4順下
+              .add({ targets: players.p5, left: '75%', top: '75%', duration: 1000 }, '-=1000') // 5外拉
+              .add({ targets: ball, left: '45%', top: '20%', duration: 500 }, '+=200'); // 1傳給4
+        }
+        
+        currentAnimation = tl;
+    }
+
+    // 視窗縮放時重新計算三角形座標
+    window.addEventListener('resize', () => {
+        if (currentTactic === 'triangle' && poly.style.opacity == 1) {
+            updateTriangle();
+        }
+    });
+
+    // 初始化
+    window.onload = resetBoard;
+</script>
+</body>
+</html>
