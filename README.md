@@ -21,3 +21,7 @@ https://236c.github.io/tw/CatSignalWars.html
 互動式進攻戰術解析 (PRO TACTICS BOARD)
 https://236c.github.io/tw/basketball-pro.html
 
+典藏暗棋
+https://236c.github.io/tw/Banqi.html
+
+
