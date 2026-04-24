@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pro Interactive Playbook</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>
         :root {
@@ -21,32 +22,50 @@
             padding-bottom: 40px;
         }
 
-        /* 標題與卡片樣式 */
-        .header-section {
-            padding: 30px 0 20px;
+        /* 置頂導覽列樣式 (整合選單版) */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 10px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eaeaea;
         }
+
         .header-title {
             font-weight: 800;
             letter-spacing: -0.5px;
             color: #2c3e50;
+            font-size: 1.4rem; /* 稍微縮小以配合導覽列 */
+            margin-bottom: 0;
+            line-height: 1.2;
+        }
+        
+        .header-subtitle {
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
         }
 
-        /* 控制面板 */
-        .controls-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            margin-bottom: 24px;
+        /* 下拉選單客製化微調 */
+        .tactic-select {
+            cursor: pointer;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        .tactic-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(43, 88, 118, 0.15);
         }
 
-        /* 籃球場地 (響應式核心) */
+        /* 籃球場地 */
         #court-container {
             position: relative;
             width: 100%;
-            max-width: 700px;
+            max-width: 750px;
             margin: 0 auto;
-            aspect-ratio: 1.2; /* 保持半場比例 */
+            aspect-ratio: 1.2;
             background: var(--court-wood);
             border-radius: 12px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.15), inset 0 0 40px rgba(0,0,0,0.1);
@@ -54,7 +73,6 @@
             border: 4px solid #fff;
         }
 
-        /* 場地標線 */
         .line { position: absolute; box-sizing: border-box; }
         
         .paint {
@@ -95,7 +113,6 @@
             border-top: 4px solid var(--court-line);
         }
 
-        /* 實體：球員與球 (使用百分比定位與視窗單位) */
         .player {
             position: absolute;
             width: clamp(24px, 5vw, 36px);
@@ -124,7 +141,6 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.4);
         }
 
-        /* 三角形連線特效 */
         #triangle-svg {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -136,83 +152,131 @@
             stroke: rgba(255, 215, 0, 0.8);
             stroke-width: 2;
             stroke-dasharray: 5, 5;
-            opacity: 0; /* 預設隱藏 */
+            opacity: 0;
         }
 
-        /* 說明文字區 */
+        /* 說明文字區塊樣式 (右側) */
         .desc-box {
             background: #fff;
-            border-left: 5px solid #2b5876;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-top: 20px;
+            border-left: 6px solid #2b5876;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             font-size: 1.05rem;
-            line-height: 1.6;
+            line-height: 1.7;
         }
         
-        /* 針對手機的按鈕調整 */
-        @media (max-width: 576px) {
-            .btn-group { display: flex; flex-direction: column; width: 100%; }
-            .btn-group .btn { border-radius: 8px !important; margin-bottom: 8px; border: 1px solid #dee2e6; }
-            .action-btns { display: flex; width: 100%; gap: 10px; }
-            .action-btns .btn { flex: 1; }
+        /* 響應式調整 */
+        @media (max-width: 991px) {
+            .desc-box {
+                border-left: none;
+                border-top: 6px solid #2b5876;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            /* 在平板與手機版面，讓元件自動換行並置中 */
+            .top-bar-wrapper { flex-direction: column; gap: 12px; }
+            .tactic-menus { justify-content: center; }
+            .action-btns { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="text-center header-section">
-        <h1 class="header-title">PRO TACTICS BOARD</h1>
-        <p class="text-muted">互動式進攻戰術解析</p>
+<div class="top-bar">
+    <div class="container-fluid px-4">
+        <div class="d-flex top-bar-wrapper justify-content-between align-items-center">
+            
+            <div class="text-center text-xl-start flex-shrink-0 pe-xl-3">
+                <h1 class="header-title">PRO TACTICS BOARD</h1>
+                <small class="text-muted fw-bold header-subtitle">互動式進攻戰術解析</small>
+            </div>
+            
+            <div class="d-flex flex-wrap gap-2 tactic-menus flex-grow-1 justify-content-xl-center">
+                <select class="form-select form-select-sm shadow-sm border-0 bg-light w-auto tactic-select" onchange="changeTacticFromGroup(this)">
+                    <option value="" disabled>🧠 動態與系統</option>
+                    <option value="princeton" selected>普林斯頓戰術</option>
+                    <option value="triangle">三角戰術</option>
+                    <option value="fiveOut">五外動態</option>
+                </select>
+
+                <select class="form-select form-select-sm shadow-sm border-0 bg-light w-auto tactic-select" onchange="changeTacticFromGroup(this)">
+                    <option value="" disabled selected>🛡️ 擋拆與掩護</option>
+                    <option value="pickAndRoll">高位擋拆</option>
+                    <option value="spain">西班牙擋拆</option>
+                    <option value="horns">牛角戰術</option>
+                    <option value="sts">STS掩護</option>
+                </select>
+
+                <select class="form-select form-select-sm shadow-sm border-0 bg-light w-auto tactic-select" onchange="changeTacticFromGroup(this)">
+                    <option value="" disabled selected>🏃‍♂️ 空切與跑位</option>
+                    <option value="flex">擋切戰術</option>
+                    <option value="ucla">UCLA空切</option>
+                    <option value="iverson">艾佛森空切</option>
+                    <option value="zipper">拉鍊戰術</option>
+                </select>
+
+                <select class="form-select form-select-sm shadow-sm border-0 bg-light w-auto tactic-select" onchange="changeTacticFromGroup(this)">
+                    <option value="" disabled selected>🎯 射手專屬</option>
+                    <option value="elevator">電梯門</option>
+                    <option value="hammer">錘子戰術</option>
+                    <option value="floppy">軟腹戰術</option>
+                </select>
+
+                <select class="form-select form-select-sm shadow-sm border-0 bg-light w-auto tactic-select" onchange="changeTacticFromGroup(this)">
+                    <option value="" disabled selected>⚡ 轉換快攻</option>
+                    <option value="pistol">手槍戰術</option>
+                </select>
+            </div>
+
+            <div class="d-flex gap-2 action-btns flex-shrink-0 ps-xl-3">
+                <button id="playBtn" class="btn btn-primary btn-sm shadow-sm px-3 fw-bold" onclick="playAnimation()">
+                    <i class="bi bi-play-fill"></i> 播放動畫
+                </button>
+                <button class="btn btn-light btn-sm border shadow-sm px-3 fw-bold" onclick="resetBoard()">
+                    <i class="bi bi-arrow-counterclockwise"></i> 重置
+                </button>
+            </div>
+
+        </div>
     </div>
+</div>
 
+<div class="container mt-2">
     <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="controls-card d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-                <div class="btn-group" role="group">
-                    <input type="radio" class="btn-check" name="btnradio" id="btnPrinceton" autocomplete="off" checked onchange="setTactic('princeton')">
-                    <label class="btn btn-outline-dark" for="btnPrinceton">普林斯頓 (Princeton)</label>
-
-                    <input type="radio" class="btn-check" name="btnradio" id="btnTriangle" autocomplete="off" onchange="setTactic('triangle')">
-                    <label class="btn btn-outline-dark" for="btnTriangle">三角戰術 (Triangle)</label>
-
-                    <input type="radio" class="btn-check" name="btnradio" id="btnHorns" autocomplete="off" onchange="setTactic('horns')">
-                    <label class="btn btn-outline-dark" for="btnHorns">牛角戰術 (Horns)</label>
-                </div>
+        <div class="col-xl-11 col-lg-12">
+            <div class="row g-4 align-items-stretch mb-4">
                 
-                <div class="action-btns">
-                    <button id="playBtn" class="btn btn-primary shadow-sm" onclick="playAnimation()">
-                        <i class="bi bi-play-fill"></i> 播放動畫
-                    </button>
-                    <button class="btn btn-light border shadow-sm" onclick="resetBoard()">重置</button>
+                <div class="col-lg-7">
+                    <div id="court-container">
+                        <svg id="triangle-svg">
+                            <polygon id="t-poly" class="triangle-polygon" points="0,0 0,0 0,0" />
+                        </svg>
+
+                        <div class="line paint"></div>
+                        <div class="line free-throw-circle"></div>
+                        <div class="line free-throw-circle-inner"></div>
+                        <div class="line three-point-line"></div>
+                        <div class="line backboard"></div>
+                        <div class="line hoop"></div>
+
+                        <div class="player" id="p1">1</div>
+                        <div class="player" id="p2">2</div>
+                        <div class="player" id="p3">3</div>
+                        <div class="player" id="p4">4</div>
+                        <div class="player" id="p5">5</div>
+                        <div class="ball" id="ball"></div>
+                    </div>
                 </div>
-            </div>
 
-            <div id="court-container">
-                <svg id="triangle-svg">
-                    <polygon id="t-poly" class="triangle-polygon" points="0,0 0,0 0,0" />
-                </svg>
+                <div class="col-lg-5 d-flex">
+                    <div class="desc-box flex-fill d-flex flex-column justify-content-start">
+                        <h4 class="text-dark fw-bold mb-3" id="tacticTitle">普林斯頓戰術 (Princeton Offense)</h4>
+                        <p id="tacticDescription" class="text-muted mb-0 fs-6">1號在弧頂將球傳給側翼3號後，立刻執行反跑空切 (Back-door cut) 直闖籃下。同時，4號為2號設立無球掩護拉開空間。最後由3號精準傳球給籃下的1號完成進攻。</p>
+                    </div>
+                </div>
 
-                <div class="line paint"></div>
-                <div class="line free-throw-circle"></div>
-                <div class="line free-throw-circle-inner"></div>
-                <div class="line three-point-line"></div>
-                <div class="line backboard"></div>
-                <div class="line hoop"></div>
-
-                <div class="player" id="p1">1</div>
-                <div class="player" id="p2">2</div>
-                <div class="player" id="p3">3</div>
-                <div class="player" id="p4">4</div>
-                <div class="player" id="p5">5</div>
-                <div class="ball" id="ball"></div>
-            </div>
-
-            <div class="desc-box">
-                <strong class="text-dark d-block mb-1" id="tacticTitle">普林斯頓戰術 (Princeton Offense)</strong>
-                <span id="tacticDescription" class="text-muted">1號在弧頂將球傳給側翼3號後，立刻執行反跑空切 (Back-door cut) 直闖籃下。同時，4號為2號設立無球掩護拉開空間。最後由3號精準傳球給籃下的1號完成進攻。</span>
             </div>
         </div>
     </div>
@@ -222,7 +286,6 @@
     let currentTactic = 'princeton';
     let currentAnimation = null;
 
-    // DOM 元素
     const players = {
         p1: document.getElementById('p1'),
         p2: document.getElementById('p2'),
@@ -235,38 +298,84 @@
     const title = document.getElementById('tacticTitle');
     const desc = document.getElementById('tacticDescription');
 
-    // 戰術初始位置 (百分比佈局，完美適應 RWD)
     const initPositions = {
         princeton: {
-            p1: { left: 50, top: 85 }, // 弧頂
-            p2: { left: 15, top: 40 }, // 左翼
-            p3: { left: 85, top: 40 }, // 右翼
-            p4: { left: 35, top: 45 }, // 左高位
-            p5: { left: 65, top: 45 }, // 右高位
-            ball: { left: 50, top: 78 }
+            p1: { left: 50, top: 85 }, p2: { left: 15, top: 40 }, p3: { left: 85, top: 40 },
+            p4: { left: 35, top: 45 }, p5: { left: 65, top: 45 }, ball: { left: 50, top: 78 }
         },
         triangle: {
-            p1: { left: 50, top: 85 }, // 弧頂
-            p2: { left: 15, top: 45 }, // 弱邊翼
-            p3: { left: 85, top: 45 }, // 強邊翼
-            p4: { left: 30, top: 15 }, // 弱邊低位
-            p5: { left: 70, top: 15 }, // 強邊低位
-            ball: { left: 50, top: 78 }
+            p1: { left: 50, top: 85 }, p2: { left: 15, top: 45 }, p3: { left: 85, top: 45 },
+            p4: { left: 30, top: 15 }, p5: { left: 70, top: 15 }, ball: { left: 50, top: 78 }
         },
         horns: {
-            p1: { left: 50, top: 85 }, // 弧頂
-            p2: { left: 8, top: 10 },  // 左底角
-            p3: { left: 92, top: 10 }, // 右底角
-            p4: { left: 38, top: 42 }, // 左高位(牛角)
-            p5: { left: 62, top: 42 }, // 右高位(牛角)
-            ball: { left: 50, top: 78 }
+            p1: { left: 50, top: 85 }, p2: { left: 8, top: 10 },  p3: { left: 92, top: 10 },
+            p4: { left: 38, top: 42 }, p5: { left: 62, top: 42 }, ball: { left: 50, top: 78 }
+        },
+        pickAndRoll: {
+            p1: { left: 50, top: 85 }, p2: { left: 10, top: 20 }, p3: { left: 90, top: 20 },
+            p4: { left: 20, top: 45 }, p5: { left: 50, top: 55 }, ball: { left: 50, top: 78 }
+        },
+        flex: {
+            p1: { left: 70, top: 80 }, p2: { left: 30, top: 80 }, p3: { left: 90, top: 15 },
+            p4: { left: 35, top: 45 }, p5: { left: 60, top: 20 }, ball: { left: 70, top: 73 }
+        },
+        ucla: {
+            p1: { left: 50, top: 85 }, p2: { left: 15, top: 40 }, p3: { left: 85, top: 40 },
+            p4: { left: 75, top: 15 }, p5: { left: 40, top: 55 }, ball: { left: 50, top: 78 }
+        },
+        fiveOut: {
+            p1: { left: 50, top: 85 }, p2: { left: 20, top: 60 }, p3: { left: 80, top: 60 },
+            p4: { left: 8, top: 15 },  p5: { left: 92, top: 15 }, ball: { left: 50, top: 78 }
+        },
+        spain: {
+            p1: { left: 50, top: 85 }, p2: { left: 10, top: 20 }, p3: { left: 90, top: 20 },
+            p4: { left: 50, top: 25 }, p5: { left: 50, top: 55 }, ball: { left: 50, top: 78 }
+        },
+        elevator: {
+            p1: { left: 50, top: 85 }, p2: { left: 50, top: 15 }, p3: { left: 15, top: 40 },
+            p4: { left: 40, top: 50 }, p5: { left: 60, top: 50 }, ball: { left: 50, top: 78 }
+        },
+        pistol: {
+            p1: { left: 70, top: 75 }, p2: { left: 85, top: 40 }, p3: { left: 15, top: 40 },
+            p4: { left: 35, top: 20 }, p5: { left: 75, top: 25 }, ball: { left: 70, top: 68 }
+        },
+        hammer: {
+            p1: { left: 20, top: 60 }, p2: { left: 92, top: 40 }, p3: { left: 10, top: 15 },
+            p4: { left: 80, top: 60 }, p5: { left: 40, top: 20 }, ball: { left: 20, top: 55 }
+        },
+        iverson: {
+            p1: { left: 50, top: 85 }, p2: { left: 85, top: 30 }, p3: { left: 15, top: 15 },
+            p4: { left: 65, top: 45 }, p5: { left: 35, top: 45 }, ball: { left: 50, top: 78 }
+        },
+        floppy: {
+            p1: { left: 50, top: 85 }, p2: { left: 50, top: 10 }, p3: { left: 65, top: 25 },
+            p4: { left: 30, top: 25 }, p5: { left: 30, top: 15 }, ball: { left: 50, top: 78 }
+        },
+        zipper: {
+            p1: { left: 50, top: 85 }, p2: { left: 65, top: 15 }, p3: { left: 15, top: 40 },
+            p4: { left: 35, top: 45 }, p5: { left: 65, top: 45 }, ball: { left: 50, top: 78 }
+        },
+        sts: {
+            p1: { left: 50, top: 85 }, p2: { left: 15, top: 40 }, p3: { left: 85, top: 40 },
+            p4: { left: 35, top: 15 }, p5: { left: 65, top: 15 }, ball: { left: 50, top: 78 }
         }
     };
+
+    function changeTacticFromGroup(selectedElement) {
+        setTactic(selectedElement.value);
+        
+        const allSelects = document.querySelectorAll('.tactic-select');
+        allSelects.forEach(select => {
+            if (select !== selectedElement) {
+                select.selectedIndex = 0; 
+            }
+        });
+    }
 
     function setTactic(tactic) {
         currentTactic = tactic;
         if (currentAnimation) currentAnimation.pause();
-        poly.style.opacity = 0; // 隱藏三角形連線
+        poly.style.opacity = 0; 
         
         const content = {
             princeton: {
@@ -280,6 +389,54 @@
             horns: {
                 title: "牛角戰術 (Horns Offense)",
                 text: "4號與5號同時上前為弧頂的1號設立高位雙掩護。1號突破後，4號順下 (Roll) 往籃框切入，5號則外拉 (Pop) 至三分線外。1號根據防守者動向，將球傳給順下的4號。"
+            },
+            pickAndRoll: {
+                title: "高位擋拆 (High Pick & Roll)",
+                text: "現代籃球最核心的戰術！5號上前為弧頂的1號設立掩護 (Screen)。1號藉由掩護迅速突破防守，同時5號順下 (Roll) 往籃框切入。1號吸引協防後，將球傳給順下得分機會極佳的5號。"
+            },
+            flex: {
+                title: "擋切戰術 (Flex Offense)",
+                text: "強調連續跑位的團隊戰術，非常考驗默契。5號在底線為3號設立無球掩護 (Flex Screen)，3號藉此空切至籃下。此時1號將球轉移給2號，2號再精準傳給空切到籃底的3號完成上籃。"
+            },
+            ucla: {
+                title: "UCLA 空切 (UCLA Cut)",
+                text: "傳奇教練 John Wooden 的招牌！1號將球傳給側翼的2號後，利用5號在高位設立的背掩護 (Back Screen)，迅速空切至籃下。這招能瞬間撕裂防線，製造輕鬆上籃的機會。"
+            },
+            fiveOut: {
+                title: "五外動態進攻 (5-Out Motion)",
+                text: "全體退至三分線外拉開極致空間！1號傳球給2號後立刻往籃下空切，若無機會則繞出到底角，其餘球員順勢輪轉補位 (Fill and Replace)，持續尋找突破或外線開火的空檔。"
+            },
+            spain: {
+                title: "西班牙擋拆 (Spain Pick & Roll)",
+                text: "現代籃球極具殺傷力的戰術！5號上前為1號擋拆，同時原本在底線的4號上提，為順下的5號設立「背掩護 (Back Screen)」。這會讓防守方瞬間大亂，1號可選擇傳給順下的5號，或外拉到三分線的4號。"
+            },
+            elevator: {
+                title: "電梯門戰術 (Elevator Doors)",
+                text: "金州勇士隊的經典絕技！射手2號從底線往弧頂快速跑動，穿過4號與5號之間的空隙。當2號一通過，4號與5號立刻像「電梯門」一樣關上，擋住追擊的防守者，讓2號獲得完全大空檔的三分出手機會。"
+            },
+            pistol: {
+                title: "手槍戰術 (Pistol Action / 21)",
+                text: "轉換快攻時的超強武器！1號推進到側翼傳給2號後，立刻上前與2號做手遞手傳球 (DHO) 並掩護。同時5號拖車跟進，設立第二層擋拆。節奏極快，防守者一閃神就會被過掉！"
+            },
+            hammer: {
+                title: "錘子戰術 (Hammer Action)",
+                text: "馬刺隊的傳奇戰術！主打聲東擊西，1號從強邊突破切入底線吸引協防。這時弱邊的4號像「錘子」一樣，為2號設立無球掩護。2號跑到弱邊底角，接獲1號跨越半場的長傳，輕鬆投進大空檔三分球！"
+            },
+            iverson: {
+                title: "艾佛森空切 (Iverson Cut)",
+                text: "戰神 AI 的招牌戰術！4號與5號在罰球線兩側設立雙掩護。2號從側翼啟動，一口氣橫跨球場，穿過這兩道掩護來到另一側接球，這能讓攻擊箭頭以極快的速度接球發動進攻。"
+            },
+            floppy: {
+                title: "軟腹戰術 (Floppy Action)",
+                text: "頂級射手最愛的跑位！2號位埋伏在籃下，此時左邊有4號、5號的「雙掩護」，右邊有3號的「單掩護」。2號可隨機應變，自行決定跑向左翼或右翼接球投籃，讓防守者完全猜不透！"
+            },
+            zipper: {
+                title: "拉鍊戰術 (Zipper Action)",
+                text: "就像拉開拉鍊一樣！5號在高位為底線的2號設立下掩護 (Down Screen)。2號直線向上空切到三分線接獲1號傳球。這個跑位能瞬間清開空間，常常緊接著啟動高位擋拆！"
+            },
+            sts: {
+                title: "掩護掩護者 (Screen the Screener - STS)",
+                text: "讓防守完全崩潰的高階觀念！4號先在籃下幫5號單擋，當防守者的注意力都被5號吸引時，3號立刻下沉幫剛剛做掩護的4號擋人。4號藉機跑出大空檔接獲1號的傳球投籃。"
             }
         };
 
@@ -295,7 +452,6 @@
         
         const pos = initPositions[currentTactic];
         
-        // 瞬間歸位
         anime.set([players.p1, players.p2, players.p3, players.p4, players.p5], {
             left: el => pos[el.id].left + '%',
             top: el => pos[el.id].top + '%'
@@ -303,16 +459,9 @@
         anime.set(ball, { left: pos.ball.left + '%', top: pos.ball.top + '%' });
     }
 
-    // 更新 SVG 三角形頂點 (取得元素的實際像素位置)
     function updateTriangle() {
         const court = document.getElementById('court-container');
-        const rect = court.getBoundingClientRect();
-        
-        // 取得 p1, p3, p5 轉為相對於 court 的百分比
-        const getPos = (p) => {
-            return `${p.style.left.replace('%','')}%, ${p.style.top.replace('%','')}%`;
-        };
-        
+        const getPos = (p) => { return `${p.style.left.replace('%','')}%, ${p.style.top.replace('%','')}%`; };
         poly.setAttribute('points', `${getPos(players.p3)} ${getPos(players.p1)} ${getPos(players.p5)}`);
     }
 
@@ -326,40 +475,112 @@
         });
 
         if (currentTactic === 'princeton') {
-            tl.add({ targets: ball, left: '80%', top: '45%', duration: 500 }) // 傳球給3
-              .add({ targets: players.p1, top: '10%', duration: 1000 }, '+=200') // 1空切
-              .add({ targets: players.p4, left: '22%', duration: 800 }, '-=800') // 4幫2掩護
-              .add({ targets: players.p2, left: '35%', top: '25%', duration: 800 }, '-=400') // 2上提
-              .add({ targets: ball, left: '50%', top: '15%', duration: 500 }, '-=200'); // 3傳給1
+            tl.add({ targets: ball, left: '80%', top: '45%', duration: 500 }) 
+              .add({ targets: players.p1, top: '10%', duration: 1000 }, '+=200') 
+              .add({ targets: players.p4, left: '22%', duration: 800 }, '-=800') 
+              .add({ targets: players.p2, left: '35%', top: '25%', duration: 800 }, '-=400') 
+              .add({ targets: ball, left: '50%', top: '15%', duration: 500 }, '-=200'); 
 
         } else if (currentTactic === 'triangle') {
-            tl.add({ targets: ball, left: '80%', top: '45%', duration: 500 }) // 傳球給3
-              .add({ targets: players.p1, left: '92%', top: '10%', duration: 1200, 
-                     update: updateTriangle // 動畫過程中持續更新座標
-                   }, '+=200') 
-              .add({ targets: poly, opacity: 1, duration: 300 }) // 顯示三角形
-              .add({ targets: ball, left: '70%', top: '20%', duration: 500 }, '+=500'); // 3傳給5
+            tl.add({ targets: ball, left: '80%', top: '45%', duration: 500 }) 
+              .add({ targets: players.p1, left: '92%', top: '10%', duration: 1200, update: updateTriangle }, '+=200') 
+              .add({ targets: poly, opacity: 1, duration: 300 }) 
+              .add({ targets: ball, left: '70%', top: '20%', duration: 500 }, '+=500'); 
 
         } else if (currentTactic === 'horns') {
-            tl.add({ targets: [players.p4, players.p5], top: '70%', duration: 800 }) // 雙掩護
-              .add({ targets: players.p1, left: '25%', top: '60%', duration: 800 }, '+=200') // 1突破
-              .add({ targets: ball, left: '25%', top: '65%', duration: 800 }, '-=800') // 球跟著1
-              .add({ targets: players.p4, left: '45%', top: '15%', duration: 1000 }, '+=100') // 4順下
-              .add({ targets: players.p5, left: '75%', top: '75%', duration: 1000 }, '-=1000') // 5外拉
-              .add({ targets: ball, left: '45%', top: '20%', duration: 500 }, '+=200'); // 1傳給4
+            tl.add({ targets: [players.p4, players.p5], top: '70%', duration: 800 }) 
+              .add({ targets: players.p1, left: '25%', top: '60%', duration: 800 }, '+=200') 
+              .add({ targets: ball, left: '25%', top: '65%', duration: 800 }, '-=800') 
+              .add({ targets: players.p4, left: '45%', top: '15%', duration: 1000 }, '+=100') 
+              .add({ targets: players.p5, left: '75%', top: '75%', duration: 1000 }, '-=1000') 
+              .add({ targets: ball, left: '45%', top: '20%', duration: 500 }, '+=200'); 
+              
+        } else if (currentTactic === 'pickAndRoll') {
+            tl.add({ targets: players.p5, top: '70%', duration: 800 }) 
+              .add({ targets: players.p1, left: '30%', top: '65%', duration: 800 }, '+=200') 
+              .add({ targets: ball, left: '30%', top: '70%', duration: 800 }, '-=800') 
+              .add({ targets: players.p5, left: '50%', top: '20%', duration: 1000 }, '+=100') 
+              .add({ targets: ball, left: '50%', top: '25%', duration: 500 }, '+=200'); 
+              
+        } else if (currentTactic === 'flex') {
+            tl.add({ targets: players.p5, left: '75%', top: '15%', duration: 800 }) 
+              .add({ targets: ball, left: '30%', top: '73%', duration: 500 }, '-=400') 
+              .add({ targets: players.p3, left: '45%', top: '15%', duration: 1200 }, '+=100') 
+              .add({ targets: ball, left: '45%', top: '20%', duration: 500 }, '+=200'); 
+              
+        } else if (currentTactic === 'ucla') {
+            tl.add({ targets: ball, left: '25%', top: '45%', duration: 500 }) 
+              .add({ targets: players.p5, left: '45%', top: '65%', duration: 600 }, '+=100') 
+              .add({ targets: players.p1, left: '45%', top: '15%', duration: 1000 }, '+=100') 
+              .add({ targets: ball, left: '45%', top: '20%', duration: 500 }, '+=200'); 
+              
+        } else if (currentTactic === 'fiveOut') {
+            tl.add({ targets: ball, left: '30%', top: '65%', duration: 500 }) 
+              .add({ targets: players.p1, left: '50%', top: '15%', duration: 1000 }, '+=200') 
+              .add({ targets: players.p3, left: '50%', top: '85%', duration: 800 }, '+=200') 
+              .add({ targets: players.p5, left: '80%', top: '60%', duration: 800 }, '-=800') 
+              .add({ targets: players.p1, left: '92%', top: '15%', duration: 800 }, '-=800') 
+              .add({ targets: ball, left: '50%', top: '75%', duration: 500 }, '+=200'); 
+              
+        } else if (currentTactic === 'spain') {
+            tl.add({ targets: players.p5, top: '70%', duration: 800 }) 
+              .add({ targets: players.p1, left: '30%', top: '65%', duration: 800 }, '+=200') 
+              .add({ targets: ball, left: '30%', top: '70%', duration: 800 }, '-=800')
+              .add({ targets: players.p5, top: '35%', duration: 1000 }, '+=100') 
+              .add({ targets: players.p4, top: '45%', duration: 800 }, '-=1000') 
+              .add({ targets: players.p4, left: '70%', top: '65%', duration: 800 }, '+=200') 
+              .add({ targets: ball, left: '70%', top: '60%', duration: 500 }, '+=100'); 
+              
+        } else if (currentTactic === 'elevator') {
+            tl.add({ targets: players.p2, top: '65%', duration: 1200 }) 
+              .add({ targets: [players.p4, players.p5], left: '50%', duration: 300 }, '-=400') 
+              .add({ targets: ball, left: '50%', top: '60%', duration: 400 }, '+=200'); 
+
+        } else if (currentTactic === 'pistol') {
+            tl.add({ targets: ball, left: '85%', top: '45%', duration: 400 }) 
+              .add({ targets: players.p1, left: '85%', top: '30%', duration: 600 }, '+=100') 
+              .add({ targets: ball, left: '85%', top: '35%', duration: 200 }, '-=200') 
+              .add({ targets: players.p5, left: '70%', top: '30%', duration: 600 }, '-=600') 
+              .add({ targets: players.p1, left: '50%', top: '20%', duration: 800 }, '+=100') 
+              .add({ targets: ball, left: '50%', top: '25%', duration: 800 }, '-=800') 
+              .add({ targets: players.p5, left: '70%', top: '15%', duration: 800 }, '-=800'); 
+
+        } else if (currentTactic === 'hammer') {
+            tl.add({ targets: players.p1, left: '15%', top: '15%', duration: 1000 }) 
+              .add({ targets: ball, left: '20%', top: '15%', duration: 1000 }, '-=1000') 
+              .add({ targets: players.p4, left: '85%', top: '35%', duration: 800 }, '-=800') 
+              .add({ targets: players.p2, left: '92%', top: '10%', duration: 800 }, '-=600') 
+              .add({ targets: ball, left: '90%', top: '15%', duration: 600 }, '+=200'); 
+
+        } else if (currentTactic === 'iverson') {
+            tl.add({ targets: players.p2, left: '15%', top: '40%', duration: 1500 }) 
+              .add({ targets: ball, left: '20%', top: '45%', duration: 500 }, '-=300'); 
+              
+        } else if (currentTactic === 'floppy') {
+            tl.add({ targets: players.p2, left: '15%', top: '45%', duration: 1200 }) 
+              .add({ targets: ball, left: '20%', top: '50%', duration: 500 }, '-=200'); 
+
+        } else if (currentTactic === 'zipper') {
+            tl.add({ targets: players.p5, top: '25%', duration: 600 }) 
+              .add({ targets: players.p2, top: '60%', duration: 1000 }, '+=100') 
+              .add({ targets: ball, left: '65%', top: '55%', duration: 500 }, '+=200') 
+              .add({ targets: players.p5, left: '55%', top: '55%', duration: 800 }, '+=200'); 
+
+        } else if (currentTactic === 'sts') {
+            tl.add({ targets: players.p4, left: '55%', duration: 600 }) 
+              .add({ targets: players.p5, left: '25%', top: '25%', duration: 1000 }, '+=100') 
+              .add({ targets: players.p3, left: '65%', top: '25%', duration: 600 }, '-=800') 
+              .add({ targets: players.p4, left: '80%', top: '60%', duration: 1000 }, '+=100') 
+              .add({ targets: ball, left: '80%', top: '55%', duration: 500 }, '+=200'); 
         }
         
         currentAnimation = tl;
     }
 
-    // 視窗縮放時重新計算三角形座標
     window.addEventListener('resize', () => {
-        if (currentTactic === 'triangle' && poly.style.opacity == 1) {
-            updateTriangle();
-        }
+        if (currentTactic === 'triangle' && poly.style.opacity == 1) updateTriangle();
     });
 
-    // 初始化
     window.onload = resetBoard;
 </script>
 </body>
