@@ -362,6 +362,82 @@
         .vs-tag {
             font-size: 1.2rem; font-weight: 900; color: #455a64; width: 10%; text-align: center; letter-spacing: 2px;
         }
+
+        /* =========================================
+           手機版優化與效能修正區 (Mobile & Performance Fixes)
+           ========================================= */
+        
+        /* 1. 開啟 GPU 硬體加速，解決攻擊條卡頓 */
+        #scanner {
+            will-change: left;
+            transform: translateZ(0) translateX(-50%); /* 強制啟用硬體加速 */
+        }
+        body::before, .rage-max-anim, .cat-entity {
+            will-change: transform;
+        }
+
+        /* 2. 手機螢幕 (寬度小於 600px) 的專屬排版 */
+        @media (max-width: 600px) {
+            /* 縮小遊戲主容器的內距，爭取更多橫向空間 */
+            #game-container {
+                padding: 20px 15px; 
+                width: 95%;
+            }
+            
+            /* 將名稱與勝利點數改為垂直排列，避免字串過長重疊 */
+            .name-tag {
+                font-size: 0.75rem;
+                flex-direction: column; 
+                align-items: flex-start;
+            }
+            #enemy-name {
+                flex-direction: column;
+                align-items: flex-end;
+            }
+            .win-dots-container {
+                margin-top: 5px;
+            }
+            
+            /* 縮小 VS 標籤 */
+            .vs-tag {
+                font-size: 0.9rem;
+                width: auto;
+                margin: 0 5px;
+            }
+            
+            /* 縮小怒氣條寬度 */
+            .rage-container {
+                width: 90px;
+            }
+            .rage-label {
+                font-size: 0.55rem;
+                width: 25px;
+            }
+
+            /* 大幅縮小顏文字，避免超出螢幕或互相打架 */
+            .cat-entity {
+                font-size: 2rem; 
+            }
+            .battle-arena {
+                height: 100px;
+                margin-bottom: 30px;
+                padding: 0;
+            }
+
+            /* 縮小戰鬥浮動文字 */
+            .float-text { font-size: 1.5rem !important; }
+            .super-ult-text { font-size: 2rem !important; }
+            .ult-text { font-size: 1.8rem !important; }
+            #qte-instruction { font-size: 0.9rem; margin-bottom: 15px; }
+
+            /* 3. 關閉手機上極度消耗效能的裝飾性特效，確保攻擊條順暢 */
+            body::before {
+                display: none; /* 關閉 3D 透視網格動畫 */
+            }
+            .rage-max-anim::after {
+                display: none; /* 關閉 MAX 怒氣的火焰殘影動畫 */
+            }
+        }
     </style>
 </head>
 <body>
