@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra Premium Banqi | 典藏暗棋</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #dfb15b;
+            --dark-gold: #9e7a33;
+            --bg-pattern: #1a1a1a;
+            --board-outer: #2d1b11;
+            --board-inner: #cfa878;
+            --red-piece: #9b111e; /* 寶石紅 */
+            --black-piece: #0a0a0a; /* 墨黑 */
+        }
+
+        /* 完美垂直與水平置中 */
+        body {
+            background: radial-gradient(circle at center, #2c2c2c 0%, #111 100%);
+            color: #f1f1f1;
+            font-family: 'Noto Serif TC', serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+
+        /* 確保全螢幕狀態下的背景也是一致的 */
+        ::backdrop {
+            background: radial-gradient(circle at center, #2c2c2c 0%, #111 100%);
+        }
+
+        .container {
+            width: 96%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        /* 狀態控制面板 */
+        .status-panel {
+            width: 100%;
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            margin-bottom: 1.5rem;
+        }
+
+        /* 按鈕區塊排版 */
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .game-header {
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        .game-header h1 {
+            font-family: 'Ma Shan Zheng', cursive;
+            letter-spacing: 6px;
+            color: var(--gold);
+            text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+        }
+
+        .turn-indicator {
+            font-family: 'Ma Shan Zheng', cursive;
+            padding: 0.5rem 2rem;
+            border-radius: 6px;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            transition: all 0.4s ease;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .turn-red { background: linear-gradient(135deg, #b71c1c, #7f0000); color: #ffd54f; }
+        .turn-black { background: linear-gradient(135deg, #424242, #111); color: #fff; }
+        .turn-wait { background: #333; color: #888; }
+
+        .btn-custom {
+            background: transparent;
+            border: 1px solid var(--dark-gold);
+            color: var(--gold);
+            padding: 0.5rem 1.2rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-custom:hover {
+            background: var(--dark-gold);
+            color: #111;
+            box-shadow: 0 0 15px var(--dark-gold);
+        }
+
+        /* 棋盤：老紅木外框 + 麂皮內墊感 */
+        .board-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: calc((100vh - 250px) * 2); 
+            padding: 1.5%; 
+            background: linear-gradient(135deg, #4e2f1d, #27140a); 
+            border: 2px solid #1a0d06;
+            border-radius: 16px;
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.8),
+                inset 0 0 10px rgba(255, 255, 255, 0.1),
+                inset 0 0 40px rgba(0,0,0,0.8);
+            margin: 0 auto;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 4px;
+            background: #d4b581; 
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(105, 66, 26, 0.8);
+            border: 1px solid #8e683c;
+        }
+
+        .cell {
+            aspect-ratio: 1 / 1;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+            border: 1px solid rgba(139, 90, 43, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .cell.selected {
+            background: rgba(223, 177, 91, 0.15);
+            border-radius: 8px;
+        }
+
+        /* 棋子專屬呼吸燈與懸浮動畫 */
+        @keyframes piece-select-pulse {
+            0% {
+                transform: scale(1.05) translateY(-2px);
+                box-shadow: 
+                    0 10px 15px rgba(0,0,0,0.6), 
+                    0 0 15px rgba(223, 177, 91, 0.6);
+                border-color: var(--gold);
+            }
+            100% {
+                transform: scale(1.15) translateY(-6px);
+                box-shadow: 
+                    0 15px 25px rgba(0,0,0,0.8), 
+                    0 0 25px rgba(223, 177, 91, 1), 
+                    inset 0 0 10px rgba(255, 255, 255, 0.5);
+                border-color: #ffe099;
+            }
+        }
+
+        .cell.selected .piece {
+            animation: piece-select-pulse 0.8s infinite alternate ease-in-out;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .cell:active .piece {
+            transform: scale(0.95) translateY(0) !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.8) !important;
+            transition: all 0.1s;
+        }
+
+        /* 棋子基礎設定 */
+        .piece {
+            width: 86%;
+            height: 86%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.4rem, 3.5vw, 3.5rem); 
+            font-weight: 900;
+            font-family: 'Noto Serif TC', serif;
+            transition: transform 0.1s;
+            user-select: none;
+            position: relative;
+        }
+
+        .piece.covered {
+            background: radial-gradient(circle at 30% 30%, #573924, #2a180e);
+            border: 1px solid #140b06;
+            box-shadow:
+                inset 2px 2px 4px rgba(255,255,255,0.15), 
+                inset -4px -4px 8px rgba(0,0,0,0.6),      
+                0 8px 12px rgba(0,0,0,0.6);               
+        }
+        
+        .piece.covered::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 1px solid rgba(223, 177, 91, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .piece.covered::after {
+            content: "㊞"; 
+            color: rgba(223, 177, 91, 0.6);
+            font-size: clamp(1.2rem, 3vw, 3rem);
+            font-family: 'Ma Shan Zheng';
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+        }
+
+        .piece.revealed {
+            background: radial-gradient(circle at 35% 25%, #fffff8 0%, #e8dec7 60%, #c4af92 100%);
+            border: 1px solid #a8947a;
+            box-shadow:
+                inset 3px 3px 6px rgba(255,255,255,0.9),  
+                inset -5px -5px 10px rgba(100,80,60,0.3), 
+                0 6px 10px rgba(0,0,0,0.5);               
+        }
+
+        .piece.red { 
+            color: var(--red-piece); 
+            text-shadow: 
+                -1px -1px 1px rgba(255,255,255,0.7), 
+                1px 1px 2px rgba(0,0,0,0.5);         
+        }
+        .piece.black { 
+            color: var(--black-piece); 
+            text-shadow: 
+                -1px -1px 1px rgba(255,255,255,0.7), 
+                1px 1px 2px rgba(0,0,0,0.5); 
+        }
+
+        /* 針對手機版的小微調 */
+        @media (max-width: 576px) {
+            .game-header h1 { font-size: 1.8rem; }
+            .turn-indicator { font-size: 1.1rem; padding: 0.5rem 1rem; width: 100%; text-align: center; }
+            .status-panel { padding: 1rem; flex-direction: column; gap: 12px; }
+            .controls { width: 100%; justify-content: center; }
+            #board { gap: 2px; padding: 2px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container pb-5">
+    <div class="game-header">
+        <h1>典藏 ‧ 經典暗棋</h1>
+    </div>
+
+    <div class="status-panel">
+        <div id="player-status" class="turn-indicator turn-wait">等待首翻</div>
+        <div class="controls">
+            <button id="fullscreen-btn" onclick="toggleFullScreen()" class="btn-custom">全螢幕</button>
+            <button onclick="initGame()" class="btn-custom">重新洗牌</button>
+        </div>
+    </div>
+
+    <div class="board-wrapper">
+        <div id="board"></div>
+    </div>
+</div>
+
+<script>
+    const config = [
+        { name: '帥', color: 'red', rank: 7 }, { name: '將', color: 'black', rank: 7 },
+        { name: '仕', color: 'red', rank: 6 }, { name: '仕', color: 'red', rank: 6 },
+        { name: '士', color: 'black', rank: 6 }, { name: '士', color: 'black', rank: 6 },
+        { name: '相', color: 'red', rank: 5 }, { name: '相', color: 'red', rank: 5 },
+        { name: '象', color: 'black', rank: 5 }, { name: '象', color: 'black', rank: 5 },
+        { name: '俥', color: 'red', rank: 4 }, { name: '俥', color: 'red', rank: 4 },
+        { name: '車', color: 'black', rank: 4 }, { name: '車', color: 'black', rank: 4 },
+        { name: '傌', color: 'red', rank: 3 }, { name: '傌', color: 'red', rank: 3 },
+        { name: '馬', color: 'black', rank: 3 }, { name: '馬', color: 'black', rank: 3 },
+        { name: '炮', color: 'red', rank: 2, isCannon: true }, { name: '炮', color: 'red', rank: 2, isCannon: true },
+        { name: '包', color: 'black', rank: 2, isCannon: true }, { name: '包', color: 'black', rank: 2, isCannon: true },
+        { name: '兵', color: 'red', rank: 1 }, { name: '兵', color: 'red', rank: 1 }, { name: '兵', color: 'red', rank: 1 }, { name: '兵', color: 'red', rank: 1 }, { name: '兵', color: 'red', rank: 1 },
+        { name: '卒', color: 'black', rank: 1 }, { name: '卒', color: 'black', rank: 1 }, { name: '卒', color: 'black', rank: 1 }, { name: '卒', color: 'black', rank: 1 }, { name: '卒', color: 'black', rank: 1 }
+    ];
+
+    let board = [];
+    let currentPlayer = null;
+    let selectedIdx = null;
+    let gameActive = true;
+
+    function initGame() {
+        let shuffled = [...config].sort(() => Math.random() - 0.5);
+        board = shuffled.map(p => ({ ...p, isCovered: true, isEmpty: false }));
+        currentPlayer = null;
+        selectedIdx = null;
+        gameActive = true;
+        render();
+        updateStatus();
+    }
+
+    function render() {
+        const boardEl = document.getElementById('board');
+        boardEl.innerHTML = '';
+        board.forEach((cell, i) => {
+            const div = document.createElement('div');
+            div.className = `cell ${selectedIdx === i ? 'selected' : ''}`;
+            if (!cell.isEmpty) {
+                const p = document.createElement('div');
+                p.className = `piece ${cell.isCovered ? 'covered' : 'revealed ' + cell.color}`;
+                p.textContent = cell.isCovered ? '' : cell.name;
+                div.appendChild(p);
+            }
+            div.onclick = () => handleMove(i);
+            boardEl.appendChild(div);
+        });
+    }
+
+    function handleMove(i) {
+        if (!gameActive) return;
+        const cell = board[i];
+
+        if (navigator.vibrate) navigator.vibrate(10);
+
+        if (!cell.isEmpty && cell.isCovered) {
+            if (selectedIdx !== null) { selectedIdx = null; render(); return; }
+            cell.isCovered = false;
+            if (currentPlayer === null) currentPlayer = cell.color;
+            else currentPlayer = (currentPlayer === 'red' ? 'black' : 'red');
+            render();
+            updateStatus();
+            checkWin();
+            return;
+        }
+
+        if (selectedIdx === null) {
+            if (!cell.isEmpty && !cell.isCovered && cell.color === currentPlayer) {
+                selectedIdx = i;
+                render();
+            }
+        } else {
+            if (i === selectedIdx) { selectedIdx = null; render(); return; }
+            
+            const fromIdx = selectedIdx;
+            const fromPiece = board[fromIdx];
+
+            if (canMove(fromIdx, i)) {
+                board[i] = { ...fromPiece };
+                board[fromIdx] = { isEmpty: true };
+                selectedIdx = null;
+                currentPlayer = (currentPlayer === 'red' ? 'black' : 'red');
+                render();
+                updateStatus();
+                checkWin();
+            } else {
+                if (!cell.isEmpty && cell.color === currentPlayer && !cell.isCovered) {
+                    selectedIdx = i;
+                    render();
+                }
+            }
+        }
+    }
+
+    function canMove(from, to) {
+        const fR = Math.floor(from / 8), fC = from % 8;
+        const tR = Math.floor(to / 8), tC = to % 8;
+        const dist = Math.abs(fR - tR) + Math.abs(fC - tC);
+        const attacker = board[from];
+        const target = board[to];
+
+        if (attacker.isCannon && !target.isEmpty && !target.isCovered) {
+            if (fR !== tR && fC !== tC) return false;
+            let count = 0;
+            if (fR === tR) {
+                for (let c = Math.min(fC, tC) + 1; c < Math.max(fC, tC); c++) {
+                    if (!board[fR * 8 + c].isEmpty) count++;
+                }
+            } else {
+                for (let r = Math.min(fR, tR) + 1; r < Math.max(fR, tR); r++) {
+                    if (!board[r * 8 + fC].isEmpty) count++;
+                }
+            }
+            return count === 1 && attacker.color !== target.color;
+        }
+
+        if (dist !== 1) return false;
+        if (target.isEmpty) return true;
+        if (target.isCovered || target.color === attacker.color) return false;
+
+        if (attacker.rank === 1 && target.rank === 7) return true;
+        if (attacker.rank === 7 && target.rank === 1) return false;
+        return attacker.rank >= target.rank;
+    }
+
+    function updateStatus() {
+        const el = document.getElementById('player-status');
+        if (!currentPlayer) {
+            el.textContent = "等待首翻";
+            el.className = "turn-indicator turn-wait";
+        } else {
+            el.textContent = currentPlayer === 'red' ? "紅方回合" : "黑方回合";
+            el.className = `turn-indicator turn-${currentPlayer}`;
+        }
+    }
+
+    function checkWin() {
+        const pieces = board.filter(p => !p.isEmpty);
+        const red = pieces.filter(p => p.color === 'red').length;
+        const black = pieces.filter(p => p.color === 'black').length;
+        
+        if (currentPlayer && (red === 0 || black === 0)) {
+            gameActive = false;
+            setTimeout(() => {
+                alert(`遊戲結束！ ${red === 0 ? '黑方' : '紅方'} 獲勝！`);
+            }, 300);
+        }
+    }
+
+    /* --- 新增：全螢幕控制邏輯 --- */
+    function toggleFullScreen() {
+        const doc = window.document;
+        const docEl = doc.documentElement;
+
+        const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+        const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+        if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+            // 進入全螢幕
+            requestFullScreen.call(docEl);
+        } else {
+            // 退出全螢幕
+            cancelFullScreen.call(doc);
+        }
+    }
+
+    // 監聽全螢幕狀態改變，自動更新按鈕文字 (包含按 ESC 退出的情況)
+    document.addEventListener('fullscreenchange', updateFullscreenButton);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+    document.addEventListener('mozfullscreenchange', updateFullscreenButton);
+    document.addEventListener('MSFullscreenChange', updateFullscreenButton);
+
+    function updateFullscreenButton() {
+        const btn = document.getElementById('fullscreen-btn');
+        if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+            btn.textContent = "退出全螢幕";
+        } else {
+            btn.textContent = "全螢幕";
+        }
+    }
+
+    initGame();
+</script>
+
+</body>
+</html>
