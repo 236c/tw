@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ultra Premium Banqi | 典藏暗棋</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
@@ -13,11 +13,10 @@
             --bg-pattern: #1a1a1a;
             --board-outer: #2d1b11;
             --board-inner: #cfa878;
-            --red-piece: #9b111e; /* 寶石紅 */
-            --black-piece: #0a0a0a; /* 墨黑 */
+            --red-piece: #9b111e;
+            --black-piece: #0a0a0a;
         }
 
-        /* 完美垂直與水平置中 */
         body {
             background: radial-gradient(circle at center, #2c2c2c 0%, #111 100%);
             color: #f1f1f1;
@@ -29,9 +28,10 @@
             margin: 0;
             padding: 1rem;
             overflow-x: hidden;
+            /* 防止手機端雙擊放大或滑動刷新 */
+            touch-action: pan-x pan-y; 
         }
 
-        /* 確保全螢幕狀態下的背景也是一致的 */
         ::backdrop {
             background: radial-gradient(circle at center, #2c2c2c 0%, #111 100%);
         }
@@ -43,9 +43,9 @@
             flex-direction: column;
             align-items: center;
             margin: 0 auto;
+            transition: all 0.3s ease;
         }
 
-        /* 狀態控制面板 */
         .status-panel {
             width: 100%;
             background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
@@ -57,9 +57,9 @@
             align-items: center;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5);
             margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
         }
 
-        /* 按鈕區塊排版 */
         .controls {
             display: flex;
             gap: 10px;
@@ -68,6 +68,7 @@
         .game-header {
             padding: 1rem 0;
             text-align: center;
+            transition: all 0.3s ease;
         }
 
         .game-header h1 {
@@ -109,10 +110,10 @@
             box-shadow: 0 0 15px var(--dark-gold);
         }
 
-        /* 棋盤：老紅木外框 + 麂皮內墊感 */
         .board-wrapper {
             position: relative;
             width: 100%;
+            /* 預設非全螢幕時的高度計算 */
             max-width: calc((100vh - 250px) * 2); 
             padding: 1.5%; 
             background: linear-gradient(135deg, #4e2f1d, #27140a); 
@@ -123,6 +124,7 @@
                 inset 0 0 10px rgba(255, 255, 255, 0.1),
                 inset 0 0 40px rgba(0,0,0,0.8);
             margin: 0 auto;
+            transition: max-width 0.3s ease;
         }
 
         #board {
@@ -154,21 +156,15 @@
             border-radius: 8px;
         }
 
-        /* 棋子專屬呼吸燈與懸浮動畫 */
         @keyframes piece-select-pulse {
             0% {
                 transform: scale(1.05) translateY(-2px);
-                box-shadow: 
-                    0 10px 15px rgba(0,0,0,0.6), 
-                    0 0 15px rgba(223, 177, 91, 0.6);
+                box-shadow: 0 10px 15px rgba(0,0,0,0.6), 0 0 15px rgba(223, 177, 91, 0.6);
                 border-color: var(--gold);
             }
             100% {
                 transform: scale(1.15) translateY(-6px);
-                box-shadow: 
-                    0 15px 25px rgba(0,0,0,0.8), 
-                    0 0 25px rgba(223, 177, 91, 1), 
-                    inset 0 0 10px rgba(255, 255, 255, 0.5);
+                box-shadow: 0 15px 25px rgba(0,0,0,0.8), 0 0 25px rgba(223, 177, 91, 1), inset 0 0 10px rgba(255, 255, 255, 0.5);
                 border-color: #ffe099;
             }
         }
@@ -185,7 +181,6 @@
             transition: all 0.1s;
         }
 
-        /* 棋子基礎設定 */
         .piece {
             width: 86%;
             height: 86%;
@@ -204,10 +199,7 @@
         .piece.covered {
             background: radial-gradient(circle at 30% 30%, #573924, #2a180e);
             border: 1px solid #140b06;
-            box-shadow:
-                inset 2px 2px 4px rgba(255,255,255,0.15), 
-                inset -4px -4px 8px rgba(0,0,0,0.6),      
-                0 8px 12px rgba(0,0,0,0.6);               
+            box-shadow: inset 2px 2px 4px rgba(255,255,255,0.15), inset -4px -4px 8px rgba(0,0,0,0.6), 0 8px 12px rgba(0,0,0,0.6);               
         }
         
         .piece.covered::before {
@@ -230,26 +222,31 @@
         .piece.revealed {
             background: radial-gradient(circle at 35% 25%, #fffff8 0%, #e8dec7 60%, #c4af92 100%);
             border: 1px solid #a8947a;
-            box-shadow:
-                inset 3px 3px 6px rgba(255,255,255,0.9),  
-                inset -5px -5px 10px rgba(100,80,60,0.3), 
-                0 6px 10px rgba(0,0,0,0.5);               
+            box-shadow: inset 3px 3px 6px rgba(255,255,255,0.9), inset -5px -5px 10px rgba(100,80,60,0.3), 0 6px 10px rgba(0,0,0,0.5);               
         }
 
-        .piece.red { 
-            color: var(--red-piece); 
-            text-shadow: 
-                -1px -1px 1px rgba(255,255,255,0.7), 
-                1px 1px 2px rgba(0,0,0,0.5);         
-        }
-        .piece.black { 
-            color: var(--black-piece); 
-            text-shadow: 
-                -1px -1px 1px rgba(255,255,255,0.7), 
-                1px 1px 2px rgba(0,0,0,0.5); 
-        }
+        .piece.red { color: var(--red-piece); text-shadow: -1px -1px 1px rgba(255,255,255,0.7), 1px 1px 2px rgba(0,0,0,0.5); }
+        .piece.black { color: var(--black-piece); text-shadow: -1px -1px 1px rgba(255,255,255,0.7), 1px 1px 2px rgba(0,0,0,0.5); }
 
-        /* 針對手機版的小微調 */
+        /* =========================================
+           🌟 全螢幕狀態 (Fullscreen) 極致滿版設定
+           ========================================= */
+        :fullscreen { display: flex; flex-direction: column; justify-content: center; background: #111; }
+        :fullscreen .game-header { display: none; /* 隱藏大標題 */ }
+        :fullscreen .status-panel { margin-bottom: 10px; padding: 10px 15px; border: none; }
+        :fullscreen .board-wrapper { max-width: calc((100vh - 100px) * 2); /* 扣除控制列後，最大化棋盤 */ }
+        
+        /* 瀏覽器前綴支援 */
+        :-webkit-full-screen { display: flex; flex-direction: column; justify-content: center; background: #111; }
+        :-webkit-full-screen .game-header { display: none; }
+        :-webkit-full-screen .status-panel { margin-bottom: 10px; padding: 10px 15px; border: none; }
+        :-webkit-full-screen .board-wrapper { max-width: calc((100vh - 100px) * 2); }
+
+        :-moz-full-screen { display: flex; flex-direction: column; justify-content: center; background: #111; }
+        :-moz-full-screen .game-header { display: none; }
+        :-moz-full-screen .status-panel { margin-bottom: 10px; padding: 10px 15px; border: none; }
+        :-moz-full-screen .board-wrapper { max-width: calc((100vh - 100px) * 2); }
+
         @media (max-width: 576px) {
             .game-header h1 { font-size: 1.8rem; }
             .turn-indicator { font-size: 1.1rem; padding: 0.5rem 1rem; width: 100%; text-align: center; }
@@ -257,11 +254,20 @@
             .controls { width: 100%; justify-content: center; }
             #board { gap: 2px; padding: 2px; }
         }
+
+        /* 針對橫向小螢幕 (例如手機轉橫向時) 即使沒開全螢幕也微調排版 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .game-header { display: none; }
+            .status-panel { margin-bottom: 10px; flex-direction: row; padding: 8px 15px; gap: 10px;}
+            .turn-indicator { width: auto; }
+            .controls { width: auto; }
+            .board-wrapper { max-width: calc((100vh - 80px) * 2); }
+        }
     </style>
 </head>
 <body>
 
-<div class="container pb-5">
+<div class="container pb-5" id="game-container">
     <div class="game-header">
         <h1>典藏 ‧ 經典暗棋</h1>
     </div>
@@ -428,8 +434,11 @@
         }
     }
 
-    /* --- 新增：全螢幕控制邏輯 --- */
-    function toggleFullScreen() {
+    /* =========================================
+       🌟 強化的全螢幕與旋轉控制邏輯
+       ========================================= */
+    async function toggleFullScreen() {
+        // 我們選擇將 documentElement (整個網頁) 全螢幕化
         const doc = window.document;
         const docEl = doc.documentElement;
 
@@ -438,27 +447,44 @@
 
         if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
             // 進入全螢幕
-            requestFullScreen.call(docEl);
+            try {
+                await requestFullScreen.call(docEl);
+                // 成功進入全螢幕後，嘗試利用 Screen Orientation API 鎖定為橫向
+                if (screen.orientation && screen.orientation.lock) {
+                    await screen.orientation.lock('landscape').catch(err => {
+                        console.log("螢幕旋轉鎖定不支援或被拒絕 (iOS Safari 常見):", err);
+                    });
+                }
+            } catch (err) {
+                console.log("進入全螢幕失敗:", err);
+            }
         } else {
-            // 退出全螢幕
+            // 退出全螢幕前，解除螢幕方向鎖定
+            if (screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            }
             cancelFullScreen.call(doc);
         }
     }
 
-    // 監聽全螢幕狀態改變，自動更新按鈕文字 (包含按 ESC 退出的情況)
-    document.addEventListener('fullscreenchange', updateFullscreenButton);
-    document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
-    document.addEventListener('mozfullscreenchange', updateFullscreenButton);
-    document.addEventListener('MSFullscreenChange', updateFullscreenButton);
-
-    function updateFullscreenButton() {
+    // 監聽全螢幕狀態改變，自動更新按鈕文字
+    const updateFullscreenStatus = () => {
         const btn = document.getElementById('fullscreen-btn');
         if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
             btn.textContent = "退出全螢幕";
         } else {
             btn.textContent = "全螢幕";
+            // 確保透過 ESC 鍵退出時也能解除方向鎖定
+            if (screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            }
         }
-    }
+    };
+
+    document.addEventListener('fullscreenchange', updateFullscreenStatus);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenStatus);
+    document.addEventListener('mozfullscreenchange', updateFullscreenStatus);
+    document.addEventListener('MSFullscreenChange', updateFullscreenStatus);
 
     initGame();
 </script>
