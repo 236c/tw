@@ -72,7 +72,6 @@
             backdrop-filter: blur(20px); position: relative; box-sizing: border-box; will-change: transform;
         }
 
-        /* 🌟 遊戲開始選單遮罩 🌟 */
         #start-menu {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 17, 26, 0.7); backdrop-filter: blur(10px);
@@ -252,31 +251,24 @@
 
         @media (max-width: 600px) {
             #game-container { padding: 15px 12px; width: 96%; }
-            
-            /* 修正手機版標題大小 */
             .title-main { font-size: 2.2rem; }
             .title-sub { font-size: 1.3rem; letter-spacing: 6px; margin-bottom: 30px;}
             .blink-start { font-size: 1rem; }
-
             .name-tag { font-size: 0.75rem; align-items: center; margin-bottom: 8px; min-height: 20px; flex-direction: row !important; }
             #enemy-name { align-items: center; flex-direction: row-reverse !important; }
             .win-dots-container { margin-top: 0; gap: 4px; }
             .win-dot { width: 7px; height: 7px; }
-
             .vs-tag { font-size: 0.9rem; width: auto; margin: 0 5px; }
             .rage-container { width: 90px; }
             .rage-label { font-size: 0.55rem; width: 25px; }
-
             .cat-entity { font-size: clamp(1rem, 4vw, 1.8rem); }
             .battle-arena { height: 90px; margin-bottom: 30px; padding: 0; }
-
             .float-text { font-size: 1.5rem !important; }
             .super-ult-text { font-size: 2rem !important; }
             .ult-text { font-size: 1.8rem !important; }
             .perfect-block-text { font-size: 1.8rem !important; }
             #qte-instruction { font-size: 0.9rem; margin-bottom: 15px; }
             .center-announce { font-size: 2.2rem; }
-
             body::before { display: none; }
             .rage-max-anim::after { display: none; }
         }
@@ -320,6 +312,65 @@
     </div>
 
     <script>
+        // --- Web Audio API 音效產生器 ---
+        const SFX = {
+            ctx: null,
+            init: function() {
+                if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+            },
+            play: function(type) {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                const now = this.ctx.currentTime;
+                
+                switch(type) {
+                    case 'hit': // 普攻打擊
+                        osc.type = 'square'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(50, now + 0.15);
+                        gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                        osc.start(now); osc.stop(now + 0.15); break;
+                    case 'miss': // 閃避/揮空
+                        osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(200, now + 0.3);
+                        gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                        osc.start(now); osc.stop(now + 0.3); break;
+                    case 'block': // 普通格檔
+                        osc.type = 'triangle'; osc.frequency.setValueAtTime(800, now);
+                        gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                        osc.start(now); osc.stop(now + 0.1); break;
+                    case 'perfect_block': // 完美格檔
+                        osc.type = 'triangle'; osc.frequency.setValueAtTime(1200, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.3);
+                        gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                        osc.start(now); osc.stop(now + 0.3); break;
+                    case 'ultimate': // 大絕招
+                        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.linearRampToValueAtTime(800, now + 0.3);
+                        gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                        osc.start(now); osc.stop(now + 0.4); break;
+                    case 'super_ultimate': // 終極奧義
+                        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, now); osc.frequency.linearRampToValueAtTime(1200, now + 0.4);
+                        gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                        osc.start(now); osc.stop(now + 0.6);
+                        setTimeout(() => this.play('hit'), 350); // 補上重擊聲
+                        break;
+                    case 'start': // 遊戲開始
+                        osc.type = 'square'; osc.frequency.setValueAtTime(440, now); osc.frequency.setValueAtTime(660, now+0.1); osc.frequency.setValueAtTime(880, now+0.2);
+                        gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now+0.4);
+                        osc.start(now); osc.stop(now+0.4); break;
+                    case 'win': // 勝利
+                        osc.type = 'square'; osc.frequency.setValueAtTime(523.25, now); osc.frequency.setValueAtTime(659.25, now+0.1); osc.frequency.setValueAtTime(783.99, now+0.2); osc.frequency.setValueAtTime(1046.50, now+0.3);
+                        gain.gain.setValueAtTime(0.15, now); gain.gain.linearRampToValueAtTime(0, now+0.6);
+                        osc.start(now); osc.stop(now+0.6); break;
+                    case 'lose': // 失敗
+                        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.linearRampToValueAtTime(100, now+0.6);
+                        gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now+0.6);
+                        osc.start(now); osc.stop(now+0.6); break;
+                }
+            }
+        };
+        // -----------------------------
+
         const CAT_STATES = {
             player: { idle: "\\(=^･ω･^=)/", attack: ["( ✧Д✧) ｶｯ!!", "(=｀ω´=)ง", "ฅ(๑*д*๑)ฅ", "(ΦωΦ)💢"], ultimate: ["(ง🔥Д🔥)ง 必殺!!", "☄️(=ΦωΦ=)☄️", "⚡(✧Д✧)⚡"], super_ultimate: ["(╬ Ò ‸ Ó) 奧義!!", "✨(✧Д✧)✨ 滅", "☄️(ง🔥Д🔥)ง 瞬獄殺!!"], hurt: ["( >д<)💦", "( ⑙_⑙ )", "∑(O_O;)", "🙀"], evade: "彡(ﾟ▽ﾟ)彡", guard: ["(=ↀωↀ=)🛡️", "( ｰ`дｰ´)✧", "(=`ω´=) 擋!"], dead: "( x_x) 💀" },
             enemy:  { idle: "ฅ(ΦωΦ)ฅ", attack: ["(ꐦ°᷄д°᷅)😾", "😾💢", "(=｀ェ´=)", "(ʘ̆_ʘ̆)"], super_ultimate: ["(╬ Ò ‸ Ó) 抹殺!!", "☠️(✧Д✧)☠️ 毀滅", "☄️(ง🔥Д🔥)ง 死!!"], hurt: ["🙀(TωT)", "(×﹏×)", "( ºÄº )", "😿"], evade: "ﾐ(=ಠ_ಠ=)ﾐ", guard: ["🛡️(ΦωΦ)", "(ↀДↀ)✧", "😾🛡️"], dead: "🪦(×_×)" }
@@ -342,7 +393,7 @@
         };
 
         let animationFrameId; let scannerContainerWidth = 0;
-        let isFirstLoad = true; // 🌟 判斷是否為第一次載入遊戲 🌟
+        let isFirstLoad = true;
 
         function resizeScanner() { const container = document.querySelector('.timing-bar-container'); if(container) scannerContainerWidth = container.clientWidth; }
         window.addEventListener('resize', resizeScanner);
@@ -350,20 +401,18 @@
         function handleInput(e) {
             if (e.type === 'keydown' && e.code !== 'Space' && e.key !== 'Enter') return;
             if (e.type === 'keydown') e.preventDefault(); 
+            
+            SFX.init(); // 初始化音效引擎，通過瀏覽器使用者互動政策
 
-            // 🌟 第一次點擊：隱藏開始選單，啟動遊戲 🌟
             if (isFirstLoad) {
                 isFirstLoad = false;
                 const startMenu = document.getElementById('start-menu');
-                startMenu.style.opacity = '0'; // 淡出效果
-                setTimeout(() => startMenu.style.display = 'none', 500); // 動畫播完後移除顯示
+                startMenu.style.opacity = '0';
+                setTimeout(() => startMenu.style.display = 'none', 500);
                 startGame();
-            } 
-            // 正常遊戲邏輯
-            else if (!state.active) {
+            } else if (!state.active) {
                 startGame(); 
-            } 
-            else if (state.canAttack) {
+            } else if (state.canAttack) {
                 evaluateHit();
             }
         }
@@ -387,6 +436,7 @@
             ui.instruction.innerHTML = `ROUND ${totalRounds + 1} GET READY...`; ui.instruction.style.color = "var(--warning)"; ui.instruction.style.textShadow = "0 0 15px rgba(255, 234, 0, 0.5)";
             state.canAttack = false; state.isAnimating = false;
             showCenterMessage("GET READY...", "var(--warning)", "var(--warning)");
+            SFX.play('start'); // 播放開始音效
 
             setTimeout(() => {
                 if(!state.active) return;
@@ -445,6 +495,14 @@
             setCatState('player', catAction); ui.p_cat.classList.remove('idle'); ui.p_cat.classList.add(animClass);
 
             setTimeout(() => {
+                // 播放對應音效
+                if (hitType === "MISS") SFX.play('miss');
+                else if (isBlocked === "PERFECT") SFX.play('perfect_block');
+                else if (isBlocked === "PARTIAL") SFX.play('block');
+                else if (hitType === "SUPER_ULTIMATE") SFX.play('super_ultimate');
+                else if (hitType === "ULTIMATE") SFX.play('ultimate');
+                else SFX.play('hit');
+
                 if (hitType === "MISS") {
                     setCatState('enemy', 'evade'); ui.e_cat.classList.remove('idle'); ui.e_cat.classList.add('evade-right');
                     showFloatingTextHTML(ui.e_cat, "MISS", 'miss-text');
@@ -501,6 +559,13 @@
             if (isSuper) triggerScreenFlash(true);
 
             setTimeout(() => {
+                // 播放敵人攻擊音效
+                if (isMiss) SFX.play('miss');
+                else if (isBlocked === "PERFECT") SFX.play('perfect_block');
+                else if (isBlocked === "PARTIAL") SFX.play('block');
+                else if (isSuper) SFX.play('super_ultimate');
+                else SFX.play('hit');
+
                 if (isMiss) { setCatState('player', 'evade'); ui.p_cat.classList.remove('idle'); ui.p_cat.classList.add('evade-left'); showFloatingTextHTML(ui.p_cat, "EVADED", 'heal-text'); } 
                 else {
                     state.p_hp = Math.max(0, state.p_hp - totalDmg); state.p_rage = Math.min(100, state.p_rage + gainedRage);
@@ -580,8 +645,14 @@
             state.active = false; state.isAnimating = false; state.canAttack = false;
             clearTimeout(state.enemyTimer); cancelAnimationFrame(animationFrameId);
             ui.p_cat.className = "cat-entity"; ui.e_cat.className = "cat-entity";
-            if (playerWon) { state.p_wins++; updateWinDots(); setCatState('player', 'idle'); setCatState('enemy', 'dead'); showCenterMessage("玩家 CYBER_MEOW<br>🏆 獲勝 🏆", "var(--success)", "var(--success)"); ui.instruction.innerHTML = "CYBER_MEOW WINS!<br><span style='font-size:0.8rem; color:#eceff1; text-shadow:none; letter-spacing:1px; line-height: 2.5;'>TAP TO CONTINUE</span>"; ui.instruction.style.color = "var(--success)"; ui.instruction.style.textShadow = "0 0 20px var(--success)"; } 
-            else { state.e_wins++; updateWinDots(); setCatState('player', 'dead'); setCatState('enemy', 'idle'); showCenterMessage("電腦 CPU_BOSS<br>💀 獲勝 💀", "var(--danger)", "var(--danger)"); ui.instruction.innerHTML = "CPU_BOSS WINS!<br><span style='font-size:0.8rem; color:#eceff1; text-shadow:none; letter-spacing:1px; line-height: 2.5;'>TAP TO RETRY</span>"; ui.instruction.style.color = "var(--danger)"; ui.instruction.style.textShadow = "0 0 20px var(--danger)"; }
+            if (playerWon) { 
+                SFX.play('win'); // 播放勝利音效
+                state.p_wins++; updateWinDots(); setCatState('player', 'idle'); setCatState('enemy', 'dead'); showCenterMessage("玩家 CYBER_MEOW<br>🏆 獲勝 🏆", "var(--success)", "var(--success)"); ui.instruction.innerHTML = "CYBER_MEOW WINS!<br><span style='font-size:0.8rem; color:#eceff1; text-shadow:none; letter-spacing:1px; line-height: 2.5;'>TAP TO CONTINUE</span>"; ui.instruction.style.color = "var(--success)"; ui.instruction.style.textShadow = "0 0 20px var(--success)"; 
+            } 
+            else { 
+                SFX.play('lose'); // 播放失敗音效
+                state.e_wins++; updateWinDots(); setCatState('player', 'dead'); setCatState('enemy', 'idle'); showCenterMessage("電腦 CPU_BOSS<br>💀 獲勝 💀", "var(--danger)", "var(--danger)"); ui.instruction.innerHTML = "CPU_BOSS WINS!<br><span style='font-size:0.8rem; color:#eceff1; text-shadow:none; letter-spacing:1px; line-height: 2.5;'>TAP TO RETRY</span>"; ui.instruction.style.color = "var(--danger)"; ui.instruction.style.textShadow = "0 0 20px var(--danger)"; 
+            }
         }
     </script>
 </body>
