@@ -3,285 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>靜網 | 專業工具與排程</title>
+    <title>靜網 | 工具與排程</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 綠意清新商業色票 */
-            --primary-green: #2d6a4f;      /* 深森林綠 */
-            --accent-green: #52b788;       /* 活力草綠 */
-            --light-mint: #f7fff7;         /* 極淺薄荷白 */
-            --soft-bg: #ffffff;
-            --business-gray: #f8f9fa;
+            /* 莫蘭迪基礎色票 */
+            --bg-main: #fafafb;
+            --bg-section: #f4f7f5;
             
-            --text-dark: #1b4332;          /* 深綠文字 */
-            --text-body: #495057;
+            /* 分類專屬色 - 籃球 (青磁) */
+            --cls-basket: #8fa898;
+            --cls-basket-hover: #7a9483;
             
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
-            --shadow-md: 0 10px 30px rgba(45, 106, 79, 0.08);
-            --radius: 12px;
+            /* 分類專屬色 - 計畫 (薄鼠) */
+            --cls-plan: #8da1b9;
+            --cls-plan-hover: #7389a3;
+            
+            /* 分類專屬色 - 遊戲 (琥珀/粉) */
+            --cls-game: #c6a49a;
+            --cls-game-hover: #b08d82;
+
+            /* 文字顏色 */
+            --text-main: #2b2b2b;  
+            --text-muted: #5e5e5e; 
+            --border-solid: #e0e0e0;
+            --border-dashed: #c4c4c4;
         }
 
         body { 
-            background-color: var(--business-gray);
-            font-family: 'Inter', 'Noto Sans TC', sans-serif;
-            color: var(--text-body);
-            padding-top: 85px; 
-            scroll-behavior: smooth;
+            background-color: var(--bg-main);
+            font-family: 'Noto Sans TC', sans-serif;
+            color: var(--text-main);
+            letter-spacing: 0.05em;
+            padding-top: 75px; 
+            scroll-padding-top: 90px; 
+            line-height: 1.6;
         }
 
-        /* 導覽列：純淨商業感 */
+        /* 導覽列 */
         .navbar {
-            background-color: rgba(255, 255, 255, 0.9) !important;
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding: 15px 0;
-            box-shadow: var(--shadow-sm);
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-solid);
+            padding: 12px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
         }
 
         .navbar-brand {
             font-weight: 700;
-            color: var(--primary-green) !important;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-        }
-        .navbar-brand::before {
-            content: '';
-            width: 8px;
-            height: 24px;
-            background: var(--accent-green);
-            margin-right: 10px;
-            border-radius: 4px;
+            color: #1a1a1a !important;
+            letter-spacing: 3px;
+            font-size: 1.25rem;
         }
 
         .nav-link {
-            color: var(--text-body) !important;
+            color: var(--text-muted) !important;
+            font-size: 0.95rem;
             font-weight: 500;
-            margin: 0 10px;
-            transition: 0.3s;
+            transition: color 0.3s ease;
+            letter-spacing: 1px;
         }
-        .nav-link:hover { color: var(--accent-green) !important; }
+        .nav-link:hover { color: var(--cls-basket) !important; }
 
-        /* Hero 標題區 */
+        /* 標題區 */
         .hero-section {
-            padding: 60px 0;
-            background: linear-gradient(135deg, #ffffff 0%, #eefaf4 100%);
-            border-radius: 0 0 50px 50px;
-            margin-bottom: 50px;
+            padding: 30px 0 40px;
             text-align: center;
+        }
+        .hero-section::before {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 2px;
+            background-color: var(--cls-basket);
+            margin: 0 auto 20px;
         }
 
         .header-title { 
             font-weight: 700; 
-            font-size: 2.5rem;
-            color: var(--text-dark);
-            margin-bottom: 10px;
+            font-size: 2rem;
+            letter-spacing: 6px;
         }
         
         .header-subtitle { 
-            color: var(--accent-green);
-            font-weight: 500;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            color: var(--text-muted); 
+            letter-spacing: 2px; 
+            margin-top: 12px;
         }
 
-        /* 區塊標題 */
+        /* 區塊顏色區分 */
         .category-title {
             font-weight: 700;
-            font-size: 1.4rem; 
-            color: var(--primary-green);
-            margin-bottom: 25px;
-            padding-left: 15px;
-            border-left: 5px solid var(--accent-green);
+            font-size: 1.2rem; 
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            letter-spacing: 1px;
+        }
+        .category-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            margin-right: 12px;
         }
 
-        /* 卡片設計：清新商業風 */
+        /* 籃球配色 */
+        #basketball-tools .category-title::before { background-color: var(--cls-basket); }
+        #basketball-tools .icon-wrapper { color: var(--cls-basket); }
+
+        /* 計畫配色 */
+        #calendar-planning .category-title::before { background-color: var(--cls-plan); }
+        #calendar-planning .icon-wrapper { color: var(--cls-plan); }
+        .section-tinted {
+            background-color: #f0f4f8; /* 稍微偏藍的背景 */
+            border-top: 1px dashed var(--border-dashed);
+            border-bottom: 1px dashed var(--border-dashed);
+            padding-bottom: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* 遊戲配色 */
+        #gaming .category-title::before { background-color: var(--cls-game); }
+        #gaming .icon-wrapper { color: var(--cls-game); }
+
+        /* 卡片設計 */
         .card { 
-            border: none;
-            border-radius: var(--radius);
+            border: 1px solid var(--border-solid); 
+            border-radius: 4px;
             background: #ffffff;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: all 0.3s ease; 
             height: 100%;
-            padding: 2rem;
-            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
         }
         .card:hover { 
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
         }
 
-        .icon-box {
-            width: 50px;
-            height: 50px;
-            background-color: var(--light-mint);
-            border-radius: 10px;
+        /* 個別卡片懸停框線顏色 */
+        #basketball-tools .card:hover { border-color: var(--cls-basket); }
+        #calendar-planning .card:hover { border-color: var(--cls-plan); }
+        #gaming .card:hover { border-color: var(--cls-game); }
+
+        .card-header-custom {
+            display: flex;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .icon-wrapper {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-solid);
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem; 
-            margin-bottom: 20px;
-            color: var(--primary-green);
+            font-size: 1.2rem; 
+            background-color: var(--bg-main);
+            margin-right: 12px;
         }
 
-        .card-title { font-weight: 700; color: var(--text-dark); margin-bottom: 15px; }
-        .card-text { font-size: 0.95rem; line-height: 1.8; color: #6c757d; margin-bottom: 25px; }
+        .card-title { font-weight: 700; font-size: 1.1rem; margin: 0; }
+        .dashed-divider { border-top: 1px dashed var(--border-dashed); margin: 0 0 16px 0; opacity: 0.7; }
+        .card-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 24px; }
 
         /* 按鈕設計 */
-        .btn-green {
-            background-color: var(--primary-green);
-            color: white;
-            border-radius: 8px;
-            padding: 12px;
-            font-weight: 600;
+        .btn-custom {
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.95rem; 
+            padding: 10px 0; 
+            letter-spacing: 1.5px;
+            transition: all 0.3s;
             text-align: center;
-            text-decoration: none;
             display: block;
-            transition: 0.3s;
-            border: none;
-        }
-        .btn-green:hover {
-            background-color: var(--accent-green);
-            color: white;
-            box-shadow: 0 4px 15px rgba(82, 183, 136, 0.3);
-        }
-
-        .btn-outline-green {
-            border: 2px solid var(--primary-green);
-            color: var(--primary-green);
-            border-radius: 8px;
-            padding: 10px;
-            font-weight: 600;
-            text-align: center;
+            width: 100%;
             text-decoration: none;
-            display: block;
-            transition: 0.3s;
-        }
-        .btn-outline-green:hover {
-            background-color: var(--primary-green);
-            color: white;
         }
 
-        /* 頁尾 */
-        footer { 
-            background: var(--text-dark);
-            color: rgba(255,255,255,0.7);
-            padding: 40px 0;
-            margin-top: 80px;
-        }
+        /* 籃球與遊戲按鈕 - 框線 */
+        .btn-basket-outline { border: 1px solid #b0b0b0; color: var(--text-main); }
+        .btn-basket-outline:hover { border-color: var(--cls-basket); color: var(--cls-basket-hover); background: #f8faf9; }
 
-        /* 特別調整：暗棋區塊 */
-        .game-card {
-            background: linear-gradient(to bottom right, #ffffff, #f0fff4);
-        }
+        .btn-game-outline { border: 1px solid #b0b0b0; color: var(--text-main); }
+        .btn-game-outline:hover { border-color: var(--cls-game); color: var(--cls-game-hover); background: #faf9f8; }
+
+        /* 計畫按鈕 - 實色 */
+        .btn-plan-solid { background-color: var(--cls-plan); color: #ffffff; border: 1px solid var(--cls-plan); }
+        .btn-plan-solid:hover { background-color: var(--cls-plan-hover); color: #ffffff; }
+
+        footer { border-top: 1px solid var(--border-solid); color: var(--text-muted); font-size: 0.85rem; position: relative; }
+        footer::before { content: ''; position: absolute; top: 2px; left: 0; right: 0; border-top: 1px dashed var(--border-dashed); }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
-        <a class="navbar-brand" href="#">JING NET</a>
-        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
+        <a class="navbar-brand" href="#">靜網</a>
+        <button class="navbar-toggler border-0 shadow-none px-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="#basketball">籃球工具</a></li>
-                <li class="nav-item"><a class="nav-link" href="#planning">計畫排程</a></li>
-                <li class="nav-item"><a class="nav-link" href="#leisure">休閒娛樂</a></li>
+            <ul class="navbar-nav ms-auto mt-3 mt-lg-0">
+                <li class="nav-item"><a class="nav-link px-lg-3" href="#basketball-tools">籃球工具</a></li>
+                <li class="nav-item"><a class="nav-link px-lg-3" href="#calendar-planning">計畫排程</a></li>
+                <li class="nav-item"><a class="nav-link px-lg-3" href="#gaming">休閒娛樂</a></li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="hero-section">
-    <div class="container">
-        <h1 class="header-title">靜網數位工具</h1>
-        <p class="header-subtitle">Efficient • Professional • Innovative</p>
-    </div>
+<div class="hero-section container">
+    <h1 class="header-title">靜網</h1>
+    <p class="header-subtitle">Jing Net — 工具與排程</p>
 </div>
 
-<div class="container mb-5" id="basketball">
+<div class="container mb-5" id="basketball-tools">
     <h3 class="category-title">籃球專業工具</h3>
     <div class="row g-4">
         <div class="col-12 col-md-6 col-lg-4">
-            <div class="card">
-                <div class="icon-box">📋</div>
-                <h5 class="card-title">籃球戰術版</h5>
-                <p class="card-text">即時模擬進攻與防守佈置，提供教練與球員最直觀的戰術交流平台。</p>
-                <a href="https://236c.github.io/tw/bcb.html" class="btn-outline-green" target="_blank">立即開啟</a>
+            <div class="card d-flex flex-column">
+                <div class="card-header-custom">
+                    <div class="icon-wrapper">📋</div>
+                    <h5 class="card-title">籃球戰術版</h5>
+                </div>
+                <div class="dashed-divider"></div>
+                <p class="card-text flex-grow-1">即時模擬進攻與防守佈置，提供教練與球員最直觀的戰術交流平台。</p>
+                <a href="https://236c.github.io/tw/bcb.html" class="btn-custom btn-basket-outline" target="_blank">開啟工具</a>
             </div>
         </div>
         <div class="col-12 col-md-6 col-lg-4">
-            <div class="card">
-                <div class="icon-box">⏱️</div>
-                <h5 class="card-title">專業記分系統</h5>
-                <p class="card-text">適用於正式賽事之計時與得分紀錄，操作簡便，精準掌握賽場節奏。</p>
-                <a href="https://236c.github.io/tw/bsb.html" class="btn-outline-green" target="_blank">立即開啟</a>
+            <div class="card d-flex flex-column">
+                <div class="card-header-custom">
+                    <div class="icon-wrapper">⏱️</div>
+                    <h5 class="card-title">專業籃球記分板</h5>
+                </div>
+                <div class="dashed-divider"></div>
+                <p class="card-text flex-grow-1">適用於專業賽事之計時與得分紀錄，操作簡便，精準掌握賽場節奏。</p>
+                <a href="https://236c.github.io/tw/bsb.html" class="btn-custom btn-basket-outline" target="_blank">開啟工具</a>
             </div>
         </div>
         <div class="col-12 col-md-6 col-lg-4">
-            <div class="card">
-                <div class="icon-box">🎯</div>
-                <h5 class="card-title">戰術解析 PRO</h5>
-                <p class="card-text">深度解析進攻跑位與戰術執行細節，全方位提升球隊作戰能力。</p>
-                <a href="https://236c.github.io/tw/basketball-pro.html" class="btn-outline-green" target="_blank">立即開啟</a>
+            <div class="card d-flex flex-column">
+                <div class="card-header-custom">
+                    <div class="icon-wrapper">🎯</div>
+                    <h5 class="card-title">互動式進攻戰術解析</h5>
+                </div>
+                <div class="dashed-divider"></div>
+                <p class="card-text flex-grow-1">PRO TACTICS BOARD：深度解析進攻跑位與戰術執行細節，提升球隊整體作戰能力。</p>
+                <a href="https://236c.github.io/tw/basketball-pro.html" class="btn-custom btn-basket-outline" target="_blank">開啟工具</a>
             </div>
         </div>
     </div>
 </div>
 
-<div class="container mb-5" id="planning">
-    <h3 class="category-title">計畫排程</h3>
-    <div class="row g-4">
-        <div class="col-12 col-md-6">
-            <div class="card">
-                <div class="icon-box">💼</div>
-                <h5 class="card-title">商務行事曆 & 記事</h5>
-                <p class="card-text">整合任務管理與日程規劃，專為追求高效的工作者設計。</p>
-                <a href="https://236c.github.io/tw/bc.html" class="btn-green" target="_blank">進入系統</a>
+<div class="section-tinted pt-4" id="calendar-planning">
+    <div class="container">
+        <h3 class="category-title mt-2">行事曆與計畫</h3>
+        <div class="row g-4">
+            <div class="col-12 col-md-6">
+                <div class="card d-flex flex-column">
+                    <div class="card-header-custom">
+                        <div class="icon-wrapper">💼</div>
+                        <h5 class="card-title">商務行事曆 & 記事</h5>
+                    </div>
+                    <div class="dashed-divider"></div>
+                    <p class="card-text flex-grow-1">高效管理商務行程與全域記事本，讓工作與生活排程井然有序。</p>
+                    <a href="https://236c.github.io/tw/bc.html" class="btn-custom btn-plan-solid" target="_blank">查看計畫</a>
+                </div>
             </div>
-        </div>
-        <div class="col-12 col-md-6">
-            <div class="card">
-                <div class="icon-box">☀️</div>
-                <h5 class="card-title">2026 暑期專案</h5>
-                <p class="card-text">年度重點計畫追蹤，確保每一階段目標如期達成。</p>
-                <a href="https://236c.github.io/tw/spc2026.html" class="btn-green" target="_blank">查看進度</a>
+            <div class="col-12 col-md-6">
+                <div class="card d-flex flex-column">
+                    <div class="card-header-custom">
+                        <div class="icon-wrapper">☀️</div>
+                        <h5 class="card-title">2026 暑期計畫行事曆</h5>
+                    </div>
+                    <div class="dashed-divider"></div>
+                    <p class="card-text flex-grow-1">專屬 2026 年度暑期訓練時程總覽，精準掌握每一天的學習與進度。</p>
+                    <a href="https://236c.github.io/tw/spc2026.html" class="btn-custom btn-plan-solid" target="_blank">查看計畫</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="container mb-5" id="leisure">
+<div class="container mb-5" id="gaming">
     <h3 class="category-title">休閒娛樂</h3>
     <div class="row g-4">
         <div class="col-12 col-md-6">
-            <div class="card game-card">
-                <div class="icon-box">♟️</div>
-                <h5 class="card-title">典藏暗棋</h5>
-                <p class="card-text">精緻棋盤設計，重溫經典博弈智慧。支持流暢對弈與戰績統計。</p>
-                <a href="https://236c.github.io/tw/Banqi.html" class="btn-outline-green" target="_blank">進入遊戲</a>
+            <div class="card d-flex flex-column">
+                <div class="card-header-custom">
+                    <div class="icon-wrapper">🐱</div>
+                    <h5 class="card-title">喵星人訊號大戰</h5>
+                </div>
+                <div class="dashed-divider"></div>
+                <p class="card-text flex-grow-1">進化覺醒：充滿趣味的互動小遊戲，在忙碌的排程中提供放鬆時刻。</p>
+                <a href="https://236c.github.io/tw/CatSignalWars.html" class="btn-custom btn-game-outline" target="_blank">開始遊戲</a>
             </div>
         </div>
         <div class="col-12 col-md-6">
-            <div class="card game-card">
-                <div class="icon-box">🐱</div>
-                <h5 class="card-title">喵星人訊號大戰</h5>
-                <p class="card-text">充滿趣味與驚喜的互動遊戲，在工作空檔享受極致放鬆。</p>
-                <a href="https://236c.github.io/tw/CatSignalWars.html" class="btn-outline-green" target="_blank">開始挑戰</a>
+            <div class="card d-flex flex-column">
+                <div class="card-header-custom">
+                    <div class="icon-wrapper">♟️</div>
+                    <h5 class="card-title">典藏暗棋</h5>
+                </div>
+                <div class="dashed-divider"></div>
+                <p class="card-text flex-grow-1">經典博弈對戰：重溫傳統暗棋的智慧與樂趣，支持精美的棋盤介面與流暢體驗。</p>
+                <a href="https://236c.github.io/tw/Banqi.html" class="btn-custom btn-game-outline" target="_blank">進入對局</a>
             </div>
         </div>
     </div>
 </div>
 
-<footer>
-    <div class="container text-center">
-        <p>© 2026 Jing Net Digital Solutions. All rights reserved.</p>
-        <small style="opacity: 0.5;">專業工具 • 智能排程 • 創意娛樂</small>
-    </div>
-</footer>
+<div class="container">
+    <footer class="text-center py-4 mt-2">
+        <span>© 2026 Jing Net. All rights reserved.</span>
+    </footer>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
