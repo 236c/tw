@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>沉浸音效 - 商業級物理風扇</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #04070a;
+            --panel-bg: rgba(12, 18, 28, 0.75);
+            --accent-blue: #00e5ff;
+            --accent-glow: rgba(0, 229, 255, 0.6);
+            --accent-ice: #81d4fa;
+            --accent-red: #ff3366;
+            --text-main: #e0e6ed;
+            --text-muted: #6c7d93;
+        }
+
+        body, html {
+            background-color: var(--bg-base);
+            height: 100dvh;
+            margin: 0;
+            padding: 0;
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        #frostOverlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, rgba(0, 180, 255, 0.12) 0%, rgba(0, 25, 50, 0.7) 100%);
+            opacity: 0; 
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 0.5s linear;
+        }
+
+        #windCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.8;
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: clamp(10px, 2vh, 20px);
+            box-sizing: border-box;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* 風扇區 */
+        .fan-section {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 0; 
+            padding-bottom: clamp(10px, 2vh, 20px);
+        }
+
+        .fan-showcase {
+            position: relative;
+            height: 100%; 
+            max-width: 100%;
+            aspect-ratio: 1 / 1; 
+            border-radius: 50%;
+            background: radial-gradient(circle, #252525, #030303);
+            box-shadow: 
+                inset 0 0 clamp(30px, 6vw, 60px) rgba(0,0,0,0.95), 
+                0 clamp(15px, 4vw, 40px) clamp(30px, 8vw, 80px) rgba(0,0,0,0.9),
+                0 0 0 clamp(8px, 2vw, 16px) rgba(35, 40, 50, 0.6),
+                0 0 0 clamp(10px, 2.5vw, 18px) rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            will-change: transform;
+        }
+
+        .fan-grill {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: 
+                repeating-radial-gradient(rgba(255,255,255,0.02) 0, transparent 4px, transparent 24px),
+                repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(255,255,255,0.05) 18px, rgba(255,255,255,0.05) 21px),
+                repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(255,255,255,0.05) 18px, rgba(255,255,255,0.05) 21px);
+            z-index: 10;
+            pointer-events: none;
+            box-shadow: inset 0 0 40px rgba(0,0,0,1);
+        }
+
+        .blades-svg {
+            width: 88%;
+            height: 88%;
+            transform-origin: center;
+            will-change: transform; 
+            filter: drop-shadow(0px 15px 15px rgba(0,0,0,0.95));
+        }
+
+        /* 控制面板區 */
+        .panel-section {
+            flex: 0 0 auto;
+            width: 100%;
+            max-width: 450px; 
+        }
+
+        .control-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 24px 28px; 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255,255,255,0.05);
+        }
+
+        .dashboard-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .status-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            text-transform: uppercase;
+        }
+
+        .status-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .temp-display {
+            text-align: right;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .temp-value {
+            font-size: 2.6rem; 
+            font-weight: 700;
+            color: var(--accent-ice);
+            line-height: 0.9;
+            font-family: 'Courier New', Courier, monospace;
+            text-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+            transition: color 0.5s;
+        }
+
+        .temp-unit {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .led-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-red);
+            box-shadow: 0 0 10px var(--accent-red);
+            margin-right: 8px;
+            transition: all 0.3s;
+        }
+        .led-dot.active {
+            background-color: var(--accent-blue);
+            box-shadow: 0 0 12px var(--accent-blue), 0 0 25px var(--accent-blue);
+        }
+
+        /* 實體滑軌設計 */
+        .slider-container {
+            width: 100%;
+            padding: 10px 0 5px 0;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .slider-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 音訊狀態標籤 */
+        .audio-badge {
+            font-size: 0.6rem;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+            color: #aaa;
+        }
+        .audio-badge.active {
+            background: rgba(0, 229, 255, 0.2);
+            color: var(--accent-blue);
+            box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+        }
+
+        .slider-percentage {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            font-family: 'Courier New', Courier, monospace;
+            text-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .track-wrapper {
+            position: relative;
+            width: 100%;
+            height: 12px;
+            background: #090e15;
+            border-radius: 10px;
+            box-shadow: 
+                inset 0 3px 6px rgba(0,0,0,0.8), 
+                inset 0 1px 2px rgba(0,0,0,1),
+                0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .track-fill {
+            position: absolute;
+            top: 0; left: 0;
+            height: 100%;
+            width: 0%; 
+            background: linear-gradient(90deg, #005c7a 0%, var(--accent-blue) 100%);
+            border-radius: 10px;
+            box-shadow: 0 0 15px var(--accent-glow);
+            pointer-events: none; 
+            transition: width 0.05s linear;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 30px; 
+            background: transparent;
+            outline: none;
+            cursor: pointer;
+            z-index: 10;
+            margin: 0;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #5a6673, #242b33);
+            border: 2px solid #1a2026;
+            box-shadow: 
+                inset 0 2px 4px rgba(255,255,255,0.3), 
+                inset 0 -2px 4px rgba(0,0,0,0.5),      
+                0 4px 10px rgba(0,0,0,0.7),            
+                0 0 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #5a6673, #242b33);
+            border: 2px solid #1a2026;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.7);
+        }
+
+        input[type=range]:active::-webkit-slider-thumb {
+            transform: scale(1.15);
+            border-color: var(--accent-blue);
+            box-shadow: 
+                inset 0 2px 4px rgba(255,255,255,0.4), 
+                0 5px 15px rgba(0,0,0,0.8),
+                0 0 20px var(--accent-glow);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="frostOverlay"></div>
+    <canvas id="windCanvas"></canvas>
+
+    <div class="app-container">
+        <div class="fan-section">
+            <div class="fan-showcase" id="fanShowcase">
+                <div class="fan-grill"></div>
+                <svg viewBox="0 0 100 100" class="blades-svg" id="fanBlades">
+                    <circle cx="50" cy="50" r="14" fill="#050505" />
+                    <g fill="url(#metalGradient)">
+                        <path d="M50,50 C30,12 68,2 50,2 C35,5 25,25 50,50" />
+                        <path d="M50,50 C88,30 98,68 98,50 C95,35 75,25 50,50" />
+                        <path d="M50,50 C70,88 32,98 50,98 C65,95 75,75 50,50" />
+                        <path d="M50,50 C12,70 2,32 2,50 C5,65 25,75 50,50" />
+                    </g>
+                    <circle cx="50" cy="50" r="12" fill="#222" stroke="#444" stroke-width="1"/>
+                    <circle cx="50" cy="50" r="4" fill="#000"/>
+                    <defs>
+                        <linearGradient id="metalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#999; stop-opacity:1" />
+                            <stop offset="35%" style="stop-color:#fff; stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#444; stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <div class="control-panel">
+                <div class="dashboard-top">
+                    <div class="status-group">
+                        <span class="status-title">
+                            <div class="led-dot" id="powerLed"></div>
+                            MOTOR PWR
+                        </span>
+                        <span class="status-value" id="statusText" style="color: var(--text-muted);">0000 RPM</span>
+                    </div>
+                    <div class="temp-display">
+                        <span class="temp-value" id="tempText">28.0</span>
+                        <span class="temp-unit">°C</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span class="slider-label">
+                            POWER CONTROL 
+                            <span class="audio-badge" id="audioBadge">AUDIO OFF</span>
+                        </span>
+                        <span class="slider-percentage" id="percentLabel">0%</span>
+                    </div>
+                    
+                    <div class="track-wrapper">
+                        <div class="track-fill" id="trackFill"></div>
+                        <input type="range" id="speedSlider" min="0" max="100" value="0" step="1">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 物理常數 ---
+        let currentRotation = 0;      
+        let actualSpeed = 0;          
+        let targetSpeed = 0;          
+        
+        const ACCELERATION = 0.025; 
+        const FRICTION = 0.008;     
+        const MAX_SPEED = 45;       
+        
+        let currentTemp = 28.0;
+        let targetTemp = 28.0;
+        const MAX_TEMP = 28.0;
+        const MIN_TEMP = 20.0;
+
+        // --- DOM ---
+        const blades = document.getElementById('fanBlades');
+        const showcase = document.getElementById('fanShowcase');
+        const statusText = document.getElementById('statusText');
+        const tempText = document.getElementById('tempText');
+        const led = document.getElementById('powerLed');
+        const frostOverlay = document.getElementById('frostOverlay');
+        const speedSlider = document.getElementById('speedSlider');
+        const percentLabel = document.getElementById('percentLabel');
+        const trackFill = document.getElementById('trackFill');
+        const audioBadge = document.getElementById('audioBadge');
+
+        // ==========================================
+        // 核心功能：Web Audio API 程序化音效合成
+        // ==========================================
+        let audioCtx;
+        let motorOsc, motorGain, motorFilter;
+        let windNoise, windFilter, windGain;
+        let isAudioInitialized = false;
+
+        function initAudio() {
+            if (isAudioInitialized) return;
+            
+            // 初始化音訊引擎 (必須在使用者點擊後)
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+
+            // 1. 馬達聲合成 (Motor Hum)
+            // 使用鋸齒波(Sawtooth)經過低通濾波，模擬沉悶的電磁馬達聲
+            motorOsc = audioCtx.createOscillator();
+            motorOsc.type = 'sawtooth';
+            
+            motorFilter = audioCtx.createBiquadFilter();
+            motorFilter.type = 'lowpass';
+            motorFilter.frequency.value = 300; // 悶住高頻
+            
+            motorGain = audioCtx.createGain();
+            motorGain.gain.value = 0;
+
+            motorOsc.connect(motorFilter);
+            motorFilter.connect(motorGain);
+            motorGain.connect(audioCtx.destination);
+            motorOsc.start();
+
+            // 2. 風切聲合成 (Wind Noise)
+            // 產生隨機白噪音 Buffer
+            const bufferSize = audioCtx.sampleRate * 2; // 2秒循環
+            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1; // 白噪音算法
+            }
+
+            windNoise = audioCtx.createBufferSource();
+            windNoise.buffer = noiseBuffer;
+            windNoise.loop = true;
+
+            // 使用帶通濾波器模擬風切的「呼嘯聲」
+            windFilter = audioCtx.createBiquadFilter();
+            windFilter.type = 'lowpass';
+            
+            windGain = audioCtx.createGain();
+            windGain.gain.value = 0;
+
+            windNoise.connect(windFilter);
+            windFilter.connect(windGain);
+            windGain.connect(audioCtx.destination);
+            windNoise.start();
+
+            isAudioInitialized = true;
+            
+            // 更新 UI 標籤
+            audioBadge.innerText = "AUDIO ON";
+            audioBadge.classList.add('active');
+        }
+
+        // 動態調整音效頻率與音量 (根據實際物理轉速 actualSpeed)
+        function updateAudioPhysics(speedRatio) {
+            if (!isAudioInitialized || !audioCtx) return;
+            
+            const time = audioCtx.currentTime;
+
+            // --- 馬達聲動態 ---
+            if (speedRatio > 0.01) {
+                // 頻率隨轉速上升 (40Hz ~ 180Hz)
+                const targetFreq = 40 + (speedRatio * 140);
+                motorOsc.frequency.setTargetAtTime(targetFreq, time, 0.1);
+                
+                // 馬達音量在中低速較明顯，高速時會被風聲蓋過
+                let mVolume = speedRatio * 0.8;
+                if (speedRatio > 0.5) mVolume = 0.4; // 壓制馬達聲
+                motorGain.gain.setTargetAtTime(mVolume, time, 0.1);
+            } else {
+                motorGain.gain.setTargetAtTime(0, time, 0.1);
+            }
+
+            // --- 風切聲動態 ---
+            if (speedRatio > 0.05) {
+                // 風速越快，高頻噪音釋放越多 (300Hz ~ 2000Hz)
+                const windFreq = 300 + (Math.pow(speedRatio, 1.5) * 1700);
+                windFilter.frequency.setTargetAtTime(windFreq, time, 0.1);
+                
+                // 風聲音量隨轉速呈指數型上升 (更有爆發力)
+                const wVolume = Math.pow(speedRatio, 2) * 1.5;
+                windGain.gain.setTargetAtTime(wVolume, time, 0.1);
+            } else {
+                windGain.gain.setTargetAtTime(0, time, 0.1);
+            }
+        }
+        // ==========================================
+
+        // --- 滑動條監聽 ---
+        speedSlider.addEventListener('input', (e) => {
+            initAudio(); // 第一次滑動時啟動音效引擎
+
+            const val = e.target.value;
+            percentLabel.innerText = `${val}%`;
+            trackFill.style.width = `${val}%`; 
+
+            targetSpeed = (val / 100) * MAX_SPEED;
+            targetTemp = MAX_TEMP - ((val / 100) * (MAX_TEMP - MIN_TEMP));
+
+            if (val > 0) led.classList.add('active');
+            else led.classList.remove('active');
+        });
+
+        // --- 主物理迴圈 ---
+        function physicsLoop() {
+            // 計算物理慣性
+            if (targetSpeed > actualSpeed) actualSpeed += (targetSpeed - actualSpeed) * ACCELERATION;
+            else if (targetSpeed < actualSpeed) actualSpeed -= (actualSpeed - targetSpeed) * FRICTION;
+            if (targetSpeed === 0 && actualSpeed < 0.05) actualSpeed = 0;
+
+            // 轉速比例 (0.0 ~ 1.0)
+            const speedRatio = actualSpeed / MAX_SPEED;
+
+            // 1. 更新視覺旋轉
+            currentRotation += actualSpeed;
+            blades.style.transform = `rotate(${currentRotation}deg)`;
+
+            // 2. 更新音效引擎 (讓聲音與物理慣性同步滑坡)
+            updateAudioPhysics(speedRatio);
+
+            // 3. 震動特效
+            if (speedRatio > 0.8) {
+                const intensity = (speedRatio - 0.8) * 1.5;
+                showcase.style.transform = `translate(${(Math.random()-0.5)*intensity}px, ${(Math.random()-0.5)*intensity}px)`;
+            } else {
+                showcase.style.transform = `translate(0px, 0px)`;
+            }
+
+            // 4. 溫度漸變
+            if (currentTemp > targetTemp) currentTemp -= 0.012;
+            else if (currentTemp < targetTemp) currentTemp += 0.005; 
+            if (Math.abs(currentTemp - targetTemp) < 0.05) currentTemp = targetTemp;
+
+            updateDashboard(speedRatio);
+            updateWindParticles(speedRatio); 
+            
+            requestAnimationFrame(physicsLoop);
+        }
+
+        // --- UI 更新 ---
+        function updateDashboard(ratio) {
+            tempText.innerText = currentTemp.toFixed(1);
+
+            let frostOpacity = Math.max(0, (MAX_TEMP - currentTemp) / (MAX_TEMP - MIN_TEMP));
+            frostOverlay.style.opacity = frostOpacity * 0.85; 
+
+            if (currentTemp <= 23) tempText.style.color = "#00e5ff";
+            else tempText.style.color = "var(--accent-ice)";
+
+            let currentRPM = ratio * 1500; 
+            
+            if (actualSpeed < 0.5 && targetSpeed === 0) {
+                statusText.innerText = "STANDBY";
+                statusText.style.color = "var(--text-muted)";
+            } else {
+                let rpmStr = currentRPM.toFixed(0).padStart(4, '0');
+                statusText.innerText = `${rpmStr} RPM`;
+                
+                if (actualSpeed < targetSpeed - 1) statusText.style.color = "#ffb142"; // 加速中
+                else if (actualSpeed > targetSpeed + 1) statusText.style.color = "var(--text-muted)"; // 慣性滑行中
+                else statusText.style.color = "var(--accent-blue)"; // 穩定
+            }
+        }
+
+        // --- 視覺氣流系統 ---
+        const canvas = document.getElementById('windCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < 150; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                length: Math.random() * 250 + 100,
+                baseSpeed: Math.random() * 5 + 3,
+                thickness: Math.random() * 2.5 + 0.5,
+                opacity: Math.random() * 0.5 + 0.1
+            });
+        }
+
+        function updateWindParticles(ratio) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (actualSpeed < 1) return;
+
+            ctx.fillStyle = `rgba(129, 212, 250, ${0.45 * ratio})`; 
+
+            particles.forEach(p => {
+                let currentParticleSpeed = p.baseSpeed * (actualSpeed * 0.8);
+                p.x -= currentParticleSpeed;
+
+                if (p.x < -p.length) {
+                    p.x = canvas.width + Math.random() * 300;
+                    p.y = Math.random() * canvas.height;
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.thickness, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillRect(p.x, p.y - p.thickness/2, p.length * ratio, p.thickness);
+            });
+        }
+
+        // 啟動主物理迴圈
+        physicsLoop();
+    </script>
+</body>
+</html>
