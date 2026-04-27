@@ -24,4 +24,6 @@ https://236c.github.io/tw/basketball-pro.html
 典藏暗棋
 https://236c.github.io/tw/Banqi.html
 
+電風扇
+https://236c.github.io/tw/eFan.html
 
