@@ -165,10 +165,24 @@
             background-color: var(--bg-surface); min-height: 135px; overflow: hidden; padding: 10px; cursor: pointer;
             border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
             position: relative; display: flex; flex-direction: column; gap: 5px; min-width: 0; 
+            transition: background-color 0.2s, opacity 0.2s;
         }
         .day-cell:nth-child(7n) { border-right: none; }
         .day-cell:hover { background-color: var(--bg-header); }
-        .day-cell.empty { background-color: var(--bg-body); cursor: default; }
+
+        /* 🔥 非本月日期的底色區別 🔥 */
+        .day-cell.other-month {
+            background-color: var(--bg-body); /* 使用頁面底色產生凹陷區隔感 */
+            opacity: 0.6; /* 降低透明度讓本月份更突顯 */
+        }
+        .day-cell.other-month:hover {
+            background-color: var(--bg-header);
+            opacity: 0.9;
+        }
+        .day-cell.other-month .date-number {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
 
         .date-number { font-weight: 600; color: var(--text-muted); margin-bottom: 6px; font-size: 0.95rem; text-align: left; padding-left: 4px; padding-top: 2px; }
 
@@ -311,9 +325,9 @@
     <div class="nav-month">
         <h4 class="month-title" id="monthYearDisplay">載入中...</h4>
         <div class="btn-group shadow-sm">
-            <button class="btn btn-custom-outline btn-sm px-2 px-md-3" id="prevMonth"><i class="bi bi-chevron-left"></i></button>
-            <button class="btn btn-custom-outline btn-sm px-3 px-md-4 fw-bold text-primary" id="todayBtn" style="border-left: none; border-right: none;">今日</button>
-            <button class="btn btn-custom-outline btn-sm px-2 px-md-3" id="nextMonth"><i class="bi bi-chevron-right"></i></button>
+            <button class="btn btn-custom-outline btn-sm px-2 px-md-3 d-flex align-items-center justify-content-center" id="prevMonth"><i class="bi bi-chevron-left"></i></button>
+            <button class="btn btn-custom-outline btn-sm px-3 px-md-4 fw-bold text-primary d-flex align-items-center justify-content-center" id="todayBtn" style="border-left: none; border-right: none;">今日</button>
+            <button class="btn btn-custom-outline btn-sm px-2 px-md-3 d-flex align-items-center justify-content-center" id="nextMonth"><i class="bi bi-chevron-right"></i></button>
         </div>
     </div>
     
@@ -676,28 +690,34 @@
             const rawFirstDay = new Date(year, month, 1).getDay(); 
             const firstDayOfMonth = rawFirstDay === 0 ? 6 : rawFirstDay - 1; 
             const daysInMonth = new Date(year, month + 1, 0).getDate(); 
-            const today = new Date();
-            const isTodayMonth = today.getFullYear() === year && today.getMonth() === month;
+            const prevMonthDays = new Date(year, month, 0).getDate();
+
+            // 處理跨年的前後月份
+            let prevMonth = month - 1; let prevYear = year;
+            if (prevMonth < 0) { prevMonth = 11; prevYear--; }
+
+            let nextMonth = month + 1; let nextYear = year;
+            if (nextMonth > 11) { nextMonth = 0; nextYear++; }
 
             calendarBody.innerHTML = '';
 
-            for (let i = 0; i < firstDayOfMonth; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.className = 'day-cell empty';
-                calendarBody.appendChild(emptyCell);
-            }
-
-            for (let day = 1; day <= daysInMonth; day++) {
+            // 🔥 共用的單日產生函數 🔥
+            const createCell = (cYear, cMonth, cDay, isOtherMonth) => {
                 const cell = document.createElement('div');
-                cell.className = 'day-cell';
-                if (isTodayMonth && day === today.getDate()) cell.classList.add('today');
+                cell.className = 'day-cell' + (isOtherMonth ? ' other-month' : '');
 
-                const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const today = new Date();
+                if (!isOtherMonth && today.getFullYear() === cYear && today.getMonth() === cMonth && today.getDate() === cDay) {
+                    cell.classList.add('today');
+                }
+
+                const dateString = `${cYear}-${String(cMonth + 1).padStart(2, '0')}-${String(cDay).padStart(2, '0')}`;
                 const dateNum = document.createElement('div');
                 dateNum.className = 'date-number';
-                dateNum.textContent = day;
+                dateNum.textContent = cDay;
                 cell.appendChild(dateNum);
 
+                // 即使是非本月份的格子，也能正常渲染該日的行程
                 const dayEvents = events.filter(evt => dateString >= evt.start && dateString <= (evt.end || evt.start));
                 const isSingleEvent = dayEvents.length === 1;
 
@@ -722,14 +742,25 @@
                 });
 
                 cell.onclick = () => openModalForNew(dateString);
-                calendarBody.appendChild(cell);
+                return cell;
+            };
+
+            // 1. 填入上個月的日期尾巴
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const day = prevMonthDays - firstDayOfMonth + 1 + i;
+                calendarBody.appendChild(createCell(prevYear, prevMonth, day, true));
+            }
+
+            // 2. 填入本月的正式日期
+            for (let day = 1; day <= daysInMonth; day++) {
+                calendarBody.appendChild(createCell(year, month, day, false));
             }
             
+            // 3. 填入下個月的日期開頭
             const totalCells = firstDayOfMonth + daysInMonth;
-            for (let i = 0; i < (7 - (totalCells % 7)) % 7; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.className = 'day-cell empty';
-                calendarBody.appendChild(emptyCell);
+            const remainingCells = (7 - (totalCells % 7)) % 7;
+            for (let day = 1; day <= remainingCells; day++) {
+                calendarBody.appendChild(createCell(nextYear, nextMonth, day, true));
             }
 
             calendarBody.classList.remove('calendar-transitioning');
@@ -789,9 +820,7 @@
             currentDate = new Date(); renderCalendar(); e.target.blur(); 
         };
         
-        // --- 鍵盤快捷鍵支援 ---
         document.addEventListener('keydown', (e) => {
-            // 如果使用者正在輸入文字或開啟對話框，不觸發快捷鍵
             const activeTag = document.activeElement.tagName.toLowerCase();
             const isSwalOpen = document.body.classList.contains('swal2-shown');
             const isModalOpen = document.getElementById('noteModal').classList.contains('show');
@@ -811,7 +840,7 @@
             }
 
             if (changed) {
-                e.preventDefault(); // 防止畫面跟著捲動
+                e.preventDefault(); 
                 renderCalendar();
             }
         });
