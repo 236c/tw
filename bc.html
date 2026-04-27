@@ -189,7 +189,7 @@
         /* 🔥 強化「本日」的顯示效果 🔥 */
         .day-cell.today { 
             background-color: var(--today-bg); 
-            box-shadow: inset 0 0 0 2.5px var(--primary-color); /* 完整的內側粗邊框 */
+            box-shadow: inset 0 0 0 2.5px var(--primary-color);
             z-index: 2; 
         }
         .day-cell.today .date-number { 
@@ -202,10 +202,10 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            padding: 0; /* 覆蓋原本的 padding */
-            margin-top: -2px; /* 微調位置 */
+            padding: 0;
+            margin-top: -2px;
             margin-left: 2px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 讓數字有實體徽章感 */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
         }
 
         /* 行程標籤樣式 */
@@ -833,6 +833,7 @@
             currentDate = new Date(); renderCalendar(); e.target.blur(); 
         };
         
+        // --- 移除了上下左右鍵的觸發，只保留 Page Up, Page Down, Home ---
         document.addEventListener('keydown', (e) => {
             const activeTag = document.activeElement.tagName.toLowerCase();
             const isSwalOpen = document.body.classList.contains('swal2-shown');
@@ -844,10 +845,10 @@
 
             let changed = false;
 
-            if (['ArrowRight', 'ArrowDown', 'PageDown'].includes(e.key)) {
+            if (e.key === 'PageDown') {
                 currentDate.setMonth(currentDate.getMonth() + 1);
                 changed = true;
-            } else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) {
+            } else if (e.key === 'PageUp') {
                 currentDate.setMonth(currentDate.getMonth() - 1);
                 changed = true;
             } else if (e.key === 'Home') {
