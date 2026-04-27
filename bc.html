@@ -160,13 +160,25 @@
         .day-header.weekend-sat { color: var(--weekend-sat); }
         .day-header.weekend-sun { color: var(--weekend-sun); }
 
-        /* 加高格子 */
+        /* 🔥 固定高度格子與內部捲軸設計 🔥 */
         .day-cell {
-            background-color: var(--bg-surface); min-height: 135px; overflow: hidden; padding: 10px; cursor: pointer;
+            background-color: var(--bg-surface); 
+            height: 140px; /* 從 min-height 改為固定 height，防止被撐高 */
+            overflow-y: auto; /* 內容過多時顯示垂直捲軸 */
+            overflow-x: hidden;
+            padding: 8px; 
+            cursor: pointer;
             border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
             position: relative; display: flex; flex-direction: column; gap: 5px; min-width: 0; 
             transition: background-color 0.2s, opacity 0.2s;
         }
+        
+        /* 美化格子內的捲軸 */
+        .day-cell::-webkit-scrollbar { width: 4px; }
+        .day-cell::-webkit-scrollbar-track { background: transparent; }
+        .day-cell::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+        body.theme-dark .day-cell::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+
         .day-cell:nth-child(7n) { border-right: none; }
         .day-cell:hover { background-color: var(--bg-header); }
 
@@ -186,7 +198,7 @@
 
         .date-number { font-weight: 600; color: var(--text-muted); margin-bottom: 6px; font-size: 0.95rem; text-align: left; padding-left: 4px; padding-top: 2px; }
 
-        /* 🔥 強化「本日」的顯示效果 🔥 */
+        /* 強化「本日」的顯示效果 */
         .day-cell.today { 
             background-color: var(--today-bg); 
             box-shadow: inset 0 0 0 2.5px var(--primary-color);
@@ -279,7 +291,7 @@
 
         @media (max-width: 992px) {
             .calendar-container { grid-template-columns: 1fr; }
-            .day-cell { min-height: 100px; max-height: 120px; padding: 6px; }
+            .day-cell { height: 120px; padding: 6px; } /* 固定高度 RWD 覆寫 */
         }
 
         @media (max-width: 850px) {
@@ -322,7 +334,7 @@
 
         @media (max-width: 576px) {
             .day-header { font-size: 0.8rem; padding: 8px 0; }
-            .day-cell { min-height: 80px; max-height: 90px; padding: 4px; gap: 3px; }
+            .day-cell { height: 100px; padding: 4px; gap: 3px; } /* 固定高度 RWD 覆寫 */
             .date-number { font-size: 0.85rem; margin-bottom: 2px; padding-left: 2px; }
             .event-chip { padding: 2px 4px; font-size: 0.75rem; gap: 4px; border-radius: 4px; }
             .event-chip.single-event .chip-text { white-space: nowrap !important; display: block !important; text-overflow: ellipsis; overflow: hidden; }
@@ -833,7 +845,6 @@
             currentDate = new Date(); renderCalendar(); e.target.blur(); 
         };
         
-        // --- 移除了上下左右鍵的觸發，只保留 Page Up, Page Down, Home ---
         document.addEventListener('keydown', (e) => {
             const activeTag = document.activeElement.tagName.toLowerCase();
             const isSwalOpen = document.body.classList.contains('swal2-shown');
