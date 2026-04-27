@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>靜網 | 工具與排程</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             /* 莫蘭迪基礎色票 */
@@ -29,13 +29,17 @@
             --text-muted: #5e5e5e; 
             --border-solid: #e0e0e0;
             --border-dashed: #c4c4c4;
+            
+            /* 附圖樣式中的金色調 */
+            --gold: #dfb15b;
+            --dark-gold: #9e7a33;
         }
 
         body { 
             background-color: var(--bg-main);
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'Noto Serif TC', serif;
             color: var(--text-main);
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
             padding-top: 75px; 
             scroll-padding-top: 90px; 
             line-height: 1.6;
@@ -52,10 +56,16 @@
         }
 
         .navbar-brand {
-            font-weight: 700;
-            color: #1a1a1a !important;
-            letter-spacing: 3px;
-            font-size: 1.25rem;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-weight: 400;
+            color: var(--gold) !important;
+            letter-spacing: 1.5em; 
+            font-size: 1.6rem;
+            text-shadow: 0 0 10px rgba(223, 177, 91, 0.4);
+            transition: color 0.3s;
+        }
+        .navbar-brand:hover {
+            color: var(--dark-gold) !important;
         }
 
         .nav-link {
@@ -65,7 +75,7 @@
             transition: color 0.3s ease;
             letter-spacing: 1px;
         }
-        .nav-link:hover { color: var(--cls-basket) !important; }
+        .nav-link:hover { color: var(--gold) !important; }
 
         /* 標題區 */
         .hero-section {
@@ -82,9 +92,15 @@
         }
 
         .header-title { 
-            font-weight: 700; 
-            font-size: 2rem;
-            letter-spacing: 6px;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-weight: 400; 
+            font-size: 5rem;
+            letter-spacing: 1.5em; /* 調整字距，避免在小螢幕過寬 */
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(223, 177, 91, 0.3);
+            padding-bottom: 20px;
+            margin-bottom: -10px;
+            margin-right: -1.5em; /* 修正 letter-spacing 造成的右偏 */
         }
         
         .header-subtitle { 
@@ -110,22 +126,19 @@
             margin-right: 12px;
         }
 
-        /* 籃球配色 */
         #basketball-tools .category-title::before { background-color: var(--cls-basket); }
         #basketball-tools .icon-wrapper { color: var(--cls-basket); }
 
-        /* 計畫配色 */
         #calendar-planning .category-title::before { background-color: var(--cls-plan); }
         #calendar-planning .icon-wrapper { color: var(--cls-plan); }
         .section-tinted {
-            background-color: #f0f4f8; /* 稍微偏藍的背景 */
+            background-color: #f0f4f8;
             border-top: 1px dashed var(--border-dashed);
             border-bottom: 1px dashed var(--border-dashed);
             padding-bottom: 2rem;
             margin-bottom: 3rem;
         }
 
-        /* 遊戲配色 */
         #gaming .category-title::before { background-color: var(--cls-game); }
         #gaming .icon-wrapper { color: var(--cls-game); }
 
@@ -143,7 +156,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
         }
 
-        /* 個別卡片懸停框線顏色 */
         #basketball-tools .card:hover { border-color: var(--cls-basket); }
         #calendar-planning .card:hover { border-color: var(--cls-plan); }
         #gaming .card:hover { border-color: var(--cls-game); }
@@ -185,26 +197,29 @@
             text-decoration: none;
         }
 
-        /* 籃球與遊戲按鈕 - 框線 */
         .btn-basket-outline { border: 1px solid #b0b0b0; color: var(--text-main); }
         .btn-basket-outline:hover { border-color: var(--cls-basket); color: var(--cls-basket-hover); background: #f8faf9; }
 
         .btn-game-outline { border: 1px solid #b0b0b0; color: var(--text-main); }
         .btn-game-outline:hover { border-color: var(--cls-game); color: var(--cls-game-hover); background: #faf9f8; }
 
-        /* 計畫按鈕 - 實色 */
         .btn-plan-solid { background-color: var(--cls-plan); color: #ffffff; border: 1px solid var(--cls-plan); }
         .btn-plan-solid:hover { background-color: var(--cls-plan-hover); color: #ffffff; }
 
         footer { border-top: 1px solid var(--border-solid); color: var(--text-muted); font-size: 0.85rem; position: relative; }
         footer::before { content: ''; position: absolute; top: 2px; left: 0; right: 0; border-top: 1px dashed var(--border-dashed); }
+
+        /* 手機版標題縮小 */
+        @media (max-width: 768px) {
+            .header-title { font-size: 3rem; letter-spacing: 0.8em; margin-right: -0.8em; }
+        }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
-        <a class="navbar-brand" href="#">靜網</a>
+        <a class="navbar-brand" href="#">靜　網</a>
         <button class="navbar-toggler border-0 shadow-none px-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
@@ -219,7 +234,7 @@
 </nav>
 
 <div class="hero-section container">
-    <h1 class="header-title">靜網</h1>
+    <h1 class="header-title">靜　網</h1>
     <p class="header-subtitle">Jing Net — 工具與排程</p>
 </div>
 
@@ -306,7 +321,7 @@
 <div class="container mb-5" id="gaming">
     <h3 class="category-title">休閒娛樂</h3>
     <div class="row g-4">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-4">
             <div class="card d-flex flex-column">
                 <div class="card-header-custom">
                     <div class="icon-wrapper">🐱</div>
@@ -317,15 +332,26 @@
                 <a href="https://236c.github.io/tw/CatSignalWars.html" class="btn-custom btn-game-outline" target="_blank">開始遊戲</a>
             </div>
         </div>
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-4">
             <div class="card d-flex flex-column">
                 <div class="card-header-custom">
                     <div class="icon-wrapper">♟️</div>
                     <h5 class="card-title">典藏暗棋</h5>
                 </div>
                 <div class="dashed-divider"></div>
-                <p class="card-text flex-grow-1">經典博弈對戰：重溫傳統暗棋的智慧與樂趣，支持精美的棋盤介面與流暢體驗。</p>
+                <p class="card-text flex-grow-1">經典博弈對戰：重溫傳統暗棋的智慧，支持精美的棋盤介面與流暢體驗。</p>
                 <a href="https://236c.github.io/tw/Banqi.html" class="btn-custom btn-game-outline" target="_blank">進入對局</a>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card d-flex flex-column">
+                <div class="card-header-custom">
+                    <div class="icon-wrapper">🍃</div>
+                    <h5 class="card-title">虛擬電風扇</h5>
+                </div>
+                <div class="dashed-divider"></div>
+                <p class="card-text flex-grow-1">簡約美學工具：模擬微風吹拂，為您的數位空間帶來涼意與平靜。</p>
+                <a href="https://236c.github.io/tw/eFan.html" class="btn-custom btn-game-outline" target="_blank">開啟涼風</a>
             </div>
         </div>
     </div>
