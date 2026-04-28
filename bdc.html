@@ -6,6 +6,7 @@
     <title>籃球數據戰情室</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
         /* =========================================
@@ -53,134 +54,102 @@
         /* =========================================
            2. 日式質感風格覆寫 (Japanese Theme)
            ========================================= */
-        body.theme-japanese {
-            background-color: #f2efe9; color: #333130; font-family: 'Noto Sans TC', Tahoma, Geneva, sans-serif;
-            background-image: url('data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23e8e4db" fill-opacity="0.4" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3Ccircle cx="13" cy="13" r="3"/%3E%3C/g%3E%3C/svg%3E');
-        }
-        .theme-japanese h1, .theme-japanese h2, .theme-japanese h3, .theme-japanese h4, .theme-japanese h5, .theme-japanese h6, 
-        .theme-japanese .fw-bold, .theme-japanese .leader-stat-val, .theme-japanese .stat-value {
-            font-family: 'Noto Serif TC', serif; font-weight: 700 !important; color: #2b2927; letter-spacing: 0.5px;
-        }
+        body.theme-japanese { background-color: #f2efe9; color: #333130; font-family: 'Noto Sans TC', Tahoma, Geneva, sans-serif; background-image: url('data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23e8e4db" fill-opacity="0.4" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3Ccircle cx="13" cy="13" r="3"/%3E%3C/g%3E%3C/svg%3E'); }
+        .theme-japanese h1, .theme-japanese h2, .theme-japanese h3, .theme-japanese h4, .theme-japanese h5, .theme-japanese h6, .theme-japanese .fw-bold, .theme-japanese .leader-stat-val, .theme-japanese .stat-value { font-family: 'Noto Serif TC', serif; font-weight: 700 !important; color: #2b2927; letter-spacing: 0.5px; }
         .theme-japanese .card-custom { background-color: #faf9f5; border: 1px solid #dcd8ce; border-radius: 4px; box-shadow: 0 4px 15px rgba(40,35,30,0.03); }
         .theme-japanese .text-primary { color: #2b3d4f !important; }
         .theme-japanese .bg-primary { background-color: #2b3d4f !important; }
         .theme-japanese .bg-white { background-color: #faf9f5 !important; }
         .theme-japanese .bg-light { background-color: #efece5 !important; }
-        .theme-japanese .border { border-color: #dcd8ce !important; }
-        .theme-japanese .border-bottom { border-bottom-color: #dcd8ce !important; }
+        .theme-japanese .border, .theme-japanese .border-bottom { border-color: #dcd8ce !important; }
         .theme-japanese .text-accent { color: #8c3a3a; }
         .theme-japanese .text-eff { color: #4e6151; }
-        .theme-japanese .text-warning-custom { color: #b08e51; }
-
-        /* 按鈕設計：強制覆蓋文字顏色，避免暗字 */
         .theme-japanese .btn-primary { background-color: #2b3d4f !important; border-color: #2b3d4f !important; border-radius: 2px; color: #faf9f5 !important; }
         .theme-japanese .btn-primary:hover { background-color: #1e2b38 !important; border-color: #1e2b38 !important; color: #ffffff !important; }
-        .theme-japanese .btn-outline-primary { color: #2b3d4f; border-color: #2b3d4f; border-radius: 2px; }
-        .theme-japanese .btn-outline-primary:hover { background-color: #2b3d4f; color: #fff; }
-        .theme-japanese .btn-outline-danger { color: #8c3a3a; border-color: #8c3a3a; border-radius: 2px; }
-        .theme-japanese .btn-outline-danger:hover { background-color: #8c3a3a; color: #fff; }
-        .theme-japanese .btn-outline-secondary { color: #5a5652; border-color: #c0bcb3; border-radius: 2px; }
-        
-        .theme-japanese .badge { border-radius: 2px; font-family: 'Noto Sans TC', sans-serif; font-weight: 500; }
-        .theme-japanese .badge.bg-secondary { background-color: #7a7671 !important; }
         .theme-japanese .badge.bg-light { background-color: #efece5 !important; border: 1px solid #dcd8ce !important; color: #2b3d4f !important; }
         .theme-japanese .form-control, .theme-japanese .form-select { background-color: #faf9f5; border: 1px solid #c0bcb3; border-radius: 2px; color: #333130; }
-        .theme-japanese .form-control:focus, .theme-japanese .form-select:focus { border-color: #b08e51; box-shadow: 0 0 0 0.2rem rgba(176, 142, 81, 0.2); }
-        .theme-japanese .nav-pills .nav-link { color: #5a5652; border-radius: 2px; font-weight: 500; }
+        .theme-japanese .nav-pills .nav-link { color: #5a5652; border-radius: 2px; }
         .theme-japanese .nav-pills .nav-link.active { background-color: #2b3d4f; color: #faf9f5; }
-        .theme-japanese .nav-pills .nav-link:hover:not(.active) { background-color: #e4dfd5; }
-        .theme-japanese .table { color: #333130; }
-        .theme-japanese .table-hover tbody tr:hover { background-color: #efece5; }
-        .theme-japanese .table th { color: #5a5652; border-bottom: 2px solid #dcd8ce; font-family: 'Noto Serif TC', serif; font-weight: 700; }
-        .theme-japanese .table td, .theme-japanese .table th { border-color: #e4dfd5; }
         .theme-japanese .circular-chart { background: conic-gradient(#b08e51 var(--p), #e4dfd5 0deg); }
         .theme-japanese .circular-chart::before { background-color: #faf9f5; }
-        .theme-japanese .circular-chart-value { color: #2b2927; font-family: 'Noto Sans TC'; }
         .theme-japanese .bar-container { background-color: #e4dfd5; border-radius: 2px; }
         .theme-japanese .bar-fill-player { background-color: #8c3a3a; }
         .theme-japanese .bar-fill-team { background-color: #b0aba1; }
         .theme-japanese .leader-card { background: #faf9f5; border: 1px solid #dcd8ce; border-radius: 4px; }
-        .theme-japanese .leader-silhouette { width: 50px; height: 50px; background-color: #dcd8ce; border-radius: 2px; }
-        .theme-japanese .leader-crown { color: #b08e51; top: 8px; left: 8px; font-size: 1.1rem; }
-        .theme-japanese .leader-stat-name { color: #7a7671; }
-        .theme-japanese .leader-player-num { color: #b0aba1; }
         .theme-japanese .roster-card { border: 1px solid #dcd8ce; border-radius: 4px; background: #faf9f5; }
-        .theme-japanese .roster-card:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(40,35,30,0.06); }
-        .theme-japanese .roster-avatar { background: #e4dfd5; border-radius: 2px; }
-        .theme-japanese .roster-avatar svg { fill: #b0aba1; }
-        .theme-japanese .stat-label { color: #7a7671; }
-        .theme-japanese .tooltip-trigger { border-bottom: 1px dashed #b0aba1; color: #5a5652; }
-        .theme-japanese .tooltip-trigger:hover { color: #2b3d4f; border-bottom-color: #2b3d4f; }
-        .theme-japanese .modal-content { border-radius: 4px; border: 1px solid #dcd8ce; background: #faf9f5; }
-        .theme-japanese .modal-header { border-bottom-color: #dcd8ce; }
 
         /* =========================================
            3. 暗黑科技風格覆寫 (Dark Theme)
            ========================================= */
         body.theme-dark { background-color: #121212; color: #e0e0e0; background-image: none; }
-        
         .theme-dark .bg-white, .theme-dark .card-custom { background-color: #1e1e1e !important; border-color: #333333 !important; }
-        .theme-dark .bg-light { background-color: #2b2b2b !important; } /* 替換淺色區塊為深灰 */
-        
-        .theme-dark .text-dark, .theme-dark h1, .theme-dark h2, .theme-dark h3, .theme-dark h4, .theme-dark h5, .theme-dark h6, 
-        .theme-dark .stat-value, .theme-dark .leader-stat-val { color: #ffffff !important; }
-        
+        .theme-dark .bg-light { background-color: #2b2b2b !important; } 
+        .theme-dark .text-dark, .theme-dark h1, .theme-dark h2, .theme-dark h3, .theme-dark h4, .theme-dark h5, .theme-dark h6, .theme-dark .stat-value, .theme-dark .leader-stat-val { color: #ffffff !important; }
         .theme-dark .text-secondary, .theme-dark .text-muted, .theme-dark .stat-label { color: #aaaaaa !important; }
         .theme-dark .border, .theme-dark .border-bottom { border-color: #333333 !important; }
-        
-        /* 選單與輸入框 */
         .theme-dark .form-control, .theme-dark .form-select { background-color: #2b2b2b !important; border-color: #444444; color: #ffffff; }
-        .theme-dark .form-control:focus, .theme-dark .form-select:focus { border-color: #0d6efd; box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25); color: #ffffff; }
-        .theme-dark .form-control::placeholder { color: #777777; }
-
-        /* 下拉選單 */
         .theme-dark .dropdown-menu { background-color: #2b2b2b; border-color: #444444; }
         .theme-dark .dropdown-item { color: #e0e0e0; }
         .theme-dark .dropdown-item:hover { background-color: #3a3a3a; color: #ffffff; }
-        .theme-dark .dropdown-header { color: #aaaaaa !important; }
-        .theme-dark .dropdown-divider { border-color: #444444; }
-        
-        /* 導覽列與標籤 */
         .theme-dark .nav-pills .nav-link { color: #aaaaaa; }
         .theme-dark .nav-pills .nav-link.active { background-color: #0d6efd; color: #ffffff; }
-        .theme-dark .nav-pills .nav-link:hover:not(.active) { background-color: #2b2b2b; color: #ffffff; }
         .theme-dark .badge.bg-light { background-color: #2b2b2b !important; color: #e0e0e0 !important; border-color: #444444 !important; }
-        
-        /* 表格 */
         .theme-dark table { --bs-table-color: #e0e0e0; --bs-table-bg: transparent; --bs-table-hover-color: #ffffff; --bs-table-hover-bg: rgba(255,255,255,0.05); }
-        .theme-dark .table th { color: #aaaaaa; border-bottom-color: #444444; }
-        .theme-dark .table td, .theme-dark .table th { border-color: #333333; }
-        
-        /* 按鈕 */
-        .theme-dark .btn-outline-secondary { color: #cccccc; border-color: #555555; }
-        .theme-dark .btn-outline-secondary:hover { background-color: #444444; color: #ffffff; border-color: #666666; }
-        .theme-dark .btn-close { filter: invert(1) grayscale(100%) brightness(200%); } /* 將彈窗的 X 變為白色 */
-
-        /* 圓餅圖 */
         .theme-dark .circular-chart { background: conic-gradient(#f59f00 var(--p), #333333 0deg); }
         .theme-dark .circular-chart::before { background-color: #1e1e1e; }
-        .theme-dark .circular-chart-value { color: #ffffff; }
-
-        /* 比較條狀圖 */
         .theme-dark .bar-container { background-color: #333333; }
-
-        /* 排行榜卡片 */
         .theme-dark .leader-card { background: #1e1e1e; border-color: #333333; }
-        .theme-dark .leader-silhouette { background-color: #333333; }
-        
-        /* 球員清單卡片 */
         .theme-dark .roster-card { background: #1e1e1e; border-color: #333333; }
-        .theme-dark .roster-card:hover { background-color: #252525; box-shadow: 0 6px 12px rgba(0,0,0,0.5); }
         .theme-dark .roster-avatar { background-color: #2b2b2b; }
-        .theme-dark .roster-avatar svg { fill: #555555; }
-
-        /* tooltip 虛線 */
-        .theme-dark .tooltip-trigger { border-bottom-color: #555555; color: #cccccc; }
-        .theme-dark .tooltip-trigger:hover { color: #0d6efd; border-bottom-color: #0d6efd; }
-        
-        /* Modal 視窗覆寫 */
         .theme-dark .modal-content { border-color: #444; background: #1e1e1e; }
         .theme-dark .modal-header { border-bottom-color: #444; }
+        .theme-dark .swal2-popup { background: #1e1e1e; color: #e0e0e0; border: 1px solid #444; }
+        .theme-dark .swal2-title, .theme-dark .swal2-html-container { color: #e0e0e0 !important; }
+        .theme-dark .swal2-input { background: #2b2b2b !important; color: #fff !important; border-color: #444 !important; }
+
+        /* =========================================
+           4. 綠意清新風格 (Fresh Green Theme)
+           ========================================= */
+        body.theme-green { background-color: #eef7f2; color: #2c4a3b; }
+        .theme-green .card-custom { background-color: #ffffff; border-color: #cde4d6; box-shadow: 0 4px 15px rgba(32, 201, 151, 0.05); }
+        .theme-green h1, .theme-green h2, .theme-green h3, .theme-green h4, .theme-green h5, .theme-green h6 { color: #1f5f40 !important; }
+        .theme-green .text-dark { color: #1f5f40 !important; }
+        .theme-green .text-primary { color: #20c997 !important; }
+        .theme-green .bg-primary { background-color: #20c997 !important; }
+        .theme-green .bg-light { background-color: #f6fcf8 !important; border-color: #cde4d6 !important; }
+        .theme-green .text-accent { color: #198754; }
+        .theme-green .text-eff { color: #0dcaf0; }
+        .theme-green .border-bottom { border-bottom-color: #cde4d6 !important; }
+        .theme-green .border { border-color: #cde4d6 !important; }
+        .theme-green .btn-primary { background-color: #20c997 !important; border-color: #20c997 !important; color: #fff !important; }
+        .theme-green .btn-primary:hover { background-color: #1aa179 !important; border-color: #1aa179 !important; }
+        .theme-green .btn-outline-primary { color: #20c997; border-color: #20c997; }
+        .theme-green .btn-outline-primary:hover { background-color: #20c997; color: #fff; }
+        .theme-green .btn-outline-success { color: #198754; border-color: #198754; }
+        .theme-green .btn-outline-success:hover { background-color: #198754; color: #fff; }
+        .theme-green .badge.bg-light { background-color: #f6fcf8 !important; border: 1px solid #cde4d6 !important; color: #20c997 !important; }
+        .theme-green .form-control, .theme-green .form-select { border: 1px solid #cde4d6; }
+        .theme-green .form-control:focus, .theme-green .form-select:focus { border-color: #20c997; box-shadow: 0 0 0 0.2rem rgba(32, 201, 151, 0.25); }
+        .theme-green .nav-pills .nav-link { color: #5a826d; font-weight: 500; }
+        .theme-green .nav-pills .nav-link.active { background-color: #20c997; color: #fff; }
+        .theme-green .nav-pills .nav-link:hover:not(.active) { background-color: #e0f2e9; }
+        .theme-green .table th { color: #437055; border-bottom-color: #cde4d6; }
+        .theme-green .table td, .theme-green .table th { border-color: #e0f2e9; }
+        .theme-green .circular-chart { background: conic-gradient(#20c997 var(--p), #e0f2e9 0deg); }
+        .theme-green .circular-chart::before { background-color: #ffffff; }
+        .theme-green .circular-chart-value { color: #1f5f40; }
+        .theme-green .bar-container { background-color: #e0f2e9; }
+        .theme-green .bar-fill-player { background-color: #20c997; }
+        .theme-green .bar-fill-team { background-color: #a3d9c3; }
+        .theme-green .leader-card { background: #f6fcf8; border-color: #cde4d6; }
+        .theme-green .leader-crown { color: #f59f00; }
+        .theme-green .leader-stat-val { color: #1f5f40; }
+        .theme-green .roster-card { background: #ffffff; border-color: #cde4d6; }
+        .theme-green .roster-card:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(32, 201, 151, 0.1); }
+        .theme-green .roster-avatar { background: #e0f2e9; }
+        .theme-green .roster-avatar svg { fill: #a3d9c3; }
+        .theme-green .tooltip-trigger { border-bottom-color: #a3d9c3; color: #437055; }
+        .theme-green .tooltip-trigger:hover { color: #20c997; border-bottom-color: #20c997; }
     </style>
 </head>
 <body>
@@ -192,31 +161,34 @@
             <div class="d-flex flex-wrap align-items-center justify-content-between bg-white p-2 rounded shadow-sm border gap-2">
                 
                 <div class="d-flex flex-wrap align-items-center gap-3">
+                    <ul class="nav nav-pills" id="viewTabs">
+                        <li class="nav-item me-2"><button class="nav-link active px-3" onclick="switchView('management')">👥 球員管理</button></li>
+                        <li class="nav-item me-2"><button class="nav-link px-3" onclick="switchView('individual')">👤 個人分析</button></li>
+                        <li class="nav-item"><button class="nav-link px-3" onclick="switchView('team')">🏀 球隊總覽</button></li>
+                    </ul>
+                </div>
+
+                <div class="d-flex gap-2 ms-auto">
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown">⚙️ 設定</button>
-                        <ul class="dropdown-menu shadow">
-                            <li><button class="dropdown-item text-primary" onclick="exportData()">💾 匯出備份 (JSON)</button></li>
-                            <li><button class="dropdown-item" onclick="document.getElementById('importFile').click()">📂 匯入資料</button></li>
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown">⚙️ 系統管理</button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li><button class="dropdown-item text-primary" onclick="exportData()">⬇️ 匯出備份 (JSON)</button></li>
+                            <li><button class="dropdown-item" onclick="document.getElementById('importFile').click()">⬆️ 匯入資料</button></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><button class="dropdown-item text-danger" onclick="clearData()">🗑️ 清除所有資料</button></li>
                         </ul>
                         <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
                     </div>
                     
-                    <ul class="nav nav-pills" id="viewTabs">
-                        <li class="nav-item me-2"><button class="nav-link px-3" onclick="switchView('management')">👥 球員管理</button></li>
-                        <li class="nav-item me-2"><button class="nav-link active px-3" onclick="switchView('team')">🏀 球隊總覽</button></li>
-                        <li class="nav-item"><button class="nav-link px-3" onclick="switchView('individual')">👤 個人分析</button></li>
-                    </ul>
-                </div>
-
-                <div class="dropdown ms-auto">
-                    <button class="btn btn-sm btn-outline-primary dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown">🎨 介面風格</button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow">
-                        <li><button class="dropdown-item" onclick="setTheme('default')">🏀 現代預設</button></li>
-                        <li><button class="dropdown-item" onclick="setTheme('dark')">🌙 暗黑風格</button></li>
-                        <li><button class="dropdown-item" onclick="setTheme('japanese')">🍵 日式質感</button></li>
-                    </ul>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-success dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown">🎨 介面風格</button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li><button class="dropdown-item" onclick="setTheme('default')">🏀 現代預設</button></li>
+                            <li><button class="dropdown-item" onclick="setTheme('green')">🍃 綠意清新</button></li>
+                            <li><button class="dropdown-item" onclick="setTheme('dark')">🌙 暗黑風格</button></li>
+                            <li><button class="dropdown-item" onclick="setTheme('japanese')">🍵 日式質感</button></li>
+                        </ul>
+                    </div>
                 </div>
 
             </div>
@@ -324,6 +296,8 @@
                             <div>
                                 <h2 class="fw-bold text-dark mb-0 d-inline-block me-2" id="displayPlayerName">載入中...</h2>
                                 <span class="badge bg-secondary fs-6 align-text-bottom" id="displayPlayerNumber">#0</span>
+                                <span class="badge bg-primary fs-6 align-text-bottom ms-1" id="displayPlayerPosition" style="display: none;">任意</span>
+                                <span class="text-muted ms-2 small fw-bold" id="displayPlayerPhysicals"></span>
                                 <span id="indGameLogSessionName" class="badge bg-light text-primary border ms-2 fs-6 align-text-bottom">所有場次 (賽季總計)</span>
                             </div>
                         </div>
@@ -414,13 +388,52 @@
 </div>
 
 <div class="modal fade" id="playerProfileModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-sm modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header"><h5 class="modal-title fw-bold" id="playerProfileModalTitle">新增球員</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
         <input type="hidden" id="profilePlayerId">
-        <div class="mb-3"><label class="form-label fw-bold stat-label">球員姓名</label><input type="text" id="profileName" class="form-control bg-light" required></div>
-        <div class="mb-4"><label class="form-label fw-bold stat-label">背號</label><input type="text" id="profileNumber" class="form-control bg-light" required></div>
+        <div class="mb-3">
+            <label class="form-label fw-bold stat-label">球員姓名</label>
+            <input type="text" id="profileName" class="form-control bg-light" required>
+        </div>
+        <div class="row g-2 mb-4">
+            <div class="col-6">
+                <label class="form-label fw-bold stat-label">背號</label>
+                <input type="text" id="profileNumber" class="form-control bg-light" required>
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold stat-label">場上位置</label>
+                <select id="profilePosition" class="form-select bg-light">
+                    <option value="任意">任意 / 搖擺人</option>
+                    <option value="PG">PG (控球後衛)</option>
+                    <option value="SG">SG (得分後衛)</option>
+                    <option value="SF">SF (小前鋒)</option>
+                    <option value="PF">PF (大前鋒)</option>
+                    <option value="C">C (中鋒)</option>
+                </select>
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold stat-label">身高 (cm)</label>
+                <input type="number" id="profileHeight" class="form-control bg-light" placeholder="例如: 170">
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold stat-label">體重 (kg)</label>
+                <input type="number" id="profileWeight" class="form-control bg-light" placeholder="例如: 60">
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold stat-label">年級 / 梯次</label>
+                <input type="text" id="profileGrade" class="form-control bg-light" placeholder="例如: 六年級">
+            </div>
+            <div class="col-6">
+                <label class="form-label fw-bold stat-label">慣用手</label>
+                <select id="profileHand" class="form-select bg-light">
+                    <option value="右手">右手</option>
+                    <option value="左手">左手</option>
+                    <option value="雙手">雙手</option>
+                </select>
+            </div>
+        </div>
         <button class="btn btn-primary w-100 fw-bold" onclick="savePlayerProfile()">💾 儲存球員</button>
       </div>
     </div>
@@ -429,12 +442,73 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // === 共用 Toast 輕提示 ===
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true
+    });
+
+    // --- IndexedDB 核心封裝 ---
+    const IDB_DB_NAME = "BasketballDataCenter";
+    const IDB_STORE_NAME = "appData";
+
+    function openDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(IDB_DB_NAME, 1);
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(IDB_STORE_NAME)) {
+                    db.createObjectStore(IDB_STORE_NAME, { keyPath: "id" });
+                }
+            };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async function idbSet(key, value) {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(IDB_STORE_NAME, "readwrite");
+            const store = tx.objectStore(IDB_STORE_NAME);
+            store.put({ id: key, value: value });
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+        });
+    }
+
+    async function idbGet(key) {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(IDB_STORE_NAME, "readonly");
+            const store = tx.objectStore(IDB_STORE_NAME);
+            const request = store.get(key);
+            request.onsuccess = () => resolve(request.result ? request.result.value : null);
+            request.onerror = () => reject(tx.error);
+        });
+    }
+
+    async function idbRemove(key) {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(IDB_STORE_NAME, "readwrite");
+            const store = tx.objectStore(IDB_STORE_NAME);
+            store.delete(key);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+        });
+    }
+    // ----------------------
+
     const defaultDB = [
-        { id: 1, name: '赤木剛憲', number: '4', games: [] },
-        { id: 2, name: '宮城良田', number: '7', games: [] },
-        { id: 3, name: '櫻木花道', number: '10', games: [] },
-        { id: 4, name: '流川楓', number: '11', games: [] },
-        { id: 5, name: '三井壽', number: '14', games: [] }
+        { id: 1, name: '赤木剛憲', number: '4', position: 'C', height: 197, weight: 90, grade: '三年級', hand: '右手', games: [] },
+        { id: 2, name: '宮城良田', number: '7', position: 'PG', height: 168, weight: 59, grade: '二年級', hand: '右手', games: [] },
+        { id: 3, name: '櫻木花道', number: '10', position: 'PF', height: 189.2, weight: 83, grade: '一年級', hand: '右手', games: [] },
+        { id: 4, name: '流川楓', number: '11', position: 'SF', height: 187, weight: 75, grade: '一年級', hand: '右手', games: [] },
+        { id: 5, name: '三井壽', number: '14', position: 'SG', height: 184, weight: 70, grade: '三年級', hand: '右手', games: [] }
     ];
 
     let db = [];
@@ -446,18 +520,20 @@
     
     const statDict = { pts: '得分 (Points)', reb: '總籃板 (Rebounds)', ast: '助攻 (Assists)', stl: '抄截 (Steals)', blk: '阻攻/蓋火鍋 (Blocks)' };
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
         editModalInstance = new bootstrap.Modal(document.getElementById('editGameModal'));
         playerProfileModalInstance = new bootstrap.Modal(document.getElementById('playerProfileModal'));
         
-        loadTheme(); // 讀取並套用儲存的風格
-        loadAppTitle(); 
-        loadData(); 
+        loadTheme(); 
+        await loadData(); 
+        await loadAppTitle(); 
+        
         updatePlayerSelect();
         updateSessionOptions();
         renderDashboard();
 
-        switchView('team');
+        // 將初始畫面改為球員管理
+        switchView('management');
 
         document.getElementById('playerSelect').addEventListener('change', (e) => {
             currentPlayerId = parseInt(e.target.value);
@@ -472,10 +548,7 @@
     }
 
     function setTheme(theme) {
-        // 先移除所有額外的風格 class
-        document.body.classList.remove('theme-japanese', 'theme-dark');
-        
-        // 依據選擇加上對應的 class
+        document.body.classList.remove('theme-japanese', 'theme-dark', 'theme-green');
         if (theme !== 'default') {
             document.body.classList.add('theme-' + theme);
         }
@@ -483,8 +556,18 @@
     }
     // --------------------
 
-    function loadAppTitle() {
-        const savedTitle = localStorage.getItem('bball_custom_title');
+    async function loadAppTitle() {
+        let savedTitle = await idbGet('bball_custom_title');
+        
+        if (!savedTitle) {
+            const lsTitle = localStorage.getItem('bball_custom_title');
+            if (lsTitle) {
+                savedTitle = lsTitle;
+                await idbSet('bball_custom_title', savedTitle);
+                localStorage.removeItem('bball_custom_title');
+            }
+        }
+
         const displayEl = document.getElementById('appTitleDisplay');
         if (savedTitle) {
             displayEl.innerText = savedTitle;
@@ -493,16 +576,27 @@
         }
     }
 
-    function editAppTitle() {
-        const currentTitle = localStorage.getItem('bball_custom_title') || 'B-BALL 數據中心';
-        const newTitle = prompt('請設定新的名稱 (留空則恢復預設)：', currentTitle);
-        if (newTitle !== null) {
+    async function editAppTitle() {
+        const currentTitle = await idbGet('bball_custom_title') || 'B-BALL 數據中心';
+        
+        const { value: newTitle } = await Swal.fire({
+            title: '設定應用程式名稱',
+            input: 'text',
+            inputValue: currentTitle,
+            inputPlaceholder: '留空則恢復預設...',
+            showCancelButton: true,
+            confirmButtonText: '儲存',
+            cancelButtonText: '取消'
+        });
+
+        if (newTitle !== undefined) {
             if (newTitle.trim() === '') {
-                localStorage.removeItem('bball_custom_title');
+                await idbRemove('bball_custom_title');
             } else {
-                localStorage.setItem('bball_custom_title', newTitle.trim());
+                await idbSet('bball_custom_title', newTitle.trim());
             }
-            loadAppTitle();
+            await loadAppTitle();
+            Toast.fire({ icon: 'success', title: '標題已更新' });
         }
     }
 
@@ -562,16 +656,37 @@
         step();
     }
 
-    function saveData() { localStorage.setItem('bball_db_v7', JSON.stringify(db)); }
-    function loadData() {
-        const saved = localStorage.getItem('bball_db_v7');
-        if (saved) { try { db = JSON.parse(saved); } catch(e) { db = JSON.parse(JSON.stringify(defaultDB)); } } 
-        else { db = JSON.parse(JSON.stringify(defaultDB)); }
+    async function saveData() { 
+        await idbSet('bball_db_v7', db); 
+    }
+
+    async function loadData() {
+        try {
+            let saved = await idbGet('bball_db_v7');
+            
+            if (!saved) {
+                const lsData = localStorage.getItem('bball_db_v7');
+                if (lsData) {
+                    saved = JSON.parse(lsData);
+                    await idbSet('bball_db_v7', saved);
+                    localStorage.removeItem('bball_db_v7');
+                }
+            }
+
+            if (saved) { 
+                db = saved; 
+            } else { 
+                db = JSON.parse(JSON.stringify(defaultDB)); 
+            } 
+        } catch(e) { 
+            console.error("載入資料失敗", e);
+            db = JSON.parse(JSON.stringify(defaultDB)); 
+        }
+        
         db.forEach(p => p.games.forEach(g => { if(!g.id) g.id = 'g_' + Math.random().toString(36).substr(2, 9); }));
         if(db.length > 0) currentPlayerId = db[0].id;
     }
 
-    // 更新選單值的通用函數
     function updateFilter(val) { 
         if (val !== undefined) {
             currentFilter = val;
@@ -580,7 +695,6 @@
             if (firstSelect) currentFilter = firstSelect.value;
         }
         
-        // 同步畫面上所有的選單
         document.querySelectorAll('.session-filter-select').forEach(sel => sel.value = currentFilter);
 
         const isAll = (currentFilter === 'ALL');
@@ -605,7 +719,6 @@
             currentFilter = 'ALL';
         }
         
-        // 同步更新所有選單的選項
         document.querySelectorAll('.session-filter-select').forEach(sel => {
             sel.innerHTML = optionsHtml;
             sel.value = currentFilter;
@@ -616,10 +729,22 @@
         document.querySelectorAll('.delete-session-btn').forEach(btn => btn.style.display = isAll ? 'none' : 'block');
     }
 
-    function editCurrentSession() {
+    async function editCurrentSession() {
         if (currentFilter === 'ALL') return;
-        const newName = prompt('請輸入新的賽事名稱：', currentFilter);
-        if (newName !== null && newName.trim() !== '' && newName.trim() !== currentFilter) {
+        
+        const { value: newName } = await Swal.fire({
+            title: '重新命名賽事',
+            input: 'text',
+            inputValue: currentFilter,
+            showCancelButton: true,
+            confirmButtonText: '儲存',
+            cancelButtonText: '取消',
+            inputValidator: (value) => {
+                if (!value || value.trim() === '') return '賽事名稱不能為空！';
+            }
+        });
+
+        if (newName !== undefined && newName.trim() !== currentFilter) {
             const finalName = newName.trim();
             db.forEach(p => {
                 p.games.forEach(g => {
@@ -629,22 +754,36 @@
                 });
             });
             currentFilter = finalName;
-            saveData();
+            await saveData();
             updateSessionOptions();
             renderDashboard();
+            Toast.fire({ icon: 'success', title: '賽事名稱已修改' });
         }
     }
 
-    function deleteCurrentSession() {
+    async function deleteCurrentSession() {
         if (currentFilter === 'ALL') return;
-        if (confirm(`警告：確定要刪除「${currentFilter}」整場賽事嗎？\n這將會移除所有球員在該賽事的數據，且無法復原！`)) {
+        
+        const result = await Swal.fire({
+            title: `刪除賽事「${currentFilter}」？`,
+            text: '這將會移除所有球員在該賽事的數據，且無法復原！',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '🗑️ 確定刪除',
+            cancelButtonText: '取消'
+        });
+
+        if (result.isConfirmed) {
             db.forEach(p => {
                 p.games = p.games.filter(g => g.sessionName !== currentFilter);
             });
             currentFilter = 'ALL';
-            saveData();
+            await saveData();
             updateSessionOptions();
             renderDashboard();
+            Toast.fire({ icon: 'success', title: '賽事紀錄已移除' });
         }
     }
 
@@ -659,14 +798,20 @@
         return g;
     }
 
-    function addGameData(e) {
+    async function addGameData(e) {
         e.preventDefault();
-        if(db.length === 0) return alert("請先新增球員！");
-        const getVal = (id) => parseInt(document.getElementById(id).value) || 0;
+        
+        if(db.length === 0) {
+            return Swal.fire('錯誤', '請先新增球員！', 'error');
+        }
         
         const newSession = document.getElementById('sessionName').value.trim();
-        if (!newSession) return alert("請輸入賽事名稱！");
+        if (!newSession) {
+            return Swal.fire('提示', '請輸入賽事名稱！', 'warning');
+        }
 
+        const getVal = (id) => parseInt(document.getElementById(id).value) || 0;
+        
         let newGameData = {
             id: 'g_' + Math.random().toString(36).substr(2, 9), 
             sessionName: newSession, 
@@ -689,13 +834,14 @@
             player.games.push(newGameData);
         }
         
-        saveData(); 
+        await saveData(); 
         currentFilter = newSession; 
         updateSessionOptions(); 
         document.querySelectorAll('#dataForm input[type="number"]').forEach(i => i.value = ''); 
         switchView('team'); 
         renderDashboard();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        Toast.fire({ icon: 'success', title: '新增紀錄成功' });
     }
 
     function openEditModal(playerId, gameId) {
@@ -706,20 +852,41 @@
         ['fg2m', 'fg2a', 'fg3m', 'fg3a', 'ftm', 'fta', 'oreb', 'dreb', 'ast', 'stl', 'blk', 'tov', 'pf'].forEach(k => document.getElementById('e_'+k).value = game[k]);
         editModalInstance.show();
     }
-    function saveEditData(e) {
+    
+    async function saveEditData(e) {
         e.preventDefault();
         const pId = parseInt(document.getElementById('editPlayerId').value);
         let game = db.find(p => p.id === pId).games.find(g => g.id === document.getElementById('editGameId').value);
         game.sessionName = document.getElementById('editSessionName').value;
         ['fg2m', 'fg2a', 'fg3m', 'fg3a', 'ftm', 'fta', 'oreb', 'dreb', 'ast', 'stl', 'blk', 'tov', 'pf'].forEach(k => game[k] = parseInt(document.getElementById('e_'+k).value) || 0);
         calculateAdvancedData(game);
-        saveData(); updateSessionOptions(); editModalInstance.hide(); renderDashboard();
+        
+        await saveData(); 
+        updateSessionOptions(); 
+        editModalInstance.hide(); 
+        renderDashboard();
+        Toast.fire({ icon: 'success', title: '數據已更新' });
     }
-    function deleteGame(playerId, gameId) {
-        if(confirm("確定刪除此比賽數據？")) {
+    
+    async function deleteGame(playerId, gameId) {
+        const result = await Swal.fire({
+            title: '刪除數據',
+            text: '確定要刪除這筆單場數據嗎？',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '🗑️ 確定刪除',
+            cancelButtonText: '取消'
+        });
+        
+        if(result.isConfirmed) {
             const player = db.find(p => p.id === playerId);
             player.games = player.games.filter(g => g.id !== gameId);
-            saveData(); updateSessionOptions(); renderDashboard();
+            await saveData(); 
+            updateSessionOptions(); 
+            renderDashboard();
+            Toast.fire({ icon: 'success', title: '已刪除該筆數據' });
         }
     }
 
@@ -736,7 +903,12 @@
         const grid = document.getElementById('playerRosterGrid');
         if(db.length === 0) { grid.innerHTML = '<div class="col-12 text-center text-muted py-5">目前無任何球員，請點擊右上角新增。</div>'; return; }
         
-        grid.innerHTML = db.map(p => `
+        grid.innerHTML = db.map(p => {
+            const posBadge = p.position ? `<span class="badge bg-primary ms-1">${p.position}</span>` : '';
+            const hwText = (p.height || p.weight) ? `<div class="text-secondary small mt-1">${p.height ? p.height+'cm' : '--'} / ${p.weight ? p.weight+'kg' : '--'}</div>` : '';
+            const extraText = (p.grade || p.hand) ? `<div class="text-muted" style="font-size: 0.75rem;">${p.grade||''} ${p.hand ? '('+p.hand+')' : ''}</div>` : '';
+            
+            return `
             <div class="col-6 col-md-4 col-lg-3">
                 <div class="roster-card" onclick="goToPlayer(${p.id})">
                     <div class="actions">
@@ -746,11 +918,13 @@
                     <div class="roster-avatar">
                         <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                     </div>
-                    <div class="fw-bold text-dark fs-6">${p.name}</div>
-                    <div class="text-secondary small">#${p.number}</div>
+                    <div class="fw-bold text-dark fs-6">${p.name} <span class="text-secondary small">#${p.number}</span>${posBadge}</div>
+                    ${hwText}
+                    ${extraText}
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     function openPlayerProfileModal(id = null, event = null) {
@@ -761,37 +935,81 @@
             document.getElementById('profilePlayerId').value = p.id;
             document.getElementById('profileName').value = p.name;
             document.getElementById('profileNumber').value = p.number;
+            document.getElementById('profilePosition').value = p.position || '任意';
+            document.getElementById('profileHeight').value = p.height || '';
+            document.getElementById('profileWeight').value = p.weight || '';
+            document.getElementById('profileGrade').value = p.grade || '';
+            document.getElementById('profileHand').value = p.hand || '右手';
         } else {
             document.getElementById('profilePlayerId').value = '';
             document.getElementById('profileName').value = '';
             document.getElementById('profileNumber').value = '';
+            document.getElementById('profilePosition').value = '任意';
+            document.getElementById('profileHeight').value = '';
+            document.getElementById('profileWeight').value = '';
+            document.getElementById('profileGrade').value = '';
+            document.getElementById('profileHand').value = '右手';
         }
         playerProfileModalInstance.show();
     }
 
-    function savePlayerProfile() {
+    async function savePlayerProfile() {
         const idVal = document.getElementById('profilePlayerId').value;
         const name = document.getElementById('profileName').value.trim();
         const number = document.getElementById('profileNumber').value.trim();
-        if(!name || !number) return alert("姓名與背號不得為空！");
+        const position = document.getElementById('profilePosition').value;
+        const height = document.getElementById('profileHeight').value;
+        const weight = document.getElementById('profileWeight').value;
+        const grade = document.getElementById('profileGrade').value.trim();
+        const hand = document.getElementById('profileHand').value;
+
+        if(!name || !number) {
+            return Swal.fire('提示', '姓名與背號不得為空！', 'warning');
+        }
 
         if(idVal) {
-            const p = db.find(x => x.id === parseInt(idVal)); p.name = name; p.number = number;
+            const p = db.find(x => x.id === parseInt(idVal)); 
+            p.name = name; p.number = number;
+            p.position = position; p.height = height; p.weight = weight;
+            p.grade = grade; p.hand = hand;
         } else {
-            const newPlayer = { id: Date.now(), name: name, number: number, games: [] };
+            const newPlayer = { 
+                id: Date.now(), name: name, number: number, 
+                position: position, height: height, weight: weight,
+                grade: grade, hand: hand, games: [] 
+            };
             db.push(newPlayer);
             if(db.length === 1) currentPlayerId = newPlayer.id;
         }
-        saveData(); updatePlayerSelect(); renderDashboard();
+        
+        await saveData(); 
+        updatePlayerSelect(); 
+        renderDashboard();
         playerProfileModalInstance.hide();
+        Toast.fire({ icon: 'success', title: '球員資料已儲存' });
     }
 
-    function deletePlayerProfile(id, event) {
+    async function deletePlayerProfile(id, event) {
         event.stopPropagation();
-        if(confirm("警告：這將會連同該球員的所有比賽紀錄一併刪除，確定嗎？")) {
+        
+        const result = await Swal.fire({
+            title: '刪除球員',
+            text: '警告：這將會連同該球員的所有比賽紀錄一併刪除，確定嗎？',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '🗑️ 確定刪除',
+            cancelButtonText: '取消'
+        });
+
+        if(result.isConfirmed) {
             db = db.filter(p => p.id !== id);
             if(currentPlayerId === id) currentPlayerId = db.length > 0 ? db[0].id : null;
-            saveData(); updatePlayerSelect(); renderDashboard();
+            await saveData(); 
+            updatePlayerSelect(); 
+            renderDashboard();
+            Toast.fire({ icon: 'success', title: '球員已刪除' });
         }
     }
 
@@ -898,6 +1116,8 @@
         if(db.length === 0) {
             document.getElementById('displayPlayerName').innerText = '無球員資料';
             document.getElementById('displayPlayerNumber').innerText = '#0';
+            document.getElementById('displayPlayerPosition').style.display = 'none';
+            document.getElementById('displayPlayerPhysicals').innerText = '';
             ['pts','reb','ast','eff'].forEach(k=> document.getElementById('anim-ind-'+k).innerText = '0.0');
             document.getElementById('comparisonCharts').innerHTML = ''; document.getElementById('playerGameLog').innerHTML = ''; document.getElementById('teamStatsTable').innerHTML = '';
             initTooltips(); 
@@ -912,6 +1132,14 @@
         
         document.getElementById('displayPlayerName').innerText = player.name;
         document.getElementById('displayPlayerNumber').innerText = `#${player.number}`;
+        
+        document.getElementById('displayPlayerPosition').innerText = player.position || '任意';
+        document.getElementById('displayPlayerPosition').style.display = player.position ? 'inline-block' : 'none';
+        
+        let physicals = [];
+        if (player.height) physicals.push(`${player.height} cm`);
+        if (player.weight) physicals.push(`${player.weight} kg`);
+        document.getElementById('displayPlayerPhysicals').innerText = physicals.join(' / ');
 
         runSuspenseAnimation('anim-ind-pts', c ? (pPts/c) : 0, 1); runSuspenseAnimation('anim-ind-reb', c ? (pReb/c) : 0, 1); runSuspenseAnimation('anim-ind-ast', c ? (pAst/c) : 0, 1); runSuspenseAnimation('anim-ind-eff', c ? (pEff/c) : 0, 1);
 
@@ -946,7 +1174,6 @@
         `).join('');
         document.getElementById('playerGameLog').innerHTML = logHtml || '<tr><td colspan="12" class="text-muted py-4">尚無數據</td></tr>';
 
-        // --- 動態處理全隊戰力統計表 ---
         const isAllSessions = (currentFilter === 'ALL');
         const teamStatsHead = `
             <tr>
@@ -1007,11 +1234,13 @@
         document.getElementById('teamView').style.display = view === 'team' ? 'block' : 'none';
         document.getElementById('managementView').style.display = view === 'management' ? 'block' : 'none';
         document.getElementById('topOverviewSection').style.display = view === 'management' ? 'none' : 'flex';
-        document.querySelectorAll('.nav-link').forEach((btn, i) => btn.classList.toggle('active', (i===0 && view==='management') || (i===1 && view==='team') || (i===2 && view==='individual')));
+        
+        // 修正標籤列的 active 狀態對應新的順序 (0:管理, 1:個人, 2:球隊)
+        document.querySelectorAll('.nav-link').forEach((btn, i) => btn.classList.toggle('active', (i===0 && view==='management') || (i===1 && view==='individual') || (i===2 && view==='team')));
     }
 
-    function exportData() { 
-        const currentTitle = localStorage.getItem('bball_custom_title') || '';
+    async function exportData() { 
+        const currentTitle = await idbGet('bball_custom_title') || '';
         const exportObj = { version: "1.1", appTitle: currentTitle, db: db };
         const a = document.createElement('a'); 
         a.href = URL.createObjectURL(new Blob([JSON.stringify(exportObj, null, 2)], {type: "application/json"})); 
@@ -1023,37 +1252,57 @@
         const f = e.target.files[0]; 
         if(!f) return; 
         const r = new FileReader(); 
-        r.onload = function(ev) { 
+        r.onload = async function(ev) { 
             try { 
                 const d = JSON.parse(ev.target.result); 
                 if (Array.isArray(d)) { db = d; } 
                 else if (d.db && Array.isArray(d.db)) {
                     db = d.db;
-                    if (d.appTitle) { localStorage.setItem('bball_custom_title', d.appTitle); } 
-                    else { localStorage.removeItem('bball_custom_title'); }
-                    loadAppTitle();
+                    if (d.appTitle) { await idbSet('bball_custom_title', d.appTitle); } 
+                    else { await idbRemove('bball_custom_title'); }
+                    await loadAppTitle();
                 } else { throw new Error("Invalid format"); }
+                
                 if(db.length > 0) currentPlayerId = db[0].id; 
-                saveData(); updatePlayerSelect(); updateSessionOptions(); renderDashboard(); 
-                alert('匯入成功！'); 
-            } catch(err) { alert('檔案格式錯誤，無法匯入！'); } 
+                await saveData(); 
+                updatePlayerSelect(); 
+                updateSessionOptions(); 
+                renderDashboard(); 
+                Swal.fire('成功', '資料已成功匯入！', 'success');
+            } catch(err) { 
+                console.error(err); 
+                Swal.fire('錯誤', '檔案格式錯誤，無法匯入！', 'error');
+            } 
         }; 
         r.readAsText(f); 
         e.target.value = ''; 
     }
 
-    function clearData() { 
-        if(confirm("確定清除所有數據與球員名單？這將恢復預設狀態！")) { 
-            localStorage.removeItem('bball_db_v7'); 
-            localStorage.removeItem('bball_custom_title'); 
+    async function clearData() { 
+        const result = await Swal.fire({
+            title: '清除所有資料',
+            text: '確定清除所有數據與球員名單？這將恢復預設狀態且無法復原！',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '🚨 確定清除',
+            cancelButtonText: '取消'
+        });
+
+        if(result.isConfirmed) { 
+            await idbRemove('bball_db_v7'); 
+            await idbRemove('bball_custom_title'); 
             db = JSON.parse(JSON.stringify(defaultDB)); 
             currentPlayerId = db[0].id; 
             currentFilter = 'ALL'; 
-            loadAppTitle(); 
+            await loadAppTitle(); 
             updateSessionOptions(); 
             updatePlayerSelect(); 
             renderDashboard(); 
             document.getElementById('dataForm').reset();
+            
+            Swal.fire('已清除', '所有資料已恢復預設狀態。', 'success');
         } 
     }
 </script>
