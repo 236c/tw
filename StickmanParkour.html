@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>籃球極限跑酷 - 火柴人動態版</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #e9ecef;
+            user-select: none; 
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        #gameCanvas {
+            background-color: #ffffff;
+            border-bottom: 4px solid #495057;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px 8px 0 0;
+            width: 100%; 
+            max-width: 800px;
+            cursor: pointer;
+        }
+        .scoreboard {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 text-center">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0 fs-5 fs-md-4">🏀 籃球跑酷：火柴人特仕版</h4>
+                    <div class="scoreboard fs-5 fs-md-4 text-warning">
+                        分數: <span id="scoreDisplay">0</span>
+                    </div>
+                </div>
+                <div class="card-body p-0 bg-light">
+                    <canvas id="gameCanvas" width="800" height="300"></canvas>
+                </div>
+                <div class="card-footer bg-white">
+                    <p class="mb-0 text-muted small">
+                        <strong>操作：</strong> 點擊畫面 / 按 <kbd>空白鍵</kbd> / <kbd>↑</kbd> 跳躍。<br>
+                        <span class="text-primary fw-bold">輕觸 = 小跳躍 | 長按 = 大跳躍</span>
+                    </p>
+                    <button id="restartBtn" class="btn btn-primary mt-2" style="display: none;" onclick="resetGame()">重新開始</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let score = 0;
+    let frames = 0;
+    let gameActive = true;
+    let obstacles = [];
+    let spawnTimer = 80; 
+    let gameSpeed = 5; // 全局遊戲速度
+
+    // 物理常數與跳躍緩衝
+    const GRAVITY = 0.7; 
+    const JUMP_STRENGTH = -14; 
+    const GROUND_Y = canvas.height - 20;
+    let jumpBufferTimer = 0;
+    const JUMP_BUFFER_MAX = 8; 
+
+    const player = {
+        x: 100,
+        y: 150,
+        width: 30,  
+        height: 50, 
+        vy: 0,
+        isGrounded: false,
+        
+        draw() {
+            const cx = this.x + this.width / 2;
+            const headY = this.y + 10;
+            const neckY = this.y + 20;
+            const hipY = this.y + 36;
+            const footY = this.y + 50;
+            const runCycle = this.isGrounded ? Math.sin(frames * 0.4) : 0; 
+            
+            ctx.strokeStyle = '#0d6efd';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // 頭
+            ctx.beginPath();
+            ctx.arc(cx, headY, 7, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // 身體
+            ctx.beginPath();
+            ctx.moveTo(cx, neckY);
+            ctx.lineTo(cx, hipY);
+            ctx.stroke();
+
+            // 雙腿
+            let leftKneeX, leftKneeY, leftFootX, leftFootY;
+            let rightKneeX, rightKneeY, rightFootX, rightFootY;
+
+            if (this.isGrounded) {
+                leftKneeX = cx - 12 * runCycle; leftKneeY = hipY + 6; leftFootX = cx - 18 * runCycle; leftFootY = footY;
+                rightKneeX = cx + 12 * runCycle; rightKneeY = hipY + 6; rightFootX = cx + 18 * runCycle; rightFootY = footY;
+            } else {
+                leftKneeX = cx - 12; leftKneeY = hipY - 2; leftFootX = cx - 5; leftFootY = hipY + 12;
+                rightKneeX = cx + 10; rightKneeY = hipY; rightFootX = cx + 15; rightFootY = hipY + 14;
+            }
+
+            ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(leftKneeX, leftKneeY); ctx.lineTo(leftFootX, leftFootY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(rightKneeX, rightKneeY); ctx.lineTo(rightFootX, rightFootY); ctx.stroke();
+
+            // 籃球與雙手
+            let ballX = cx + 25;
+            let ballY = this.y + 35;
+            if (this.isGrounded) {
+                ballY += Math.sin(frames * 0.3) * 12; 
+            } else {
+                ballY = neckY - 5; 
+            }
+
+            let leftElbowX, leftElbowY, leftHandX, leftHandY;
+            let rightElbowX, rightElbowY, rightHandX, rightHandY;
+
+            if (this.isGrounded) {
+                leftElbowX = cx - 8; leftElbowY = neckY + 8; leftHandX = cx - 15 + 10 * runCycle; leftHandY = neckY + 15;
+            } else {
+                leftElbowX = cx - 12; leftElbowY = neckY; leftHandX = cx - 18; leftHandY = neckY - 8;
+            }
+
+            rightElbowX = cx + 12; rightElbowY = neckY + 5; rightHandX = ballX - 3; rightHandY = ballY - 6;
+
+            ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(leftElbowX, leftElbowY); ctx.lineTo(leftHandX, leftHandY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(rightHandX, rightHandY); ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, 8, 0, Math.PI * 2);
+            ctx.fillStyle = '#fd7e14';
+            ctx.fill();
+            ctx.strokeStyle = '#212529';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(ballX - 8, ballY);
+            ctx.lineTo(ballX + 8, ballY);
+            ctx.stroke();
+        },
+
+        update() {
+            this.vy += GRAVITY;
+            this.y += this.vy;
+
+            if (this.y + this.height >= GROUND_Y) {
+                this.y = GROUND_Y - this.height;
+                this.vy = 0;
+                this.isGrounded = true;
+
+                if (jumpBufferTimer > 0) {
+                    this.jump();
+                    jumpBufferTimer = 0; 
+                }
+            } else {
+                this.isGrounded = false;
+            }
+
+            if (jumpBufferTimer > 0) jumpBufferTimer--;
+        },
+
+        jump() {
+            this.vy = JUMP_STRENGTH; 
+            this.isGrounded = false;
+        }
+    };
+
+    class Obstacle {
+        constructor(offsetX = 0) {
+            this.x = canvas.width + offsetX; 
+            this.difficulty = Math.floor(Math.random() * 3) + 1;
+            this.width = 20 + (this.difficulty * 10);
+            this.height = 30 + (this.difficulty * 20); 
+            this.y = GROUND_Y - this.height;
+            this.passed = false; 
+
+            this.updateAppearance();
+        }
+
+        updateAppearance() {
+            this.width = 20 + (this.difficulty * 10);
+            this.height = 30 + (this.difficulty * 20); 
+            this.y = GROUND_Y - this.height;
+            switch(this.difficulty) {
+                case 1: this.color = '#198754'; this.bonus = 10; break;
+                case 2: this.color = '#ffc107'; this.bonus = 30; break;
+                case 3: this.color = '#dc3545'; this.bonus = 50; break;
+            }
+        }
+
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.fillStyle = 'white';
+            ctx.font = '14px Arial';
+            ctx.fillText('+' + this.bonus, this.x + 2, this.y - 5);
+        }
+
+        update() {
+            // 統一使用全局速度，避免新舊障礙物速度不同導致疊加
+            this.x -= gameSpeed;
+        }
+    }
+
+    // --- 輸入控制 ---
+    function handleInputPress(e) {
+        if (e && e.preventDefault) {
+            if(e.target === canvas) e.preventDefault(); 
+        }
+
+        if (gameActive) {
+            if (player.isGrounded) {
+                player.jump();
+            } else {
+                jumpBufferTimer = JUMP_BUFFER_MAX;
+            }
+        } else {
+            resetGame(); 
+        }
+    }
+
+    function handleInputRelease() {
+        if (player.vy < 0) {
+            player.vy *= 0.4; 
+        }
+    }
+
+    window.addEventListener('keydown', function(e) {
+        if (e.code === 'Space' || e.code === 'ArrowUp') {
+            if (!e.repeat) handleInputPress(e);
+        }
+    });
+    window.addEventListener('keyup', function(e) {
+        if (e.code === 'Space' || e.code === 'ArrowUp') handleInputRelease();
+    });
+    canvas.addEventListener('touchstart', handleInputPress, { passive: false });
+    canvas.addEventListener('touchend', handleInputRelease, { passive: false });
+    canvas.addEventListener('mousedown', handleInputPress);
+    canvas.addEventListener('mouseup', handleInputRelease);
+
+    // --- 遊戲邏輯 ---
+    function handleObstacles() {
+        spawnTimer--;
+        
+        if (spawnTimer <= 0) {
+            let obs1 = new Obstacle();
+            obstacles.push(obs1);
+            
+            let isDoubleObstacle = Math.random() < 0.25;
+
+            if (isDoubleObstacle) {
+                // 完全貼合的雙重障礙物
+                let obs2 = new Obstacle(obs1.width);
+                
+                // 強制讓第二個障礙物的高度與第一個不同，形成階梯感
+                if (obs1.difficulty === 3) {
+                    obs2.difficulty = Math.floor(Math.random() * 2) + 1; // 1 或 2
+                } else {
+                    // 如果第一個是 1或2，第二個就強制選一個不同的
+                    do {
+                        obs2.difficulty = Math.floor(Math.random() * 3) + 1;
+                    } while (obs2.difficulty === obs1.difficulty);
+                }
+                
+                obs2.updateAppearance();
+                obstacles.push(obs2);
+
+                // 計算基礎等待幀數，並根據當下速度進行縮放 (速度越快，等待幀數越少)
+                let baseWait = Math.floor(Math.random() * 50) + 110;
+                spawnTimer = Math.floor(baseWait * (5 / gameSpeed)); 
+            } else {
+                let baseWait = Math.floor(Math.random() * 50) + 70;
+                spawnTimer = Math.floor(baseWait * (5 / gameSpeed)); 
+            }
+        }
+
+        for (let i = 0; i < obstacles.length; i++) {
+            let obs = obstacles[i];
+            obs.update();
+            obs.draw();
+
+            let hitTolerance = 4; 
+            if (
+                player.x + hitTolerance < obs.x + obs.width &&
+                player.x + player.width - hitTolerance > obs.x &&
+                player.y + hitTolerance < obs.y + obs.height &&
+                player.y + player.height - hitTolerance > obs.y
+            ) {
+                gameActive = false; 
+            }
+
+            if (!obs.passed && player.x > obs.x + obs.width) {
+                score += obs.bonus;
+                obs.passed = true;
+            }
+
+            if (obs.x + obs.width < 0) {
+                obstacles.splice(i, 1);
+                i--;
+            }
+        }
+    }
+
+    function animate() {
+        if (!gameActive) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 36px Courier New';
+            ctx.textAlign = 'center';
+            ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 10);
+            ctx.font = '20px Courier New';
+            ctx.fillText('點擊畫面重新開始', canvas.width/2, canvas.height/2 + 30);
+            restartBtn.style.display = 'inline-block';
+            return;
+        }
+
+        // 動態調整全局速度，分數越高越快 (上限限制在 12)
+        gameSpeed = 5 + (score * 0.003);
+        if (gameSpeed > 12) gameSpeed = 12;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.beginPath();
+        ctx.moveTo(0, GROUND_Y);
+        ctx.lineTo(canvas.width, GROUND_Y);
+        ctx.strokeStyle = '#adb5bd';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        player.update();
+        player.draw();
+        handleObstacles();
+
+        frames++;
+        if (frames % 10 === 0) score++; 
+        scoreDisplay.innerText = score;
+
+        requestAnimationFrame(animate);
+    }
+
+    function resetGame() {
+        score = 0;
+        frames = 0;
+        obstacles = [];
+        player.y = 150;
+        player.vy = 0;
+        jumpBufferTimer = 0;
+        gameActive = true;
+        spawnTimer = 80; 
+        gameSpeed = 5; // 重置遊戲速度
+        restartBtn.style.display = 'none';
+        animate();
+    }
+
+    animate();
+
+</script>
+</body>
+</html>
