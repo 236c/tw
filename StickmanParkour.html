@@ -5,27 +5,221 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>籃球極限跑酷 - 火柴人動態版</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;1,900&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #e9ecef;
+            background-color: #0f172a; 
             user-select: none; 
             -webkit-user-select: none;
             touch-action: manipulation;
+            min-height: 100vh; 
+            margin: 0;
+            font-family: 'Noto Sans TC', sans-serif;
         }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7) !important;
+        }
+
+        .card-body {
+            position: relative; 
+            background-color: #1e293b !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* 移除了桌機版的 min-height，讓容器完全貼合 800x300 的緊湊畫布 */
+        }
+
         #gameCanvas {
-            background-color: #ffffff;
-            border-bottom: 4px solid #495057;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: #1e293b; 
             display: block;
             margin: 0 auto;
-            border-radius: 8px 8px 0 0;
+            border-radius: 12px 12px 0 0;
             width: 100%; 
             max-width: 800px;
-            cursor: pointer;
+            height: auto; 
         }
-        .scoreboard {
+
+        .menu-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(4px); 
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 10; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s; 
+            visibility: visible;
+            opacity: 1;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        .menu-overlay::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 200%; height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 4px,
+                rgba(0, 242, 254, 0.03) 4px,
+                rgba(0, 242, 254, 0.03) 8px
+            );
+            pointer-events: none;
+            z-index: -1;
+            animation: panBackground 20s linear infinite;
+        }
+
+        @keyframes panBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-50px, -50px); }
+        }
+
+        .menu-overlay.hidden {
+            visibility: hidden;
+            opacity: 0;
+            transform: scale(1.05); 
+        }
+        
+        /* --- 壓緊選單排版，確保它能完美塞進 300px 的高度 --- */
+        .game-title {
+            font-family: 'Montserrat', 'Noto Sans TC', sans-serif;
+            font-weight: 900;
+            font-style: italic;
+            font-size: 2.8rem; /* 縮小字體 */
+            margin-bottom: 0.5rem; /* 縮小間距 */
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #00f2fe, #4facfe, #00f2fe); 
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+            animation: floatTitle 3s ease-in-out infinite, gradientShine 3s linear infinite;
+        }
+
+        @keyframes floatTitle {
+            0%, 100% { transform: translateY(0); filter: drop-shadow(0px 5px 15px rgba(0, 242, 254, 0.3)); }
+            50% { transform: translateY(-8px); filter: drop-shadow(0px 10px 20px rgba(0, 242, 254, 0.7)); }
+        }
+        @keyframes gradientShine {
+            to { background-position: 200% center; }
+        }
+
+        .highest-score-badge {
+            background: rgba(15, 23, 42, 0.8);
+            color: #f1c40f;
+            padding: 5px 16px;
+            border-radius: 20px;
             font-family: 'Courier New', Courier, monospace;
             font-weight: bold;
+            font-size: 0.95rem;
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            margin-bottom: 0.8rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .instruction-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #00f2fe;
+            padding: 10px 20px;
+            border-radius: 6px;
+            color: #e2e8f0;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-play {
+            position: relative;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            border: none;
+            color: white;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            border-radius: 50px;
+            padding: 10px 40px;
+            font-size: 1.2rem;
+            box-shadow: 0 8px 25px rgba(0, 242, 254, 0.4);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .btn-play::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            animation: sweepLight 3s infinite;
+        }
+
+        @keyframes sweepLight {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        .btn-play:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 242, 254, 0.6);
+            color: white;
+        }
+
+        .audio-toggle {
+            background: rgba(255,255,255,0.1);
+            color: #94a3b8;
+            border: 1px solid #475569;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .audio-toggle.active {
+            background: rgba(0, 242, 254, 0.2);
+            color: #00f2fe;
+            border-color: #00f2fe;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+        }
+
+        .hud-score {
+            z-index: 5;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            pointer-events: none; 
+        }
+        
+        .pulse-text {
+            animation: pulseOpacity 2s infinite;
+            margin-top: 10px !important;
+        }
+        @keyframes pulseOpacity {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* --- 手機版專屬防裁切設計 (自動產生上下黑邊 Letterbox) --- */
+        @media (max-width: 768px) {
+            .card-body {
+                min-height: 380px; 
+            }
+            .game-title { font-size: 2rem; margin-bottom: 0.5rem; }
+            .instruction-box { font-size: 0.85rem; padding: 8px 15px; margin-bottom: 1rem; }
+            .btn-play { padding: 10px 30px; font-size: 1.1rem; }
+            #gameCanvas { border-radius: 0; }
         }
     </style>
 </head>
@@ -34,22 +228,36 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-10 text-center">
-            <div class="card shadow">
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0 fs-5 fs-md-4">🏀 籃球跑酷：火柴人特仕版</h4>
-                    <div class="scoreboard fs-5 fs-md-4 text-warning">
-                        分數: <span id="scoreDisplay">0</span>
+            <div class="card shadow-lg">
+                <div class="card-body p-0">
+                    <div class="position-absolute top-0 end-0 p-3 fs-5 text-info hud-score">
+                        SCORE: <span id="scoreDisplay" class="text-white">0</span>
                     </div>
-                </div>
-                <div class="card-body p-0 bg-light">
+
+                    <div id="mainMenuOverlay" class="menu-overlay">
+                        <div class="game-title">籃球跑酷</div>
+                        
+                        <div class="highest-score-badge">
+                            <span>🏆 最高紀錄: <span id="highScoreMenu">0</span></span>
+                            <div id="audioBtn" class="audio-toggle active">🔊 音效: ON</div>
+                        </div>
+
+                        <div class="instruction-box text-start">
+                            <div class="fs-6 mb-1">🎮 <strong>操作指南</strong></div>
+                            <div class="small">
+                                • 點擊畫面任意處 / <kbd>空白鍵</kbd> / <kbd>↑</kbd> 跳躍<br>
+                                • <span class="text-info">輕觸 = 小跳躍</span> | <span class="text-danger">長按 = 大跳躍</span>
+                            </div>
+                        </div>
+                        
+                        <button id="startBtn" class="btn btn-play">START GAME</button>
+                        <div class="text-white pulse-text small" style="letter-spacing: 2px;">- TAP ANYWHERE TO START -</div>
+                    </div>
+                    
                     <canvas id="gameCanvas" width="800" height="300"></canvas>
                 </div>
-                <div class="card-footer bg-white">
-                    <p class="mb-0 text-muted small">
-                        <strong>操作：</strong> 點擊畫面 / 按 <kbd>空白鍵</kbd> / <kbd>↑</kbd> 跳躍。<br>
-                        <span class="text-primary fw-bold">輕觸 = 小跳躍 | 長按 = 大跳躍</span>
-                    </p>
-                    <button id="restartBtn" class="btn btn-primary mt-2" style="display: none;" onclick="resetGame()">重新開始</button>
+                <div class="card-footer bg-dark border-0 pb-3">
+                    <button id="restartBtn" class="btn btn-outline-info mt-2 px-4 rounded-pill fw-bold" style="display: none;" onclick="resetGame()">RESTART 重新開始</button>
                 </div>
             </div>
         </div>
@@ -57,32 +265,113 @@
 </div>
 
 <script>
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+    let isAudioEnabled = true;
+
+    function initAudio() {
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playTone(freq, type, duration, vol) {
+        if (!audioCtx || !isAudioEnabled) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playJumpSound() {
+        if (!audioCtx || !isAudioEnabled) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function playScoreSound() {
+        if (!isAudioEnabled) return;
+        playTone(880, 'sine', 0.1, 0.05); 
+        setTimeout(() => playTone(1108, 'sine', 0.15, 0.05), 100); 
+    }
+
+    function playCrashSound() {
+        if (!audioCtx || !isAudioEnabled) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    }
+
+    const audioBtn = document.getElementById('audioBtn');
+    audioBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        isAudioEnabled = !isAudioEnabled;
+        if (isAudioEnabled) {
+            audioBtn.innerText = '🔊 音效: ON';
+            audioBtn.classList.add('active');
+            initAudio(); 
+        } else {
+            audioBtn.innerText = '🔇 音效: OFF';
+            audioBtn.classList.remove('active');
+        }
+    });
+
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const scoreDisplay = document.getElementById('scoreDisplay');
     const restartBtn = document.getElementById('restartBtn');
+    const mainMenuOverlay = document.getElementById('mainMenuOverlay');
+    const highScoreMenu = document.getElementById('highScoreMenu');
 
     let score = 0;
     let frames = 0;
-    let gameActive = true;
+    let gameActive = false; 
+    let inMenu = true; 
     let obstacles = [];
-    let spawnTimer = 80; 
-    let gameSpeed = 5; // 全局遊戲速度
+    let floatingTexts = []; 
+    let animationId;
 
-    // 物理常數與跳躍緩衝
+    let speedLines = [];
+    const NUM_SPEED_LINES = 20; 
+    for(let i=0; i<NUM_SPEED_LINES; i++) {
+        speedLines.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * (canvas.height - 40), 
+            length: Math.random() * 150 + 50,
+            baseSpeed: Math.random() * 3 + 2, 
+            alpha: Math.random() * 0.3 + 0.1  
+        });
+    }
+
+    let spawnTimer = 80; 
+    let gameSpeed = 5; 
+    let highScore = localStorage.getItem('highScore') || 0; 
+
     const GRAVITY = 0.7; 
     const JUMP_STRENGTH = -14; 
-    const GROUND_Y = canvas.height - 20;
+    const GROUND_Y = canvas.height - 20; 
     let jumpBufferTimer = 0;
     const JUMP_BUFFER_MAX = 8; 
 
     const player = {
-        x: 100,
-        y: 150,
-        width: 30,  
-        height: 50, 
-        vy: 0,
-        isGrounded: false,
+        // 恢復到原本緊湊的 Y 軸起始位置
+        x: 100, y: 150, width: 30, height: 50, vy: 0, isGrounded: false, 
         
         draw() {
             const cx = this.x + this.width / 2;
@@ -92,26 +381,18 @@
             const footY = this.y + 50;
             const runCycle = this.isGrounded ? Math.sin(frames * 0.4) : 0; 
             
-            ctx.strokeStyle = '#0d6efd';
+            ctx.strokeStyle = '#38bdf8'; 
             ctx.lineWidth = 4;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
+            ctx.shadowColor = '#38bdf8'; 
+            ctx.shadowBlur = 5;
 
-            // 頭
-            ctx.beginPath();
-            ctx.arc(cx, headY, 7, 0, Math.PI * 2);
-            ctx.stroke();
+            ctx.beginPath(); ctx.arc(cx, headY, 7, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(cx, hipY); ctx.stroke();
 
-            // 身體
-            ctx.beginPath();
-            ctx.moveTo(cx, neckY);
-            ctx.lineTo(cx, hipY);
-            ctx.stroke();
-
-            // 雙腿
             let leftKneeX, leftKneeY, leftFootX, leftFootY;
             let rightKneeX, rightKneeY, rightFootX, rightFootY;
-
             if (this.isGrounded) {
                 leftKneeX = cx - 12 * runCycle; leftKneeY = hipY + 6; leftFootX = cx - 18 * runCycle; leftFootY = footY;
                 rightKneeX = cx + 12 * runCycle; rightKneeY = hipY + 6; rightFootX = cx + 18 * runCycle; rightFootY = footY;
@@ -119,43 +400,33 @@
                 leftKneeX = cx - 12; leftKneeY = hipY - 2; leftFootX = cx - 5; leftFootY = hipY + 12;
                 rightKneeX = cx + 10; rightKneeY = hipY; rightFootX = cx + 15; rightFootY = hipY + 14;
             }
-
             ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(leftKneeX, leftKneeY); ctx.lineTo(leftFootX, leftFootY); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(rightKneeX, rightKneeY); ctx.lineTo(rightFootX, rightFootY); ctx.stroke();
 
-            // 籃球與雙手
             let ballX = cx + 25;
             let ballY = this.y + 35;
-            if (this.isGrounded) {
-                ballY += Math.sin(frames * 0.3) * 12; 
-            } else {
-                ballY = neckY - 5; 
-            }
+            if (this.isGrounded) ballY += Math.sin(frames * 0.3) * 12; 
+            else ballY = neckY - 5; 
 
             let leftElbowX, leftElbowY, leftHandX, leftHandY;
             let rightElbowX, rightElbowY, rightHandX, rightHandY;
-
             if (this.isGrounded) {
                 leftElbowX = cx - 8; leftElbowY = neckY + 8; leftHandX = cx - 15 + 10 * runCycle; leftHandY = neckY + 15;
             } else {
                 leftElbowX = cx - 12; leftElbowY = neckY; leftHandX = cx - 18; leftHandY = neckY - 8;
             }
-
             rightElbowX = cx + 12; rightElbowY = neckY + 5; rightHandX = ballX - 3; rightHandY = ballY - 6;
 
             ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(leftElbowX, leftElbowY); ctx.lineTo(leftHandX, leftHandY); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(rightHandX, rightHandY); ctx.stroke();
 
-            ctx.beginPath();
-            ctx.arc(ballX, ballY, 8, 0, Math.PI * 2);
-            ctx.fillStyle = '#fd7e14';
+            ctx.shadowBlur = 0; 
+            ctx.beginPath(); ctx.arc(ballX, ballY, 8, 0, Math.PI * 2); 
+            ctx.fillStyle = '#f97316'; 
             ctx.fill();
-            ctx.strokeStyle = '#212529';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(ballX - 8, ballY);
-            ctx.lineTo(ballX + 8, ballY);
-            ctx.stroke();
+            ctx.strokeStyle = '#ffffff'; 
+            ctx.lineWidth = 1.5; 
+            ctx.beginPath(); ctx.moveTo(ballX - 8, ballY); ctx.lineTo(ballX + 8, ballY); ctx.stroke();
         },
 
         update() {
@@ -166,7 +437,6 @@
                 this.y = GROUND_Y - this.height;
                 this.vy = 0;
                 this.isGrounded = true;
-
                 if (jumpBufferTimer > 0) {
                     this.jump();
                     jumpBufferTimer = 0; 
@@ -174,13 +444,13 @@
             } else {
                 this.isGrounded = false;
             }
-
             if (jumpBufferTimer > 0) jumpBufferTimer--;
         },
 
         jump() {
             this.vy = JUMP_STRENGTH; 
             this.isGrounded = false;
+            playJumpSound(); 
         }
     };
 
@@ -188,108 +458,115 @@
         constructor(offsetX = 0) {
             this.x = canvas.width + offsetX; 
             this.difficulty = Math.floor(Math.random() * 3) + 1;
-            this.width = 20 + (this.difficulty * 10);
-            this.height = 30 + (this.difficulty * 20); 
-            this.y = GROUND_Y - this.height;
-            this.passed = false; 
-
             this.updateAppearance();
+            this.passed = false; 
         }
-
         updateAppearance() {
             this.width = 20 + (this.difficulty * 10);
             this.height = 30 + (this.difficulty * 20); 
             this.y = GROUND_Y - this.height;
             switch(this.difficulty) {
-                case 1: this.color = '#198754'; this.bonus = 10; break;
-                case 2: this.color = '#ffc107'; this.bonus = 30; break;
-                case 3: this.color = '#dc3545'; this.bonus = 50; break;
+                case 1: this.color = '#10b981'; this.bonus = 10; break; 
+                case 2: this.color = '#facc15'; this.bonus = 30; break; 
+                case 3: this.color = '#ef4444'; this.bonus = 50; break; 
             }
         }
-
         draw() {
             ctx.fillStyle = this.color;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-            ctx.fillStyle = 'white';
-            ctx.font = '14px Arial';
-            ctx.fillText('+' + this.bonus, this.x + 2, this.y - 5);
+            ctx.beginPath();
+            ctx.roundRect(this.x, this.y, this.width, this.height, [4, 4, 0, 0]);
+            ctx.fill();
         }
-
         update() {
-            // 統一使用全局速度，避免新舊障礙物速度不同導致疊加
             this.x -= gameSpeed;
         }
     }
 
-    // --- 輸入控制 ---
-    function handleInputPress(e) {
-        if (e && e.preventDefault) {
-            if(e.target === canvas) e.preventDefault(); 
+    class FloatingText {
+        constructor(text, x, y, color) {
+            this.text = text; this.x = x; this.y = y; this.color = color;
+            this.alpha = 1.0; this.vy = -1.5;   
         }
+        update() { this.y += this.vy; this.alpha -= 0.02; }
+        draw() {
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, this.alpha);
+            ctx.font = 'bold 24px Montserrat, Courier New';
+            ctx.fillStyle = this.color;
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#0f172a';
+            ctx.strokeText(this.text, this.x, this.y);
+            ctx.fillText(this.text, this.x, this.y);
+            ctx.restore();
+        }
+    }
 
+    function handleInputPress(e) {
+        initAudio(); 
         if (gameActive) {
-            if (player.isGrounded) {
-                player.jump();
-            } else {
-                jumpBufferTimer = JUMP_BUFFER_MAX;
-            }
+            if (player.isGrounded) player.jump();
+            else jumpBufferTimer = JUMP_BUFFER_MAX;
         } else {
-            resetGame(); 
+            resetGame();
         }
     }
 
     function handleInputRelease() {
-        if (player.vy < 0) {
-            player.vy *= 0.4; 
-        }
+        if (gameActive && player.vy < 0) player.vy *= 0.4; 
     }
 
     window.addEventListener('keydown', function(e) {
         if (e.code === 'Space' || e.code === 'ArrowUp') {
+            e.preventDefault(); 
             if (!e.repeat) handleInputPress(e);
         }
-    });
-    window.addEventListener('keyup', function(e) {
-        if (e.code === 'Space' || e.code === 'ArrowUp') handleInputRelease();
-    });
-    canvas.addEventListener('touchstart', handleInputPress, { passive: false });
-    canvas.addEventListener('touchend', handleInputRelease, { passive: false });
-    canvas.addEventListener('mousedown', handleInputPress);
-    canvas.addEventListener('mouseup', handleInputRelease);
+    }, { passive: false });
 
-    // --- 遊戲邏輯 ---
+    window.addEventListener('keyup', function(e) {
+        if (e.code === 'Space' || e.code === 'ArrowUp') {
+            e.preventDefault();
+            handleInputRelease();
+        }
+    });
+
+    window.addEventListener('touchstart', function(e) {
+        if (e.target.id === 'audioBtn' || e.target.id === 'startBtn' || e.target.id === 'restartBtn') return; 
+        e.preventDefault(); 
+        handleInputPress(e);
+    }, { passive: false });
+    
+    window.addEventListener('touchend', function(e) {
+        if (e.target.id === 'audioBtn' || e.target.id === 'startBtn' || e.target.id === 'restartBtn') return;
+        e.preventDefault();
+        handleInputRelease();
+    }, { passive: false });
+    
+    window.addEventListener('mousedown', function(e){
+        if (e.target.id === 'audioBtn' || e.target.id === 'startBtn' || e.target.id === 'restartBtn') return;
+        if (e.button === 0) {
+            e.preventDefault();
+            handleInputPress(e);
+        }
+    });
+    
+    window.addEventListener('mouseup', function(e){
+        if (e.button === 0) handleInputRelease();
+    });
+
     function handleObstacles() {
         spawnTimer--;
-        
         if (spawnTimer <= 0) {
             let obs1 = new Obstacle();
             obstacles.push(obs1);
-            
-            let isDoubleObstacle = Math.random() < 0.25;
-
-            if (isDoubleObstacle) {
-                // 完全貼合的雙重障礙物
-                let obs2 = new Obstacle(obs1.width);
-                
-                // 強制讓第二個障礙物的高度與第一個不同，形成階梯感
-                if (obs1.difficulty === 3) {
-                    obs2.difficulty = Math.floor(Math.random() * 2) + 1; // 1 或 2
-                } else {
-                    // 如果第一個是 1或2，第二個就強制選一個不同的
-                    do {
-                        obs2.difficulty = Math.floor(Math.random() * 3) + 1;
-                    } while (obs2.difficulty === obs1.difficulty);
-                }
-                
+            if (Math.random() < 0.25) {
+                let obs2 = new Obstacle(obs1.width + 15); 
+                if (obs1.difficulty === 3) obs2.difficulty = Math.floor(Math.random() * 2) + 1;
+                else do { obs2.difficulty = Math.floor(Math.random() * 3) + 1; } while (obs2.difficulty === obs1.difficulty);
                 obs2.updateAppearance();
                 obstacles.push(obs2);
-
-                // 計算基礎等待幀數，並根據當下速度進行縮放 (速度越快，等待幀數越少)
-                let baseWait = Math.floor(Math.random() * 50) + 110;
-                spawnTimer = Math.floor(baseWait * (5 / gameSpeed)); 
+                spawnTimer = Math.floor((Math.floor(Math.random() * 50) + 110) * (5 / gameSpeed)); 
             } else {
-                let baseWait = Math.floor(Math.random() * 50) + 70;
-                spawnTimer = Math.floor(baseWait * (5 / gameSpeed)); 
+                spawnTimer = Math.floor((Math.floor(Math.random() * 50) + 70) * (5 / gameSpeed)); 
             }
         }
 
@@ -298,19 +575,22 @@
             obs.update();
             obs.draw();
 
-            let hitTolerance = 4; 
+            let hitTolerance = 6; 
             if (
                 player.x + hitTolerance < obs.x + obs.width &&
                 player.x + player.width - hitTolerance > obs.x &&
                 player.y + hitTolerance < obs.y + obs.height &&
                 player.y + player.height - hitTolerance > obs.y
             ) {
+                playCrashSound(); 
                 gameActive = false; 
             }
 
             if (!obs.passed && player.x > obs.x + obs.width) {
                 score += obs.bonus;
                 obs.passed = true;
+                playScoreSound(); 
+                floatingTexts.push(new FloatingText('+' + obs.bonus, obs.x, obs.y - 10, obs.color));
             }
 
             if (obs.x + obs.width < 0) {
@@ -320,59 +600,160 @@
         }
     }
 
+    function drawSpeedLines(menuSpeedOverride = 0) {
+        ctx.save();
+        ctx.lineCap = 'round';
+        let currentSpeed = menuSpeedOverride > 0 ? menuSpeedOverride : gameSpeed;
+
+        for (let i = 0; i < speedLines.length; i++) {
+            let line = speedLines[i];
+            line.x -= (line.baseSpeed + currentSpeed * 0.8);
+            if (line.x + line.length < 0) {
+                line.x = canvas.width + Math.random() * 200;
+                line.y = Math.random() * (GROUND_Y - 20); 
+            }
+            ctx.beginPath();
+            ctx.moveTo(line.x, line.y);
+            ctx.lineTo(line.x + line.length, line.y);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${line.alpha})`;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    function menuAnimate() {
+        if (!inMenu) return; 
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        drawSpeedLines(4);
+
+        ctx.beginPath();
+        ctx.moveTo(0, GROUND_Y);
+        ctx.lineTo(canvas.width, GROUND_Y);
+        ctx.strokeStyle = '#475569'; 
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        player.isGrounded = true;
+        player.draw();
+
+        frames++;
+        
+        animationId = requestAnimationFrame(menuAnimate);
+    }
+
     function animate() {
         if (!gameActive) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('highScore', highScore);
+            }
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 36px Courier New';
+            
+            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowBlur = 10;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 48px Montserrat, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 10);
-            ctx.font = '20px Courier New';
-            ctx.fillText('點擊畫面重新開始', canvas.width/2, canvas.height/2 + 30);
+            ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 30);
+            
+            ctx.shadowBlur = 0;
+            ctx.font = 'bold 24px Noto Sans TC, sans-serif';
+            ctx.fillStyle = '#00f2fe'; 
+            ctx.fillText('最終分數: ' + score, canvas.width/2, canvas.height/2 + 10);
+            
+            ctx.font = '14px Montserrat, sans-serif';
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText('HIGH SCORE: ' + highScore, canvas.width/2, canvas.height/2 + 40);
+
+            ctx.font = '16px Noto Sans TC, sans-serif';
+            ctx.fillStyle = '#e2e8f0';
+            ctx.globalAlpha = 0.7 + Math.sin(frames * 0.1) * 0.3; 
+            ctx.fillText('— 點擊畫面重新開始 —', canvas.width/2, canvas.height/2 + 75);
+            ctx.globalAlpha = 1.0;
+
             restartBtn.style.display = 'inline-block';
-            return;
+            return; 
         }
 
-        // 動態調整全局速度，分數越高越快 (上限限制在 12)
         gameSpeed = 5 + (score * 0.003);
         if (gameSpeed > 12) gameSpeed = 12;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
+        drawSpeedLines();
+
         ctx.beginPath();
         ctx.moveTo(0, GROUND_Y);
         ctx.lineTo(canvas.width, GROUND_Y);
-        ctx.strokeStyle = '#adb5bd';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#475569'; 
+        ctx.lineWidth = 3;
         ctx.stroke();
 
         player.update();
         player.draw();
         handleObstacles();
 
+        for (let i = floatingTexts.length - 1; i >= 0; i--) {
+            let ft = floatingTexts[i];
+            ft.update();
+            ft.draw();
+            if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+        }
+
         frames++;
         if (frames % 10 === 0) score++; 
         scoreDisplay.innerText = score;
 
-        requestAnimationFrame(animate);
+        animationId = requestAnimationFrame(animate);
     }
 
     function resetGame() {
+        initAudio(); 
+        
+        cancelAnimationFrame(animationId);
+        
+        mainMenuOverlay.classList.add('hidden');
+        
         score = 0;
         frames = 0;
         obstacles = [];
-        player.y = 150;
+        floatingTexts = []; 
+        player.y = 150; // 恢復回 150 起始高度
         player.vy = 0;
         jumpBufferTimer = 0;
+        
         gameActive = true;
+        inMenu = false; 
+
         spawnTimer = 80; 
-        gameSpeed = 5; // 重置遊戲速度
+        gameSpeed = 5; 
         restartBtn.style.display = 'none';
-        animate();
+        
+        animate(); 
     }
 
-    animate();
+    function showMainMenu() {
+        cancelAnimationFrame(animationId); 
+        
+        highScoreMenu.innerText = highScore;
+        mainMenuOverlay.classList.remove('hidden');
+        restartBtn.style.display = 'none';
+        
+        gameActive = false; 
+        inMenu = true; 
+        
+        menuAnimate(); 
+    }
+    
+    document.getElementById('startBtn').addEventListener('click', resetGame);
+    
+    showMainMenu(); 
+    window.focus(); 
 
 </script>
 </body>
