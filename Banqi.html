@@ -136,13 +136,18 @@
         .btn-custom:hover { background: var(--dark-gold); color: #111; box-shadow: 0 0 15px var(--dark-gold); }
 
         .board-wrapper {
-            position: relative; width: 100%;
-            max-width: calc((100vh - 250px) * 2); 
+            position: relative; 
+            width: 100%;
+            /* 修復過度擠壓：確保寬度不超過螢幕寬，且不超過可用高度的兩倍 */
+            max-width: min(100%, calc((100vh - 120px) * 2)); 
             padding: 1.5%; 
             background: linear-gradient(135deg, #4e2f1d, #27140a); 
             border: 2px solid #1a0d06;
             border-radius: 16px;
             box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            
+            /* 啟用 CSS 容器查詢：讓棋子文字可以根據棋盤總寬度完美縮放 */
+            container-type: inline-size;
         }
 
         #board {
@@ -152,6 +157,7 @@
             gap: 4px;
             background: #d4b581; padding: 4px; border-radius: 8px;
             box-shadow: inset 0 0 20px rgba(105, 66, 26, 0.8);
+            min-width: 0; /* 防止網格破版 */
         }
 
         .cell {
@@ -159,12 +165,16 @@
             background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
             border: 1px solid rgba(139, 90, 43, 0.3);
             display: flex; align-items: center; justify-content: center; cursor: pointer;
+            min-width: 0; min-height: 0; /* 防止內容撐破格子 */
         }
 
         .piece {
             width: 86%; height: 86%; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: clamp(1.4rem, 3.5vw, 3.5rem); font-weight: 900;
+            /* 將文字大小設定為棋盤寬度的 7%，確保在任何比例下都不會把格子撐破 */
+            font-size: min(5vmin, 2rem); /* 舊設備備用 */
+            font-size: clamp(12px, 7cqi, 3.5rem); 
+            font-weight: 900;
         }
 
         .piece.covered {
@@ -257,7 +267,6 @@
                 justify-content: center;
             }
 
-            /* 保持原本橫排結構，極度壓縮高度與外距 */
             .status-panel {
                 padding: 0.4rem 1rem;
                 margin-top: 0 !important;
@@ -276,8 +285,8 @@
             }
 
             .board-wrapper {
-                /* 計算扣除縮小後的資訊列，最大化棋盤 */
-                max-width: calc((100vw - 65px) * 2); 
+                /* 計算扣除縮小後的資訊列，最大化棋盤，同樣加入防破版機制 */
+                max-width: min(100%, calc((100vw - 80px) * 2)); 
                 padding: 1.5%;
             }
         }
@@ -361,7 +370,7 @@
         }
     }
 
-    // ====== 新增：請求全螢幕並鎖定橫式函數 ======
+    // ====== 請求全螢幕並鎖定橫式函數 ======
     function requestLandscapeFullscreen() {
         const docEl = document.documentElement;
         // 支援跨瀏覽器的全螢幕請求
@@ -386,8 +395,7 @@
         initAudio();
         playSound('start');
         
-        // 在玩家點擊螢幕的瞬間，觸發全螢幕與橫式鎖定
-        requestLandscapeFullscreen();
+        // 【已修改】移除此處的 requestLandscapeFullscreen(); 讓使用者主動點擊按鈕才全螢幕
 
         const menu = document.getElementById('start-menu');
         menu.style.opacity = '0';
