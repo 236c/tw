@@ -41,7 +41,7 @@
             top: 0; left: 0; right: 0; bottom: 0;
             width: 100%; height: 100%; 
             overflow: hidden;
-            touch-action: none; /* 禁用雙擊放大等預設手勢，確保點擊 0 延遲 */
+            touch-action: none; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -144,14 +144,13 @@
             transition: all 0.2s ease;
         }
 
-        /* 🚀 效能優化：移除耗能的 box-shadow 動畫，僅保留硬體加速的 transform 🚀 */
         .piece {
             width: 86%; height: 86%; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 7.5cqi; font-weight: 900;
             transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), border 0.1s ease;
             position: relative; 
-            pointer-events: none; /* 確保點擊事件 100% 交給底層的 .cell 處理 */
+            pointer-events: none; 
         }
 
         .piece.covered { 
@@ -169,7 +168,6 @@
         .piece.red { color: #8b0000; text-shadow: 1px 1px 1px rgba(255,255,255,0.3); }
         .piece.black { color: #111; text-shadow: 1px 1px 1px rgba(255,255,255,0.3); }
 
-        /* 手指按下格子的瞬間回饋 */
         .cell:active .piece { transform: scale(0.92); }
 
         .cell.selected {
@@ -179,7 +177,6 @@
             border-radius: 4px;
         }
 
-        /* 🚀 效能優化：陰影設為靜態常駐，不參與動畫，只讓棋子做輕微位移 🚀 */
         .cell.selected .piece { 
             border: 3px solid var(--highlight-glow);
             z-index: 20; 
@@ -351,7 +348,6 @@
                 div.appendChild(p);
             }
             
-            // 🚀 回歸最穩定相容的 onclick，避免稍微滑動就取消選取的問題 🚀
             div.onclick = () => {
                 handleMove(i);
             };
@@ -364,20 +360,28 @@
         if (!gameActive) return;
         const cell = board[i];
 
+        // 翻開棋子
         if (!cell.isEmpty && cell.isCovered) {
             playSound('flip');
             cell.isCovered = false;
+            
+            // 🔥 核心修復：強制清除剛剛可能誤選取的棋子，防止狀態機錯亂
+            selectedIdx = null; 
+
             if (currentPlayer === null) currentPlayer = cell.color;
             else currentPlayer = (currentPlayer === 'red' ? 'black' : 'red');
             render(); updateStatus(); checkWin(); return;
         }
 
+        // 選取與移動邏輯
         if (selectedIdx === null) {
             if (!cell.isEmpty && !cell.isCovered && cell.color === currentPlayer) {
                 selectedIdx = i; render();
             }
         } else {
+            // 如果點選同一顆，取消選取
             if (i === selectedIdx) { selectedIdx = null; render(); return; }
+            
             if (canMove(selectedIdx, i)) {
                 playSound(board[i].isEmpty ? 'flip' : 'capture');
                 board[i] = { ...board[selectedIdx] };
@@ -386,6 +390,7 @@
                 currentPlayer = (currentPlayer === 'red' ? 'black' : 'red');
                 render(); updateStatus(); checkWin();
             } else if (!cell.isEmpty && cell.color === currentPlayer && !cell.isCovered) {
+                // 如果點選自己的其他棋子，直接切換選取對象
                 selectedIdx = i; render();
             }
         }
