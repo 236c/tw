@@ -7,189 +7,56 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
     <style>
+        *, *::before, *::after { box-sizing: border-box; }
+
         :root {
             --gold: #dfb15b;
             --dark-gold: #9e7a33;
             --red-piece: #9b111e;
             --black-piece: #0a0a0a;
+            --highlight-glow: #ffea00; /* 高亮呼吸燈專用色 */
         }
 
-        /* 凍結整個 Body，不允許任何滑動或橡皮筋效應 */
+        html {
+            background-color: #111 !important;
+            width: 100%; height: 100%;
+        }
+
         body {
-            background: radial-gradient(circle at center, #2c2c2c 0%, #111 100%);
+            background-color: #111 !important;
+            background-image: radial-gradient(circle at center, #2c2c2c 0%, #111 100%) !important;
+            background-size: cover !important; 
             color: #f1f1f1;
             font-family: 'Noto Serif TC', serif;
             margin: 0; padding: 0;
-            position: fixed; /* 釘死視窗 */
+            position: fixed; 
             top: 0; left: 0; right: 0; bottom: 0;
-            width: 100vw; height: 100vh;
+            width: 100%; height: 100%; 
             overflow: hidden;
-            touch-action: none; /* 停用所有預設手勢 (如上一頁、下拉更新) */
+            touch-action: none; 
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .container {
-            width: 100%; height: 100%;
-            max-width: 1200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 15px;
-            box-sizing: border-box;
-        }
-
         /* =========================================
-           🌟 UI 面板樣式
-           ========================================= */
-        .status-panel {
-            width: 100%;
-            max-width: 800px; /* 限制寬度使其與棋盤更搭配 */
-            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-            padding: 10px 20px;
-            border-radius: 12px;
-            border: 1px solid #444;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            margin-bottom: 15px;
-            flex-shrink: 0; /* 確保面板不會被壓縮 */
-        }
-
-        .turn-indicator {
-            font-family: 'Ma Shan Zheng', cursive;
-            padding: 5px 20px;
-            border-radius: 6px;
-            font-size: 1.4rem;
-            letter-spacing: 2px;
-            transition: all 0.4s ease;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-        }
-
-        .turn-red { background: linear-gradient(135deg, #b71c1c, #7f0000); color: #ffd54f; }
-        .turn-black { background: linear-gradient(135deg, #424242, #111); color: #fff; }
-        .turn-wait { background: #333; color: #888; }
-
-        .controls { display: flex; gap: 10px; }
-        
-        .btn-custom {
-            background: transparent;
-            border: 1px solid var(--dark-gold);
-            color: var(--gold);
-            padding: 5px 15px;
-            border-radius: 6px;
-            transition: all 0.3s;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .btn-custom:hover { background: var(--dark-gold); color: #111; box-shadow: 0 0 15px var(--dark-gold); }
-
-        /* =========================================
-           🌟 棋盤自適應核心 (抗破版)
-           ========================================= */
-        .board-scaler {
-            width: 100%;
-            flex-grow: 1; /* 佔滿剩餘空間 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 0; /* 防止 Flex 子元素撐破父層 */
-        }
-
-        .board-wrapper {
-            width: 100%;
-            /* 透過公式保證寬度絕對不會超過可用高度的 2 倍 */
-            max-width: calc((100vh - 120px) * 2); 
-            padding: 10px; 
-            background: linear-gradient(135deg, #4e2f1d, #27140a); 
-            border: 2px solid #1a0d06;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-            box-sizing: border-box;
-            container-type: inline-size; /* 讓棋子字體可依此容器寬度縮放 */
-        }
-
-        #board {
-            width: 100%;
-            /* 關鍵修正：由整個棋盤掌控比例，確保完美 8x4 網格 */
-            aspect-ratio: 2 / 1; 
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 2px; /* 稍微縮小間距適應手機 */
-            background: #d4b581; 
-            padding: 4px; 
-            border-radius: 8px;
-            box-shadow: inset 0 0 15px rgba(105, 66, 26, 0.8);
-            box-sizing: border-box;
-        }
-
-        .cell {
-            /* 刪除原本的 aspect-ratio: 1/1，交給 #board 控制 */
-            width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
-            border: 1px solid rgba(139, 90, 43, 0.3);
-            display: flex; align-items: center; justify-content: center; 
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-
-        .piece {
-            width: 86%; height: 86%; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            /* 將字體綁定在容器的 6.5% 寬度，永不撐破格子 */
-            font-size: clamp(14px, 6.5cqi, 4rem); 
-            font-weight: 900;
-            box-sizing: border-box;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
-            position: relative; 
-        }
-
-        .piece.covered {
-            background: radial-gradient(circle at 30% 30%, #573924, #2a180e);
-            border: 1px solid #140b06;
-            box-shadow: inset 2px 2px 4px rgba(255,255,255,0.15), inset -4px -4px 8px rgba(0,0,0,0.6), 0 8px 12px rgba(0,0,0,0.6);               
-        }
-        .piece.covered::after { content: "㊞"; color: rgba(223, 177, 91, 0.6); font-family: 'Ma Shan Zheng'; }
-
-        .piece.revealed {
-            background: radial-gradient(circle at 35% 25%, #fffff8 0%, #e8dec7 60%, #c4af92 100%);
-            box-shadow: inset 3px 3px 6px rgba(255,255,255,0.9), 0 6px 10px rgba(0,0,0,0.5);               
-        }
-
-        .piece.red { color: var(--red-piece); }
-        .piece.black { color: var(--black-piece); }
-
-        .piece:active { transform: scale(0.92); }
-        .cell.selected .piece {
-            transform: scale(1.15) translateY(-4px);
-            box-shadow: 0 10px 20px rgba(223, 177, 91, 0.6), inset 3px 3px 6px rgba(255,255,255,0.9);
-            border: 2px solid var(--gold);
-            z-index: 10; 
-        }
-
-        /* =========================================
-           🌟 結算畫面與開場畫面
+           🌟 遊戲開始畫面 & 結算畫面
            ========================================= */
         #start-menu {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.95);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 5000; transition: opacity 0.8s ease; cursor: pointer;
         }
-        .start-title { font-family: 'Ma Shan Zheng', cursive; font-size: clamp(4rem, 15vw, 7rem); color: var(--gold); margin-bottom: 10px; text-shadow: 0 0 20px rgba(223, 177, 91, 0.5); }
-        .start-subtitle { font-size: 1.2rem; letter-spacing: 8px; color: var(--dark-gold); margin-bottom: 60px; font-weight: 700; }
-        .tap-prompt { font-family: 'Ma Shan Zheng', cursive; font-size: 1.8rem; color: #fff; letter-spacing: 4px; animation: blink 1.2s infinite alternate; }
+        .start-title { font-family: 'Ma Shan Zheng', cursive; font-size: clamp(3rem, 12vmin, 7rem); color: var(--gold); margin-bottom: 10px; text-shadow: 0 0 20px rgba(223, 177, 91, 0.5); }
+        .start-subtitle { font-size: clamp(1rem, 3vmin, 1.5rem); letter-spacing: 8px; color: var(--dark-gold); margin-bottom: 60px; font-weight: 700; }
+        .tap-prompt { font-family: 'Ma Shan Zheng', cursive; font-size: clamp(1.2rem, 4vmin, 2rem); color: #fff; letter-spacing: 4px; animation: blink 1.2s infinite alternate; }
         @keyframes blink { 0% { opacity: 0.1; } 100% { opacity: 0.9; } }
 
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px);
-            display: flex; align-items: center; justify-content: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 6000; opacity: 0; visibility: hidden; transition: all 0.4s;
         }
         .modal-overlay.show { opacity: 1; visibility: visible; }
@@ -205,31 +72,139 @@
         .winner-black { color: #e0e0e0; text-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
 
         /* =========================================
-           🌟 響應式：手機直式自動轉橫向 (旋轉演算法更新)
+           🌟 遊戲主佈局與 UI 面板
+           ========================================= */
+        .container {
+            width: 98%; max-width: 1200px;
+            height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .status-panel {
+            width: 100%; max-width: 800px;
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            padding: 10px 20px;
+            border-radius: 12px; border: 1px solid #444;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            margin-bottom: 15px; flex-shrink: 0; 
+        }
+
+        .turn-indicator { font-family: 'Ma Shan Zheng', cursive; padding: 5px 20px; border-radius: 6px; font-size: 1.4rem; letter-spacing: 2px; }
+        .turn-red { background: linear-gradient(135deg, #b71c1c, #7f0000); color: #ffd54f; }
+        .turn-black { background: linear-gradient(135deg, #424242, #111); color: #fff; }
+        .turn-wait { background: #333; color: #888; }
+        
+        .controls { display: flex; gap: 10px; }
+        .btn-custom { background: transparent; border: 1px solid var(--dark-gold); color: var(--gold); padding: 5px 15px; border-radius: 6px; transition: all 0.3s; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .btn-custom:hover { background: var(--dark-gold); color: #111; box-shadow: 0 0 15px var(--dark-gold); }
+
+        /* =========================================
+           🌟 棋盤自適應核心
+           ========================================= */
+        .board-wrapper {
+            position: relative; width: 100%; margin: 0 auto;
+            max-width: calc((100vh - 160px) * 2); 
+            padding: 1.5%; 
+            background: linear-gradient(135deg, #4e2f1d, #27140a); 
+            border: 2px solid #1a0d06; border-radius: 16px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+        }
+
+        #board {
+            width: 100%; aspect-ratio: 2 / 1; 
+            display: grid;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            grid-template-rows: repeat(4, minmax(0, 1fr));
+            gap: 2px; 
+            background: #d4b581; padding: 4px; border-radius: 8px;
+            box-shadow: inset 0 0 15px rgba(105, 66, 26, 0.8);
+            container-type: inline-size; 
+        }
+
+        /* 格子基礎樣式 */
+        .cell {
+            min-width: 0; min-height: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+            border: 1px solid rgba(139, 90, 43, 0.3);
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* 棋子基礎樣式 */
+        .piece {
+            width: 86%; height: 86%; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 7.5cqi; font-weight: 900;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease, border 0.2s ease;
+            position: relative; 
+        }
+
+        /* 蓋住的棋子 */
+        .piece.covered { 
+            background: radial-gradient(circle at 30% 30%, #573924, #2a180e); 
+            border: 1px solid #140b06; 
+            box-shadow: inset 2px 2px 4px rgba(255,255,255,0.15), inset -4px -4px 8px rgba(0,0,0,0.6), 0 8px 12px rgba(0,0,0,0.6); 
+        }
+        .piece.covered::after { content: "㊞"; color: rgba(223, 177, 91, 0.6); font-family: 'Ma Shan Zheng'; }
+        
+        /* 翻開的棋子 */
+        .piece.revealed { 
+            background: radial-gradient(circle at 35% 25%, #e0b471 0%, #b88645 60%, #7a4f1c 100%); 
+            box-shadow: inset 2px 2px 5px rgba(255,255,255,0.3), 0 5px 10px rgba(0,0,0,0.5); 
+            border: 1px solid #5a3a15;
+        }
+        .piece.red { color: #8b0000; text-shadow: 1px 1px 1px rgba(255,255,255,0.3); }
+        .piece.black { color: #111; text-shadow: 1px 1px 1px rgba(255,255,255,0.3); }
+
+        .piece:active { transform: scale(0.92) !important; }
+
+        /* =========================================
+           🔥 強化版：棋子與格子選取特效 (呼吸燈浮空)
+           ========================================= */
+        
+        /* 1. 讓被選取的「格子」發出微光，加強底部視覺提示 */
+        .cell.selected {
+            background: radial-gradient(circle, rgba(255, 234, 0, 0.4) 0%, rgba(255, 255, 255, 0.1) 80%);
+            box-shadow: inset 0 0 15px rgba(255, 234, 0, 0.5);
+            border: 1px solid rgba(255, 234, 0, 0.8);
+            border-radius: 4px;
+        }
+
+        /* 2. 讓被選取的「棋子」明顯浮起、換上亮金邊框，並加上呼吸燈動畫 */
+        .cell.selected .piece { 
+            border: 3px solid var(--highlight-glow);
+            z-index: 20; 
+            animation: pieceFloat 0.8s infinite alternate ease-in-out;
+        }
+
+        @keyframes pieceFloat {
+            0% { 
+                transform: scale(1.1) translateY(-4px); 
+                box-shadow: 0 10px 15px rgba(223, 177, 91, 0.6), inset 3px 3px 6px rgba(255,255,255,0.9); 
+            }
+            100% { 
+                transform: scale(1.22) translateY(-8px); 
+                box-shadow: 0 20px 30px rgba(255, 234, 0, 0.8), inset 3px 3px 6px rgba(255,255,255,1), 0 0 20px rgba(255, 234, 0, 0.7); 
+            }
+        }
+
+        /* =========================================
+           🌟 響應式：手機直式自動轉橫向
            ========================================= */
         @media screen and (orientation: portrait) {
-            .container {
-                position: absolute;
-                top: 50%; left: 50%;
-                /* 巧妙互換 viewport 單位，讓旋轉後的內容完美貼合直式螢幕 */
-                width: 100vh; height: 100vw;
-                transform: translate(-50%, -50%) rotate(90deg);
-                padding: 10px;
+            .container, #start-menu, .modal-overlay {
+                position: fixed !important;
+                top: 50% !important; left: 50% !important;
+                width: 100vh !important; height: 100vw !important; 
+                transform: translate(-50%, -50%) rotate(90deg) !important;
+                flex-direction: column; 
             }
 
-            .status-panel {
-                padding: 8px 15px;
-                margin-bottom: 10px;
-                max-width: 95%; /* 確保面板不會超出版面 */
-            }
-
+            .status-panel { padding: 8px 15px; margin-bottom: 10px; max-width: 95%; }
             .turn-indicator { font-size: 1.2rem; padding: 5px 15px; }
-
-            .board-wrapper {
-                /* 旋轉後，可用高度其實是 100vw。扣掉上方 UI 高度 (~80px) */
-                max-width: calc((100vw - 80px) * 2);
-                padding: 8px;
-            }
+            .board-wrapper { max-width: calc((100vw - 100px) * 2); }
         }
     </style>
 </head>
@@ -250,10 +225,8 @@
             </div>
         </div>
 
-        <div class="board-scaler">
-            <div class="board-wrapper">
-                <div id="board"></div>
-            </div>
+        <div class="board-wrapper">
+            <div id="board"></div>
         </div>
     </div>
 
@@ -261,7 +234,7 @@
         <div class="modal-content">
             <div class="modal-title">對局結束</div>
             <div id="modal-message" style="font-size: 2rem; margin-bottom: 2rem;"></div>
-            <button onclick="closeModalAndRestart()" class="btn-custom" style="font-size: 1.2rem;">再玩一局</button>
+            <button onclick="closeModalAndRestart()" class="btn-custom" style="font-size: 1.2rem; padding: 10px 30px;">再玩一局</button>
         </div>
     </div>
 
@@ -287,7 +260,7 @@
         const now = audioCtx.currentTime;
 
         switch (type) {
-            case 'start': // 啟動音效
+            case 'start': 
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(440, now);
                 osc.frequency.exponentialRampToValueAtTime(880, now + 0.5);
@@ -313,7 +286,6 @@
         }
     }
 
-    // ====== 請求全螢幕並鎖定橫式函數 ======
     function requestLandscapeFullscreen() {
         const docEl = document.documentElement;
         const requestFullscreen = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
@@ -336,7 +308,6 @@
         initAudio();
         playSound('start');
         
-        // 依照要求：點擊開始不自動全螢幕，由玩家手動按按鈕
         const menu = document.getElementById('start-menu');
         menu.style.opacity = '0';
         setTimeout(() => {
@@ -474,11 +445,8 @@
     function closeModalAndRestart() { initGame(); }
 
     function toggleFullScreen() {
-        if (!document.fullscreenElement) {
-            requestLandscapeFullscreen();
-        } else {
-            document.exitFullscreen();
-        }
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
     }
 </script>
 </body>
