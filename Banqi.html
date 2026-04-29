@@ -331,28 +331,45 @@
         currentPlayer = null;
         selectedIdx = null;
         gameActive = true;
+
+        // 【優化】只在初始化時建立 32 個格子的 DOM
+        const boardEl = document.getElementById('board');
+        if (boardEl.children.length === 0) {
+            for (let i = 0; i < 32; i++) {
+                const div = document.createElement('div');
+                div.onclick = () => { handleMove(i); };
+                boardEl.appendChild(div);
+            }
+        }
+
         render();
         updateStatus();
     }
 
     function render() {
         const boardEl = document.getElementById('board');
-        boardEl.innerHTML = '';
         board.forEach((cell, i) => {
-            const div = document.createElement('div');
+            const div = boardEl.children[i];
+            
+            // 更新外層格子的選取狀態
             div.className = `cell ${selectedIdx === i ? 'selected' : ''}`;
+            
+            // 【優化】重複利用內部的 .piece 節點，僅修改屬性而不破壞結構
+            let p = div.querySelector('.piece');
+            
             if (!cell.isEmpty) {
-                const p = document.createElement('div');
+                if (!p) {
+                    p = document.createElement('div');
+                    div.appendChild(p);
+                }
                 p.className = `piece ${cell.isCovered ? 'covered' : 'revealed ' + cell.color}`;
                 p.textContent = cell.isCovered ? '' : cell.name;
-                div.appendChild(p);
+            } else {
+                // 如果該格子是空的，把棋子節點移除
+                if (p) {
+                    div.removeChild(p);
+                }
             }
-            
-            div.onclick = () => {
-                handleMove(i);
-            };
-            
-            boardEl.appendChild(div);
         });
     }
 
@@ -365,8 +382,7 @@
             playSound('flip');
             cell.isCovered = false;
             
-            // 🔥 核心修復：強制清除剛剛可能誤選取的棋子，防止狀態機錯亂
-            selectedIdx = null; 
+            selectedIdx = null; // 清除可能選取的狀態
 
             if (currentPlayer === null) currentPlayer = cell.color;
             else currentPlayer = (currentPlayer === 'red' ? 'black' : 'red');
@@ -392,6 +408,9 @@
             } else if (!cell.isEmpty && cell.color === currentPlayer && !cell.isCovered) {
                 // 如果點選自己的其他棋子，直接切換選取對象
                 selectedIdx = i; render();
+            } else {
+                // 【優化】點選無效的格子（無法吃、無法移動），取消選取
+                selectedIdx = null; render();
             }
         }
     }
