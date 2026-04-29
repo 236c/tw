@@ -9,23 +9,17 @@
     
     <style>
         :root {
-            /* 日式和色色彩計畫 (Traditional Japanese Palette - Zen Style)
-               沉靜、自然、專注
-            */
-            --bg-main: #FBF9F6;         /* 淺米色 / 蒸栗色 (Mushi-kuri-iro) - 像和紙一樣的溫暖 */
-            --bg-section: #F3EEE7;      /* 暖灰藍 / 白練 (Shiro-neri) - 微微偏冷的溫暖灰 */
+            /* 日式和色色彩計畫 */
+            --bg-main: #FBF9F6;
+            --bg-section: #F3EEE7;
+            --primary-dark: #2F4F4F;
+            --accent-moss: #8E9775;
+            --accent-brass: #A67C52;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-light: #D3C3A3;
+            --shadow-color: rgba(47, 79, 79, 0.03);
             
-            --primary-dark: #2F4F4F;    /* 暗瓦色 / 藍墨 (Ai-sumi) - 墨水般的深邃藍綠 */
-            --accent-moss: #8E9775;     /* 苔色 (Koke-iro) - 庭園般的靜謐綠 */
-            --accent-brass: #A67C52;    /* 黃櫨染 (Kōrozen) - 古典的黃銅色 */
-            
-            --text-main: #333333;       /* 墨灰色 / 烏羽色 (Uba-iro) - 柔和的深灰 */
-            --text-muted: #666666;      /* 鼠色 (Nezumi-iro) - 次要文字的淺灰 */
-            
-            --border-light: #D3C3A3;    /* 薄葉色 (Usu-ha-iro) - 像竹皮一樣的淡色 */
-            --shadow-color: rgba(47, 79, 79, 0.03); /* 極淡的深色陰影，營造層次感 */
-            
-            /* 字體設定 */
             --font-title: 'Ma Shan Zheng', cursive;
             --font-body: 'Noto Serif TC', serif;
             --font-accent: 'Playfair Display', serif;
@@ -35,108 +29,61 @@
             background-color: var(--bg-main);
             font-family: var(--font-body);
             color: var(--text-main);
-            padding-top: 100px; /* 增加頂部間距，營造「間」 */
+            padding-top: 100px;
             scroll-padding-top: 120px; 
-            line-height: 2; /* 增加行距，提升閱讀的舒適度 */
+            line-height: 2;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* 導覽列 (和紙質感玻璃擬物化)
-        */
+        /* 導覽列 */
         .navbar {
-            background-color: rgba(251, 249, 246, 0.92) !important; /* 與背景一致，微透 */
+            background-color: rgba(251, 249, 246, 0.92) !important;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(211, 195, 163, 0.3);
             padding: 20px 0;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s ease;
+            z-index: 1050;
         }
 
         .navbar-brand {
             font-family: var(--font-title);
-            font-weight: 400;
-            color: var(--primary-dark) !important; /* 回歸深色 ink 質感 */
-            letter-spacing: 1.2em; /* 增加字距，營造空靈感 */
+            color: var(--primary-dark) !important;
+            letter-spacing: 1.2em;
             font-size: 1.5rem;
             margin-right: -1.2em;
-            text-shadow: none;
-            opacity: 1;
-            transition: opacity 0.3s;
-        }
-        
-        .navbar-brand:hover {
-            opacity: 0.7;
         }
 
         .nav-link {
             color: var(--text-main) !important;
             font-size: 0.9rem;
-            font-weight: 400;
-            transition: all 0.3s ease;
             letter-spacing: 2px;
             position: relative;
-        }
-        
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 1px; /* 極細的線 */
-            bottom: 0;
-            left: 50%;
-            background: var(--accent-brass); /* 黃銅色底線 */
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-            border-radius: 1px;
+            padding: 10px 15px !important;
         }
 
-        .nav-link:hover::after {
-            width: 70%;
-        }
-        .nav-link:hover { color: var(--accent-brass) !important; }
-
-        /* 主視覺標題區 (日式幽玄)
-        */
+        /* 主視覺標題區 */
         .hero-section {
             padding: 100px 0 80px;
             text-align: center;
-            position: relative;
-        }
-
-        .hero-section::before {
-            content: 'JING NET . 靜心工作坊'; /* 改為更具文學感的英文與中文對照 */
-            display: block;
-            font-family: var(--font-accent);
-            font-style: italic;
-            color: var(--accent-moss);
-            font-size: 0.8rem;
-            letter-spacing: 6px;
-            margin-bottom: 25px;
         }
 
         .header-title { 
             font-family: var(--font-title);
-            font-weight: 400; 
             font-size: 5.5rem;
-            letter-spacing: 1.1em; /* 保持原有的氣勢 */
+            letter-spacing: 1.1em;
             margin-right: -1.1em; 
             color: var(--primary-dark);
-            text-shadow: 0px 5px 15px rgba(0,0,0,0.03); /* 極淡的陰影，像墨水擴散 */
             padding-bottom: 15px;
         }
         
         .header-subtitle { 
-            font-family: var(--font-body);
             color: var(--text-muted); 
             letter-spacing: 5px; 
-            margin-top: 15px;
             font-weight: 300;
-            font-size: 1rem;
         }
 
-        /* 區塊標題設計 (簡約細緻)
-        */
+        /* 區塊標題 */
         .category-title {
             font-weight: 500;
             font-size: 1.3rem; 
@@ -146,156 +93,81 @@
             align-items: center;
             letter-spacing: 3px;
         }
-        
-        .emoji-title {
-            margin-right: 18px;
-            font-size: 1.6rem;
-            line-height: 1;
-            opacity: 0.9;
-        }
 
-        /* 將 Tinted 區塊改為暖白色調 */
         .section-tinted {
             background-color: var(--bg-section);
             border-top: 1px solid rgba(211, 195, 163, 0.2);
             border-bottom: 1px solid rgba(211, 195, 163, 0.2);
             padding: 5rem 0;
             margin: 5rem 0;
-            position: relative;
         }
 
-        /* 現代化卡片設計 (如紙般輕盈，增加 Ma 間距)
-        */
+        /* 卡片設計 */
         .card { 
-            border: 1px solid rgba(211, 195, 163, 0.4); /* 極淡的淡棕色邊框 */
+            border: 1px solid rgba(211, 195, 163, 0.4);
             border-radius: 12px;
             background: #ffffff;
-            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 柔和的動畫 */
+            transition: all 0.4s ease;
             height: 100%;
             padding: 2.5rem 2.2rem;
             box-shadow: 0 4px 15px var(--shadow-color);
             position: relative;
-            overflow: hidden;
-        }
-        
-        /* 移除原本鮮豔的漸層頂部線條 */
-        .card::before {
-            display: none;
         }
 
-        /* 柔和的懸浮效果，像呼吸一樣 */
         .card:hover { 
             transform: translateY(-4px);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04); 
-            border-color: rgba(166, 124, 82, 0.3); /* 懸浮時邊框微微變暗 brass 色 */
+            border-color: var(--accent-brass);
         }
         
-        .card-header-custom {
-            display: flex;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
         .icon-wrapper {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%; /* 改為圓形，營造和諧感 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 55px; height: 55px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
             font-size: 1.6rem; 
-            background-color: var(--bg-main); /* 默認淡米色 */
-            margin-right: 20px;
-            transition: all 0.3s ease;
+            background-color: var(--bg-main);
             border: 1px solid rgba(211, 195, 163, 0.3);
+            margin-right: 20px;
+            flex-shrink: 0;
         }
 
-        /* 懸浮時 Emoji 背景變色，保持 Emoji 原色 */
-        .card:hover .icon-wrapper {
-            background-color: rgba(166, 124, 82, 0.1); /* 黃銅色淡背景 */
-            transform: scale(1.05);
-            border-color: rgba(166, 124, 82, 0.2);
-        }
+        .card-header-custom { display: flex; align-items: center; margin-bottom: 25px; }
+        .card-title { font-weight: 500; font-size: 1.2rem; letter-spacing: 2px; margin: 0; }
+        .card-text { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 35px; font-weight: 300; }
 
-        .card-title { 
-            font-weight: 500; /* Noto Serif TC 的中文字體粗細 */
-            font-size: 1.2rem; 
-            margin: 0; 
-            color: var(--text-main);
-            letter-spacing: 2px;
-        }
-        
-        .card-text { 
-            color: var(--text-muted); 
-            font-size: 0.95rem; 
-            line-height: 1.9; 
-            margin-bottom: 35px; 
-            font-weight: 300;
-        }
-
-        /* 沉靜風格按鈕 (極簡實心與細框)
-        */
         .btn-custom {
             border-radius: 6px;
-            font-weight: 400;
-            font-size: 0.9rem; 
-            padding: 14px 0; 
+            padding: 12px 0; 
             letter-spacing: 3px;
-            transition: all 0.3s ease;
             text-align: center;
             display: block;
             width: 100%;
             text-decoration: none;
-            position: relative;
-            z-index: 1;
+            font-size: 0.9rem;
         }
 
-        /* 柔和的細框按鈕 (用於一般工具) */
-        .btn-outline-zen { 
-            border: 1px solid var(--border-light); 
-            color: var(--text-main); 
-            background: transparent;
-        }
-        
-        .btn-outline-zen:hover { 
-            border-color: var(--primary-dark); 
-            background: var(--primary-dark); /* 變為墨色實心 */
-            color: #ffffff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
+        .btn-outline-zen { border: 1px solid var(--border-light); color: var(--text-main); }
+        .btn-outline-zen:hover { background: var(--primary-dark); color: #fff; }
+        .btn-solid-zen { background: var(--primary-dark); color: #fff; }
 
-        /* 柔和的實心按鈕 (用於行事曆/計畫) */
-        .btn-solid-zen { 
-            background: var(--primary-dark); /* 墨色實心 */
-            color: #ffffff; 
-            border: 1px solid var(--primary-dark); 
-        }
-        
-        .btn-solid-zen:hover { 
-            background: var(--accent-moss); /* 變為苔色 */
-            border-color: var(--accent-moss);
-            color: #ffffff; 
-            box-shadow: 0 8px 20px rgba(142, 151, 117, 0.2);
-            transform: translateY(-1px);
-        }
-
-        /* 頁尾設計 (淡雅無負擔)
-        */
-        footer { 
-            border-top: 1px solid rgba(211, 195, 163, 0.2); 
-            color: var(--text-muted); 
-            font-size: 0.8rem; 
-            letter-spacing: 1px;
-            font-family: var(--font-body);
-        }
-
-        /* 手機版適應 (優化間距) */
+        /* 📱 手機優化：雙欄 + 自動收合支援 */
         @media (max-width: 768px) {
-            body { padding-top: 80px; }
-            .header-title { font-size: 3.5rem; letter-spacing: 0.6em; margin-right: -0.6em; }
-            .hero-section { padding: 60px 0 40px; }
-            .hero-section::before { font-size: 0.7rem; letter-spacing: 4px; }
-            .card { padding: 2rem 1.8rem; }
+            body { padding-top: 70px; }
+            .hero-section { padding: 40px 0 20px; }
+            .header-title { font-size: 2.8rem; letter-spacing: 0.4em; margin-right: -0.4em; }
+            .header-subtitle { font-size: 0.8rem; letter-spacing: 2px; }
+            
+            .category-title { font-size: 1.1rem; margin-bottom: 1.5rem; }
+            .section-tinted { padding: 3rem 0; margin: 3rem 0; }
+
+            /* 緊湊雙欄卡片 */
+            .card { padding: 1.2rem 0.8rem; text-align: center; align-items: center; }
+            .card-header-custom { flex-direction: column; margin-bottom: 10px; }
+            .icon-wrapper { margin: 0 0 10px 0; width: 45px; height: 45px; font-size: 1.2rem; }
+            .card-title { font-size: 0.9rem; letter-spacing: 1px; }
+            .card-text { display: none; } /* 隱藏描述節省空間 */
+            
+            .btn-custom { padding: 8px 0; font-size: 0.75rem; width: 90%; margin: 10px auto 0; }
         }
     </style>
 </head>
@@ -304,14 +176,14 @@
 <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
         <a class="navbar-brand" href="#">靜　網</a>
-        <button class="navbar-toggler border-0 shadow-none px-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span style="font-size: 1.5rem; color: var(--primary-dark);">☰</span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto mt-3 mt-lg-0">
-                <li class="nav-item"><a class="nav-link px-lg-3" href="#basketball-tools">專業籃球</a></li>
-                <li class="nav-item"><a class="nav-link px-lg-3" href="#calendar-planning">專注排程</a></li>
-                <li class="nav-item"><a class="nav-link px-lg-3" href="#gaming">數位休閒</a></li>
+                <li class="nav-item"><a class="nav-link" href="#basketball-tools">專業籃球</a></li>
+                <li class="nav-item"><a class="nav-link" href="#calendar-planning">專注排程</a></li>
+                <li class="nav-item"><a class="nav-link" href="#gaming">數位休閒</a></li>
             </ul>
         </div>
     </div>
@@ -324,72 +196,50 @@
 
 <div class="container mb-5" id="basketball-tools">
     <h3 class="category-title"><span class="emoji-title">🏀</span> 籃球專業工具</h3>
-    <div class="row g-4">
-        <div class="col-12 col-md-6">
+    <div class="row g-3 g-md-4">
+        <div class="col-6 col-md-6">
             <div class="card d-flex flex-column">
                 <div class="card-header-custom">
                     <div class="icon-wrapper">📋</div>
                     <h5 class="card-title">籃球戰術版</h5>
                 </div>
-                <p class="card-text flex-grow-1">即時模擬進攻與防守佈置，提供教練與球員最直觀的戰術交流平台。</p>
-                <a href="https://236c.github.io/tw/bcb.html" class="btn-custom btn-outline-zen" target="_blank">開啟工具</a>
+                <p class="card-text">即時模擬進攻與防守佈置。</p>
+                <a href="https://236c.github.io/tw/bcb.html" class="btn-custom btn-outline-zen stretched-link" target="_blank">開啟工具</a>
             </div>
         </div>
-        <div class="col-12 col-md-6">
+        <div class="col-6 col-md-6">
             <div class="card d-flex flex-column">
                 <div class="card-header-custom">
                     <div class="icon-wrapper">⏱️</div>
-                    <h5 class="card-title">專業籃球記分板</h5>
+                    <h5 class="card-title">專業記分板</h5>
                 </div>
-                <p class="card-text flex-grow-1">適用於專業賽事之計時與得分紀錄，操作簡便，精準掌握賽場節奏。</p>
-                <a href="https://236c.github.io/tw/bsb.html" class="btn-custom btn-outline-zen" target="_blank">開啟工具</a>
-            </div>
-        </div>
-        <div class="col-12 col-md-6">
-            <div class="card d-flex flex-column">
-                <div class="card-header-custom">
-                    <div class="icon-wrapper">🎯</div>
-                    <h5 class="card-title">互動式進攻戰術解析</h5>
-                </div>
-                <p class="card-text flex-grow-1">PRO TACTICS BOARD：深度解析進攻跑位與戰術執行細節，提升球隊整體作戰能力。</p>
-                <a href="https://236c.github.io/tw/basketball-pro.html" class="btn-custom btn-outline-zen" target="_blank">開啟工具</a>
-            </div>
-        </div>
-        <div class="col-12 col-md-6">
-            <div class="card d-flex flex-column">
-                <div class="card-header-custom">
-                    <div class="icon-wrapper">📊</div>
-                    <h5 class="card-title">籃球數據中心</h5>
-                </div>
-                <p class="card-text flex-grow-1">全方位整合賽事與球員表現，提供精準的數據分析與視覺化圖表，協助掌握賽場優勢。</p>
-                <a href="https://236c.github.io/tw/bdc.html" class="btn-custom btn-outline-zen" target="_blank">開啟工具</a>
+                <p class="card-text">精準掌握賽場節奏。</p>
+                <a href="https://236c.github.io/tw/bsb.html" class="btn-custom btn-outline-zen stretched-link" target="_blank">開啟工具</a>
             </div>
         </div>
     </div>
 </div>
 
 <div class="section-tinted" id="calendar-planning">
-    <div class="container position-relative">
+    <div class="container">
         <h3 class="category-title"><span class="emoji-title">📅</span> 行事曆與計畫</h3>
-        <div class="row g-4">
-            <div class="col-12 col-md-6">
+        <div class="row g-3 g-md-4">
+            <div class="col-6 col-md-6">
                 <div class="card d-flex flex-column border-0 shadow-sm">
                     <div class="card-header-custom">
                         <div class="icon-wrapper">💼</div>
                         <h5 class="card-title">商務行事曆</h5>
                     </div>
-                    <p class="card-text flex-grow-1">高效管理商務行程與全域記事本，讓工作與生活排程井然有序。</p>
-                    <a href="https://236c.github.io/tw/bc.html" class="btn-custom btn-solid-zen" target="_blank">查看計畫</a>
+                    <a href="https://236c.github.io/tw/bc.html" class="btn-custom btn-solid-zen stretched-link" target="_blank">查看計畫</a>
                 </div>
             </div>
-            <div class="col-12 col-md-6">
+            <div class="col-6 col-md-6">
                 <div class="card d-flex flex-column border-0 shadow-sm">
                     <div class="card-header-custom">
                         <div class="icon-wrapper">☀️</div>
-                        <h5 class="card-title">暑期計畫行事曆</h5>
+                        <h5 class="card-title">暑期計畫</h5>
                     </div>
-                    <p class="card-text flex-grow-1">專屬 2026 年度暑期訓練時程總覽，精準掌握每一天的學習與進度。</p>
-                    <a href="https://236c.github.io/tw/spc2026.html" class="btn-custom btn-solid-zen" target="_blank">查看計畫</a>
+                    <a href="https://236c.github.io/tw/spc2026.html" class="btn-custom btn-solid-zen stretched-link" target="_blank">查看計畫</a>
                 </div>
             </div>
         </div>
@@ -398,56 +248,68 @@
 
 <div class="container mb-5 pb-5" id="gaming">
     <h3 class="category-title"><span class="emoji-title">🎮</span> 數位休閒娛樂</h3>
-    <div class="row g-4">
-        <div class="col-12 col-md-6">
+    <div class="row g-3 g-md-4">
+        <div class="col-6 col-md-6">
             <div class="card d-flex flex-column">
                 <div class="card-header-custom">
                     <div class="icon-wrapper">🐱</div>
                     <h5 class="card-title">星人訊號大戰</h5>
                 </div>
-                <p class="card-text flex-grow-1">進化覺醒：充滿趣味的互動小遊戲，在忙碌的排程中提供放鬆時刻。</p>
-                <a href="https://236c.github.io/tw/CatSignalWars.html" class="btn-custom btn-outline-zen" target="_blank">開始遊戲</a>
+                <a href="https://236c.github.io/tw/CatSignalWars.html" class="btn-custom btn-outline-zen stretched-link" target="_blank">開始遊戲</a>
             </div>
         </div>
-        <div class="col-12 col-md-6">
+        <div class="col-6 col-md-6">
             <div class="card d-flex flex-column">
                 <div class="card-header-custom">
                     <div class="icon-wrapper">♟️</div>
                     <h5 class="card-title">典藏暗棋</h5>
                 </div>
-                <p class="card-text flex-grow-1">經典博弈對戰：重溫傳統暗棋的智慧，支持精美的棋盤介面與流暢體驗。</p>
-                <a href="https://236c.github.io/tw/Banqi.html" class="btn-custom btn-outline-zen" target="_blank">進入對局</a>
+                <a href="https://236c.github.io/tw/Banqi.html" class="btn-custom btn-outline-zen stretched-link" target="_blank">進入對局</a>
             </div>
         </div>
-        <div class="col-12 col-md-6">
+        <div class="col-6 col-md-6">
+            <div class="card d-flex flex-column">
+                <div class="card-header-custom">
+                    <div class="icon-wrapper">跑</div>
+                    <h5 class="card-title">籃球跑酷</h5>
+                </div>
+                <a href="https://236c.github.io/tw/StickmanParkour.html" class="btn-custom btn-outline-zen stretched-link" target="_blank">開始遊戲</a>
+            </div>
+        </div>
+        <div class="col-6 col-md-6">
             <div class="card d-flex flex-column">
                 <div class="card-header-custom">
                     <div class="icon-wrapper">🍃</div>
                     <h5 class="card-title">虛擬電風扇</h5>
                 </div>
-                <p class="card-text flex-grow-1">簡約美學工具：模擬微風吹拂，為您的數位空間帶來涼意與平靜。</p>
-                <a href="https://236c.github.io/tw/eFan.html" class="btn-custom btn-outline-zen" target="_blank">開啟涼風</a>
-            </div>
-        </div>
-        <div class="col-12 col-md-6">
-            <div class="card d-flex flex-column">
-                <div class="card-header-custom">
-                    <div class="icon-wrapper">🏃</div>
-                    <h5 class="card-title">籃球跑酷：火柴人特仕版</h5>
-                </div>
-                <p class="card-text flex-grow-1">極限運動體驗：結合籃球與跑酷元素的火柴人動作遊戲，挑戰您的反應與專注力。</p>
-                <a href="https://236c.github.io/tw/StickmanParkour.html" class="btn-custom btn-outline-zen" target="_blank">開始遊戲</a>
+                <a href="https://236c.github.io/tw/eFan.html" class="btn-custom btn-outline-zen stretched-link" target="_blank">開啟涼風</a>
             </div>
         </div>
     </div>
 </div>
 
-<div class="container">
-    <footer class="text-center py-4">
-        <span>&copy; 2026 Jing Net Workspace. All rights reserved.</span>
-    </footer>
-</div>
+<footer class="text-center py-4">
+    <span class="text-muted small">&copy; 2026 Jing Net Workspace.</span>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+        const navbarCollapse = document.getElementById('navbarNav');
+        // 初始化 Bootstrap 的 Collapse 實體
+        const bsCollapse = new bootstrap.Collapse(navbarCollapse, { toggle: false });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (navbarCollapse.classList.contains('show')) {
+                    bsCollapse.hide();
+                }
+            });
+        });
+    });
+</script>
+
 </body>
 </html>
