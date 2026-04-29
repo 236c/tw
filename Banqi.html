@@ -7,14 +7,22 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; }
+        /* 1. 確保所有元素的內距不會撐破外框，並🔥徹底禁止反白選取🔥 */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            -webkit-touch-callout: none; /* 禁用 iOS 長按彈出選單 */
+            -webkit-user-select: none;   /* Safari */
+            -moz-user-select: none;      /* Firefox */
+            -ms-user-select: none;       /* IE/Edge */
+            user-select: none;           /* 標準語法：禁止文字被選取 */
+        }
 
         :root {
             --gold: #dfb15b;
             --dark-gold: #9e7a33;
             --red-piece: #9b111e;
             --black-piece: #0a0a0a;
-            --highlight-glow: #ffea00; /* 高亮呼吸燈專用色 */
+            --highlight-glow: #ffea00;
         }
 
         html {
@@ -33,7 +41,7 @@
             top: 0; left: 0; right: 0; bottom: 0;
             width: 100%; height: 100%; 
             overflow: hidden;
-            touch-action: none; 
+            touch-action: none; /* 禁止預設的滑動手勢 */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -122,7 +130,6 @@
             container-type: inline-size; 
         }
 
-        /* 格子基礎樣式 */
         .cell {
             min-width: 0; min-height: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
@@ -132,7 +139,6 @@
             transition: all 0.3s ease;
         }
 
-        /* 棋子基礎樣式 */
         .piece {
             width: 86%; height: 86%; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
@@ -141,7 +147,6 @@
             position: relative; 
         }
 
-        /* 蓋住的棋子 */
         .piece.covered { 
             background: radial-gradient(circle at 30% 30%, #573924, #2a180e); 
             border: 1px solid #140b06; 
@@ -149,7 +154,6 @@
         }
         .piece.covered::after { content: "㊞"; color: rgba(223, 177, 91, 0.6); font-family: 'Ma Shan Zheng'; }
         
-        /* 翻開的棋子 */
         .piece.revealed { 
             background: radial-gradient(circle at 35% 25%, #e0b471 0%, #b88645 60%, #7a4f1c 100%); 
             box-shadow: inset 2px 2px 5px rgba(255,255,255,0.3), 0 5px 10px rgba(0,0,0,0.5); 
@@ -160,11 +164,6 @@
 
         .piece:active { transform: scale(0.92) !important; }
 
-        /* =========================================
-           🔥 強化版：棋子與格子選取特效 (呼吸燈浮空)
-           ========================================= */
-        
-        /* 1. 讓被選取的「格子」發出微光，加強底部視覺提示 */
         .cell.selected {
             background: radial-gradient(circle, rgba(255, 234, 0, 0.4) 0%, rgba(255, 255, 255, 0.1) 80%);
             box-shadow: inset 0 0 15px rgba(255, 234, 0, 0.5);
@@ -172,7 +171,6 @@
             border-radius: 4px;
         }
 
-        /* 2. 讓被選取的「棋子」明顯浮起、換上亮金邊框，並加上呼吸燈動畫 */
         .cell.selected .piece { 
             border: 3px solid var(--highlight-glow);
             z-index: 20; 
@@ -202,9 +200,24 @@
                 flex-direction: column; 
             }
 
-            .status-panel { padding: 8px 15px; margin-bottom: 10px; max-width: 95%; }
-            .turn-indicator { font-size: 1.2rem; padding: 5px 15px; }
-            .board-wrapper { max-width: calc((100vw - 100px) * 2); }
+            /* 🔥 在手機直式轉橫向的狀態下，進一步縮小面板與文字 🔥 */
+            .status-panel { 
+                padding: 4px 10px; /* 縮小上下內距 */
+                margin-bottom: 8px; 
+                max-width: 98%; 
+            }
+            
+            .turn-indicator { 
+                font-size: 0.95rem; /* 大幅縮小回合字體 */
+                padding: 4px 12px; 
+            }
+
+            .btn-custom {
+                font-size: 0.85rem; /* 縮小按鈕字體 */
+                padding: 4px 10px;
+            }
+
+            .board-wrapper { max-width: calc((100vw - 80px) * 2); /* 挪出更多空間給棋盤 */ }
         }
     </style>
 </head>
