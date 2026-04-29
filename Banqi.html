@@ -105,6 +105,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            margin-top: 1.5rem;
             margin-bottom: 1.5rem;
         }
 
@@ -182,7 +183,7 @@
         .piece.black { color: var(--black-piece); }
 
         /* =========================================
-           🌟 棋子互動與選取特效 (新增部分)
+           🌟 棋子互動與選取特效
            ========================================= */
         .piece {
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
@@ -232,6 +233,54 @@
         .modal-title { font-family: 'Ma Shan Zheng'; color: var(--gold); font-size: 3.5rem; margin-bottom: 1rem; }
         .winner-red { color: #ff5252; text-shadow: 0 0 15px rgba(255, 82, 82, 0.6); }
         .winner-black { color: #e0e0e0; text-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
+
+        /* =========================================
+           🌟 響應式：手機直式自動轉橫向滿版 (高度壓縮版)
+           ========================================= */
+        @media screen and (orientation: portrait) {
+            body {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                /* 螢幕高變為網頁寬，螢幕寬變為網頁高 */
+                width: 100vh;
+                height: 100vw;
+                transform: translate(-50%, -50%) rotate(90deg);
+                overflow: hidden;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .container {
+                width: 98%;
+                height: 100%;
+                justify-content: center;
+            }
+
+            /* 保持原本橫排結構，極度壓縮高度與外距 */
+            .status-panel {
+                padding: 0.4rem 1rem;
+                margin-top: 0 !important;
+                margin-bottom: 0.5rem;
+                border-radius: 8px;
+            }
+
+            .turn-indicator {
+                padding: 0.2rem 1.5rem;
+                font-size: 1.2rem;
+            }
+
+            .btn-custom {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.95rem;
+            }
+
+            .board-wrapper {
+                /* 計算扣除縮小後的資訊列，最大化棋盤 */
+                max-width: calc((100vw - 65px) * 2); 
+                padding: 1.5%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -243,9 +292,9 @@
     </div>
 
     <div class="container pb-5">
-        <div class="status-panel mt-4">
+        <div class="status-panel">
             <div id="player-status" class="turn-indicator turn-wait">等待首翻</div>
-            <div class="controls">
+            <div class="controls d-flex gap-2">
                 <button onclick="toggleFullScreen()" class="btn-custom">全螢幕</button>
                 <button onclick="initGame()" class="btn-custom">重新洗牌</button>
             </div>
@@ -312,11 +361,34 @@
         }
     }
 
+    // ====== 新增：請求全螢幕並鎖定橫式函數 ======
+    function requestLandscapeFullscreen() {
+        const docEl = document.documentElement;
+        // 支援跨瀏覽器的全螢幕請求
+        const requestFullscreen = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+
+        if (requestFullscreen) {
+            requestFullscreen.call(docEl).then(() => {
+                // 成功進入全螢幕後，嘗試鎖定為橫向 (Landscape)
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(err => {
+                        console.log("此設備不支援原生的方向鎖定 (將依賴 CSS 旋轉):", err);
+                    });
+                }
+            }).catch(err => {
+                console.log("無法自動進入全螢幕:", err);
+            });
+        }
+    }
+
     function handleStartGame() {
         if (!isFirstLoad) return;
         initAudio();
         playSound('start');
         
+        // 在玩家點擊螢幕的瞬間，觸發全螢幕與橫式鎖定
+        requestLandscapeFullscreen();
+
         const menu = document.getElementById('start-menu');
         menu.style.opacity = '0';
         setTimeout(() => {
@@ -454,8 +526,11 @@
     function closeModalAndRestart() { initGame(); }
 
     function toggleFullScreen() {
-        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-        else document.exitFullscreen();
+        if (!document.fullscreenElement) {
+            requestLandscapeFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
     }
 </script>
 </body>
