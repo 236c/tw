@@ -57,7 +57,7 @@
 
         #fullscreenBtn {
             position: absolute;
-            top: 15px; /* 移至左上角，避免手機底部的系統手勢誤觸 */
+            top: 15px;
             left: 15px;
             width: 40px;
             height: 40px;
@@ -266,7 +266,7 @@
                 width: 34px;
                 height: 34px;
                 font-size: 1.2rem;
-                top: 10px; /* 手機版也是在左上角 */
+                top: 10px;
                 left: 10px;
             }
         }
@@ -336,6 +336,9 @@
     let LOGICAL_WIDTH = 1000;
     const LOGICAL_HEIGHT = 300;
     let gameStarted = false; 
+
+    // 判斷是否為手機尺寸
+    const isMobileDevice = window.innerWidth <= 768;
 
     // --- 音效系統 ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -727,7 +730,14 @@
             ctx.textAlign = 'center'; ctx.fillText(this.playerName, cx, headY - 18); ctx.restore();
 
             ctx.strokeStyle = this.color; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-            ctx.shadowColor = this.color; ctx.shadowBlur = 4;
+            
+            // 【最佳化】如果是手機螢幕，就關閉高耗能的陰影渲染
+            if (!isMobileDevice) {
+                ctx.shadowColor = this.color; 
+                ctx.shadowBlur = 4;
+            } else {
+                ctx.shadowBlur = 0;
+            }
 
             ctx.beginPath(); ctx.arc(cx, headY, 7, 0, Math.PI * 2); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(cx, hipY); ctx.stroke();
@@ -823,8 +833,10 @@
         }
     }
 
+    // 【最佳化】手機畫布較窄，將同場人數從 8 人調降為 5 人，讓畫面不擁擠並提升幀數
+    const stickmanCount = isMobileDevice ? 5 : 8;
     const stickmen = [];
-    for (let i = 0; i < 8; i++) stickmen.push(new Stickman());
+    for (let i = 0; i < stickmanCount; i++) stickmen.push(new Stickman());
 
     const speedLines = [];
     for(let i = 0; i < 15; i++) {
@@ -851,7 +863,8 @@
     });
 
     function animate() {
-        const dpr = window.devicePixelRatio || 1;
+        // 【最佳化】將 DPR 最高限制為 2 倍，防止手機的高解析度吃光 GPU 資源
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
         const displayWidth = canvas.clientWidth;
         const displayHeight = canvas.clientHeight;
         
@@ -866,7 +879,8 @@
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        const scaleFactor = canvas.height / LOGICAL_HEIGHT;
+        // 配合 DPR 的縮放設定
+        const scaleFactor = (canvas.height / LOGICAL_HEIGHT) * (targetHeight / canvas.height);
         ctx.scale(scaleFactor, scaleFactor);
 
         ctx.lineCap = 'round';
