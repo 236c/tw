@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>籃球極限跑酷 - 互動神射手版 (實體文字與音效)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;1,900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0f172a; 
+            user-select: none; 
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            min-height: 100vh; 
+            margin: 0;
+            font-family: 'Noto Sans TC', sans-serif;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7) !important;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .card-body {
+            position: relative; 
+            background-color: #1e293b !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border-radius: 12px;
+        }
+
+        #canvasContainer {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            aspect-ratio: 1000 / 300;
+            margin: 0 auto;
+        }
+
+        #gameCanvas {
+            background-color: #1e293b; 
+            display: block;
+            width: 100%; 
+            height: 100%;
+            cursor: crosshair; 
+            border-radius: 12px;
+        }
+
+        #fullscreenBtn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1.5px solid rgba(0, 242, 254, 0.4);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00f2fe;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            pointer-events: auto;
+        }
+
+        #fullscreenBtn:hover {
+            transform: scale(1.1);
+            background: rgba(15, 23, 42, 0.95);
+            border-color: #00f2fe;
+            box-shadow: 0 6px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        #ballLayer {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none; 
+            z-index: 9999; 
+            overflow: hidden; 
+        }
+
+        .dom-basketball {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 42%, #ffffff 42%, #ffffff 58%, rgba(255,255,255,0) 58%), #f97316;
+            border-style: solid;
+            border-color: #ffffff;
+            pointer-events: none; 
+            transform: translate(-50%, -50%);
+            display: none;
+            animation: spinBall 0.8s linear infinite;
+            will-change: left, top, opacity;
+        }
+
+        @keyframes spinBall {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .menu-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(4px); 
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 30; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s, transform 0.4s; 
+            visibility: visible;
+            opacity: 1;
+            overflow: hidden;
+            cursor: pointer;
+            border-radius: 12px;
+        }
+        
+        .menu-overlay::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 200%; height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 4px,
+                rgba(0, 242, 254, 0.03) 4px,
+                rgba(0, 242, 254, 0.03) 8px
+            );
+            pointer-events: none;
+            z-index: -1;
+            animation: panBackground 20s linear infinite;
+        }
+
+        @keyframes panBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-50px, -50px); }
+        }
+
+        .menu-overlay.hidden {
+            visibility: hidden;
+            opacity: 0;
+            transform: scale(1.05); 
+            pointer-events: none;
+        }
+        
+        .game-title {
+            font-family: 'Montserrat', 'Noto Sans TC', sans-serif;
+            font-weight: 900;
+            font-style: italic;
+            font-size: 2.8rem; 
+            margin-bottom: 0.5rem; 
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #00f2fe, #4facfe, #00f2fe); 
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+            animation: floatTitle 3s ease-in-out infinite, gradientShine 3s linear infinite;
+        }
+
+        .game-subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        @keyframes floatTitle {
+            0%, 100% { transform: translateY(0); filter: drop-shadow(0px 5px 15px rgba(0, 242, 254, 0.3)); }
+            50% { transform: translateY(-8px); filter: drop-shadow(0px 10px 20px rgba(0, 242, 254, 0.7)); }
+        }
+        @keyframes gradientShine {
+            to { background-position: 200% center; }
+        }
+
+        .instruction-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #00f2fe;
+            padding: 10px 20px;
+            border-radius: 6px;
+            color: #e2e8f0;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            position: relative;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .btn-play {
+            position: relative;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            border: none;
+            color: white;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            border-radius: 50px;
+            padding: 12px 45px; 
+            box-shadow: 0 8px 25px rgba(0, 242, 254, 0.4);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .btn-play::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            animation: sweepLight 3s infinite;
+        }
+
+        @keyframes sweepLight {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        .btn-play:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 242, 254, 0.6);
+            color: white;
+        }
+
+        .pulse-text {
+            animation: pulseOpacity 2s infinite;
+        }
+        @keyframes pulseOpacity {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) and (orientation: portrait) {
+            .card-body { min-height: 380px; }
+            .game-title { font-size: 2.2rem; margin-bottom: 0.2rem; }
+            .game-subtitle { font-size: 1.2rem; margin-bottom: 0.8rem; }
+            .instruction-box { font-size: 0.85rem; padding: 8px 15px; margin-bottom: 1rem; }
+            .btn-play { padding: 10px 30px; }
+        }
+
+        #gameWrapper:fullscreen, #gameWrapper:-webkit-full-screen {
+            background-color: #0f172a !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            height: 100vh;
+            padding: 0;
+            border-radius: 0;
+        }
+        
+        #gameWrapper:fullscreen #canvasContainer, #gameWrapper:-webkit-full-screen #canvasContainer {
+            width: 100vw;
+            height: 100vh;
+            max-width: calc(100vh * (1000 / 300));
+            max-height: calc(100vw * (300 / 1000));
+        }
+
+        #gameWrapper:fullscreen #gameCanvas, #gameWrapper:-webkit-full-screen #gameCanvas {
+            border-radius: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="ballLayer"></div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12 text-center">
+            <div class="card shadow-lg">
+                <div class="card-body" id="gameWrapper">
+                    
+                    <div id="mainMenuOverlay" class="menu-overlay">
+                        <div class="game-title">十興國小 籃球隊</div>
+                        <div class="game-subtitle">Shi-Hsing BASKETBALL</div>
+                        
+                        <div class="instruction-box">
+                            <div class="fs-6 mb-1">🏀 <strong>第四面牆突破版</strong></div>
+                            <div class="small">
+                                <span class="text-warning fw-bold">點擊球員，直接把球投出視窗框架之外吧！</span><br>
+                                (老師隨時在場邊盯著你們 👀)
+                            </div>
+                        </div>
+                        
+                        <button id="startBtn" class="btn btn-play d-flex flex-column align-items-center">
+                            <span class="pulse-text" style="font-size: 0.85rem; font-weight: 400; letter-spacing: 2px;">- 點擊畫面任意處開始 -</span>
+                        </button>
+                    </div>
+
+                    <div id="canvasContainer">
+                        <div id="fullscreenBtn" title="全螢幕">⛶</div>
+                        <canvas id="gameCanvas" width="1000" height="300"></canvas>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const LOGICAL_WIDTH = 1000;
+    const LOGICAL_HEIGHT = 300;
+    let gameStarted = false; 
+
+    // --- 音效系統 ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+
+    class SoundManager {
+        constructor() { this.enabled = false; }
+        init() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            this.enabled = true;
+        }
+        playShoot() {
+            if (!this.enabled || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.1);
+        }
+        playBounce() {
+            if (!this.enabled || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.1);
+        }
+        playSwish() {
+            if (!this.enabled || !audioCtx) return;
+            const bufferSize = audioCtx.sampleRate * 0.35; 
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; 
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'highpass'; filter.frequency.value = 3000; 
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.25, audioCtx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+            noise.start(audioCtx.currentTime);
+        }
+        playWhistle() {
+            if (!this.enabled || !audioCtx) return;
+            const osc1 = audioCtx.createOscillator(); const osc2 = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
+            osc1.type = 'square'; osc2.type = 'square';
+            osc1.frequency.setValueAtTime(2000, audioCtx.currentTime);
+            osc2.frequency.setValueAtTime(2200, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc1.start(audioCtx.currentTime); osc2.start(audioCtx.currentTime);
+            osc1.stop(audioCtx.currentTime + 0.3); osc2.stop(audioCtx.currentTime + 0.3);
+        }
+    }
+
+    const soundManager = new SoundManager();
+    const mainMenuOverlay = document.getElementById('mainMenuOverlay');
+
+    mainMenuOverlay.addEventListener('click', () => {
+        mainMenuOverlay.classList.add('hidden');
+        soundManager.init(); 
+        gameStarted = true; 
+    });
+
+    const gameWrapper = document.getElementById('gameWrapper');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+    function handleFullscreenChange() {
+        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+        const ballLayer = document.getElementById('ballLayer');
+        
+        if (isFullscreen) {
+            fullscreenBtn.innerHTML = '✖'; 
+            fullscreenBtn.style.color = '#ef4444'; 
+            fullscreenBtn.style.borderColor = '#ef4444';
+            if (ballLayer) gameWrapper.appendChild(ballLayer);
+        } else {
+            fullscreenBtn.innerHTML = '⛶'; 
+            fullscreenBtn.style.color = ''; 
+            fullscreenBtn.style.borderColor = ''; 
+            if (ballLayer) document.body.appendChild(ballLayer);
+        }
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
+    fullscreenBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            if (gameWrapper.requestFullscreen) gameWrapper.requestFullscreen();
+            else if (gameWrapper.webkitRequestFullscreen) gameWrapper.webkitRequestFullscreen();
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+    });
+
+    const playerNames = [
+        "徐毅丞", "董宥葳", "吳秉恩", "劉軒禎", "蔡昕宏", "林稟硯", "范睿軒", "蘇靖翔",
+        "張栩睿", "黃御展", "張煒誠", "張皓丞", "蔡棏曜", "范翔鈞", "邱得洛", "黃晟祐",
+        "周楷杰", "沈廷軒", "鄭光熙", "黃宇紘", "張家閎", "邱嚴平", "羅毅軒", "姜樂",
+        "郭曜丞", "古宇超", "陳品勳"
+    ];
+    let availableNames = [...playerNames];
+
+    const teacherQuotes = [
+        "專心點！眼睛看哪裡啊！ 👀", "跑位！跑起來！不要站在那邊發呆！ 🏃‍♂️💨",
+        "防守！手舉高！ ✋🤚", "這球傳得太隨便了！ 🤦‍♂️", "呼吸！調整節奏！ 🧘‍♂️",
+        "平常練習是這樣教的嗎？ 💢", "卡位！籃板球是誰的！ 🛡️🏀",
+        "好球！繼續保持！ 🔥👏", "節奏慢下來！不要急！ 🐢",
+        "不要一直運球，球傳出去！ 🏀", "膝蓋彎曲！重心壓低！ 🦵",
+        "到底有沒有吃飯啊？跑這麼慢！ 🍚", "快攻！快攻！不要拖時間！ ⚡",
+        "喊聲啊！都不講話怎麼配合！ 🗣️", "盯人！你的防守者呢？ 👀",
+        "出手要果斷！不要猶豫！ 🎯", "體力不行了是不是？撐下去！ 💦"
+    ];
+    
+    const missQuotes = [
+        "這在投什麼東西？！ 🤷‍♂️", "手腕！用手腕的力量！ 💪",
+        "用力過猛啦！ 💥", "沒進沒關係，趕快回防！ 🛡️🏃‍♂️", "專注力呢？ 🧐",
+        "麵包球！這力道也差太多了吧！ 🍞", "打鐵啦！籃框都要被你敲壞了！ 🔨",
+        "瞄準再投啊！閉著眼睛投是不是？ 🫣", "投籃弧度太低了！ 📉",
+        "自己投不進自己去搶籃板！ 🏃‍♂️", "今天手感很冰喔！ 🥶",
+        "這球太離譜了，投到哪裡去了！ 🛸"
+    ];
+
+    class QuoteManager {
+        constructor() {
+            this.quotes = [];
+            this.lastRandomQuoteTime = 0;
+            this.randomQuoteInterval = 4000; 
+        }
+        addQuote(text, color = '#facc15') {
+            let x = 200 + Math.random() * 300;
+            let y = 60 + Math.random() * 40;
+            this.quotes.push({ text: text, x: x, y: y, alpha: 1.0, color: color, life: 120 });
+        }
+        updateAndDraw(ctx) {
+            let currentTime = Date.now();
+            if (currentTime - this.lastRandomQuoteTime > this.randomQuoteInterval) {
+                if (Math.random() > 0.6) { 
+                    this.addQuote(teacherQuotes[Math.floor(Math.random() * teacherQuotes.length)]);
+                    soundManager.playWhistle(); 
+                }
+                this.lastRandomQuoteTime = currentTime;
+                this.randomQuoteInterval = 3000 + Math.random() * 3000; 
+            }
+            for (let i = this.quotes.length - 1; i >= 0; i--) {
+                let q = this.quotes[i];
+                q.y -= 0.3; q.life--;
+                if (q.life < 30) q.alpha = q.life / 30;
+                else if (q.life > 105) q.alpha = (120 - q.life) / 15;
+                else q.alpha = 1.0;
+
+                if (q.life <= 0) { this.quotes.splice(i, 1); continue; }
+                ctx.save();
+                ctx.globalAlpha = q.alpha;
+                ctx.font = 'bold 22px "Noto Sans TC", sans-serif';
+                ctx.textAlign = 'center'; ctx.fillStyle = q.color;
+                ctx.fillText(`💬 老師：「${q.text}」`, q.x, q.y);
+                ctx.restore();
+            }
+        }
+    }
+    const quoteManager = new QuoteManager();
+
+    class BasketballHoop {
+        constructor() {
+            this.rimY = 85; this.rimLeft = 922; this.rimRight = 942; 
+            this.netAnim = 0; this.swishActive = false;
+        }
+        triggerSwish() { this.netAnim = 1.0; this.swishActive = true; }
+        update() {
+            if (this.swishActive) {
+                this.netAnim -= 0.035; 
+                if (this.netAnim <= 0) { this.netAnim = 0; this.swishActive = false; }
+            }
+        }
+        draw(ctx) {
+            ctx.save();
+            ctx.fillStyle = '#475569'; ctx.fillRect(950, 40, 10, 260); 
+            ctx.fillStyle = 'rgba(240, 248, 255, 0.85)'; ctx.fillRect(942, 40, 8, 60); 
+            ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3; ctx.strokeRect(942, 55, 8, 25); 
+            
+            let sway = 0, stretch = 0; 
+            if (this.swishActive) {
+                sway = Math.sin((1 - this.netAnim) * Math.PI * 6) * (10 * this.netAnim);
+                stretch = Math.sin((1 - this.netAnim) * Math.PI * 2) * (7 * this.netAnim);
+            }
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)'; ctx.lineWidth = 1.5; ctx.beginPath();
+            let netTopY = this.rimY, netBotY = netTopY + 22 + stretch; 
+            let netBotLeft = this.rimLeft + 3.5 + sway, netBotRight = this.rimRight - 3.5 + sway;
+
+            for (let i = 0; i <= 6; i++) {
+                let ratio = i / 6;
+                let topX = (this.rimLeft + 1) + (this.rimRight - this.rimLeft - 2) * ratio; 
+                let botX = netBotLeft + (netBotRight - netBotLeft) * ratio;
+                ctx.moveTo(topX, netTopY);
+                ctx.quadraticCurveTo(topX + sway * 0.5, netTopY + 11 + stretch * 0.5, botX, netBotY);
+            }
+            for (let j = 1; j <= 3; j++) {
+                let ratio = j / 4;
+                let y = netTopY + (netBotY - netTopY) * ratio;
+                let currentLeft = (this.rimLeft + 1) + ratio * (netBotLeft - (this.rimLeft + 1));
+                let currentRight = (this.rimRight - 1) + ratio * (netBotRight - (this.rimRight - 1));
+                ctx.moveTo(currentLeft, y);
+                ctx.quadraticCurveTo(currentLeft + (currentRight - currentLeft) / 2, y + 4 * ratio + stretch * ratio, currentRight, y);
+            }
+            ctx.stroke();
+
+            ctx.strokeStyle = '#ea580c'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(this.rimLeft, this.rimY); ctx.lineTo(this.rimRight, this.rimY); ctx.stroke();
+            ctx.restore();
+        }
+    }
+    const globalHoop = new BasketballHoop();
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const stickmanColors = ['#38bdf8', '#10b981', '#facc15', '#ef4444', '#a855f7', '#f472b6', '#cbd5e1'];
+    
+    class Stickman {
+        constructor() { 
+            this.ballElement = document.createElement('div');
+            this.ballElement.className = 'dom-basketball';
+            document.getElementById('ballLayer').appendChild(this.ballElement);
+            this.init(true); 
+        }
+
+        init(randomStart = false) {
+            if (this.playerName && !availableNames.includes(this.playerName)) availableNames.push(this.playerName);
+            if (availableNames.length === 0) availableNames = [...playerNames];
+            this.playerName = availableNames.splice(Math.floor(Math.random() * availableNames.length), 1)[0];
+
+            this.baseY = 80 + Math.random() * 180; 
+            this.y = this.baseY;
+            this.scale = 0.4 + (this.baseY / 300) * 0.8; 
+            this.speed = (1.5 + Math.random() * 2) * this.scale; 
+            this.x = randomStart ? Math.random() * (LOGICAL_WIDTH - 200) : -100;
+            this.localFrames = Math.random() * 1000; 
+            this.color = stickmanColors[Math.floor(Math.random() * stickmanColors.length)];
+            this.ballColor = '#f97316';
+            this.alpha = 1; 
+            this.ballAlpha = 1; 
+            
+            this.state = 'run'; this.jumpVy = 0;
+            this.ballThrown = false; this.ballScored = false; 
+            this.willScore = true; this.missQuoteTriggered = false; 
+            
+            this.ballWorldX = 0; this.ballWorldY = 0;
+            this.ballVx = 0; this.ballVy = 0; this.worldGravity = 0;
+        }
+
+        forceShoot() {
+            if (this.state !== 'run') return; 
+            this.state = 'jump'; this.jumpVy = -8 * this.scale;
+            this.willScore = Math.random() > 0.5;
+        }
+
+        update() {
+            if (this.state === 'run') {
+                this.x += this.speed; this.localFrames += this.speed * 0.2; 
+                let jumpDistance = 120 * this.scale; 
+                if (this.x > (globalHoop.rimLeft - 2) - jumpDistance) {
+                    this.forceShoot(); this.willScore = Math.random() > 0.15; 
+                }
+            } else if (this.state === 'jump') {
+                this.x += this.speed * 0.7; this.y += this.jumpVy;
+                this.jumpVy += 0.35 * this.scale; 
+
+                if (this.jumpVy > -1 * this.scale && !this.ballThrown) {
+                    this.ballThrown = true; soundManager.playShoot(); 
+
+                    this.ballWorldX = this.x + 20 * this.scale;
+                    this.ballWorldY = this.y - 5 * this.scale; 
+
+                    let hoopTargetX = (globalHoop.rimLeft + globalHoop.rimRight) / 2; 
+                    let hoopTargetY = globalHoop.rimY; 
+                    
+                    if (!this.willScore) {
+                        hoopTargetX += (Math.random() > 0.5 ? -18 : 15);
+                        hoopTargetY -= Math.random() * 10; 
+                    }
+
+                    let dx = hoopTargetX - this.ballWorldX;
+                    let flightFrames = Math.max(16, dx / 12); 
+                    let gravity = 0.6;
+                    let rX = (Math.random() - 0.5) * 6;
+                    let rY = (Math.random() - 0.5) * 6;
+                    
+                    this.ballVx = (hoopTargetX + rX - this.ballWorldX) / flightFrames;
+                    this.ballVy = (hoopTargetY + rY - this.ballWorldY - 0.5 * gravity * flightFrames * flightFrames) / flightFrames;
+                    this.worldGravity = gravity;
+                }
+
+                if (this.y >= this.baseY) {
+                    this.y = this.baseY; this.state = 'run_away';
+                }
+            } else if (this.state === 'run_away') {
+                this.x += this.speed; this.localFrames += this.speed * 0.2; 
+            }
+
+            if (this.ballThrown) {
+                let prevBallY = this.ballWorldY; 
+                this.ballWorldX += this.ballVx; 
+                this.ballWorldY += this.ballVy;
+                this.ballVy += this.worldGravity;
+
+                if (!this.ballScored && prevBallY < globalHoop.rimY && this.ballWorldY >= globalHoop.rimY) {
+                    if (this.willScore && this.ballWorldX > globalHoop.rimLeft - 5 && this.ballWorldX < globalHoop.rimRight + 5) {
+                        this.ballScored = true; globalHoop.triggerSwish(); soundManager.playSwish(); 
+                    } else if (!this.willScore && this.ballWorldX > globalHoop.rimLeft - 20 && this.ballWorldX < globalHoop.rimRight + 20) {
+                        this.ballVy = -this.ballVy * (0.4 + Math.random() * 0.3); 
+                        this.ballVx = this.ballVx * 0.5 + (Math.random() - 0.5) * 6; 
+                        this.ballWorldY = globalHoop.rimY - 2; soundManager.playBounce(); 
+
+                        if (!this.missQuoteTriggered && Math.random() > 0.5) {
+                            this.missQuoteTriggered = true;
+                            quoteManager.addQuote(`${this.playerName}，${missQuotes[Math.floor(Math.random() * missQuotes.length)]}`, '#ef4444');
+                            soundManager.playWhistle(); 
+                        }
+                    }
+                }
+
+                const groundY = LOGICAL_HEIGHT - 8; 
+                if (this.ballWorldY >= groundY) {
+                    this.ballWorldY = groundY; 
+                    this.ballVy = -this.ballVy * 0.55; 
+                    this.ballVx = this.ballVx * 0.8;  
+
+                    if (Math.abs(this.ballVy) > 2.5) {
+                        soundManager.playBounce(); 
+                    } else {
+                        this.ballVy = 0;
+                        this.worldGravity = 0; 
+                        if (Math.abs(this.ballVx) < 0.2) {
+                            this.ballVx = 0; 
+                        }
+                    }
+
+                    // --- 修正：只有當球觸地且動能變弱，才開始慢慢淡出 ---
+                    if (Math.abs(this.ballVy) < 3) {
+                        this.ballAlpha = Math.max(0, this.ballAlpha - 0.03);
+                    }
+                }
+            }
+
+            // 球員跑到畫面邊緣淡出，但不影響已經投出的球
+            if (this.x > 900) {
+                this.alpha = Math.max(0, 1 - (this.x - 900) / 100);
+            } else {
+                this.alpha = 1;
+            }
+
+            // 稍微拉長回收距離，讓地上的球有足夠時間淡出消失
+            if (this.x > LOGICAL_WIDTH + 400) {
+                this.init();
+            }
+        }
+
+        draw(renderParams) {
+            ctx.save();
+            ctx.globalAlpha = this.alpha;
+            
+            ctx.translate(this.x, this.y); ctx.scale(this.scale, this.scale);
+            const cx = 0, headY = 10, neckY = 20, hipY = 36, footY = 50;
+            
+            ctx.save(); ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px "Noto Sans TC", sans-serif'; 
+            ctx.textAlign = 'center'; ctx.fillText(this.playerName, cx, headY - 18); ctx.restore();
+
+            ctx.strokeStyle = this.color; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.shadowColor = this.color; ctx.shadowBlur = 4;
+
+            ctx.beginPath(); ctx.arc(cx, headY, 7, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(cx, hipY); ctx.stroke();
+
+            let ballX = 0, ballY = 0, drawLocalBall = false;
+
+            if (this.state === 'run' || this.state === 'run_away') {
+                const runCycle = Math.sin(this.localFrames); 
+                let leftKneeX = cx - 12 * runCycle, leftKneeY = hipY + 6, leftFootX = cx - 18 * runCycle, leftFootY = footY;
+                let rightKneeX = cx + 12 * runCycle, rightKneeY = hipY + 6, rightFootX = cx + 18 * runCycle, rightFootY = footY;
+                ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(leftKneeX, leftKneeY); ctx.lineTo(leftFootX, leftFootY); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(rightKneeX, rightKneeY); ctx.lineTo(rightFootX, rightFootY); ctx.stroke();
+
+                let leftElbowX = cx - 8, leftElbowY = neckY + 8, leftHandX = cx - 15 + 10 * runCycle, leftHandY = neckY + 15;
+                ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(leftElbowX, leftElbowY); ctx.lineTo(leftHandX, leftHandY); ctx.stroke();
+
+                if (this.state === 'run') {
+                    ballX = cx + 25; ballY = hipY + Math.sin(this.localFrames * 0.8) * 12; drawLocalBall = true;
+                    let rightElbowX = cx + 12, rightElbowY = neckY + 5, rightHandX = ballX - 3, rightHandY = ballY - 6;
+                    ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(rightHandX, rightHandY); ctx.stroke();
+                } else {
+                    let rightElbowX = cx + 8, rightElbowY = neckY + 8, rightHandX = cx + 15 - 10 * runCycle, rightHandY = neckY + 15;
+                    ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(rightHandX, rightHandY); ctx.stroke();
+                }
+            } else if (this.state === 'jump') {
+                let leftKneeX = cx - 5, leftKneeY = hipY + 15, leftFootX = cx - 10, leftFootY = hipY + 30; 
+                let rightKneeX = cx + 15, rightKneeY = hipY - 5, rightFootX = cx + 15, rightFootY = hipY + 15; 
+                ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(leftKneeX, leftKneeY); ctx.lineTo(leftFootX, leftFootY); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(rightKneeX, rightKneeY); ctx.lineTo(rightFootX, rightFootY); ctx.stroke();
+
+                let leftElbowX = cx - 15, leftElbowY = neckY + 5, leftHandX = cx - 20, leftHandY = neckY - 5;
+                ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(leftElbowX, leftElbowY); ctx.lineTo(leftHandX, leftHandY); ctx.stroke();
+
+                if (!this.ballThrown) {
+                    let rightElbowX = cx + 10, rightElbowY = neckY - 5, rightHandX = cx + 20, rightHandY = headY - 15;
+                    ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(rightHandX, rightHandY); ctx.stroke();
+                    ballX = rightHandX + 5; ballY = rightHandY - 5; drawLocalBall = true;
+                } else {
+                    let rightElbowX = cx + 15, rightElbowY = neckY - 10, rightHandX = cx + 25, rightHandY = headY - 25;
+                    ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(rightHandX, rightHandY); ctx.stroke();
+                }
+            }
+
+            if (drawLocalBall) {
+                ctx.shadowBlur = 0; ctx.beginPath(); ctx.arc(ballX, ballY, 8, 0, Math.PI * 2); 
+                ctx.fillStyle = this.ballColor; ctx.fill();
+                ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5; 
+                ctx.beginPath(); ctx.moveTo(ballX - 8, ballY); ctx.lineTo(ballX + 8, ballY); ctx.stroke();
+            }
+            
+            ctx.restore();
+
+            if (this.ballThrown) {
+                if (gameStarted) {
+                    if (this.ballElement.style.display !== 'block') {
+                        this.ballElement.style.display = 'block';
+                    }
+                    
+                    let screenX = renderParams.canvasRect.left + this.ballWorldX * renderParams.scaleX;
+                    let screenY = renderParams.canvasRect.top + this.ballWorldY * renderParams.scaleY;
+
+                    let r = 8 * this.scale * renderParams.scaleX;
+                    let bw = 1.5 * this.scale * renderParams.scaleX;
+
+                    this.ballElement.style.width = `${r * 2}px`;
+                    this.ballElement.style.height = `${r * 2}px`;
+                    this.ballElement.style.left = `${screenX}px`;
+                    this.ballElement.style.top = `${screenY}px`;
+                    this.ballElement.style.borderWidth = `${bw}px`;
+                    
+                    this.ballElement.style.opacity = this.ballAlpha;
+                } else {
+                    if (this.ballElement.style.display !== 'none') {
+                        this.ballElement.style.display = 'none';
+                    }
+                    
+                    ctx.save();
+                    ctx.shadowBlur = 0; 
+                    ctx.globalAlpha = this.ballAlpha; 
+                    
+                    let br = 8 * this.scale; 
+                    ctx.beginPath(); ctx.arc(this.ballWorldX, this.ballWorldY, br, 0, Math.PI * 2); 
+                    ctx.fillStyle = this.ballColor; ctx.fill();
+                    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5 * this.scale; 
+                    ctx.beginPath(); ctx.moveTo(this.ballWorldX - br, this.ballWorldY); ctx.lineTo(this.ballWorldX + br, this.ballWorldY); ctx.stroke();
+                    ctx.restore();
+                }
+            } else {
+                if (this.ballElement.style.display !== 'none') {
+                    this.ballElement.style.display = 'none';
+                }
+            }
+        }
+    }
+
+    const stickmen = [];
+    for (let i = 0; i < 8; i++) stickmen.push(new Stickman());
+
+    const speedLines = [];
+    for(let i = 0; i < 15; i++) {
+        speedLines.push({
+            x: Math.random() * LOGICAL_WIDTH, y: Math.random() * LOGICAL_HEIGHT, 
+            length: Math.random() * 100 + 50, speed: Math.random() * 2 + 1, alpha: Math.random() * 0.15 + 0.05  
+        });
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+        if (!mainMenuOverlay.classList.contains('hidden')) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = LOGICAL_WIDTH / rect.width;
+        const scaleY = LOGICAL_HEIGHT / rect.height;
+        const mouseX = (e.clientX - rect.left) * scaleX;
+        const mouseY = (e.clientY - rect.top) * scaleY; 
+
+        for (let i = stickmen.length - 1; i >= 0; i--) {
+            let man = stickmen[i];
+            if (man.state === 'run' && Math.hypot(mouseX - man.x, mouseY - (man.y + 20)) < 60 * man.scale) {
+                man.forceShoot(); break; 
+            }
+        }
+    });
+
+    function animate() {
+        const dpr = window.devicePixelRatio || 1;
+        const displayWidth = canvas.clientWidth || LOGICAL_WIDTH;
+        const displayHeight = canvas.clientHeight || LOGICAL_HEIGHT;
+        
+        const targetWidth = Math.max(1, Math.round(displayWidth * dpr));
+        const targetHeight = Math.max(1, Math.round(displayHeight * dpr));
+
+        if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+            canvas.width = targetWidth; canvas.height = targetHeight;
+        }
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.scale(canvas.width / LOGICAL_WIDTH, canvas.height / LOGICAL_HEIGHT);
+
+        ctx.lineCap = 'round';
+        for (let i = 0; i < speedLines.length; i++) {
+            let line = speedLines[i];
+            line.x -= line.speed;
+            if (line.x + line.length < 0) { line.x = LOGICAL_WIDTH + Math.random() * 100; line.y = Math.random() * LOGICAL_HEIGHT; }
+            ctx.beginPath(); ctx.moveTo(line.x, line.y); ctx.lineTo(line.x + line.length, line.y);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${line.alpha})`; ctx.lineWidth = 1.5; ctx.stroke();
+        }
+
+        globalHoop.update(); globalHoop.draw(ctx);
+
+        const canvasRect = canvas.getBoundingClientRect();
+        const scaleX = canvasRect.width / LOGICAL_WIDTH;
+        const scaleY = canvasRect.height / LOGICAL_HEIGHT;
+        const renderParams = { canvasRect, scaleX, scaleY };
+
+        stickmen.sort((a, b) => a.y - b.y);
+        stickmen.forEach(man => { man.update(); man.draw(renderParams); });
+        
+        quoteManager.updateAndDraw(ctx);
+
+        requestAnimationFrame(animate);
+    }
+
+    animate(); 
+</script>
+</body>
+</html>
