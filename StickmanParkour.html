@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>籃球極限跑酷 - 火柴人動態版</title>
+    <title>籃球極限跑酷 - 終極完美版 (日夜輪迴加速)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;1,900&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -33,7 +33,7 @@
         }
 
         #gameCanvas {
-            background-color: #1e293b; 
+            background-color: transparent; 
             display: block;
             margin: 0 auto;
             border-radius: 12px 12px 0 0;
@@ -129,13 +129,34 @@
         .instruction-box {
             background: rgba(255, 255, 255, 0.05);
             border-left: 4px solid #00f2fe;
-            padding: 10px 20px;
             border-radius: 6px;
             color: #e2e8f0;
             margin-bottom: 1.2rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            position: relative;
             backdrop-filter: blur(10px);
+            
+            position: relative;
+            width: 320px;
+            height: 95px; 
+            overflow: hidden; 
+        }
+
+        .billboard-slide {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            right: 10px;
+            transform: translateY(-50%) translateX(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease-out;
+            pointer-events: none;
+        }
+
+        .billboard-slide.active {
+            transform: translateY(-50%) translateX(0);
+            opacity: 1;
+            visibility: visible;
         }
 
         .btn-play {
@@ -202,7 +223,7 @@
         #fullscreenBtn {
             cursor: pointer;
             transition: transform 0.2s;
-            pointer-events: auto; /* 允許點擊 */
+            pointer-events: auto;
         }
         #fullscreenBtn:hover {
             transform: scale(1.1);
@@ -217,26 +238,21 @@
             50% { opacity: 1; }
         }
 
-        /* --- 手機直向 (Portrait) 優化 --- */
         @media (max-width: 768px) and (orientation: portrait) {
             .card-body { min-height: 380px; }
             .game-title { font-size: 2rem; margin-bottom: 0.5rem; }
-            .instruction-box { font-size: 0.85rem; padding: 8px 15px; margin-bottom: 1rem; }
             .btn-play { padding: 10px 30px; font-size: 1.1rem; }
             #gameCanvas { border-radius: 0; }
         }
 
-        /* --- 手機橫向 (Landscape) 極致壓縮優化 --- */
         @media (max-width: 950px) and (orientation: landscape) {
             .game-title { font-size: 1.8rem; margin-bottom: 0.2rem; }
             .highest-score-badge { font-size: 0.8rem; margin-bottom: 0.5rem; padding: 4px 10px; }
-            .instruction-box { font-size: 0.75rem; padding: 5px 15px; margin-bottom: 0.5rem; }
             .btn-play { padding: 6px 30px; font-size: 1rem; }
             .pulse-text { font-size: 0.7rem; margin-top: 5px !important; }
             #gameCanvas { border-radius: 0; }
         }
 
-        /* --- 全螢幕模式 (Fullscreen) 專用樣式 --- */
         #gameWrapper:fullscreen, #gameWrapper:-webkit-full-screen {
             background-color: #0f172a !important;
             display: flex;
@@ -251,7 +267,7 @@
             height: 100vh;
             max-width: none;
             border-radius: 0;
-            object-fit: contain; /* 確保畫布完美縮放且不變形 */
+            object-fit: contain;
         }
     </style>
 </head>
@@ -267,7 +283,7 @@
                         ⛶
                     </div>
 
-                    <div class="position-absolute top-0 end-0 p-3 fs-5 text-info hud-ui pointer-events-none" style="pointer-events: none;">
+                    <div class="position-absolute top-0 end-0 p-3 fs-5 text-info hud-ui pointer-events-none text-end" style="pointer-events: none;">
                         SCORE: <span id="scoreDisplay" class="text-white">0</span>
                     </div>
 
@@ -280,10 +296,26 @@
                         </div>
 
                         <div class="instruction-box text-start">
-                            <div class="fs-6 mb-1">🎮 <strong>操作指南</strong></div>
-                            <div class="small">
-                                • 點擊畫面任意處 / <kbd>空白鍵</kbd> / <kbd>↑</kbd> 跳躍<br>
-                                • <span class="text-info">輕觸 = 小跳躍</span> | <span class="text-danger">長按 = 大跳躍</span>
+                            <div class="billboard-slide active">
+                                <div class="fs-6 mb-1">🎮 <strong>操作指南</strong></div>
+                                <div class="small">
+                                    • 畫面 / <kbd>空白</kbd> / <kbd>↑</kbd> 跳躍<br>
+                                    • <span class="text-info">輕觸 = 小跳躍</span> | <span class="text-danger">長按 = 大跳躍</span>
+                                </div>
+                            </div>
+                            <div class="billboard-slide">
+                                <div class="fs-6 mb-1">🎁 <strong>強力道具</strong></div>
+                                <div class="small">
+                                    • <span class="text-warning">⭐無敵星星</span>：撞碎障礙物！<br>
+                                    • <span class="text-success">👟彈簧鞋</span>：解鎖空中二段跳！
+                                </div>
+                            </div>
+                            <div class="billboard-slide">
+                                <div class="fs-6 mb-1">🔥 <strong>加分機制</strong></div>
+                                <div class="small">
+                                    • <span class="text-danger">🧲分數磁鐵</span>：過關得分 ×2<br>
+                                    • <span class="text-info">🦅空中老鷹</span>：撞擊獲高額紅利
+                                </div>
                             </div>
                         </div>
                         
@@ -356,6 +388,13 @@
         osc.start(); osc.stop(audioCtx.currentTime + 0.3);
     }
 
+    function playPowerupSound() {
+        if (!isAudioEnabled) return;
+        playTone(600, 'sine', 0.1, 0.05); 
+        setTimeout(() => playTone(800, 'sine', 0.1, 0.05), 100); 
+        setTimeout(() => playTone(1200, 'sine', 0.2, 0.05), 200); 
+    }
+
     const audioBtn = document.getElementById('audioBtn');
     audioBtn.addEventListener('click', (e) => {
         e.stopPropagation(); 
@@ -370,43 +409,37 @@
         }
     });
 
-    // --- 全螢幕 API 邏輯 ---
     const gameWrapper = document.getElementById('gameWrapper');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
 
     fullscreenBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // 避免點擊全螢幕時觸發跳躍
-        
+        e.stopPropagation(); 
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            // 進入全螢幕
             if (gameWrapper.requestFullscreen) {
                 gameWrapper.requestFullscreen();
-            } else if (gameWrapper.webkitRequestFullscreen) { // Safari/iOS
+            } else if (gameWrapper.webkitRequestFullscreen) {
                 gameWrapper.webkitRequestFullscreen();
             }
         } else {
-            // 退出全螢幕
             if (document.exitFullscreen) {
                 document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) { // Safari/iOS
+            } else if (document.webkitExitFullscreen) { 
                 document.webkitExitFullscreen();
             }
         }
     });
 
-    // 監聽全螢幕狀態改變，更新按鈕圖示
     function handleFullscreenChange() {
         if (document.fullscreenElement || document.webkitFullscreenElement) {
-            fullscreenBtn.innerHTML = '✖'; // 變成叉叉圖案
+            fullscreenBtn.innerHTML = '✖'; 
             fullscreenBtn.style.color = '#ef4444'; 
         } else {
-            fullscreenBtn.innerHTML = '⛶'; // 恢復展開圖案
+            fullscreenBtn.innerHTML = '⛶'; 
             fullscreenBtn.style.color = '#00f2fe'; 
         }
     }
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-
 
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -415,13 +448,35 @@
     const mainMenuOverlay = document.getElementById('mainMenuOverlay');
     const highScoreMenu = document.getElementById('highScoreMenu');
 
+    let billboardInterval;
+    function startBillboard() {
+        const slides = document.querySelectorAll('.billboard-slide');
+        let currentIndex = 0;
+        if (slides.length === 0) return;
+        
+        clearInterval(billboardInterval);
+        billboardInterval = setInterval(() => {
+            slides[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex + 1) % slides.length;
+            slides[currentIndex].classList.add('active');
+        }, 3000); 
+    }
+
+    function stopBillboard() {
+        clearInterval(billboardInterval);
+    }
+
     let score = 0;
     let frames = 0;
     let gameActive = false; 
     let inMenu = true; 
     let obstacles = [];
+    let birds = []; 
+    let clouds = []; 
     let floatingTexts = []; 
+    let items = []; 
     let animationId;
+    let dayProgress = 0; 
 
     let speedLines = [];
     const NUM_SPEED_LINES = 20; 
@@ -445,10 +500,49 @@
     let jumpBufferTimer = 0;
     const JUMP_BUFFER_MAX = 8; 
 
+    const ITEM_CONFIG = [
+        { type: 'star', icon: '⭐', color: '#FFFF00', text: '⭐ 無敵狀態!', duration: 300 },
+        { type: 'shoe', icon: '👟', color: '#00FF66', text: '👟 解鎖二段跳!', duration: 600 }, 
+        { type: 'magnet', icon: '🧲', color: '#FF3333', text: '🧲 分數雙倍!', duration: 600 } 
+    ];
+
     const player = {
         x: 100, y: 150, width: 30, height: 50, vy: 0, isGrounded: false, 
+        isInvincible: false, 
+        invincibleTimer: 0,  
+        canDoubleJump: false,
+        doubleJumpTimer: 0,
+        hasDoubleJumped: false, 
+        hasMagnet: false,
+        magnetTimer: 0,
         
         draw() {
+            ctx.save();
+            
+            let currentLightness = 60 - (dayProgress * 55); 
+            let defaultColor = `hsl(200, 95%, ${currentLightness}%)`;
+            
+            let r = 56 + dayProgress * (255 - 56);
+            let g = 189 + dayProgress * (255 - 189);
+            let b = 248 + dayProgress * (255 - 248);
+            let shadowColor = `rgba(${r}, ${g}, ${b}, 1)`; 
+            let shadowSpread = 5 + (dayProgress * 5); 
+
+            let strokeCol = defaultColor;
+            let shadCol = shadowColor;
+            let shadBlur = shadowSpread;
+
+            if (this.isInvincible) {
+                let isEnding = this.invincibleTimer < 120;
+                let flashVisible = !isEnding || (Math.floor(this.invincibleTimer / 8) % 2 === 0);
+
+                if (flashVisible) {
+                    shadCol = '#fcd34d'; 
+                    shadBlur = 20 + Math.random() * 10;
+                    strokeCol = frames % 6 < 3 ? '#ffffff' : '#fcd34d'; 
+                }
+            }
+
             const cx = this.x + this.width / 2;
             const headY = this.y + 10;
             const neckY = this.y + 20;
@@ -456,16 +550,6 @@
             const footY = this.y + 50;
             const runCycle = this.isGrounded ? Math.sin(frames * 0.4) : 0; 
             
-            ctx.strokeStyle = '#38bdf8'; 
-            ctx.lineWidth = 4;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.shadowColor = '#38bdf8'; 
-            ctx.shadowBlur = 5;
-
-            ctx.beginPath(); ctx.arc(cx, headY, 7, 0, Math.PI * 2); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(cx, hipY); ctx.stroke();
-
             let leftKneeX, leftKneeY, leftFootX, leftFootY;
             let rightKneeX, rightKneeY, rightFootX, rightFootY;
             if (this.isGrounded) {
@@ -475,13 +559,6 @@
                 leftKneeX = cx - 12; leftKneeY = hipY - 2; leftFootX = cx - 5; leftFootY = hipY + 12;
                 rightKneeX = cx + 10; rightKneeY = hipY; rightFootX = cx + 15; rightFootY = hipY + 14;
             }
-            ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(leftKneeX, leftKneeY); ctx.lineTo(leftFootX, leftFootY); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(rightKneeX, rightKneeY); ctx.lineTo(rightFootX, rightFootY); ctx.stroke();
-
-            let ballX = cx + 25;
-            let ballY = this.y + 35;
-            if (this.isGrounded) ballY += Math.sin(frames * 0.3) * 12; 
-            else ballY = neckY - 5; 
 
             let leftElbowX, leftElbowY, leftHandX, leftHandY;
             let rightElbowX, rightElbowY, rightHandX, rightHandY;
@@ -490,10 +567,38 @@
             } else {
                 leftElbowX = cx - 12; leftElbowY = neckY; leftHandX = cx - 18; leftHandY = neckY - 8;
             }
+            
+            let ballX = cx + 25;
+            let ballY = this.y + 35;
+            if (this.isGrounded) ballY += Math.sin(frames * 0.3) * 12; 
+            else ballY = neckY - 5; 
+            
             rightElbowX = cx + 12; rightElbowY = neckY + 5; rightHandX = ballX - 3; rightHandY = ballY - 6;
 
-            ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(leftElbowX, leftElbowY); ctx.lineTo(leftHandX, leftHandY); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(rightHandX, rightHandY); ctx.stroke();
+            const drawSkeleton = () => {
+                ctx.beginPath(); ctx.arc(cx, headY, 7, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(cx, hipY); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(leftKneeX, leftKneeY); ctx.lineTo(leftFootX, leftFootY); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(rightKneeX, rightKneeY); ctx.lineTo(rightFootX, rightFootY); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(leftElbowX, leftElbowY); ctx.lineTo(leftHandX, leftHandY); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(rightHandX, rightHandY); ctx.stroke();
+            };
+
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            if (dayProgress > 0.1 && !this.isInvincible) {
+                ctx.lineWidth = 8; 
+                ctx.strokeStyle = `rgba(255, 255, 255, ${dayProgress * 0.9})`; 
+                ctx.shadowBlur = 0; 
+                drawSkeleton();
+            }
+
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = strokeCol;
+            ctx.shadowColor = shadCol;
+            ctx.shadowBlur = shadBlur;
+            drawSkeleton();
 
             ctx.shadowBlur = 0; 
             ctx.beginPath(); ctx.arc(ballX, ballY, 8, 0, Math.PI * 2); 
@@ -502,6 +607,8 @@
             ctx.strokeStyle = '#ffffff'; 
             ctx.lineWidth = 1.5; 
             ctx.beginPath(); ctx.moveTo(ballX - 8, ballY); ctx.lineTo(ballX + 8, ballY); ctx.stroke();
+            
+            ctx.restore();
         },
 
         update() {
@@ -512,6 +619,8 @@
                 this.y = GROUND_Y - this.height;
                 this.vy = 0;
                 this.isGrounded = true;
+                this.hasDoubleJumped = false; 
+                
                 if (jumpBufferTimer > 0) {
                     this.jump();
                     jumpBufferTimer = 0; 
@@ -520,12 +629,29 @@
                 this.isGrounded = false;
             }
             if (jumpBufferTimer > 0) jumpBufferTimer--;
+
+            if (this.isInvincible) {
+                this.invincibleTimer--;
+                if (this.invincibleTimer <= 0) this.isInvincible = false;
+            }
+            if (this.canDoubleJump) {
+                this.doubleJumpTimer--;
+                if (this.doubleJumpTimer <= 0) this.canDoubleJump = false;
+            }
+            if (this.hasMagnet) {
+                this.magnetTimer--;
+                if (this.magnetTimer <= 0) this.hasMagnet = false;
+            }
         },
 
         jump() {
             this.vy = JUMP_STRENGTH; 
             this.isGrounded = false;
             playJumpSound(); 
+            
+            if (this.hasDoubleJumped) {
+                floatingTexts.push(new FloatingText('💨', this.x + 10, this.y + this.height, '#ffffff'));
+            }
         }
     };
 
@@ -540,47 +666,166 @@
             this.width = 20 + (this.difficulty * 10);
             this.height = 30 + (this.difficulty * 20); 
             this.y = GROUND_Y - this.height;
+            
             switch(this.difficulty) {
-                case 1: this.color = '#10b981'; this.bonus = 10; break; 
-                case 2: this.color = '#facc15'; this.bonus = 30; break; 
-                case 3: this.color = '#ef4444'; this.bonus = 50; break; 
+                case 1: 
+                    this.hue = 150; this.sat = 90; this.baseLight = 45; 
+                    this.color = '#00FF66'; 
+                    this.bonus = 10; break; 
+                case 2: 
+                    this.hue = 40; this.sat = 100; this.baseLight = 50;  
+                    this.color = '#FFFF00'; 
+                    this.bonus = 30; break; 
+                case 3: 
+                    this.hue = 355; this.sat = 90; this.baseLight = 55;   
+                    this.color = '#FF5555'; 
+                    this.bonus = 50; break;
             }
         }
         draw() {
-            ctx.fillStyle = this.color;
+            ctx.save();
+            
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetY = 4;
+            
+            let currentLightness = this.baseLight - (dayProgress * 20); 
+            
+            ctx.fillStyle = `hsl(${this.hue}, ${this.sat}%, ${currentLightness}%)`;
+            
             ctx.beginPath();
             ctx.roundRect(this.x, this.y, this.width, this.height, [4, 4, 0, 0]);
             ctx.fill();
+
+            ctx.restore();
         }
         update() {
             this.x -= gameSpeed;
         }
     }
 
+    class Cloud {
+        constructor() {
+            this.x = canvas.width + Math.random() * 100;
+            this.y = Math.random() * 100 + 20; 
+            this.size = Math.random() * 20 + 30; 
+            this.speed = Math.random() * 0.5 + 0.2; 
+            this.alpha = Math.random() * 0.2 + 0.1; 
+        }
+        update() {
+            this.x -= (this.speed + gameSpeed * 0.15); 
+        }
+        draw() {
+            ctx.save();
+            ctx.globalAlpha = this.alpha;
+            ctx.font = this.size + 'px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('☁️', this.x, this.y);
+            ctx.restore();
+        }
+    }
+
+    class Bird {
+        constructor() {
+            this.x = canvas.width;
+            this.y = Math.random() * 70 + 60; 
+            this.size = 28;
+            this.hit = false;
+        }
+        update() {
+            this.x -= (gameSpeed * 1.3); 
+            this.y += Math.sin(frames * 0.1) * 1.5; 
+        }
+        draw() {
+            if (this.hit) return; 
+            ctx.save();
+            ctx.font = this.size + 'px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.translate(this.x, this.y);
+            ctx.rotate(Math.sin(frames * 0.2) * 0.1);
+            ctx.fillText('🦅', 0, 0);
+            ctx.restore();
+        }
+    }
+
     class FloatingText {
         constructor(text, x, y, color) {
-            this.text = text; this.x = x; this.y = y; this.color = color;
+            this.text = text; this.x = x; this.y = y; 
+            this.color = color || '#ffffff'; 
             this.alpha = 1.0; this.vy = -1.5;   
         }
         update() { this.y += this.vy; this.alpha -= 0.02; }
         draw() {
             ctx.save();
             ctx.globalAlpha = Math.max(0, this.alpha);
-            ctx.font = 'bold 24px Montserrat, Courier New';
+            
+            ctx.font = '800 24px Montserrat, "Noto Sans TC", sans-serif';
+            
+            ctx.shadowBlur = 0; 
+            ctx.shadowColor = 'transparent';
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.5)';
+            ctx.fillText(this.text, this.x, this.y + 2);
+
             ctx.fillStyle = this.color;
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = '#0f172a';
-            ctx.strokeText(this.text, this.x, this.y);
             ctx.fillText(this.text, this.x, this.y);
+            
             ctx.restore();
         }
+    }
+
+    class Item {
+        constructor() {
+            const config = ITEM_CONFIG[Math.floor(Math.random() * ITEM_CONFIG.length)];
+            this.type = config.type;
+            this.icon = config.icon;
+            this.color = config.color;
+            this.text = config.text;
+            this.duration = config.duration;
+            
+            this.x = canvas.width;
+            this.y = GROUND_Y - 50 - Math.random() * 60; 
+            this.size = 24;
+            this.collected = false;
+            this.pulseOff = Math.random() * Math.PI * 2; 
+        }
+        update() {
+            this.x -= gameSpeed;
+        }
+        draw() {
+            if (this.collected) return;
+            ctx.save();
+            ctx.font = this.size + 'px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 15 + Math.sin(frames * 0.15 + this.pulseOff) * 10;
+            let floatY = this.y + Math.sin(frames * 0.08 + this.pulseOff) * 6;
+            ctx.translate(this.x, floatY);
+            ctx.fillText(this.icon, 0, 0);
+            ctx.restore();
+        }
+    }
+
+    for(let i=0; i<2; i++) {
+        let c = new Cloud();
+        c.x = Math.random() * canvas.width;
+        clouds.push(c);
     }
 
     function handleInputPress(e) {
         initAudio(); 
         if (gameActive) {
-            if (player.isGrounded) player.jump();
-            else jumpBufferTimer = JUMP_BUFFER_MAX;
+            if (player.isGrounded) {
+                player.jump();
+            } else if (player.canDoubleJump && !player.hasDoubleJumped) {
+                player.hasDoubleJumped = true;
+                player.jump();
+            } else {
+                jumpBufferTimer = JUMP_BUFFER_MAX;
+            }
         } else {
             resetGame();
         }
@@ -595,6 +840,18 @@
             e.preventDefault(); 
             if (!e.repeat) handleInputPress(e);
         }
+        
+        if (e.key === '1') {
+            if (player.isInvincible && player.invincibleTimer > 10000) {
+                player.isInvincible = false;
+                player.invincibleTimer = 0;
+                floatingTexts.push(new FloatingText('❌ 密技關閉', player.x, player.y - 20, '#ef4444'));
+            } else {
+                player.isInvincible = true;
+                player.invincibleTimer = 999999; 
+                floatingTexts.push(new FloatingText('⭐ 密技開啟', player.x, player.y - 20, '#fcd34d'));
+            }
+        }
     }, { passive: false });
 
     window.addEventListener('keyup', function(e) {
@@ -604,7 +861,6 @@
         }
     });
 
-    // --- 確保點擊全螢幕與音效按鈕時，不會誤觸發跳躍 ---
     window.addEventListener('touchstart', function(e) {
         if (e.target.id === 'audioBtn' || e.target.id === 'startBtn' || e.target.id === 'restartBtn' || e.target.id === 'fullscreenBtn') return; 
         e.preventDefault(); 
@@ -646,6 +902,8 @@
             }
         }
 
+        const scoreMultiplier = player.hasMagnet ? 2 : 1;
+
         for (let i = 0; i < obstacles.length; i++) {
             let obs = obstacles[i];
             obs.update();
@@ -658,15 +916,29 @@
                 player.y + hitTolerance < obs.y + obs.height &&
                 player.y + player.height - hitTolerance > obs.y
             ) {
-                playCrashSound(); 
-                gameActive = false; 
+                if (player.isInvincible) {
+                    if (!obs.passed) {
+                        score += (obs.bonus * 2); 
+                        playScoreSound();
+                        floatingTexts.push(new FloatingText('💥 CRASH!', obs.x, obs.y, '#f97316'));
+                    }
+                    obs.passed = true;
+                    obs.x = -100; 
+                } else {
+                    playCrashSound(); 
+                    gameActive = false; 
+                }
             }
 
             if (!obs.passed && player.x > obs.x + obs.width) {
-                score += obs.bonus;
+                let earnedScore = obs.bonus * scoreMultiplier; 
+                score += earnedScore;
                 obs.passed = true;
                 playScoreSound(); 
-                floatingTexts.push(new FloatingText('+' + obs.bonus, obs.x, obs.y - 10, obs.color));
+                
+                let floatColor = player.hasMagnet ? '#f87171' : obs.color;
+                let floatMsg = player.hasMagnet ? `+${earnedScore} (x2)` : `+${earnedScore}`;
+                floatingTexts.push(new FloatingText(floatMsg, obs.x, obs.y - 10, floatColor));
             }
 
             if (obs.x + obs.width < 0) {
@@ -676,10 +948,151 @@
         }
     }
 
+    function handleClouds() {
+        if (Math.random() < 0.003) {
+            clouds.push(new Cloud());
+        }
+        for (let i = 0; i < clouds.length; i++) {
+            let c = clouds[i];
+            c.update();
+            c.draw();
+            if (c.x + c.size < 0) {
+                clouds.splice(i, 1);
+                i--;
+            }
+        }
+    }
+
+    function handleBirds() {
+        if (score > 100 && Math.random() < 0.003) {
+            birds.push(new Bird());
+        }
+
+        const scoreMultiplier = player.hasMagnet ? 2 : 1;
+
+        for (let i = 0; i < birds.length; i++) {
+            let bird = birds[i];
+            bird.update();
+            bird.draw();
+
+            let hitRadius = 15; 
+            if (
+                !bird.hit &&
+                player.x < bird.x + hitRadius &&
+                player.x + player.width > bird.x - hitRadius &&
+                player.y < bird.y + hitRadius &&
+                player.y + player.height > bird.y - hitRadius
+            ) {
+                bird.hit = true;
+                let earnedScore = 50 * scoreMultiplier; 
+                score += earnedScore;
+                playScoreSound(); 
+                
+                let floatColor = player.hasMagnet ? '#f87171' : '#fcd34d';
+                let floatMsg = player.hasMagnet ? `+${earnedScore} 🦅 (x2)` : `+${earnedScore} 🦅`;
+                floatingTexts.push(new FloatingText(floatMsg, bird.x, bird.y, floatColor));
+            }
+
+            if (bird.x + bird.size < 0 || bird.hit) {
+                birds.splice(i, 1);
+                i--;
+            }
+        }
+    }
+
+    function handleItems() {
+        // 1. 稍微提高基礎機率，讓整體節奏更好玩
+        let currentSpawnChance = 0.008 + (gameSpeed * 0.0005);
+
+        if (Math.random() < currentSpawnChance) {
+            let newItem = new Item();
+            
+            // 2. 關鍵修改：主動避讓邏輯！不取消生成，而是挪動位置
+            for (let obs of obstacles) {
+                // 如果道具預設出現的位置 (canvas.width)，跟障礙物距離太近 (< 70)
+                if (Math.abs(newItem.x - obs.x) < 70) {
+                    // 強制把道具往右邊（障礙物後方的空隙）推開 80 像素，保證絕對安全！
+                    newItem.x = Math.max(newItem.x, obs.x + obs.width + 80);
+                }
+            }
+            
+            // 控制畫面上最多同時存在 3 個道具，避免眼花撩亂
+            if (items.length < 3) {
+                items.push(newItem);
+            }
+        }
+
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+            item.update();
+            item.draw();
+
+            let hit = 12; 
+            if (
+                !item.collected &&
+                player.x < item.x + hit &&
+                player.x + player.width > item.x - hit &&
+                player.y < item.y + hit &&
+                player.y + player.height > item.y - hit
+            ) {
+                item.collected = true;
+                playPowerupSound(); 
+                
+                if (item.type === 'star') {
+                    player.isInvincible = true;
+                    // 使用 Math.max 確保吃到星星不會縮短現有的無敵時間（保護密技的 999999）
+                    player.invincibleTimer = Math.max(player.invincibleTimer, item.duration); 
+                } else if (item.type === 'shoe') {
+                    player.canDoubleJump = true;
+                    player.doubleJumpTimer = item.duration;
+                } else if (item.type === 'magnet') {
+                    player.hasMagnet = true;
+                    player.magnetTimer = item.duration;
+                }
+
+                floatingTexts.push(new FloatingText(item.text, item.x, item.y - 20, item.color));
+            }
+
+            if (item.x + item.size < 0 || item.collected) {
+                items.splice(i, 1);
+                i--;
+            }
+        }
+    }
+
+    function drawBackground() {
+        // 改使用 frames 計算，確保每次 resetGame() 將 frames 歸零時，都會從起點開始
+        // 假設遊戲運行在 60 FPS，7200 個 frame 大約是 2 分鐘 (120秒) 循環一次
+        // 你可以修改 7200 這個數字來調整日夜交替的速度 (數字越小交替越快)
+        let cycle = (frames / 7200) * (Math.PI * 2);
+        
+        // 當 frames 為 0 時，cycle = 0。Math.sin(-Math.PI / 2) 會是 -1
+        // 這樣可以確保 dayProgress 一開始剛好是 0 (黑夜)
+        dayProgress = (Math.sin(cycle - Math.PI / 2) + 1) / 2; 
+
+        let h = 217 - (dayProgress * 17); 
+        let s = 33 + (dayProgress * 62); 
+        let l = 17 + (dayProgress * 43); 
+
+        ctx.fillStyle = `hsl(${h}, ${s}%, ${l}%)`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.beginPath();
+        ctx.moveTo(0, GROUND_Y);
+        ctx.lineTo(canvas.width, GROUND_Y);
+        ctx.strokeStyle = `hsl(215, 18%, ${33 - dayProgress * 10}%)`; 
+        ctx.lineWidth = 3;
+        ctx.stroke();
+    }
+
     function drawSpeedLines(menuSpeedOverride = 0) {
         ctx.save();
         ctx.lineCap = 'round';
         let currentSpeed = menuSpeedOverride > 0 ? menuSpeedOverride : gameSpeed;
+
+        let r = 56 + dayProgress * (255 - 56);
+        let g = 189 + dayProgress * (255 - 189);
+        let b = 248 + dayProgress * (255 - 248);
 
         for (let i = 0; i < speedLines.length; i++) {
             let line = speedLines[i];
@@ -691,9 +1104,40 @@
             ctx.beginPath();
             ctx.moveTo(line.x, line.y);
             ctx.lineTo(line.x + line.length, line.y);
-            ctx.strokeStyle = `rgba(56, 189, 248, ${line.alpha})`;
+            
+            ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${line.alpha * (0.5 + dayProgress)})`;
             ctx.lineWidth = 1.5;
             ctx.stroke();
+        }
+        ctx.restore();
+    }
+    
+    function drawActiveBuffsUI() {
+        ctx.save();
+        ctx.textAlign = 'right';
+        ctx.font = 'bold 16px Noto Sans TC, sans-serif';
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowBlur = 4;
+        
+        let uiY = 60; 
+        
+        if (player.isInvincible) {
+            ctx.fillStyle = '#fcd34d';
+            let displayTime = player.invincibleTimer > 10000 ? '∞' : Math.ceil(player.invincibleTimer / 60) + 's';
+            ctx.fillText(`⭐ 無敵: ${displayTime}`, canvas.width - 20, uiY);
+            uiY += 25;
+        }
+        if (player.canDoubleJump) {
+            ctx.fillStyle = '#34d399';
+            let sec = Math.ceil(player.doubleJumpTimer / 60);
+            ctx.fillText(`👟 二段跳: ${sec}s`, canvas.width - 20, uiY);
+            uiY += 25;
+        }
+        if (player.hasMagnet) {
+            ctx.fillStyle = '#f87171';
+            let sec = Math.ceil(player.magnetTimer / 60);
+            ctx.fillText(`🧲 倍率x2: ${sec}s`, canvas.width - 20, uiY);
+            uiY += 25;
         }
         ctx.restore();
     }
@@ -703,20 +1147,14 @@
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
+        drawBackground();
+        handleClouds(); 
         drawSpeedLines(4);
-
-        ctx.beginPath();
-        ctx.moveTo(0, GROUND_Y);
-        ctx.lineTo(canvas.width, GROUND_Y);
-        ctx.strokeStyle = '#475569'; 
-        ctx.lineWidth = 3;
-        ctx.stroke();
 
         player.isGrounded = true;
         player.draw();
 
         frames++;
-        
         animationId = requestAnimationFrame(menuAnimate);
     }
 
@@ -761,18 +1199,16 @@
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
+        drawBackground();
+        handleClouds(); 
         drawSpeedLines();
-
-        ctx.beginPath();
-        ctx.moveTo(0, GROUND_Y);
-        ctx.lineTo(canvas.width, GROUND_Y);
-        ctx.strokeStyle = '#475569'; 
-        ctx.lineWidth = 3;
-        ctx.stroke();
 
         player.update();
         player.draw();
+        
         handleObstacles();
+        handleBirds(); 
+        handleItems();
 
         for (let i = floatingTexts.length - 1; i >= 0; i--) {
             let ft = floatingTexts[i];
@@ -780,6 +1216,8 @@
             ft.draw();
             if (ft.alpha <= 0) floatingTexts.splice(i, 1);
         }
+        
+        drawActiveBuffsUI();
 
         frames++;
         if (frames % 10 === 0) score++; 
@@ -790,17 +1228,34 @@
 
     function resetGame() {
         initAudio(); 
-        
         cancelAnimationFrame(animationId);
-        
+        stopBillboard(); 
         mainMenuOverlay.classList.add('hidden');
         
         score = 0;
         frames = 0;
         obstacles = [];
+        birds = []; 
+        clouds = []; 
         floatingTexts = []; 
+        items = []; 
+        
+        for(let i=0; i<2; i++) {
+            let c = new Cloud();
+            c.x = Math.random() * canvas.width;
+            clouds.push(c);
+        }
+
         player.y = 150; 
         player.vy = 0;
+        
+        player.isInvincible = false; 
+        player.invincibleTimer = 0;  
+        player.canDoubleJump = false;
+        player.doubleJumpTimer = 0;
+        player.hasMagnet = false;
+        player.magnetTimer = 0;
+        
         jumpBufferTimer = 0;
         
         gameActive = true;
@@ -823,11 +1278,11 @@
         gameActive = false; 
         inMenu = true; 
         
+        startBillboard(); 
         menuAnimate(); 
     }
     
     document.getElementById('startBtn').addEventListener('click', resetGame);
-    
     showMainMenu(); 
     window.focus(); 
 
