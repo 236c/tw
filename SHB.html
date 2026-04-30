@@ -83,6 +83,34 @@
             box-shadow: 0 6px 15px rgba(0, 242, 254, 0.3);
         }
 
+        #homeBtn {
+            position: absolute;
+            top: 15px;
+            left: 65px;
+            width: 40px;
+            height: 40px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1.5px solid rgba(0, 242, 254, 0.4);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00f2fe;
+            font-size: 1.3rem;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            pointer-events: auto;
+        }
+
+        #homeBtn:hover {
+            transform: scale(1.1);
+            background: rgba(15, 23, 42, 0.95);
+            border-color: #00f2fe;
+            box-shadow: 0 6px 15px rgba(0, 242, 254, 0.3);
+        }
+
         #ballLayer {
             position: fixed; 
             top: 0;
@@ -159,6 +187,13 @@
             pointer-events: none;
         }
         
+        .title-wrapper {
+            position: relative;
+            display: inline-block;
+            text-align: center;
+            margin-top: 15px; /* 給標籤多一點上方空間 */
+        }
+
         .game-title {
             font-family: 'Montserrat', 'Noto Sans TC', sans-serif;
             font-weight: 900;
@@ -172,7 +207,33 @@
             -webkit-text-fill-color: transparent;
             letter-spacing: 2px;
             animation: floatTitle 3s ease-in-out infinite, gradientShine 3s linear infinite;
-            text-align: center;
+        }
+
+        /* 修正：往左上方移動避開文字 */
+        .year-badge {
+            position: absolute;
+            top: -5px; 
+            left: -80px; 
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #facc15;
+            background: rgba(15, 23, 42, 0.85);
+            border: 2px solid #facc15;
+            border-radius: 8px;
+            padding: 2px 10px;
+            transform: rotate(-12deg);
+            box-shadow: 0 4px 10px rgba(250, 204, 21, 0.4);
+            letter-spacing: 1px;
+            z-index: 10;
+            animation: pulseBadge 2s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulseBadge {
+            0%, 100% { transform: rotate(-12deg) scale(1); box-shadow: 0 4px 10px rgba(250, 204, 21, 0.4); }
+            50% { transform: rotate(-12deg) scale(1.08); box-shadow: 0 6px 15px rgba(250, 204, 21, 0.7); }
         }
 
         .game-subtitle {
@@ -200,11 +261,16 @@
             padding: 10px 20px;
             border-radius: 6px;
             color: #e2e8f0;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             position: relative;
             backdrop-filter: blur(10px);
             text-align: center;
+            transition: opacity 0.5s ease-in-out; 
+            min-height: 80px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .btn-play {
@@ -252,15 +318,43 @@
             50% { opacity: 1; }
         }
 
+        .music-controls {
+            z-index: 50;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-music {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #4facfe;
+            color: #4facfe;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .btn-music:hover {
+            background: #4facfe;
+            color: #0f172a;
+        }
+
         @media (max-width: 768px) and (orientation: portrait) {
             #canvasContainer { 
                 height: 55vh; 
                 min-height: 300px;
             }
             .game-title { font-size: 2.2rem; margin-bottom: 0.2rem; }
-            .game-subtitle { font-size: 1.2rem; margin-bottom: 0.8rem; }
-            .instruction-box { font-size: 0.85rem; padding: 8px 15px; margin-bottom: 1rem; width: 90%; }
+            /* 修正：手機版也一併往左上調整 */
+            .year-badge { top: -18px; left: -35px; font-size: 0.85rem; padding: 2px 8px; }
+            .game-subtitle { font-size: 1.2rem; margin-bottom: 0.4rem; }
+            .instruction-box { font-size: 0.85rem; padding: 8px 15px; margin-bottom: 0.8rem; width: 90%; min-height: 70px; }
             .btn-play { padding: 10px 30px; }
+            .music-controls { margin-bottom: 1rem; }
             
             #fullscreenBtn {
                 width: 34px;
@@ -268,6 +362,13 @@
                 font-size: 1.2rem;
                 top: 10px;
                 left: 10px;
+            }
+            #homeBtn {
+                width: 34px;
+                height: 34px;
+                font-size: 1.1rem;
+                top: 10px;
+                left: 54px;
             }
         }
 
@@ -305,15 +406,26 @@
                 <div class="card-body" id="gameWrapper">
                     
                     <div id="mainMenuOverlay" class="menu-overlay">
-                        <div class="game-title">十興國小 籃球隊</div>
+                        <div class="title-wrapper">
+                            <div id="yearBadge" class="year-badge"></div>
+                            <div class="game-title">十興國小 籃球隊</div>
+                        </div>
                         <div class="game-subtitle">Shi-Hsing BASKETBALL</div>
                         
-                        <div class="instruction-box">
-                            <div class="fs-6 mb-1">🏀 <strong>第四面牆突破版</strong></div>
+                        <div class="instruction-box" id="instructionBox">
+                            <div class="fs-6 mb-1" id="recruitTitle"></div>
                             <div class="small">
-                                <span class="text-warning fw-bold">點擊球員，直接把球投出視窗框架之外吧！</span><br>
-                                (老師隨時在場邊盯著你們 👀)
+                                <span class="text-warning fw-bold" id="recruitMain"></span><br>
+                                <span id="recruitSub"></span>
                             </div>
+                        </div>
+
+                        <div class="music-controls">
+                            <div style="display: flex; gap: 10px;">
+                                <button id="selectMusicBtn" class="btn-music">🎵 選擇背景音樂</button>
+                                <button id="playSavedMusicBtn" class="btn-music" style="display: none;">▶️ 播放上次音樂</button>
+                            </div>
+                            <div id="musicStatus" style="font-size: 0.8rem; color: #cbd5e1;">系統尚未載入音樂檔案</div>
                         </div>
                         
                         <button id="startBtn" class="btn btn-play d-flex flex-column align-items-center">
@@ -323,6 +435,7 @@
 
                     <div id="canvasContainer">
                         <div id="fullscreenBtn" title="全螢幕">⛶</div>
+                        <div id="homeBtn" title="回到起始頁面">🏡</div>
                         <canvas id="gameCanvas"></canvas>
                     </div>
                     
@@ -333,12 +446,239 @@
 </div>
 
 <script>
-    let LOGICAL_WIDTH = 1000;
-    const LOGICAL_HEIGHT = 300;
-    let gameStarted = false; 
+    // ==========================================
+    // 遊戲資料設定區 (可在此自由新增、修改、刪除)
+    // ==========================================
 
-    // 判斷是否為手機尺寸
-    const isMobileDevice = window.innerWidth <= 768;
+    // 0. 標題左上角特效字串 (如: 梯次或年份)
+    const TITLE_BADGE_TEXT = "2026";
+
+    // 1. 招募訊息輪播設定
+    const RECRUIT_CONFIG = {
+        interval: 4000, 
+        fadeSpeed: 500, 
+        messages: [
+            {
+                title: "🏀 十興國小籃球隊 招募中！",
+                main: "喜歡打球嗎？加入我們一起在球場上熱血奮戰！",
+                sub: "(歡迎熱愛籃球的同學加入我們的行列 👀)"
+            },
+            {
+                title: "🏆 挑戰自我，團隊合作",
+                main: "跟著古教練一起扎實訓練，提升籃球技巧！",
+                sub: "(無經驗可，只要有一顆肯學與堅持的心 💪)"
+            },
+            {
+                title: "🎯 遊戲第四面牆突破版",
+                main: "點擊畫面上的球員，直接把球投出視窗框架之外吧！",
+                sub: "(老師隨時在場邊盯著你們 👀)"
+            }
+        ]
+    };
+
+    // 2. 球員名單設定
+    const PLAYER_NAMES = [
+        "徐毅丞", "董宥葳", "吳秉恩", "劉軒禎", "蔡昕宏", "林稟硯", "范睿軒", "蘇靖翔",
+        "張栩睿", "黃御展", "張煒誠", "張皓丞", "蔡棏曜", "范翔鈞", "邱得洛", "黃晟祐",
+        "周楷杰", "沈廷軒", "鄭光熙", "黃宇紘", "張家閎", "邱嚴平", "羅毅軒", "姜樂",
+        "郭曜丞", "古宇超", "陳品勳"
+    ];
+
+    // 3. 老師語錄
+    const TEACHER_QUOTES = [
+        "專心點！眼睛看哪裡啊！ 👀", "跑位！跑起來！不要站在那邊發呆！ 🏃‍♂️💨",
+        "防守！手舉高！ ✋🤚", "這球傳得太隨便了！ 🤦‍♂️", "呼吸！調整節奏！ 🧘‍♂️",
+        "平常練習是這樣教的嗎？ 💢", "卡位！籃板球是誰的！ 🛡️🏀",
+        "好球！繼續保持！ 🔥👏", "節奏慢下來！不要急！ 🐢",
+        "不要一直運球，球傳出去！ 🏀", "膝蓋彎曲！重心壓低！ 🦵",
+        "到底有沒有吃飯啊？跑這麼慢！ 🍚", "快攻！快攻！不要拖時間！ ⚡",
+        "喊聲啊！都不講話怎麼配合！ 🗣️", "盯人！你的防守者呢？ 👀",
+        "出手要果斷！不要猶豫！ 🎯", "體力不行了是不是？撐下去！ 💦"
+    ];
+
+    // 4. 失誤語錄
+    const MISS_QUOTES = [
+        "這在投什麼東西？！ 🤷‍♂️", "手腕！用手腕的力量！ 💪",
+        "用力過猛啦！ 💥", "沒進沒關係，趕快回防！ 🛡️🏃‍♂️", "專注力呢？ 🧐",
+        "麵包球！這力道也差太多了吧！ 🍞", "打鐵啦！籃框都要被你敲壞了！ 🔨",
+        "瞄準再投啊！閉著眼睛投是不是？ 🫣", "投籃弧度太低了！ 📉",
+        "自己投不進自己去搶籃板！ 🏃‍♂️", "今天手感很冰喔！ 🥶",
+        "這球太離譜了，投到哪裡去了！ 🛸"
+    ];
+    // ==========================================
+
+    document.getElementById('yearBadge').textContent = TITLE_BADGE_TEXT;
+
+    // --- 招募訊息動態切換邏輯 ---
+    const instructionBox = document.getElementById('instructionBox');
+    const recruitTitle = document.getElementById('recruitTitle');
+    const recruitMain = document.getElementById('recruitMain');
+    const recruitSub = document.getElementById('recruitSub');
+    let currentRecruitIdx = 0;
+    let recruitTimer = null;
+
+    function renderRecruitMessage() {
+        const msg = RECRUIT_CONFIG.messages[currentRecruitIdx];
+        recruitTitle.innerHTML = `<strong>${msg.title}</strong>`;
+        recruitMain.textContent = msg.main;
+        recruitSub.textContent = msg.sub;
+        instructionBox.style.opacity = 1;
+    }
+
+    function cycleRecruitMessage() {
+        instructionBox.style.opacity = 0; 
+        setTimeout(() => {
+            currentRecruitIdx = (currentRecruitIdx + 1) % RECRUIT_CONFIG.messages.length;
+            renderRecruitMessage(); 
+        }, RECRUIT_CONFIG.fadeSpeed);
+    }
+
+    renderRecruitMessage();
+    recruitTimer = setInterval(cycleRecruitMessage, RECRUIT_CONFIG.interval);
+
+    // --- 背景音樂 (File System Access API + IndexedDB) ---
+    const bgmAudio = new Audio();
+    bgmAudio.loop = true;
+    bgmAudio.volume = 0.4;
+    let isMusicLoaded = false;
+
+    const selectMusicBtn = document.getElementById('selectMusicBtn');
+    const playSavedMusicBtn = document.getElementById('playSavedMusicBtn');
+    const musicStatus = document.getElementById('musicStatus');
+
+    [selectMusicBtn, playSavedMusicBtn].forEach(btn => {
+        btn.addEventListener('click', (e) => e.stopPropagation());
+    });
+
+    const DB_NAME = 'SHB_AudioDB';
+    const STORE_NAME = 'settings';
+
+    function openDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = (e) => {
+                if (!e.target.result.objectStoreNames.contains(STORE_NAME)) {
+                    e.target.result.createObjectStore(STORE_NAME);
+                }
+            };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async function saveFileHandle(handle) {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const request = tx.objectStore(STORE_NAME).put(handle, 'bgmHandle');
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async function getFileHandle() {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const request = tx.objectStore(STORE_NAME).get('bgmHandle');
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async function verifyPermission(fileHandle) {
+        const options = { mode: 'read' };
+        if ((await fileHandle.queryPermission(options)) === 'granted') { return true; }
+        if ((await fileHandle.requestPermission(options)) === 'granted') { return true; }
+        return false;
+    }
+
+    async function playFileFromHandle(fileHandle) {
+        try {
+            const file = await fileHandle.getFile();
+            if (bgmAudio.src) {
+                URL.revokeObjectURL(bgmAudio.src);
+            }
+            const url = URL.createObjectURL(file);
+            bgmAudio.src = url;
+            await bgmAudio.play();
+            
+            isMusicLoaded = true;
+            playSavedMusicBtn.style.display = 'inline-block';
+            playSavedMusicBtn.textContent = '⏸️ 暫停音樂';
+            musicStatus.textContent = `🎵 正在播放: ${file.name}`;
+            musicStatus.style.color = '#10b981';
+        } catch (error) {
+            console.error('播放失敗:', error);
+            musicStatus.textContent = '❌ 播放失敗，可能檔案已移動或損毀';
+            musicStatus.style.color = '#ef4444';
+        }
+    }
+
+    selectMusicBtn.addEventListener('click', async () => {
+        try {
+            if (!window.showOpenFilePicker) {
+                alert("您的瀏覽器不支援 File System Access API，請使用新版 Chrome 或 Edge。");
+                return;
+            }
+            const [fileHandle] = await window.showOpenFilePicker({
+                types: [{
+                    description: 'Audio Files',
+                    accept: { 'audio/*': ['.mp3', '.wav', '.ogg', '.m4a'] }
+                }],
+                excludeAcceptAllOption: true,
+                multiple: false
+            });
+            await saveFileHandle(fileHandle);
+            await playFileFromHandle(fileHandle);
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error(error);
+                musicStatus.textContent = '讀取檔案失敗';
+            }
+        }
+    });
+
+    playSavedMusicBtn.addEventListener('click', async () => {
+        if (isMusicLoaded) {
+            if (!bgmAudio.paused) {
+                bgmAudio.pause();
+                playSavedMusicBtn.textContent = '▶️ 繼續播放音樂';
+                musicStatus.textContent = '⏸️ 音樂已暫停';
+                musicStatus.style.color = '#cbd5e1';
+            } else {
+                await bgmAudio.play();
+                playSavedMusicBtn.textContent = '⏸️ 暫停音樂';
+                musicStatus.textContent = '🎵 音樂播放中...';
+                musicStatus.style.color = '#10b981';
+            }
+            return;
+        }
+
+        const handle = await getFileHandle();
+        if (handle) {
+            const hasPermission = await verifyPermission(handle);
+            if (hasPermission) {
+                await playFileFromHandle(handle);
+            } else {
+                musicStatus.textContent = '❌ 沒有權限讀取檔案，請重新選擇音樂';
+            }
+        }
+    });
+
+    window.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const handle = await getFileHandle();
+            if (handle) {
+                playSavedMusicBtn.style.display = 'inline-block';
+                playSavedMusicBtn.textContent = '▶️ 播放上次音樂';
+                musicStatus.textContent = `📦 發現已儲存的音樂: ${handle.name} (點擊按鈕播放)`;
+            }
+        } catch (e) {
+            console.warn('無法讀取 IndexedDB 或無已儲存的檔案', e);
+        }
+    });
+
 
     // --- 音效系統 ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -408,18 +748,27 @@
             osc1.stop(audioCtx.currentTime + 0.3); osc2.stop(audioCtx.currentTime + 0.3);
         }
     }
+    const soundManager = new SoundManager(); 
 
-    const soundManager = new SoundManager();
+    let LOGICAL_WIDTH = 1000;
+    const LOGICAL_HEIGHT = 300;
+    let gameStarted = false; 
+    const isMobileDevice = window.innerWidth <= 768;
+
+
+    // --- 主選單與控制按鈕邏輯 ---
     const mainMenuOverlay = document.getElementById('mainMenuOverlay');
 
     mainMenuOverlay.addEventListener('click', () => {
         mainMenuOverlay.classList.add('hidden');
         soundManager.init(); 
         gameStarted = true; 
+        clearInterval(recruitTimer); 
     });
 
     const gameWrapper = document.getElementById('gameWrapper');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const homeBtn = document.getElementById('homeBtn');
 
     function handleFullscreenChange() {
         const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
@@ -451,33 +800,22 @@
         }
     });
 
-    const playerNames = [
-        "徐毅丞", "董宥葳", "吳秉恩", "劉軒禎", "蔡昕宏", "林稟硯", "范睿軒", "蘇靖翔",
-        "張栩睿", "黃御展", "張煒誠", "張皓丞", "蔡棏曜", "范翔鈞", "邱得洛", "黃晟祐",
-        "周楷杰", "沈廷軒", "鄭光熙", "黃宇紘", "張家閎", "邱嚴平", "羅毅軒", "姜樂",
-        "郭曜丞", "古宇超", "陳品勳"
-    ];
-    let availableNames = [...playerNames];
+    homeBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+        mainMenuOverlay.classList.remove('hidden');
+        gameStarted = false; 
+        
+        clearInterval(recruitTimer);
+        recruitTimer = setInterval(cycleRecruitMessage, RECRUIT_CONFIG.interval);
+    });
 
-    const teacherQuotes = [
-        "專心點！眼睛看哪裡啊！ 👀", "跑位！跑起來！不要站在那邊發呆！ 🏃‍♂️💨",
-        "防守！手舉高！ ✋🤚", "這球傳得太隨便了！ 🤦‍♂️", "呼吸！調整節奏！ 🧘‍♂️",
-        "平常練習是這樣教的嗎？ 💢", "卡位！籃板球是誰的！ 🛡️🏀",
-        "好球！繼續保持！ 🔥👏", "節奏慢下來！不要急！ 🐢",
-        "不要一直運球，球傳出去！ 🏀", "膝蓋彎曲！重心壓低！ 🦵",
-        "到底有沒有吃飯啊？跑這麼慢！ 🍚", "快攻！快攻！不要拖時間！ ⚡",
-        "喊聲啊！都不講話怎麼配合！ 🗣️", "盯人！你的防守者呢？ 👀",
-        "出手要果斷！不要猶豫！ 🎯", "體力不行了是不是？撐下去！ 💦"
-    ];
-    
-    const missQuotes = [
-        "這在投什麼東西？！ 🤷‍♂️", "手腕！用手腕的力量！ 💪",
-        "用力過猛啦！ 💥", "沒進沒關係，趕快回防！ 🛡️🏃‍♂️", "專注力呢？ 🧐",
-        "麵包球！這力道也差太多了吧！ 🍞", "打鐵啦！籃框都要被你敲壞了！ 🔨",
-        "瞄準再投啊！閉著眼睛投是不是？ 🫣", "投籃弧度太低了！ 📉",
-        "自己投不進自己去搶籃板！ 🏃‍♂️", "今天手感很冰喔！ 🥶",
-        "這球太離譜了，投到哪裡去了！ 🛸"
-    ];
+
+    // --- 遊戲元件設計 ---
+    let availableNames = [...PLAYER_NAMES];
 
     class QuoteManager {
         constructor() {
@@ -486,8 +824,8 @@
             this.randomQuoteInterval = 4000; 
         }
         addQuote(text, color = '#facc15') {
-            let minX = Math.min(150, LOGICAL_WIDTH * 0.2);
-            let maxX = Math.max(minX + 100, LOGICAL_WIDTH - 250);
+            let minX = LOGICAL_WIDTH * 0.2;
+            let maxX = LOGICAL_WIDTH * 0.8;
             let x = minX + Math.random() * (maxX - minX);
             let y = 60 + Math.random() * 40;
             this.quotes.push({ text: text, x: x, y: y, alpha: 1.0, color: color, life: 120 });
@@ -496,12 +834,15 @@
             let currentTime = Date.now();
             if (currentTime - this.lastRandomQuoteTime > this.randomQuoteInterval) {
                 if (Math.random() > 0.6) { 
-                    this.addQuote(teacherQuotes[Math.floor(Math.random() * teacherQuotes.length)]);
+                    this.addQuote(TEACHER_QUOTES[Math.floor(Math.random() * TEACHER_QUOTES.length)]);
                     soundManager.playWhistle(); 
                 }
                 this.lastRandomQuoteTime = currentTime;
                 this.randomQuoteInterval = 3000 + Math.random() * 3000; 
             }
+            
+            let dynamicFontSize = Math.max(11, Math.min(22, LOGICAL_WIDTH * 0.04));
+
             for (let i = this.quotes.length - 1; i >= 0; i--) {
                 let q = this.quotes[i];
                 q.y -= 0.3; q.life--;
@@ -512,9 +853,14 @@
                 if (q.life <= 0) { this.quotes.splice(i, 1); continue; }
                 ctx.save();
                 ctx.globalAlpha = q.alpha;
-                ctx.font = 'bold 22px "Noto Sans TC", sans-serif';
-                ctx.textAlign = 'center'; ctx.fillStyle = q.color;
-                ctx.fillText(`💬 老師：「${q.text}」`, q.x, q.y);
+                ctx.font = `bold ${dynamicFontSize}px "Noto Sans TC", sans-serif`;
+                ctx.textAlign = 'center'; 
+                ctx.fillStyle = q.color;
+                
+                let safeX = q.x;
+                if (LOGICAL_WIDTH < 600) safeX = LOGICAL_WIDTH / 2;
+                
+                ctx.fillText(`💬 老師：「${q.text}」`, safeX, q.y, LOGICAL_WIDTH * 0.9);
                 ctx.restore();
             }
         }
@@ -592,7 +938,7 @@
 
         init(randomStart = false) {
             if (this.playerName && !availableNames.includes(this.playerName)) availableNames.push(this.playerName);
-            if (availableNames.length === 0) availableNames = [...playerNames];
+            if (availableNames.length === 0) availableNames = [...PLAYER_NAMES];
             this.playerName = availableNames.splice(Math.floor(Math.random() * availableNames.length), 1)[0];
 
             this.baseY = 80 + Math.random() * 180; 
@@ -679,7 +1025,7 @@
 
                         if (!this.missQuoteTriggered && Math.random() > 0.5) {
                             this.missQuoteTriggered = true;
-                            quoteManager.addQuote(`${this.playerName}，${missQuotes[Math.floor(Math.random() * missQuotes.length)]}`, '#ef4444');
+                            quoteManager.addQuote(`${this.playerName}，${MISS_QUOTES[Math.floor(Math.random() * MISS_QUOTES.length)]}`, '#ef4444');
                             soundManager.playWhistle(); 
                         }
                     }
@@ -726,12 +1072,16 @@
             ctx.translate(this.x, this.y); ctx.scale(this.scale, this.scale);
             const cx = 0, headY = 10, neckY = 20, hipY = 36, footY = 50;
             
-            ctx.save(); ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px "Noto Sans TC", sans-serif'; 
-            ctx.textAlign = 'center'; ctx.fillText(this.playerName, cx, headY - 18); ctx.restore();
+            let dynamicNameSize = Math.max(11, Math.min(20, LOGICAL_WIDTH * 0.035));
+            ctx.save(); 
+            ctx.fillStyle = '#ffffff'; 
+            ctx.font = `bold ${dynamicNameSize}px "Noto Sans TC", sans-serif`; 
+            ctx.textAlign = 'center'; 
+            ctx.fillText(this.playerName, cx, headY - 18, 100); 
+            ctx.restore();
 
             ctx.strokeStyle = this.color; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
             
-            // 【最佳化】如果是手機螢幕，就關閉高耗能的陰影渲染
             if (!isMobileDevice) {
                 ctx.shadowColor = this.color; 
                 ctx.shadowBlur = 4;
@@ -833,7 +1183,8 @@
         }
     }
 
-    // 【最佳化】手機畫布較窄，將同場人數從 8 人調降為 5 人，讓畫面不擁擠並提升幀數
+
+    // --- 啟動與繪製迴圈 ---
     const stickmanCount = isMobileDevice ? 5 : 8;
     const stickmen = [];
     for (let i = 0; i < stickmanCount; i++) stickmen.push(new Stickman());
@@ -863,7 +1214,6 @@
     });
 
     function animate() {
-        // 【最佳化】將 DPR 最高限制為 2 倍，防止手機的高解析度吃光 GPU 資源
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         const displayWidth = canvas.clientWidth;
         const displayHeight = canvas.clientHeight;
@@ -879,7 +1229,6 @@
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // 配合 DPR 的縮放設定
         const scaleFactor = (canvas.height / LOGICAL_HEIGHT) * (targetHeight / canvas.height);
         ctx.scale(scaleFactor, scaleFactor);
 
