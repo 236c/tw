@@ -25,6 +25,7 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7) !important;
             max-width: 1000px;
             margin: 0 auto;
+            width: 100%;
         }
 
         .card-body {
@@ -35,13 +36,13 @@
             justify-content: center;
             padding: 0;
             border-radius: 12px;
+            overflow: hidden;
         }
 
         #canvasContainer {
             position: relative;
             width: 100%;
-            max-width: 1000px;
-            aspect-ratio: 1000 / 300;
+            height: 400px; 
             margin: 0 auto;
         }
 
@@ -56,8 +57,8 @@
 
         #fullscreenBtn {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 15px; /* 移至左上角，避免手機底部的系統手勢誤觸 */
+            left: 15px;
             width: 40px;
             height: 40px;
             background: rgba(15, 23, 42, 0.6);
@@ -171,6 +172,7 @@
             -webkit-text-fill-color: transparent;
             letter-spacing: 2px;
             animation: floatTitle 3s ease-in-out infinite, gradientShine 3s linear infinite;
+            text-align: center;
         }
 
         .game-subtitle {
@@ -181,6 +183,7 @@
             margin-bottom: 1rem;
             letter-spacing: 1px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-align: center;
         }
 
         @keyframes floatTitle {
@@ -250,11 +253,22 @@
         }
 
         @media (max-width: 768px) and (orientation: portrait) {
-            .card-body { min-height: 380px; }
+            #canvasContainer { 
+                height: 55vh; 
+                min-height: 300px;
+            }
             .game-title { font-size: 2.2rem; margin-bottom: 0.2rem; }
             .game-subtitle { font-size: 1.2rem; margin-bottom: 0.8rem; }
-            .instruction-box { font-size: 0.85rem; padding: 8px 15px; margin-bottom: 1rem; }
+            .instruction-box { font-size: 0.85rem; padding: 8px 15px; margin-bottom: 1rem; width: 90%; }
             .btn-play { padding: 10px 30px; }
+            
+            #fullscreenBtn {
+                width: 34px;
+                height: 34px;
+                font-size: 1.2rem;
+                top: 10px; /* 手機版也是在左上角 */
+                left: 10px;
+            }
         }
 
         #gameWrapper:fullscreen, #gameWrapper:-webkit-full-screen {
@@ -271,8 +285,8 @@
         #gameWrapper:fullscreen #canvasContainer, #gameWrapper:-webkit-full-screen #canvasContainer {
             width: 100vw;
             height: 100vh;
-            max-width: calc(100vh * (1000 / 300));
-            max-height: calc(100vw * (300 / 1000));
+            max-width: none;
+            max-height: none;
         }
 
         #gameWrapper:fullscreen #gameCanvas, #gameWrapper:-webkit-full-screen #gameCanvas {
@@ -284,9 +298,9 @@
 
 <div id="ballLayer"></div>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12 text-center">
+<div class="container-fluid p-2 p-md-4">
+    <div class="row justify-content-center m-0">
+        <div class="col-12 text-center p-0">
             <div class="card shadow-lg">
                 <div class="card-body" id="gameWrapper">
                     
@@ -309,7 +323,7 @@
 
                     <div id="canvasContainer">
                         <div id="fullscreenBtn" title="全螢幕">⛶</div>
-                        <canvas id="gameCanvas" width="1000" height="300"></canvas>
+                        <canvas id="gameCanvas"></canvas>
                     </div>
                     
                 </div>
@@ -319,7 +333,7 @@
 </div>
 
 <script>
-    const LOGICAL_WIDTH = 1000;
+    let LOGICAL_WIDTH = 1000;
     const LOGICAL_HEIGHT = 300;
     let gameStarted = false; 
 
@@ -469,7 +483,9 @@
             this.randomQuoteInterval = 4000; 
         }
         addQuote(text, color = '#facc15') {
-            let x = 200 + Math.random() * 300;
+            let minX = Math.min(150, LOGICAL_WIDTH * 0.2);
+            let maxX = Math.max(minX + 100, LOGICAL_WIDTH - 250);
+            let x = minX + Math.random() * (maxX - minX);
             let y = 60 + Math.random() * 40;
             this.quotes.push({ text: text, x: x, y: y, alpha: 1.0, color: color, life: 120 });
         }
@@ -504,9 +520,14 @@
 
     class BasketballHoop {
         constructor() {
-            this.rimY = 85; this.rimLeft = 922; this.rimRight = 942; 
+            this.rimY = 85; 
             this.netAnim = 0; this.swishActive = false;
         }
+        get rimLeft() { return LOGICAL_WIDTH - 78; }
+        get rimRight() { return LOGICAL_WIDTH - 58; }
+        get poleX() { return LOGICAL_WIDTH - 50; }
+        get backboardX() { return LOGICAL_WIDTH - 58; }
+
         triggerSwish() { this.netAnim = 1.0; this.swishActive = true; }
         update() {
             if (this.swishActive) {
@@ -516,9 +537,9 @@
         }
         draw(ctx) {
             ctx.save();
-            ctx.fillStyle = '#475569'; ctx.fillRect(950, 40, 10, 260); 
-            ctx.fillStyle = 'rgba(240, 248, 255, 0.85)'; ctx.fillRect(942, 40, 8, 60); 
-            ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3; ctx.strokeRect(942, 55, 8, 25); 
+            ctx.fillStyle = '#475569'; ctx.fillRect(this.poleX, 40, 10, 260); 
+            ctx.fillStyle = 'rgba(240, 248, 255, 0.85)'; ctx.fillRect(this.backboardX, 40, 8, 60); 
+            ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3; ctx.strokeRect(this.backboardX, 55, 8, 25); 
             
             let sway = 0, stretch = 0; 
             if (this.swishActive) {
@@ -677,21 +698,19 @@
                         }
                     }
 
-                    // --- 修正：只有當球觸地且動能變弱，才開始慢慢淡出 ---
                     if (Math.abs(this.ballVy) < 3) {
                         this.ballAlpha = Math.max(0, this.ballAlpha - 0.03);
                     }
                 }
             }
 
-            // 球員跑到畫面邊緣淡出，但不影響已經投出的球
-            if (this.x > 900) {
-                this.alpha = Math.max(0, 1 - (this.x - 900) / 100);
+            let fadeOutStart = LOGICAL_WIDTH - 100;
+            if (this.x > fadeOutStart) {
+                this.alpha = Math.max(0, 1 - (this.x - fadeOutStart) / 100);
             } else {
                 this.alpha = 1;
             }
 
-            // 稍微拉長回收距離，讓地上的球有足夠時間淡出消失
             if (this.x > LOGICAL_WIDTH + 400) {
                 this.init();
             }
@@ -810,7 +829,7 @@
     const speedLines = [];
     for(let i = 0; i < 15; i++) {
         speedLines.push({
-            x: Math.random() * LOGICAL_WIDTH, y: Math.random() * LOGICAL_HEIGHT, 
+            x: Math.random() * 2000, y: Math.random() * LOGICAL_HEIGHT, 
             length: Math.random() * 100 + 50, speed: Math.random() * 2 + 1, alpha: Math.random() * 0.15 + 0.05  
         });
     }
@@ -833,9 +852,11 @@
 
     function animate() {
         const dpr = window.devicePixelRatio || 1;
-        const displayWidth = canvas.clientWidth || LOGICAL_WIDTH;
-        const displayHeight = canvas.clientHeight || LOGICAL_HEIGHT;
+        const displayWidth = canvas.clientWidth;
+        const displayHeight = canvas.clientHeight;
         
+        LOGICAL_WIDTH = (displayWidth / displayHeight) * LOGICAL_HEIGHT;
+
         const targetWidth = Math.max(1, Math.round(displayWidth * dpr));
         const targetHeight = Math.max(1, Math.round(displayHeight * dpr));
 
@@ -844,7 +865,9 @@
         }
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.scale(canvas.width / LOGICAL_WIDTH, canvas.height / LOGICAL_HEIGHT);
+        
+        const scaleFactor = canvas.height / LOGICAL_HEIGHT;
+        ctx.scale(scaleFactor, scaleFactor);
 
         ctx.lineCap = 'round';
         for (let i = 0; i < speedLines.length; i++) {
@@ -858,9 +881,8 @@
         globalHoop.update(); globalHoop.draw(ctx);
 
         const canvasRect = canvas.getBoundingClientRect();
-        const scaleX = canvasRect.width / LOGICAL_WIDTH;
-        const scaleY = canvasRect.height / LOGICAL_HEIGHT;
-        const renderParams = { canvasRect, scaleX, scaleY };
+        const scaleFactorCSS = canvasRect.height / LOGICAL_HEIGHT;
+        const renderParams = { canvasRect, scaleX: scaleFactorCSS, scaleY: scaleFactorCSS };
 
         stickmen.sort((a, b) => a.y - b.y);
         stickmen.forEach(man => { man.update(); man.draw(renderParams); });
