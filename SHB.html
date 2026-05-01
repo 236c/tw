@@ -504,7 +504,6 @@
         "自己投不進自己去搶籃板！ 🏃‍♂️", "今天手感很冰喔！ 🥶",
         "這球太離譜了，投到哪裡去了！ 🛸"
     ];
-    // ==========================================
 
     document.getElementById('yearBadge').textContent = TITLE_BADGE_TEXT;
 
@@ -774,13 +773,17 @@
     }
     const soundManager = new SoundManager(); 
 
-    // === 核心變數與顯示模式防護邏輯 ===
-    let LOGICAL_WIDTH = 1000;
+    // ==========================================
+    // 半場相機核心變數設定
+    // ==========================================
     const LOGICAL_HEIGHT = 300; 
+    const RIGHT_EDGE_X = 600;      // 攝影機永遠貼齊這個右側邊界 (籃板在 562，保留一點右側空間)
+    const MIN_LOGICAL_WIDTH = 450; // 防呆寬度，直向手機時避免切到籃框
+    
     let currentOffsetX = 0;     
-    let currentOffsetY = 0;     // 儲存全螢幕的垂直置中偏移量
-    let globalScaleFactor = 1;  // 給 DOM 和事件換算用的全局縮放比
-    const MIN_LOGICAL_WIDTH = 650; 
+    let currentOffsetY = 0;     
+    let globalScaleFactor = 1;  
+    
     let gameStarted = false; 
     const isMobileDevice = window.innerWidth <= 768;
 
@@ -921,7 +924,6 @@
             this.randomQuoteInterval = 4000; 
         }
         addQuote(text, color = '#facc15') {
-            // 動態確保對話氣泡出現在可見區域內
             let visibleLogicalLeft = -currentOffsetX;
             let visibleWidth = canvas.clientWidth / globalScaleFactor;
             let minX = visibleLogicalLeft + visibleWidth * 0.2;
@@ -970,37 +972,52 @@
     }
     const quoteManager = new QuoteManager();
 
-    // === 全場畫線方法 ===
+    // === 純右半場畫線方法 ===
     function drawCourtLines(ctx) {
         ctx.save();
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
         ctx.lineWidth = 3;
         
-        ctx.strokeRect(40, 120, LOGICAL_WIDTH - 80, 160);
-        ctx.beginPath(); ctx.moveTo(LOGICAL_WIDTH/2, 120); ctx.lineTo(LOGICAL_WIDTH/2, 280); ctx.stroke();
-        ctx.beginPath(); ctx.ellipse(LOGICAL_WIDTH/2, 200, 50, 25, 0, 0, Math.PI*2); ctx.stroke();
+        // 將地板線條往左無限延伸，不管螢幕多寬都不會看到黑色空洞
+        ctx.beginPath();
+        ctx.moveTo(-3000, 120); ctx.lineTo(560, 120); // 上邊界
+        ctx.moveTo(-3000, 280); ctx.lineTo(560, 280); // 下邊界
+        ctx.stroke();
         
-        ctx.strokeRect(40, 165, 120, 70); 
-        ctx.beginPath(); ctx.ellipse(40, 200, 200, 72, 0, -Math.PI/2, Math.PI/2); ctx.stroke();
+        // 右側底線
+        ctx.beginPath(); ctx.moveTo(560, 120); ctx.lineTo(560, 280); ctx.stroke();
         
-        ctx.strokeRect(LOGICAL_WIDTH - 160, 165, 120, 70);
-        ctx.beginPath(); ctx.ellipse(LOGICAL_WIDTH - 40, 200, 200, 72, 0, Math.PI/2, Math.PI*1.5); ctx.stroke();
+        // 中線
+        ctx.beginPath(); ctx.moveTo(40, 120); ctx.lineTo(40, 280); ctx.stroke();
+        
+        // 中圈 (右半部)
+        ctx.beginPath(); 
+        ctx.ellipse(40, 200, 50, 25, 0, -Math.PI/2, Math.PI/2); 
+        ctx.stroke();
+        
+        // 禁區
+        ctx.strokeRect(440, 165, 120, 70); 
+        
+        // 三分線
+        ctx.beginPath(); 
+        ctx.ellipse(560, 200, 200, 72, 0, Math.PI/2, Math.PI*1.5); 
+        ctx.stroke();
+        
         ctx.restore();
     }
 
-    // === 雙籃框 ===
+    // === 單一右側籃框 ===
     class BasketballHoop {
-        constructor(side = 'right') {
-            this.side = side;
+        constructor() {
             this.rimY = 85; 
             this.netAnim = 0; 
             this.swishActive = false;
             this.baseY = 160;
         }
-        get poleX() { return this.side === 'right' ? LOGICAL_WIDTH - 50 : 40; }
-        get backboardX() { return this.side === 'right' ? LOGICAL_WIDTH - 58 : 50; }
-        get rimLeft() { return this.side === 'right' ? LOGICAL_WIDTH - 78 : 58; }
-        get rimRight() { return this.side === 'right' ? LOGICAL_WIDTH - 58 : 78; }
+        get poleX() { return 570; }
+        get backboardX() { return 562; }
+        get rimLeft() { return 542; }
+        get rimRight() { return 562; }
 
         triggerSwish() { this.netAnim = 1.0; this.swishActive = true; }
         update() {
@@ -1053,8 +1070,7 @@
         }
     }
     
-    const leftHoop = new BasketballHoop('left');
-    const globalHoop = new BasketballHoop('right');
+    const globalHoop = new BasketballHoop();
 
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -1074,10 +1090,22 @@
             this.playerName = availableNames.splice(Math.floor(Math.random() * availableNames.length), 1)[0];
 
             this.baseY = 95 + Math.random() * 125; 
+            
             this.y = this.baseY;
             this.scale = 0.4 + (this.baseY / 300) * 0.8; 
             this.speed = (1.5 + Math.random() * 2) * this.scale; 
-            this.x = randomStart ? Math.random() * (LOGICAL_WIDTH - 200) : -100;
+            
+            // 重要：讓出生點「動態跟隨螢幕的最左側邊緣」
+            // 螢幕有多寬，他們就會從多外面跑進來，完美填補寬螢幕的左側留白
+            let visibleLogicalLeft = -currentOffsetX;
+            let visibleWidth = canvas.clientWidth / globalScaleFactor || 1000;
+            
+            if (randomStart) {
+                this.x = visibleLogicalLeft + Math.random() * visibleWidth;
+            } else {
+                this.x = visibleLogicalLeft - 50 - Math.random() * 200;
+            }
+            
             this.localFrames = Math.random() * 1000; 
             this.color = stickmanColors[Math.floor(Math.random() * stickmanColors.length)];
             this.ballColor = '#f97316';
@@ -1185,14 +1213,16 @@
                 }
             }
 
-            let fadeOutStart = LOGICAL_WIDTH - 100;
+            // 跑出邊界後逐漸淡出
+            let fadeOutStart = RIGHT_EDGE_X;
             if (this.x > fadeOutStart) {
                 this.alpha = Math.max(0, 1 - (this.x - fadeOutStart) / 100);
             } else {
                 this.alpha = 1;
             }
 
-            if (this.x > LOGICAL_WIDTH + 400) {
+            // 跑出視野後重生
+            if (this.x > RIGHT_EDGE_X + 200) {
                 this.init();
             }
         }
@@ -1279,7 +1309,6 @@
                         this.ballElement.style.display = 'block';
                     }
                     
-                    // DOM 球的繪製座標需加入 renderOffsetX 與 renderOffsetY 並套用一致的 CSS 縮放比
                     let screenX = renderParams.canvasRect.left + (this.ballWorldX + renderParams.offsetX) * renderParams.scaleFactorCSS;
                     let screenY = renderParams.canvasRect.top + (this.ballWorldY + renderParams.offsetY) * renderParams.scaleFactorCSS;
 
@@ -1317,7 +1346,8 @@
         }
     }
 
-    const stickmanCount = isMobileDevice ? 7 : 8;
+    // 球員數量根據螢幕大小調整，寬螢幕可以多放一點人
+    const stickmanCount = isMobileDevice ? 5 : 8;
     const stickmen = [];
     for (let i = 0; i < stickmanCount; i++) stickmen.push(new Stickman());
 
@@ -1336,11 +1366,9 @@
         homeBtn.classList.add('show-btn');
 
         const rect = canvas.getBoundingClientRect();
-        
         let cssX = e.clientX - rect.left;
         let cssY = e.clientY - rect.top;
 
-        // 計算滑鼠實際的邏輯座標
         let mouseX = cssX / globalScaleFactor - currentOffsetX;
         let mouseY = cssY / globalScaleFactor - currentOffsetY;
 
@@ -1353,7 +1381,6 @@
     });
 
     function animate() {
-        const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         const displayWidth = canvas.clientWidth;
         const displayHeight = canvas.clientHeight;
@@ -1365,39 +1392,30 @@
             canvas.width = targetWidth; canvas.height = targetHeight;
         }
 
-        let scaleFactor;
-        let renderOffsetX = 0;
+        // ==========================================
+        // 全新攝影機視角運算 (保證最大化與鎖定右側)
+        // ==========================================
+        
+        // 核心邏輯：將場景高度 (300) 放大到填滿螢幕高度
+        let scaleFactor = targetHeight / LOGICAL_HEIGHT;
+        let visibleLogicalWidth = targetWidth / scaleFactor;
         let renderOffsetY = 0;
-
-        if (isFullscreen) {
-            // 全螢幕模式：將畫面縮放以保證完整塞入 1000 寬度的球場 (顯示完整的全場)
-            scaleFactor = Math.min(targetWidth / 1000, targetHeight / 300);
-            
-            // 強制設定球場寬度等於 1000，確保比例絕對一致不變形
-            LOGICAL_WIDTH = 1000; 
-            
-            let screenLogicalWidth = targetWidth / scaleFactor;
-            let screenLogicalHeight = targetHeight / scaleFactor;
-            
-            // 全場置中於螢幕
-            renderOffsetX = (screenLogicalWidth - 1000) / 2;
-            renderOffsetY = (screenLogicalHeight - 300) / 2;
-        } else {
-            // 一般模式：以 300 高度為基準進行縮放
-            scaleFactor = targetHeight / 300;
-            let visibleLogicalWidth = targetWidth / scaleFactor;
-            
-            // 螢幕太窄時最小寬度限制在 MIN_LOGICAL_WIDTH (避免球場過度被擠壓)
-            LOGICAL_WIDTH = Math.max(visibleLogicalWidth, MIN_LOGICAL_WIDTH);
-            
-            // 畫面偏移，對齊右半場
-            renderOffsetX = LOGICAL_WIDTH > visibleLogicalWidth ? -(LOGICAL_WIDTH - visibleLogicalWidth) : 0;
-            renderOffsetY = 0;
+        
+        // 如果螢幕過於狹窄（例如手機直向），改用寬度來決定縮放比例，確保不會切掉籃框
+        if (visibleLogicalWidth < MIN_LOGICAL_WIDTH) {
+            scaleFactor = targetWidth / MIN_LOGICAL_WIDTH;
+            visibleLogicalWidth = MIN_LOGICAL_WIDTH;
+            const visibleLogicalHeight = targetHeight / scaleFactor;
+            // 高度有剩餘空間時，將畫面垂直置中
+            renderOffsetY = (visibleLogicalHeight - LOGICAL_HEIGHT) / 2;
         }
+        
+        // 最關鍵的一步：將畫布向左平移，讓右邊界 (RIGHT_EDGE_X) 永遠貼著螢幕右側！
+        let renderOffsetX = visibleLogicalWidth - RIGHT_EDGE_X;
 
         currentOffsetX = renderOffsetX;
         currentOffsetY = renderOffsetY;
-        globalScaleFactor = scaleFactor / dpr; // 提供給 DOM 物件/事件的純 CSS 縮放倍率
+        globalScaleFactor = scaleFactor / dpr;
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1405,26 +1423,24 @@
         ctx.scale(scaleFactor, scaleFactor);
         ctx.translate(renderOffsetX, renderOffsetY);
 
-        // 速度線處理
+        // 繪製速度線
         ctx.lineCap = 'round';
         let visibleLogicalLeft = -currentOffsetX;
-        let visibleLogicalRight = -currentOffsetX + displayWidth / globalScaleFactor;
+        let visibleLogicalRight = -currentOffsetX + visibleLogicalWidth;
 
         for (let i = 0; i < speedLines.length; i++) {
             let line = speedLines[i];
             line.x -= line.speed;
             if (line.x + line.length < visibleLogicalLeft) { 
                 line.x = visibleLogicalRight + Math.random() * 100; 
-                line.y = Math.random() * 300; 
+                line.y = -renderOffsetY + Math.random() * (LOGICAL_HEIGHT + renderOffsetY * 2); 
             }
             ctx.beginPath(); ctx.moveTo(line.x, line.y); ctx.lineTo(line.x + line.length, line.y);
             ctx.strokeStyle = `rgba(56, 189, 248, ${line.alpha})`; ctx.lineWidth = 1.5; ctx.stroke();
         }
 
-        // === 渲染全場場地與雙籃框 ===
+        // 渲染球場與籃框
         drawCourtLines(ctx);
-        leftHoop.update(); 
-        leftHoop.draw(ctx);
         globalHoop.update(); 
         globalHoop.draw(ctx);
 
