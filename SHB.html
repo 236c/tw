@@ -373,7 +373,10 @@
             .game-title { font-size: 2.2rem; margin-bottom: 0.2rem; }
             .year-badge { top: -18px; left: -35px; font-size: 0.85rem; padding: 2px 8px; }
             .game-subtitle { font-size: 1.2rem; margin-bottom: 0.4rem; }
-            .instruction-box { font-size: 0.85rem; padding: 8px 15px; margin-bottom: 0.8rem; width: 90%; min-height: 70px; }
+            
+            /* 手機版招募區塊微調 (移除固定小字體，加寬) */
+            .instruction-box { padding: 12px 20px; margin-bottom: 0.8rem; width: 95%; min-height: 85px; }
+            
             .btn-play { padding: 10px 30px; }
             .music-controls { margin-bottom: 1rem; }
             
@@ -394,7 +397,7 @@
             }
         }
 
-        #gameWrapper:fullscreen, #gameWrapper:-webkit-full-screen {
+        #gameWrapper:fullscreen, #gameWrapper:-webkit-full-screen, #gameWrapper:-moz-full-screen, #gameWrapper:-ms-fullscreen {
             background-color: #0f172a !important;
             display: flex;
             align-items: center;
@@ -405,14 +408,14 @@
             border-radius: 0;
         }
         
-        #gameWrapper:fullscreen #canvasContainer, #gameWrapper:-webkit-full-screen #canvasContainer {
+        #gameWrapper:fullscreen #canvasContainer, #gameWrapper:-webkit-full-screen #canvasContainer, #gameWrapper:-moz-full-screen #canvasContainer, #gameWrapper:-ms-fullscreen #canvasContainer {
             width: 100vw;
             height: 100vh;
             max-width: none;
             max-height: none;
         }
 
-        #gameWrapper:fullscreen #gameCanvas, #gameWrapper:-webkit-full-screen #gameCanvas {
+        #gameWrapper:fullscreen #gameCanvas, #gameWrapper:-webkit-full-screen #gameCanvas, #gameWrapper:-moz-full-screen #gameCanvas, #gameWrapper:-ms-fullscreen #gameCanvas {
             border-radius: 0;
         }
     </style>
@@ -433,14 +436,13 @@
                             <div class="game-title">十興國小 籃球隊</div>
                         </div>
                   
-                        
-						<div class="instruction-box" id="instructionBox">
-							<div class="fs-4 mb-2" id="recruitTitle"></div>
-							<div class="fs-5">
-								<span class="text-warning fw-bold" id="recruitMain"></span><br>
-								<span class="fs-6" id="recruitSub"></span>
-							</div>
-						</div>
+                        <div class="instruction-box" id="instructionBox">
+                            <div class="fs-4 mb-2" id="recruitTitle"></div>
+                            <div class="fs-5">
+                                <span class="text-warning fw-bold" id="recruitMain"></span><br>
+                                <span class="fs-6" id="recruitSub"></span>
+                            </div>
+                        </div>
 
                         <div class="music-controls">
                             <div style="display: flex; gap: 10px;">
@@ -813,43 +815,64 @@
     const homeBtn = document.getElementById('homeBtn');
 
     function handleFullscreenChange() {
-        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+        // 涵蓋各家瀏覽器的全螢幕狀態判斷
+        const isFullscreen = document.fullscreenElement || 
+                             document.webkitFullscreenElement || 
+                             document.mozFullScreenElement || 
+                             document.msFullscreenElement;
+                             
         const ballLayer = document.getElementById('ballLayer');
         
         if (isFullscreen) {
+            // 進入全螢幕狀態：變成紅色 X
             fullscreenBtn.innerHTML = '✖'; 
             fullscreenBtn.style.color = '#ef4444'; 
             fullscreenBtn.style.borderColor = '#ef4444';
             if (ballLayer) gameWrapper.appendChild(ballLayer);
         } else {
+            // 退出全螢幕狀態：明確把顏色指定回來，不依賴空字串
             fullscreenBtn.innerHTML = '⛶'; 
-            fullscreenBtn.style.color = ''; 
-            fullscreenBtn.style.borderColor = ''; 
+            fullscreenBtn.style.color = '#00f2fe'; 
+            fullscreenBtn.style.borderColor = 'rgba(0, 242, 254, 0.4)'; 
             if (ballLayer) document.body.appendChild(ballLayer);
             
-            // 退出全螢幕時，解除螢幕方向鎖定
+            // 退出全螢幕時，解除螢幕方向鎖定 (加 try-catch 避免不支援時報錯卡住)
             if (screen.orientation && screen.orientation.unlock) {
-                screen.orientation.unlock();
+                try {
+                    screen.orientation.unlock();
+                } catch (err) {
+                    console.warn('Unlock orientation failed', err);
+                }
             }
         }
     }
     
+    // 增加對所有主流瀏覽器的事件監聽，確保按 ESC 或其他方式退出都能偵測到
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
     fullscreenBtn.addEventListener('click', async (e) => {
         e.stopPropagation(); 
         
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const isFullscreen = document.fullscreenElement || 
+                             document.webkitFullscreenElement || 
+                             document.mozFullScreenElement || 
+                             document.msFullscreenElement;
+        
+        if (!isFullscreen) {
             try {
-                // 1. 先請求進入全螢幕
                 if (gameWrapper.requestFullscreen) {
                     await gameWrapper.requestFullscreen();
                 } else if (gameWrapper.webkitRequestFullscreen) {
                     await gameWrapper.webkitRequestFullscreen();
+                } else if (gameWrapper.mozRequestFullScreen) {
+                    await gameWrapper.mozRequestFullScreen();
+                } else if (gameWrapper.msRequestFullscreen) {
+                    await gameWrapper.msRequestFullscreen();
                 }
                 
-                // 2. 成功進入全螢幕後，嘗試將螢幕鎖定為橫向 (Landscape)
                 if (screen.orientation && screen.orientation.lock) {
                     await screen.orientation.lock('landscape');
                 }
@@ -857,21 +880,33 @@
                 console.warn('無法進入全螢幕或螢幕旋轉鎖定失敗:', err);
             }
         } else {
-            // 退出全螢幕
+            // 退出全螢幕 (加入多瀏覽器支援)
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             } else if (document.webkitExitFullscreen) {
                 document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
             }
         }
     });
 
     // 抽出回到首頁的功能，供按鈕與 ESC 鍵共用
     function goBackToHome() {
-        if (document.fullscreenElement || document.webkitFullscreenElement) {
+        const isFullscreen = document.fullscreenElement || 
+                             document.webkitFullscreenElement || 
+                             document.mozFullScreenElement || 
+                             document.msFullscreenElement;
+                             
+        if (isFullscreen) {
             if (document.exitFullscreen) document.exitFullscreen();
             else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+            else if (document.msExitFullscreen) document.msExitFullscreen();
         }
+        
         mainMenuOverlay.classList.remove('hidden');
         gameStarted = false; 
         
@@ -883,6 +918,11 @@
         // 回首頁時，將按鈕重新隱藏
         fullscreenBtn.classList.remove('show-btn');
         homeBtn.classList.remove('show-btn');
+        
+        // 保險起見，在此強制重置全螢幕按鈕狀態
+        fullscreenBtn.innerHTML = '⛶'; 
+        fullscreenBtn.style.color = '#00f2fe'; 
+        fullscreenBtn.style.borderColor = 'rgba(0, 242, 254, 0.4)';
     }
 
     homeBtn.addEventListener('click', (e) => {
@@ -890,7 +930,7 @@
         goBackToHome();
     });
 
-    // 新增：按下 ESC 鍵回首頁
+    // 按下 ESC 鍵回首頁
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && gameStarted) {
             goBackToHome();
