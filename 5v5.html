@@ -137,6 +137,7 @@
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(4px);
+            white-space: nowrap; /* 新增：強制整個記分板內容不換行 */
         }
 
         #scoreboard.show-board {
@@ -145,7 +146,13 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        .team-name { font-size: 1rem; font-weight: 800; letter-spacing: 1px; }
+        .team-name { 
+            font-size: 1rem; 
+            font-weight: 800; 
+            letter-spacing: 1px; 
+            white-space: nowrap; /* 新增：防止隊名變垂直 */
+        }
+        
         .team-score {
             font-size: 2.2rem;
             font-weight: 900;
@@ -154,6 +161,7 @@
             min-width: 45px;
             text-align: center;
             text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            white-space: nowrap; /* 新增：防止雙位數分數上下疊加 */
         }
 
         .team-home { color: #00f2fe; }
@@ -273,7 +281,21 @@
             
             #fullscreenBtn { top: 10px; left: 54px; right: auto; }
             #homeBtn { top: 10px; left: 10px; }
-            #scoreboard { transform: translateX(-50%) translateY(-10px) scale(0.8); top: 10px; padding: 5px 15px; }
+            
+            /* 更新：手機直式記分板顯示與隱藏狀態的縮放 */
+            #scoreboard { 
+                transform: translateX(-50%) translateY(-10px) scale(0.65); 
+                top: 10px; 
+                padding: 5px 12px; 
+                gap: 10px; 
+            }
+            #scoreboard.show-board { transform: translateX(-50%) translateY(0) scale(0.65); }
+        }
+
+        /* 新增：手機橫向模式的縮放保護 */
+        @media (max-width: 900px) and (orientation: landscape) {
+            #scoreboard { transform: translateX(-50%) translateY(-10px) scale(0.75); }
+            #scoreboard.show-board { transform: translateX(-50%) translateY(0) scale(0.75); }
         }
 
         /* 完美無縫全螢幕設定 */
