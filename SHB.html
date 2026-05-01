@@ -17,6 +17,7 @@
             font-family: 'Noto Sans TC', sans-serif;
             display: flex;
             align-items: flex-start;
+            overflow-x: hidden; 
         }
         
         .card {
@@ -36,7 +37,6 @@
             justify-content: center;
             padding: 0;
             border-radius: 12px;
-            overflow: hidden;
         }
 
         #canvasContainer {
@@ -46,15 +46,35 @@
             height: auto; 
             max-height: 80vh; 
             margin: 0 auto;
+            background-color: #1e293b; 
+            border-radius: 12px;
+        }
+
+        #gameCanvas, #frontCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; 
+            height: 100%;
+            border-radius: 12px;
         }
 
         #gameCanvas {
-            background-color: #1e293b; 
-            display: block;
-            width: 100%; 
-            height: 100%;
+            z-index: 1;
             cursor: crosshair; 
-            border-radius: 12px;
+        }
+
+        #frontCanvas {
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        #ballLayer {
+            position: absolute; 
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; 
+            z-index: 5; 
+            overflow: visible; 
         }
 
         #fullscreenBtn {
@@ -120,17 +140,6 @@
         #fullscreenBtn.show-btn, #homeBtn.show-btn {
             opacity: 1;
             visibility: visible;
-        }
-
-        #ballLayer {
-            position: fixed; 
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none; 
-            z-index: 9999; 
-            overflow: hidden; 
         }
 
         .dom-basketball {
@@ -354,7 +363,7 @@
             color: #0f172a;
         }
 
-        @media (max-width: 768px) and (orientation: portrait) {
+        @media (orientation: portrait) {
             #canvasContainer { 
                 aspect-ratio: 3 / 4; 
                 height: auto;
@@ -405,16 +414,16 @@
             height: 100vh;
             max-width: none;
             max-height: none;
+            border-radius: 0;
         }
 
-        #gameWrapper:fullscreen #gameCanvas, #gameWrapper:-webkit-full-screen #gameCanvas, #gameWrapper:-moz-full-screen #gameCanvas, #gameWrapper:-ms-fullscreen #gameCanvas {
+        #gameWrapper:fullscreen #gameCanvas, #gameWrapper:-webkit-full-screen #gameCanvas, #gameWrapper:-moz-full-screen #gameCanvas, #gameWrapper:-ms-fullscreen #gameCanvas,
+        #gameWrapper:fullscreen #frontCanvas, #gameWrapper:-webkit-full-screen #frontCanvas, #gameWrapper:-moz-full-screen #frontCanvas, #gameWrapper:-ms-fullscreen #frontCanvas {
             border-radius: 0;
         }
     </style>
 </head>
 <body>
-
-<div id="ballLayer"></div>
 
 <div class="container-fluid p-2 p-md-4">
     <div class="row justify-content-center m-0">
@@ -452,7 +461,12 @@
                     <div id="canvasContainer">
                         <div id="fullscreenBtn" title="全螢幕">⛶</div>
                         <div id="homeBtn" title="回到起始頁面">🏀</div>
+                        <!-- 底層畫布 -->
                         <canvas id="gameCanvas"></canvas>
+                        <!-- 飛行籃球層 -->
+                        <div id="ballLayer"></div>
+                        <!-- 頂層畫布 -->
+                        <canvas id="frontCanvas"></canvas>
                     </div>
                     
                 </div>
@@ -816,25 +830,16 @@
                              document.mozFullScreenElement || 
                              document.msFullscreenElement;
                              
-        const ballLayer = document.getElementById('ballLayer');
-        
         if (isFullscreen) {
             fullscreenBtn.innerHTML = '✖'; 
             fullscreenBtn.style.color = '#ef4444'; 
             fullscreenBtn.style.borderColor = '#ef4444';
-            if (ballLayer) gameWrapper.appendChild(ballLayer);
         } else {
             fullscreenBtn.innerHTML = '⛶'; 
             fullscreenBtn.style.color = '#00f2fe'; 
             fullscreenBtn.style.borderColor = 'rgba(0, 242, 254, 0.4)'; 
-            if (ballLayer) document.body.appendChild(ballLayer);
-            
             if (screen.orientation && screen.orientation.unlock) {
-                try {
-                    screen.orientation.unlock();
-                } catch (err) {
-                    console.warn('Unlock orientation failed', err);
-                }
+                try { screen.orientation.unlock(); } catch (err) { console.warn('Unlock orientation failed', err); }
             }
         }
     }
@@ -955,9 +960,6 @@
                 this.lastRandomQuoteTime = currentTime;
                 this.randomQuoteInterval = 3000 + Math.random() * 3000; 
             }
-            
-            // ★ 將老師的文字改為固定邏輯大小 (14)，不再因為寬螢幕被無限放大
-            let dynamicFontSize = 14;
 
             for (let i = this.quotes.length - 1; i >= 0; i--) {
                 let q = this.quotes[i];
@@ -969,7 +971,7 @@
                 if (q.life <= 0) { this.quotes.splice(i, 1); continue; }
                 ctx.save();
                 ctx.globalAlpha = q.alpha;
-                ctx.font = `bold ${dynamicFontSize}px "Noto Sans TC", sans-serif`;
+                ctx.font = `bold 14px "Noto Sans TC", sans-serif`; 
                 ctx.textAlign = 'center'; 
                 ctx.fillStyle = q.color;
                 
@@ -983,7 +985,6 @@
     }
     const quoteManager = new QuoteManager();
 
-    // === 純右半場畫線方法 ===
     function drawCourtLines(ctx) {
         ctx.save();
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
@@ -998,7 +999,6 @@
         
         ctx.beginPath(); ctx.moveTo(40, 120); ctx.lineTo(40, 280); ctx.stroke();
         
-        // 完整中圈 (由 0 到 Math.PI * 2)
         ctx.beginPath(); 
         ctx.ellipse(40, 200, 50, 25, 0, 0, Math.PI * 2); 
         ctx.stroke();
@@ -1012,7 +1012,6 @@
         ctx.restore();
     }
 
-    // === 單一右側籃框 ===
     class BasketballHoop {
         constructor() {
             this.rimY = 85; 
@@ -1032,7 +1031,8 @@
                 if (this.netAnim <= 0) { this.netAnim = 0; this.swishActive = false; }
             }
         }
-        draw(ctx) {
+        
+        drawBack(ctx) {
             ctx.save();
             ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'; 
             ctx.beginPath(); 
@@ -1042,7 +1042,11 @@
             ctx.fillStyle = '#475569'; ctx.fillRect(this.poleX, 40, 10, this.baseY); 
             ctx.fillStyle = 'rgba(240, 248, 255, 0.85)'; ctx.fillRect(this.backboardX, 40, 8, 60); 
             ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3; ctx.strokeRect(this.backboardX, 55, 8, 25); 
-            
+            ctx.restore();
+        }
+
+        drawFront(ctx) {
+            ctx.save();
             let sway = 0, stretch = 0; 
             if (this.swishActive) {
                 sway = Math.sin((1 - this.netAnim) * Math.PI * 6) * (10 * this.netAnim);
@@ -1080,6 +1084,9 @@
 
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    const frontCanvas = document.getElementById('frontCanvas');
+    const frontCtx = frontCanvas.getContext('2d');
+
     const stickmanColors = ['#38bdf8', '#10b981', '#facc15', '#ef4444', '#a855f7', '#f472b6', '#cbd5e1'];
     
     class Stickman {
@@ -1236,11 +1243,9 @@
             ctx.translate(this.x, this.y); ctx.scale(this.scale, this.scale);
             const cx = 0, headY = 10, neckY = 20, hipY = 36, footY = 50;
             
-            // ★ 將球員名字的文字也改為固定邏輯大小 (12)，不會因為寬螢幕放大
-            let dynamicNameSize = 12;
             ctx.save(); 
             ctx.fillStyle = '#ffffff'; 
-            ctx.font = `bold ${dynamicNameSize}px "Noto Sans TC", sans-serif`; 
+            ctx.font = `bold 12px "Noto Sans TC", sans-serif`; 
             ctx.textAlign = 'center'; 
             ctx.fillText(this.playerName, cx, headY - 18, 100); 
             ctx.restore();
@@ -1311,8 +1316,8 @@
                         this.ballElement.style.display = 'block';
                     }
                     
-                    let screenX = renderParams.canvasRect.left + (this.ballWorldX + renderParams.offsetX) * renderParams.scaleFactorCSS;
-                    let screenY = renderParams.canvasRect.top + (this.ballWorldY + renderParams.offsetY) * renderParams.scaleFactorCSS;
+                    let screenX = (this.ballWorldX + renderParams.offsetX) * renderParams.scaleFactorCSS;
+                    let screenY = (this.ballWorldY + renderParams.offsetY) * renderParams.scaleFactorCSS;
 
                     let r = 8 * this.scale * renderParams.scaleFactorCSS;
                     let bw = 1.5 * this.scale * renderParams.scaleFactorCSS;
@@ -1391,6 +1396,7 @@
 
         if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
             canvas.width = targetWidth; canvas.height = targetHeight;
+            frontCanvas.width = targetWidth; frontCanvas.height = targetHeight;
         }
 
         const VIEW_WIDTH = 560; 
@@ -1402,12 +1408,14 @@
         if (actualLogicalHeight < 280) {
             scaleFactor = targetHeight / 280;
             actualLogicalHeight = targetHeight / scaleFactor;
+        } else if (actualLogicalHeight > 420) {
+            scaleFactor = targetHeight / 420;
+            actualLogicalHeight = targetHeight / scaleFactor;
         }
 
         let actualLogicalWidth = targetWidth / scaleFactor;
 
         let renderOffsetX = actualLogicalWidth - VIEW_X_RIGHT;
-        
         let renderOffsetY = -160 + (actualLogicalHeight / 2);
 
         currentOffsetX = renderOffsetX;
@@ -1417,8 +1425,14 @@
         ctx.setTransform(1, 0, 0, 1, 0, 0); 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
+        frontCtx.setTransform(1, 0, 0, 1, 0, 0);
+        frontCtx.clearRect(0, 0, frontCanvas.width, frontCanvas.height);
+        
         ctx.scale(scaleFactor, scaleFactor);
         ctx.translate(renderOffsetX, renderOffsetY);
+        
+        frontCtx.scale(scaleFactor, scaleFactor);
+        frontCtx.translate(renderOffsetX, renderOffsetY);
 
         ctx.lineCap = 'round';
         let visibleLogicalLeft = -currentOffsetX;
@@ -1437,11 +1451,9 @@
 
         drawCourtLines(ctx);
         globalHoop.update(); 
-        globalHoop.draw(ctx);
+        globalHoop.drawBack(ctx); 
 
-        const canvasRect = canvas.getBoundingClientRect();
         const renderParams = { 
-            canvasRect, 
             scaleFactorCSS: globalScaleFactor, 
             offsetX: currentOffsetX,
             offsetY: currentOffsetY
@@ -1450,6 +1462,8 @@
         stickmen.sort((a, b) => a.y - b.y);
         stickmen.forEach(man => { man.update(); man.draw(renderParams); });
         
+        globalHoop.drawFront(frontCtx);
+
         quoteManager.updateAndDraw(ctx);
 
         requestAnimationFrame(animate);
