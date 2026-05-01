@@ -354,20 +354,34 @@
             color: #0f172a;
         }
 
+        /* =======================================
+           手機直向顯示修復區 (調整比例與縮小字體)
+           ======================================= */
         @media (max-width: 768px) and (orientation: portrait) {
             #canvasContainer { 
-                aspect-ratio: 4 / 3; 
+                aspect-ratio: 3 / 4; /* 改為 3:4 直向比例，拉出垂直空間 */
                 height: auto;
-                min-height: auto;
+                min-height: 480px;   /* 設定最小高度，確保選單絕對不會擠在一起 */
+                max-height: 85vh;
             }
-            .game-title { font-size: 2.2rem; margin-bottom: 0.2rem; }
-            .year-badge { top: -18px; left: -35px; font-size: 0.85rem; padding: 2px 8px; }
-            .game-subtitle { font-size: 1.2rem; margin-bottom: 0.4rem; }
+            .title-wrapper { margin-top: 5px; }
+            .game-title { font-size: 1.8rem; margin-bottom: 0.2rem; }
+            .year-badge { top: -10px; left: -25px; font-size: 0.8rem; padding: 2px 6px; }
             
-            .instruction-box { padding: 12px 20px; margin-bottom: 0.8rem; width: 95%; min-height: 85px; }
+            .instruction-box { padding: 10px; margin-bottom: 0.8rem; width: 95%; min-height: 70px; }
             
-            .btn-play { padding: 10px 30px; }
-            .music-controls { margin-bottom: 1rem; }
+            /* 強制縮小手機版的招募標題與內文 */
+            #recruitTitle { font-size: 1.1rem !important; margin-bottom: 5px !important; }
+            #recruitMain { font-size: 0.95rem !important; line-height: 1.4; display: inline-block; }
+            #recruitSub { font-size: 0.75rem !important; }
+
+            .btn-play { padding: 8px 24px; }
+            .pulse-text { font-size: 0.75rem !important; }
+            
+            /* 縮小音樂按鈕區塊 */
+            .music-controls { margin-bottom: 0.8rem; }
+            .btn-music { padding: 6px 12px; font-size: 0.8rem; }
+            #musicStatus { font-size: 0.7rem !important; }
             
             #fullscreenBtn {
                 top: 10px;
@@ -643,7 +657,7 @@
             if (!bgmAudio.paused) {
                 bgmAudio.pause();
                 playSavedMusicBtn.textContent = '▶️ 繼續播放音樂';
-                musicStatus.textContent = '⏸️ 音റ്റു音樂已暫停';
+                musicStatus.textContent = '⏸️ 音樂已暫停';
                 musicStatus.style.color = '#cbd5e1';
             } else {
                 await bgmAudio.play();
