@@ -956,7 +956,8 @@
                 this.randomQuoteInterval = 3000 + Math.random() * 3000; 
             }
             
-            let dynamicFontSize = Math.max(11, Math.min(22, visibleWidth * 0.04));
+            // ★ 將老師的文字改為固定邏輯大小 (14)，不再因為寬螢幕被無限放大
+            let dynamicFontSize = 14;
 
             for (let i = this.quotes.length - 1; i >= 0; i--) {
                 let q = this.quotes[i];
@@ -997,7 +998,7 @@
         
         ctx.beginPath(); ctx.moveTo(40, 120); ctx.lineTo(40, 280); ctx.stroke();
         
-        // ★ 完整中圈 (原本只有右半部，現在修改為 0 到 Math.PI * 2 畫完整圓形)
+        // 完整中圈 (由 0 到 Math.PI * 2)
         ctx.beginPath(); 
         ctx.ellipse(40, 200, 50, 25, 0, 0, Math.PI * 2); 
         ctx.stroke();
@@ -1235,8 +1236,8 @@
             ctx.translate(this.x, this.y); ctx.scale(this.scale, this.scale);
             const cx = 0, headY = 10, neckY = 20, hipY = 36, footY = 50;
             
-            let visibleWidth = canvas.clientWidth / globalScaleFactor;
-            let dynamicNameSize = Math.max(11, Math.min(20, visibleWidth * 0.035));
+            // ★ 將球員名字的文字也改為固定邏輯大小 (12)，不會因為寬螢幕放大
+            let dynamicNameSize = 12;
             ctx.save(); 
             ctx.fillStyle = '#ffffff'; 
             ctx.font = `bold ${dynamicNameSize}px "Noto Sans TC", sans-serif`; 
