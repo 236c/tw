@@ -55,7 +55,6 @@
             border-radius: 12px;
         }
 
-        /* 全螢幕按鈕移到首頁按鈕右側 */
         #fullscreenBtn {
             position: fixed;
             top: 15px;
@@ -80,7 +79,6 @@
             visibility: hidden;
         }
 
-        /* 回到首頁按鈕放在最左上角 */
         #homeBtn {
             position: fixed;
             top: 15px;
@@ -776,8 +774,11 @@
     }
     const soundManager = new SoundManager(); 
 
+    // === 新增/修改：畫布裁切與比例防護邏輯 ===
     let LOGICAL_WIDTH = 1000;
     const LOGICAL_HEIGHT = 300;
+    let currentOffsetX = 0; // 記錄畫面向左平移的量（確保聚焦右半場）
+    const MIN_LOGICAL_WIDTH = 650; // 最小邏輯寬度，確保畫面不會過度變形（包含右半場與中線附近）
     let gameStarted = false; 
     const isMobileDevice = window.innerWidth <= 768;
 
@@ -899,7 +900,7 @@
 
     homeBtn.addEventListener('click', (e) => {
         e.stopPropagation(); 
-        homeBtn.blur(); // 強制取消焦點
+        homeBtn.blur(); 
         goBackToHome();
     });
 
@@ -918,8 +919,10 @@
             this.randomQuoteInterval = 4000; 
         }
         addQuote(text, color = '#facc15') {
-            let minX = LOGICAL_WIDTH * 0.2;
-            let maxX = LOGICAL_WIDTH * 0.8;
+            // 修改：確保對話氣泡出現在可見區域內
+            let visibleWidth = LOGICAL_WIDTH - currentOffsetX;
+            let minX = currentOffsetX + visibleWidth * 0.2;
+            let maxX = currentOffsetX + visibleWidth * 0.8;
             let x = minX + Math.random() * (maxX - minX);
             let y = 60 + Math.random() * 40;
             this.quotes.push({ text: text, x: x, y: y, alpha: 1.0, color: color, life: 120 });
@@ -935,7 +938,8 @@
                 this.randomQuoteInterval = 3000 + Math.random() * 3000; 
             }
             
-            let dynamicFontSize = Math.max(11, Math.min(22, LOGICAL_WIDTH * 0.04));
+            let visibleWidth = LOGICAL_WIDTH - currentOffsetX;
+            let dynamicFontSize = Math.max(11, Math.min(22, visibleWidth * 0.04));
 
             for (let i = this.quotes.length - 1; i >= 0; i--) {
                 let q = this.quotes[i];
@@ -952,9 +956,9 @@
                 ctx.fillStyle = q.color;
                 
                 let safeX = q.x;
-                if (LOGICAL_WIDTH < 600) safeX = LOGICAL_WIDTH / 2;
+                if (visibleWidth < 600) safeX = currentOffsetX + visibleWidth / 2;
                 
-                ctx.fillText(`💬 老師：「${q.text}」`, safeX, q.y, LOGICAL_WIDTH * 0.9);
+                ctx.fillText(`💬 老師：「${q.text}」`, safeX, q.y, visibleWidth * 0.9);
                 ctx.restore();
             }
         }
@@ -1064,11 +1068,7 @@
             if (availableNames.length === 0) availableNames = [...PLAYER_NAMES];
             this.playerName = availableNames.splice(Math.floor(Math.random() * availableNames.length), 1)[0];
 
-            // 修正：限制球員的腳步(Y座標)嚴格在球場白線範圍內跑動
-            // 由於繪圖時腳的位置是在 baseY + 50 * scale，將 baseY 設定在 95 ~ 220 之間
-            // 如此一來，腳踩的位置會完美落於 Y: 120 ~ 280 (場內白線) 的區間，不再從上下的場外進入
             this.baseY = 95 + Math.random() * 125; 
-            
             this.y = this.baseY;
             this.scale = 0.4 + (this.baseY / 300) * 0.8; 
             this.speed = (1.5 + Math.random() * 2) * this.scale; 
@@ -1199,7 +1199,8 @@
             ctx.translate(this.x, this.y); ctx.scale(this.scale, this.scale);
             const cx = 0, headY = 10, neckY = 20, hipY = 36, footY = 50;
             
-            let dynamicNameSize = Math.max(11, Math.min(20, LOGICAL_WIDTH * 0.035));
+            let visibleWidth = LOGICAL_WIDTH - currentOffsetX;
+            let dynamicNameSize = Math.max(11, Math.min(20, visibleWidth * 0.035));
             ctx.save(); 
             ctx.fillStyle = '#ffffff'; 
             ctx.font = `bold ${dynamicNameSize}px "Noto Sans TC", sans-serif`; 
@@ -1273,7 +1274,8 @@
                         this.ballElement.style.display = 'block';
                     }
                     
-                    let screenX = renderParams.canvasRect.left + this.ballWorldX * renderParams.scaleX;
+                    // 修正：DOM 的 3D 球在對應畫面位置時，必須扣除背景的 offsetX 偏移量
+                    let screenX = renderParams.canvasRect.left + (this.ballWorldX - renderParams.offsetX) * renderParams.scaleX;
                     let screenY = renderParams.canvasRect.top + this.ballWorldY * renderParams.scaleY;
 
                     let r = 8 * this.scale * renderParams.scaleX;
@@ -1329,10 +1331,10 @@
         homeBtn.classList.add('show-btn');
 
         const rect = canvas.getBoundingClientRect();
-        const scaleX = LOGICAL_WIDTH / rect.width;
-        const scaleY = LOGICAL_HEIGHT / rect.height;
-        const mouseX = (e.clientX - rect.left) * scaleX;
-        const mouseY = (e.clientY - rect.top) * scaleY; 
+        // 修正點擊座標換算：因為鎖定比例縮放，統一用 height 來推算 scale，並把 currentOffsetX 加回去
+        const scaleFactor = LOGICAL_HEIGHT / rect.height; 
+        const mouseX = (e.clientX - rect.left) * scaleFactor + currentOffsetX;
+        const mouseY = (e.clientY - rect.top) * scaleFactor; 
 
         for (let i = stickmen.length - 1; i >= 0; i--) {
             let man = stickmen[i];
@@ -1347,7 +1349,14 @@
         const displayWidth = canvas.clientWidth;
         const displayHeight = canvas.clientHeight;
         
-        LOGICAL_WIDTH = (displayWidth / displayHeight) * LOGICAL_HEIGHT;
+        // 修正：依照視窗比例推算正常的邏輯寬度
+        let visibleLogicalWidth = (displayWidth / displayHeight) * LOGICAL_HEIGHT;
+
+        // 設定畫布的最小邏輯寬度防線 (650 約為右半場含中線)，避免視窗太窄時畫面內容整個被壓扁變形
+        LOGICAL_WIDTH = Math.max(visibleLogicalWidth, MIN_LOGICAL_WIDTH);
+
+        // 如果邏輯寬度被強行拉大，計算這中間的差異作為向左位移量，確保視角向右方對齊（維持只看右半場）
+        currentOffsetX = LOGICAL_WIDTH > visibleLogicalWidth ? LOGICAL_WIDTH - visibleLogicalWidth : 0;
 
         const targetWidth = Math.max(1, Math.round(displayWidth * dpr));
         const targetHeight = Math.max(1, Math.round(displayHeight * dpr));
@@ -1360,12 +1369,19 @@
         
         const scaleFactor = (canvas.height / LOGICAL_HEIGHT) * (targetHeight / canvas.height);
         ctx.scale(scaleFactor, scaleFactor);
+        
+        // 平移畫布視角
+        ctx.translate(-currentOffsetX, 0); 
 
         ctx.lineCap = 'round';
         for (let i = 0; i < speedLines.length; i++) {
             let line = speedLines[i];
             line.x -= line.speed;
-            if (line.x + line.length < 0) { line.x = LOGICAL_WIDTH + Math.random() * 100; line.y = Math.random() * LOGICAL_HEIGHT; }
+            // 修正：當速度線移出畫面最左側(加上偏移量)，才重置它
+            if (line.x + line.length < currentOffsetX) { 
+                line.x = LOGICAL_WIDTH + Math.random() * 100; 
+                line.y = Math.random() * LOGICAL_HEIGHT; 
+            }
             ctx.beginPath(); ctx.moveTo(line.x, line.y); ctx.lineTo(line.x + line.length, line.y);
             ctx.strokeStyle = `rgba(56, 189, 248, ${line.alpha})`; ctx.lineWidth = 1.5; ctx.stroke();
         }
@@ -1379,7 +1395,8 @@
 
         const canvasRect = canvas.getBoundingClientRect();
         const scaleFactorCSS = canvasRect.height / LOGICAL_HEIGHT;
-        const renderParams = { canvasRect, scaleX: scaleFactorCSS, scaleY: scaleFactorCSS };
+        // 把 currentOffsetX 傳遞進 renderParams 讓外層 DOM 籃球也能跟著一起精確定位
+        const renderParams = { canvasRect, scaleX: scaleFactorCSS, scaleY: scaleFactorCSS, offsetX: currentOffsetX };
 
         stickmen.sort((a, b) => a.y - b.y);
         stickmen.forEach(man => { man.update(); man.draw(renderParams); });
