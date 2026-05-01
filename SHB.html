@@ -55,10 +55,12 @@
             border-radius: 12px;
         }
 
+        /* 全螢幕按鈕移到右上角 */
         #fullscreenBtn {
             position: absolute;
             top: 15px;
-            left: 15px;
+            right: 15px;
+            left: auto;
             width: 40px;
             height: 40px;
             background: rgba(15, 23, 42, 0.6);
@@ -74,6 +76,9 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             pointer-events: auto;
+            /* 預設隱藏 */
+            opacity: 0;
+            visibility: hidden;
         }
 
         #fullscreenBtn:hover {
@@ -83,10 +88,17 @@
             box-shadow: 0 6px 15px rgba(0, 242, 254, 0.3);
         }
 
+        /* 顯示按鈕的 class */
+        #fullscreenBtn.show-btn {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 回到首頁按鈕放在最左上角 */
         #homeBtn {
             position: absolute;
             top: 15px;
-            left: 65px;
+            left: 15px;
             width: 40px;
             height: 40px;
             background: rgba(15, 23, 42, 0.6);
@@ -102,6 +114,9 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             pointer-events: auto;
+            /* 預設隱藏 */
+            opacity: 0;
+            visibility: hidden;
         }
 
         #homeBtn:hover {
@@ -109,6 +124,12 @@
             background: rgba(15, 23, 42, 0.95);
             border-color: #00f2fe;
             box-shadow: 0 6px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        /* 顯示按鈕的 class */
+        #homeBtn.show-btn {
+            opacity: 1;
+            visibility: visible;
         }
 
         #ballLayer {
@@ -207,6 +228,8 @@
             -webkit-text-fill-color: transparent;
             letter-spacing: 2px;
             animation: floatTitle 3s ease-in-out infinite, gradientShine 3s linear infinite;
+            /* 修正「隊」字右側被裁切的問題 */
+            padding-right: 0.2em;
         }
 
         .year-badge {
@@ -359,14 +382,15 @@
                 height: 34px;
                 font-size: 1.2rem;
                 top: 10px;
-                left: 10px;
+                right: 10px;
+                left: auto;
             }
             #homeBtn {
                 width: 34px;
                 height: 34px;
                 font-size: 1.1rem;
                 top: 10px;
-                left: 54px;
+                left: 10px;
             }
         }
 
@@ -842,9 +866,8 @@
         }
     });
 
-    // === 在這段加入了 soundManager.enabled = false; 讓回到首頁時關閉投籃音效 ===
-    homeBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); 
+    // 抽出回到首頁的功能，供按鈕與 ESC 鍵共用
+    function goBackToHome() {
         if (document.fullscreenElement || document.webkitFullscreenElement) {
             if (document.exitFullscreen) document.exitFullscreen();
             else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
@@ -856,6 +879,22 @@
         
         clearInterval(recruitTimer);
         recruitTimer = setInterval(cycleRecruitMessage, RECRUIT_CONFIG.interval);
+
+        // 回首頁時，將按鈕重新隱藏
+        fullscreenBtn.classList.remove('show-btn');
+        homeBtn.classList.remove('show-btn');
+    }
+
+    homeBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        goBackToHome();
+    });
+
+    // 新增：按下 ESC 鍵回首頁
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && gameStarted) {
+            goBackToHome();
+        }
     });
 
     let availableNames = [...PLAYER_NAMES];
@@ -1226,7 +1265,7 @@
         }
     }
 
-    const stickmanCount = isMobileDevice ? 8 : 10;
+    const stickmanCount = isMobileDevice ? 7 : 8;
     const stickmen = [];
     for (let i = 0; i < stickmanCount; i++) stickmen.push(new Stickman());
 
@@ -1240,6 +1279,11 @@
 
     canvas.addEventListener('pointerdown', (e) => {
         if (!mainMenuOverlay.classList.contains('hidden')) return;
+
+        // 按一下螢幕時顯示按鈕
+        fullscreenBtn.classList.add('show-btn');
+        homeBtn.classList.add('show-btn');
+
         const rect = canvas.getBoundingClientRect();
         const scaleX = LOGICAL_WIDTH / rect.width;
         const scaleY = LOGICAL_HEIGHT / rect.height;
