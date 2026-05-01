@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>籃球極限跑酷 - 互動神射手版 (實體文字與音效)</title>
+    <title>十興國小-籃球隊</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;1,900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -59,7 +59,7 @@
         #fullscreenBtn {
             position: absolute;
             top: 15px;
-            left: 65px; /* 首頁按鈕的 left (15px) + 寬度 (40px) + 間距 (10px) */
+            left: 65px; 
             right: auto;
             width: 40px;
             height: 40px;
@@ -76,22 +76,8 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             pointer-events: auto;
-            /* 預設隱藏 */
             opacity: 0;
             visibility: hidden;
-        }
-
-        #fullscreenBtn:hover {
-            transform: scale(1.1);
-            background: rgba(15, 23, 42, 0.95);
-            border-color: #00f2fe;
-            box-shadow: 0 6px 15px rgba(0, 242, 254, 0.3);
-        }
-
-        /* 顯示按鈕的 class */
-        #fullscreenBtn.show-btn {
-            opacity: 1;
-            visibility: visible;
         }
 
         /* 回到首頁按鈕放在最左上角 */
@@ -114,20 +100,27 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             pointer-events: auto;
-            /* 預設隱藏 */
             opacity: 0;
             visibility: hidden;
         }
 
-        #homeBtn:hover {
-            transform: scale(1.1);
-            background: rgba(15, 23, 42, 0.95);
-            border-color: #00f2fe;
-            box-shadow: 0 6px 15px rgba(0, 242, 254, 0.3);
+        /* 限制 :hover 特效只在支援滑鼠的裝置上觸發，避免手機觸控殘留 */
+        @media (hover: hover) {
+            #fullscreenBtn:hover, #homeBtn:hover {
+                transform: scale(1.1);
+                background: rgba(15, 23, 42, 0.95);
+                border-color: #00f2fe;
+                box-shadow: 0 6px 15px rgba(0, 242, 254, 0.3);
+            }
+        }
+
+        /* 強制移除點擊後的原生日暈或殘留的 Focus 樣式 */
+        #fullscreenBtn:focus, #homeBtn:focus {
+            outline: none;
         }
 
         /* 顯示按鈕的 class */
-        #homeBtn.show-btn {
+        #fullscreenBtn.show-btn, #homeBtn.show-btn {
             opacity: 1;
             visibility: visible;
         }
@@ -228,7 +221,6 @@
             -webkit-text-fill-color: transparent;
             letter-spacing: 2px;
             animation: floatTitle 3s ease-in-out infinite, gradientShine 3s linear infinite;
-            /* 修正「隊」字右側被裁切的問題 */
             padding-right: 0.2em;
         }
 
@@ -385,7 +377,7 @@
                 height: 34px;
                 font-size: 1.2rem;
                 top: 10px;
-                left: 54px; /* 首頁按鈕 left(10) + 寬度(34) + 間距(10) */
+                left: 54px;
                 right: auto;
             }
             #homeBtn {
@@ -815,7 +807,6 @@
     const homeBtn = document.getElementById('homeBtn');
 
     function handleFullscreenChange() {
-        // 涵蓋各家瀏覽器的全螢幕狀態判斷
         const isFullscreen = document.fullscreenElement || 
                              document.webkitFullscreenElement || 
                              document.mozFullScreenElement || 
@@ -824,19 +815,16 @@
         const ballLayer = document.getElementById('ballLayer');
         
         if (isFullscreen) {
-            // 進入全螢幕狀態：變成紅色 X
             fullscreenBtn.innerHTML = '✖'; 
             fullscreenBtn.style.color = '#ef4444'; 
             fullscreenBtn.style.borderColor = '#ef4444';
             if (ballLayer) gameWrapper.appendChild(ballLayer);
         } else {
-            // 退出全螢幕狀態：明確把顏色指定回來，不依賴空字串
             fullscreenBtn.innerHTML = '⛶'; 
             fullscreenBtn.style.color = '#00f2fe'; 
             fullscreenBtn.style.borderColor = 'rgba(0, 242, 254, 0.4)'; 
             if (ballLayer) document.body.appendChild(ballLayer);
             
-            // 退出全螢幕時，解除螢幕方向鎖定 (加 try-catch 避免不支援時報錯卡住)
             if (screen.orientation && screen.orientation.unlock) {
                 try {
                     screen.orientation.unlock();
@@ -847,7 +835,6 @@
         }
     }
     
-    // 增加對所有主流瀏覽器的事件監聽，確保按 ESC 或其他方式退出都能偵測到
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
@@ -855,6 +842,7 @@
 
     fullscreenBtn.addEventListener('click', async (e) => {
         e.stopPropagation(); 
+        fullscreenBtn.blur(); // 強制取消焦點
         
         const isFullscreen = document.fullscreenElement || 
                              document.webkitFullscreenElement || 
@@ -880,7 +868,6 @@
                 console.warn('無法進入全螢幕或螢幕旋轉鎖定失敗:', err);
             }
         } else {
-            // 退出全螢幕 (加入多瀏覽器支援)
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             } else if (document.webkitExitFullscreen) {
@@ -893,7 +880,6 @@
         }
     });
 
-    // 抽出回到首頁的功能，供按鈕與 ESC 鍵共用
     function goBackToHome() {
         const isFullscreen = document.fullscreenElement || 
                              document.webkitFullscreenElement || 
@@ -910,16 +896,14 @@
         mainMenuOverlay.classList.remove('hidden');
         gameStarted = false; 
         
-        soundManager.enabled = false; // 關閉遊戲音效
+        soundManager.enabled = false; 
         
         clearInterval(recruitTimer);
         recruitTimer = setInterval(cycleRecruitMessage, RECRUIT_CONFIG.interval);
 
-        // 回首頁時，將按鈕重新隱藏
         fullscreenBtn.classList.remove('show-btn');
         homeBtn.classList.remove('show-btn');
         
-        // 保險起見，在此強制重置全螢幕按鈕狀態
         fullscreenBtn.innerHTML = '⛶'; 
         fullscreenBtn.style.color = '#00f2fe'; 
         fullscreenBtn.style.borderColor = 'rgba(0, 242, 254, 0.4)';
@@ -927,10 +911,10 @@
 
     homeBtn.addEventListener('click', (e) => {
         e.stopPropagation(); 
+        homeBtn.blur(); // 強制取消焦點
         goBackToHome();
     });
 
-    // 按下 ESC 鍵回首頁
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && gameStarted) {
             goBackToHome();
@@ -1320,7 +1304,6 @@
     canvas.addEventListener('pointerdown', (e) => {
         if (!mainMenuOverlay.classList.contains('hidden')) return;
 
-        // 按一下螢幕時顯示按鈕
         fullscreenBtn.classList.add('show-btn');
         homeBtn.classList.add('show-btn');
 
