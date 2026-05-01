@@ -398,6 +398,7 @@
             }
         }
 
+        /* 全螢幕佈局優化：透過 CSS 維持畫布比例，避免籃框相對位置變形 */
         #gameWrapper:fullscreen, #gameWrapper:-webkit-full-screen, #gameWrapper:-moz-full-screen, #gameWrapper:-ms-fullscreen {
             background-color: #0f172a !important;
             display: flex;
@@ -411,10 +412,23 @@
         
         #gameWrapper:fullscreen #canvasContainer, #gameWrapper:-webkit-full-screen #canvasContainer, #gameWrapper:-moz-full-screen #canvasContainer, #gameWrapper:-ms-fullscreen #canvasContainer {
             width: 100vw;
-            height: 100vh;
-            max-width: none;
-            max-height: none;
+            height: 50vw; 
+            max-width: 200vh; 
+            max-height: 100vh;
             border-radius: 0;
+            aspect-ratio: 2 / 1;
+            margin: auto;
+        }
+
+        @media (orientation: portrait) {
+            #gameWrapper:fullscreen #canvasContainer, #gameWrapper:-webkit-full-screen #canvasContainer, #gameWrapper:-moz-full-screen #canvasContainer, #gameWrapper:-ms-fullscreen #canvasContainer {
+                width: 100vw;
+                height: 133.333vw; 
+                max-width: 75vh;  
+                max-height: 100vh;
+                aspect-ratio: 3 / 4;
+                margin: auto;
+            }
         }
 
         #gameWrapper:fullscreen #gameCanvas, #gameWrapper:-webkit-full-screen #gameCanvas, #gameWrapper:-moz-full-screen #gameCanvas, #gameWrapper:-ms-fullscreen #gameCanvas,
@@ -461,11 +475,8 @@
                     <div id="canvasContainer">
                         <div id="fullscreenBtn" title="全螢幕">⛶</div>
                         <div id="homeBtn" title="回到起始頁面">🏀</div>
-                        <!-- 底層畫布 -->
                         <canvas id="gameCanvas"></canvas>
-                        <!-- 飛行籃球層 -->
                         <div id="ballLayer"></div>
-                        <!-- 頂層畫布 -->
                         <canvas id="frontCanvas"></canvas>
                     </div>
                     
