@@ -42,7 +42,9 @@
         #canvasContainer {
             position: relative;
             width: 100%;
-            height: 400px; 
+            aspect-ratio: 2 / 1; /* 讓容器預設就是 2:1 的等比例縮放 */
+            height: auto; 
+            max-height: 80vh; 
             margin: 0 auto;
         }
 
@@ -354,8 +356,9 @@
 
         @media (max-width: 768px) and (orientation: portrait) {
             #canvasContainer { 
-                height: 55vh; 
-                min-height: 300px;
+                aspect-ratio: 4 / 3; /* 手機直向時比例可稍微調整，避免畫面太細長 */
+                height: auto;
+                min-height: auto;
             }
             .game-title { font-size: 2.2rem; margin-bottom: 0.2rem; }
             .year-badge { top: -18px; left: -35px; font-size: 0.85rem; padding: 2px 8px; }
@@ -776,9 +779,11 @@
     // ==========================================
     // 半場相機核心變數設定
     // ==========================================
-    const LOGICAL_HEIGHT = 300; 
-    const RIGHT_EDGE_X = 600;      // 攝影機永遠貼齊這個右側邊界 (籃板在 562，保留一點右側空間)
-    const MIN_LOGICAL_WIDTH = 450; // 防呆寬度，直向手機時避免切到籃框
+    const VIEW_WIDTH = 700;   // 固定邏輯寬度
+    const VIEW_HEIGHT = 350;  // 固定邏輯高度
+    const VIEW_X_MIN = -80;   // 畫面左側的邏輯起始點 (留空間給球員生成)
+    const VIEW_Y_MIN = -30;   // 畫面頂部的邏輯起始點
+    const RIGHT_EDGE_X = 600; // 籃框與右側邊界參考點 (保留供原程式使用)
     
     let currentOffsetX = 0;     
     let currentOffsetY = 0;     
@@ -980,8 +985,8 @@
         
         // 將地板線條往左無限延伸，不管螢幕多寬都不會看到黑色空洞
         ctx.beginPath();
-        ctx.moveTo(-3000, 120); ctx.lineTo(560, 120); // 上邊界
-        ctx.moveTo(-3000, 280); ctx.lineTo(560, 280); // 下邊界
+        ctx.moveTo(-3000, 120); ctx.lineTo(1000, 120); // 上邊界延伸至 1000
+        ctx.moveTo(-3000, 280); ctx.lineTo(1000, 280); // 下邊界延伸至 1000
         ctx.stroke();
         
         // 右側底線
@@ -1393,25 +1398,18 @@
         }
 
         // ==========================================
-        // 全新攝影機視角運算 (保證最大化與鎖定右側)
+        // 攝影機視角運算：全畫面等比例縮放 (Proportional Scaling)
         // ==========================================
-        
-        // 核心邏輯：將場景高度 (300) 放大到填滿螢幕高度
-        let scaleFactor = targetHeight / LOGICAL_HEIGHT;
-        let visibleLogicalWidth = targetWidth / scaleFactor;
-        let renderOffsetY = 0;
-        
-        // 如果螢幕過於狹窄（例如手機直向），改用寬度來決定縮放比例，確保不會切掉籃框
-        if (visibleLogicalWidth < MIN_LOGICAL_WIDTH) {
-            scaleFactor = targetWidth / MIN_LOGICAL_WIDTH;
-            visibleLogicalWidth = MIN_LOGICAL_WIDTH;
-            const visibleLogicalHeight = targetHeight / scaleFactor;
-            // 高度有剩餘空間時，將畫面垂直置中
-            renderOffsetY = (visibleLogicalHeight - LOGICAL_HEIGHT) / 2;
-        }
-        
-        // 最關鍵的一步：將畫布向左平移，讓右邊界 (RIGHT_EDGE_X) 永遠貼著螢幕右側！
-        let renderOffsetX = visibleLogicalWidth - RIGHT_EDGE_X;
+        // 取寬高最小的縮放倍率，確保畫面不被裁切
+        let scaleFactor = Math.min(targetWidth / VIEW_WIDTH, targetHeight / VIEW_HEIGHT);
+
+        // 反推實際畫布涵蓋的邏輯範圍
+        let actualLogicalWidth = targetWidth / scaleFactor;
+        let actualLogicalHeight = targetHeight / scaleFactor;
+
+        // 將遊戲邏輯畫面強制置中
+        let renderOffsetX = -VIEW_X_MIN + (actualLogicalWidth - VIEW_WIDTH) / 2;
+        let renderOffsetY = -VIEW_Y_MIN + (actualLogicalHeight - VIEW_HEIGHT) / 2;
 
         currentOffsetX = renderOffsetX;
         currentOffsetY = renderOffsetY;
@@ -1426,14 +1424,14 @@
         // 繪製速度線
         ctx.lineCap = 'round';
         let visibleLogicalLeft = -currentOffsetX;
-        let visibleLogicalRight = -currentOffsetX + visibleLogicalWidth;
+        let visibleLogicalRight = -currentOffsetX + actualLogicalWidth;
 
         for (let i = 0; i < speedLines.length; i++) {
             let line = speedLines[i];
             line.x -= line.speed;
             if (line.x + line.length < visibleLogicalLeft) { 
                 line.x = visibleLogicalRight + Math.random() * 100; 
-                line.y = -renderOffsetY + Math.random() * (LOGICAL_HEIGHT + renderOffsetY * 2); 
+                line.y = -renderOffsetY + Math.random() * actualLogicalHeight; 
             }
             ctx.beginPath(); ctx.moveTo(line.x, line.y); ctx.lineTo(line.x + line.length, line.y);
             ctx.strokeStyle = `rgba(56, 189, 248, ${line.alpha})`; ctx.lineWidth = 1.5; ctx.stroke();
