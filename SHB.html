@@ -354,14 +354,11 @@
             color: #0f172a;
         }
 
-        /* =======================================
-           手機直向顯示修復區 (調整比例與縮小字體)
-           ======================================= */
         @media (max-width: 768px) and (orientation: portrait) {
             #canvasContainer { 
-                aspect-ratio: 3 / 4; /* 改為 3:4 直向比例，拉出垂直空間 */
+                aspect-ratio: 3 / 4; 
                 height: auto;
-                min-height: 480px;   /* 設定最小高度，確保選單絕對不會擠在一起 */
+                min-height: 480px;   
                 max-height: 85vh;
             }
             .title-wrapper { margin-top: 5px; }
@@ -370,7 +367,6 @@
             
             .instruction-box { padding: 10px; margin-bottom: 0.8rem; width: 95%; min-height: 70px; }
             
-            /* 強制縮小手機版的招募標題與內文 */
             #recruitTitle { font-size: 1.1rem !important; margin-bottom: 5px !important; }
             #recruitMain { font-size: 0.95rem !important; line-height: 1.4; display: inline-block; }
             #recruitSub { font-size: 0.75rem !important; }
@@ -378,7 +374,6 @@
             .btn-play { padding: 8px 24px; }
             .pulse-text { font-size: 0.75rem !important; }
             
-            /* 縮小音樂按鈕區塊 */
             .music-controls { margin-bottom: 0.8rem; }
             .btn-music { padding: 6px 12px; font-size: 0.8rem; }
             #musicStatus { font-size: 0.7rem !important; }
@@ -994,16 +989,17 @@
         ctx.lineWidth = 3;
         
         ctx.beginPath();
-        ctx.moveTo(40, 120); ctx.lineTo(1000, 120); 
-        ctx.moveTo(40, 280); ctx.lineTo(1000, 280); 
+        ctx.moveTo(-3000, 120); ctx.lineTo(1000, 120); 
+        ctx.moveTo(-3000, 280); ctx.lineTo(1000, 280); 
         ctx.stroke();
         
         ctx.beginPath(); ctx.moveTo(560, 120); ctx.lineTo(560, 280); ctx.stroke();
         
         ctx.beginPath(); ctx.moveTo(40, 120); ctx.lineTo(40, 280); ctx.stroke();
         
+        // ★ 完整中圈 (原本只有右半部，現在修改為 0 到 Math.PI * 2 畫完整圓形)
         ctx.beginPath(); 
-        ctx.ellipse(40, 200, 50, 25, 0, -Math.PI/2, Math.PI/2); 
+        ctx.ellipse(40, 200, 50, 25, 0, 0, Math.PI * 2); 
         ctx.stroke();
         
         ctx.strokeRect(440, 165, 120, 70); 
@@ -1397,12 +1393,11 @@
         }
 
         const VIEW_WIDTH = 560; 
-        const VIEW_X_MIN = 40;  
+        const VIEW_X_RIGHT = 600;
 
         let scaleFactor = targetWidth / VIEW_WIDTH;
         let actualLogicalHeight = targetHeight / scaleFactor;
 
-        // 防呆：確保垂直視野至少有 280 的高度，才不會把籃框或地板切掉
         if (actualLogicalHeight < 280) {
             scaleFactor = targetHeight / 280;
             actualLogicalHeight = targetHeight / scaleFactor;
@@ -1410,9 +1405,8 @@
 
         let actualLogicalWidth = targetWidth / scaleFactor;
 
-        let renderOffsetX = -VIEW_X_MIN;
+        let renderOffsetX = actualLogicalWidth - VIEW_X_RIGHT;
         
-        // Y軸中心點設為 160 (原本是200)，讓畫面整體往下沉，上方保留足夠空間顯示籃板與訊息
         let renderOffsetY = -160 + (actualLogicalHeight / 2);
 
         currentOffsetX = renderOffsetX;
