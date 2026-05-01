@@ -670,6 +670,43 @@
         }
     });
 
+    // === 新增：監聽網頁可見度變化 (切換分頁、最小化時自動暫停音樂) ===
+    let wasPlayingBeforeHidden = false;
+
+    document.addEventListener("visibilitychange", async () => {
+        if (document.hidden) {
+            // 當離開網頁視窗時
+            if (!bgmAudio.paused) {
+                wasPlayingBeforeHidden = true; // 記錄離開前是正在播放的狀態
+                bgmAudio.pause();              // 暫停音樂
+                
+                // 同步更新介面上的按鈕與文字狀態
+                if (isMusicLoaded) {
+                    playSavedMusicBtn.textContent = '▶️ 繼續播放音樂';
+                    musicStatus.textContent = '⏸️ 離開網頁，音樂已自動暫停';
+                    musicStatus.style.color = '#cbd5e1';
+                }
+            } else {
+                wasPlayingBeforeHidden = false;
+            }
+        } else {
+            // 當重新回到網頁視窗時
+            if (wasPlayingBeforeHidden && isMusicLoaded) {
+                try {
+                    await bgmAudio.play(); // 恢復音樂播放
+                    
+                    // 同步更新介面上的按鈕與文字狀態
+                    playSavedMusicBtn.textContent = '⏸️ 暫停音樂';
+                    musicStatus.textContent = '🎵 音樂播放中...';
+                    musicStatus.style.color = '#10b981';
+                } catch (error) {
+                    console.error("回到網頁時恢復播放失敗:", error);
+                }
+            }
+        }
+    });
+    // ==============================================================
+
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
 
@@ -1192,7 +1229,8 @@
         }
     }
 
-    const stickmanCount = isMobileDevice ? 5 : 8;
+	// 增加畫面人數 (手機版/電腦版)
+    const stickmanCount = isMobileDevice ? 8 : 10;
     const stickmen = [];
     for (let i = 0; i < stickmanCount; i++) stickmen.push(new Stickman());
 
