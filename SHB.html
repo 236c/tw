@@ -57,7 +57,7 @@
 
         /* 全螢幕按鈕移到首頁按鈕右側 */
         #fullscreenBtn {
-            position: fixed; /* 改為 fixed，讓它絕對固定在網頁左上角 */
+            position: fixed;
             top: 15px;
             left: 65px; 
             right: auto;
@@ -72,7 +72,7 @@
             color: #00f2fe;
             font-size: 1.5rem;
             cursor: pointer;
-            z-index: 9999; /* 確保不會被任何圖層覆蓋 */
+            z-index: 9999;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             pointer-events: auto;
@@ -82,7 +82,7 @@
 
         /* 回到首頁按鈕放在最左上角 */
         #homeBtn {
-            position: fixed; /* 改為 fixed，讓它絕對固定在網頁左上角 */
+            position: fixed;
             top: 15px;
             left: 15px;
             width: 40px;
@@ -96,7 +96,7 @@
             color: #00f2fe;
             font-size: 1.3rem;
             cursor: pointer;
-            z-index: 9999; /* 確保不會被任何圖層覆蓋 */
+            z-index: 9999;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             pointer-events: auto;
@@ -104,7 +104,6 @@
             visibility: hidden;
         }
 
-        /* 限制 :hover 特效只在支援滑鼠的裝置上觸發，避免手機觸控殘留 */
         @media (hover: hover) {
             #fullscreenBtn:hover, #homeBtn:hover {
                 transform: scale(1.1);
@@ -114,12 +113,10 @@
             }
         }
 
-        /* 強制移除點擊後的原生日暈或殘留的 Focus 樣式 */
         #fullscreenBtn:focus, #homeBtn:focus {
             outline: none;
         }
 
-        /* 顯示按鈕的 class */
         #fullscreenBtn.show-btn, #homeBtn.show-btn {
             opacity: 1;
             visibility: visible;
@@ -366,7 +363,6 @@
             .year-badge { top: -18px; left: -35px; font-size: 0.85rem; padding: 2px 8px; }
             .game-subtitle { font-size: 1.2rem; margin-bottom: 0.4rem; }
             
-            /* 手機版招募區塊微調 (移除固定小字體，加寬) */
             .instruction-box { padding: 12px 20px; margin-bottom: 0.8rem; width: 95%; min-height: 85px; }
             
             .btn-play { padding: 10px 30px; }
@@ -457,7 +453,7 @@
 
 <script>
     // ==========================================
-    // 遊戲資料設定區 (可在此自由新增、修改、刪除)
+    // 遊戲資料設定區
     // ==========================================
 
     const TITLE_BADGE_TEXT = "2026";
@@ -682,7 +678,6 @@
         }
     });
 
-    // === 監聽網頁可見度變化 (切換分頁、最小化時自動暫停音樂) ===
     let wasPlayingBeforeHidden = false;
 
     document.addEventListener("visibilitychange", async () => {
@@ -711,7 +706,6 @@
             }
         }
     });
-    // ==============================================================
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
@@ -967,15 +961,37 @@
     }
     const quoteManager = new QuoteManager();
 
+    // === 全場畫線方法 ===
+    function drawCourtLines(ctx) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+        ctx.lineWidth = 3;
+        
+        ctx.strokeRect(40, 120, LOGICAL_WIDTH - 80, 160);
+        ctx.beginPath(); ctx.moveTo(LOGICAL_WIDTH/2, 120); ctx.lineTo(LOGICAL_WIDTH/2, 280); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(LOGICAL_WIDTH/2, 200, 50, 25, 0, 0, Math.PI*2); ctx.stroke();
+        
+        ctx.strokeRect(40, 165, 120, 70); 
+        ctx.beginPath(); ctx.ellipse(40, 200, 200, 72, 0, -Math.PI/2, Math.PI/2); ctx.stroke();
+        
+        ctx.strokeRect(LOGICAL_WIDTH - 160, 165, 120, 70);
+        ctx.beginPath(); ctx.ellipse(LOGICAL_WIDTH - 40, 200, 200, 72, 0, Math.PI/2, Math.PI*1.5); ctx.stroke();
+        ctx.restore();
+    }
+
+    // === 雙籃框 ===
     class BasketballHoop {
-        constructor() {
+        constructor(side = 'right') {
+            this.side = side;
             this.rimY = 85; 
-            this.netAnim = 0; this.swishActive = false;
+            this.netAnim = 0; 
+            this.swishActive = false;
+            this.baseY = 160;
         }
-        get rimLeft() { return LOGICAL_WIDTH - 78; }
-        get rimRight() { return LOGICAL_WIDTH - 58; }
-        get poleX() { return LOGICAL_WIDTH - 50; }
-        get backboardX() { return LOGICAL_WIDTH - 58; }
+        get poleX() { return this.side === 'right' ? LOGICAL_WIDTH - 50 : 40; }
+        get backboardX() { return this.side === 'right' ? LOGICAL_WIDTH - 58 : 50; }
+        get rimLeft() { return this.side === 'right' ? LOGICAL_WIDTH - 78 : 58; }
+        get rimRight() { return this.side === 'right' ? LOGICAL_WIDTH - 58 : 78; }
 
         triggerSwish() { this.netAnim = 1.0; this.swishActive = true; }
         update() {
@@ -986,7 +1002,12 @@
         }
         draw(ctx) {
             ctx.save();
-            ctx.fillStyle = '#475569'; ctx.fillRect(this.poleX, 40, 10, 260); 
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'; 
+            ctx.beginPath(); 
+            ctx.ellipse(this.poleX + 5, this.baseY + 45, 18, 6, 0, 0, Math.PI * 2); 
+            ctx.fill();
+
+            ctx.fillStyle = '#475569'; ctx.fillRect(this.poleX, 40, 10, this.baseY); 
             ctx.fillStyle = 'rgba(240, 248, 255, 0.85)'; ctx.fillRect(this.backboardX, 40, 8, 60); 
             ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3; ctx.strokeRect(this.backboardX, 55, 8, 25); 
             
@@ -1022,7 +1043,9 @@
             ctx.restore();
         }
     }
-    const globalHoop = new BasketballHoop();
+    
+    const leftHoop = new BasketballHoop('left');
+    const globalHoop = new BasketballHoop('right');
 
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -1041,7 +1064,11 @@
             if (availableNames.length === 0) availableNames = [...PLAYER_NAMES];
             this.playerName = availableNames.splice(Math.floor(Math.random() * availableNames.length), 1)[0];
 
-            this.baseY = 80 + Math.random() * 180; 
+            // 修正：限制球員的腳步(Y座標)嚴格在球場白線範圍內跑動
+            // 由於繪圖時腳的位置是在 baseY + 50 * scale，將 baseY 設定在 95 ~ 220 之間
+            // 如此一來，腳踩的位置會完美落於 Y: 120 ~ 280 (場內白線) 的區間，不再從上下的場外進入
+            this.baseY = 95 + Math.random() * 125; 
+            
             this.y = this.baseY;
             this.scale = 0.4 + (this.baseY / 300) * 0.8; 
             this.speed = (1.5 + Math.random() * 2) * this.scale; 
@@ -1343,7 +1370,12 @@
             ctx.strokeStyle = `rgba(56, 189, 248, ${line.alpha})`; ctx.lineWidth = 1.5; ctx.stroke();
         }
 
-        globalHoop.update(); globalHoop.draw(ctx);
+        // === 渲染全場場地與雙籃框 ===
+        drawCourtLines(ctx);
+        leftHoop.update(); 
+        leftHoop.draw(ctx);
+        globalHoop.update(); 
+        globalHoop.draw(ctx);
 
         const canvasRect = canvas.getBoundingClientRect();
         const scaleFactorCSS = canvasRect.height / LOGICAL_HEIGHT;
