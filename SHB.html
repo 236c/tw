@@ -16,7 +16,7 @@
             margin: 0;
             font-family: 'Noto Sans TC', sans-serif;
             display: flex;
-            align-items: center;
+            align-items: flex-start; /* 修改此處：從 center 改為 flex-start 讓介面靠上方 */
         }
         
         .card {
@@ -191,7 +191,7 @@
             position: relative;
             display: inline-block;
             text-align: center;
-            margin-top: 15px; /* 給標籤多一點上方空間 */
+            margin-top: 15px;
         }
 
         .game-title {
@@ -209,7 +209,6 @@
             animation: floatTitle 3s ease-in-out infinite, gradientShine 3s linear infinite;
         }
 
-        /* 修正：往左上方移動避開文字 */
         .year-badge {
             position: absolute;
             top: -5px; 
@@ -349,7 +348,6 @@
                 min-height: 300px;
             }
             .game-title { font-size: 2.2rem; margin-bottom: 0.2rem; }
-            /* 修正：手機版也一併往左上調整 */
             .year-badge { top: -18px; left: -35px; font-size: 0.85rem; padding: 2px 8px; }
             .game-subtitle { font-size: 1.2rem; margin-bottom: 0.4rem; }
             .instruction-box { font-size: 0.85rem; padding: 8px 15px; margin-bottom: 0.8rem; width: 90%; min-height: 70px; }
@@ -435,7 +433,7 @@
 
                     <div id="canvasContainer">
                         <div id="fullscreenBtn" title="全螢幕">⛶</div>
-                        <div id="homeBtn" title="回到起始頁面">🏡</div>
+                        <div id="homeBtn" title="回到起始頁面">🏀</div>
                         <canvas id="gameCanvas"></canvas>
                     </div>
                     
@@ -450,10 +448,8 @@
     // 遊戲資料設定區 (可在此自由新增、修改、刪除)
     // ==========================================
 
-    // 0. 標題左上角特效字串 (如: 梯次或年份)
     const TITLE_BADGE_TEXT = "2026";
 
-    // 1. 招募訊息輪播設定
     const RECRUIT_CONFIG = {
         interval: 4000, 
         fadeSpeed: 500, 
@@ -476,7 +472,6 @@
         ]
     };
 
-    // 2. 球員名單設定
     const PLAYER_NAMES = [
         "徐毅丞", "董宥葳", "吳秉恩", "劉軒禎", "蔡昕宏", "林稟硯", "范睿軒", "蘇靖翔",
         "張栩睿", "黃御展", "張煒誠", "張皓丞", "蔡棏曜", "范翔鈞", "邱得洛", "黃晟祐",
@@ -484,7 +479,6 @@
         "郭曜丞", "古宇超", "陳品勳"
     ];
 
-    // 3. 老師語錄
     const TEACHER_QUOTES = [
         "專心點！眼睛看哪裡啊！ 👀", "跑位！跑起來！不要站在那邊發呆！ 🏃‍♂️💨",
         "防守！手舉高！ ✋🤚", "這球傳得太隨便了！ 🤦‍♂️", "呼吸！調整節奏！ 🧘‍♂️",
@@ -496,7 +490,6 @@
         "出手要果斷！不要猶豫！ 🎯", "體力不行了是不是？撐下去！ 💦"
     ];
 
-    // 4. 失誤語錄
     const MISS_QUOTES = [
         "這在投什麼東西？！ 🤷‍♂️", "手腕！用手腕的力量！ 💪",
         "用力過猛啦！ 💥", "沒進沒關係，趕快回防！ 🛡️🏃‍♂️", "專注力呢？ 🧐",
@@ -509,7 +502,6 @@
 
     document.getElementById('yearBadge').textContent = TITLE_BADGE_TEXT;
 
-    // --- 招募訊息動態切換邏輯 ---
     const instructionBox = document.getElementById('instructionBox');
     const recruitTitle = document.getElementById('recruitTitle');
     const recruitMain = document.getElementById('recruitMain');
@@ -536,7 +528,6 @@
     renderRecruitMessage();
     recruitTimer = setInterval(cycleRecruitMessage, RECRUIT_CONFIG.interval);
 
-    // --- 背景音樂 (File System Access API + IndexedDB) ---
     const bgmAudio = new Audio();
     bgmAudio.loop = true;
     bgmAudio.volume = 0.4;
@@ -679,8 +670,6 @@
         }
     });
 
-
-    // --- 音效系統 ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
 
@@ -755,8 +744,6 @@
     let gameStarted = false; 
     const isMobileDevice = window.innerWidth <= 768;
 
-
-    // --- 主選單與控制按鈕邏輯 ---
     const mainMenuOverlay = document.getElementById('mainMenuOverlay');
 
     mainMenuOverlay.addEventListener('click', () => {
@@ -784,19 +771,43 @@
             fullscreenBtn.style.color = ''; 
             fullscreenBtn.style.borderColor = ''; 
             if (ballLayer) document.body.appendChild(ballLayer);
+            
+            // 退出全螢幕時，解除螢幕方向鎖定
+            if (screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            }
         }
     }
+    
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
 
-    fullscreenBtn.addEventListener('click', (e) => {
+    fullscreenBtn.addEventListener('click', async (e) => {
         e.stopPropagation(); 
+        
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            if (gameWrapper.requestFullscreen) gameWrapper.requestFullscreen();
-            else if (gameWrapper.webkitRequestFullscreen) gameWrapper.webkitRequestFullscreen();
+            try {
+                // 1. 先請求進入全螢幕
+                if (gameWrapper.requestFullscreen) {
+                    await gameWrapper.requestFullscreen();
+                } else if (gameWrapper.webkitRequestFullscreen) {
+                    await gameWrapper.webkitRequestFullscreen();
+                }
+                
+                // 2. 成功進入全螢幕後，嘗試將螢幕鎖定為橫向 (Landscape)
+                if (screen.orientation && screen.orientation.lock) {
+                    await screen.orientation.lock('landscape');
+                }
+            } catch (err) {
+                console.warn('無法進入全螢幕或螢幕旋轉鎖定失敗:', err);
+            }
         } else {
-            if (document.exitFullscreen) document.exitFullscreen();
-            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            // 退出全螢幕
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
         }
     });
 
@@ -813,8 +824,6 @@
         recruitTimer = setInterval(cycleRecruitMessage, RECRUIT_CONFIG.interval);
     });
 
-
-    // --- 遊戲元件設計 ---
     let availableNames = [...PLAYER_NAMES];
 
     class QuoteManager {
@@ -1183,8 +1192,6 @@
         }
     }
 
-
-    // --- 啟動與繪製迴圈 ---
     const stickmanCount = isMobileDevice ? 5 : 8;
     const stickmen = [];
     for (let i = 0; i < stickmanCount; i++) stickmen.push(new Stickman());
