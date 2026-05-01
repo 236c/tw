@@ -57,7 +57,7 @@
 
         /* 全螢幕按鈕移到首頁按鈕右側 */
         #fullscreenBtn {
-            position: absolute;
+            position: fixed; /* 改為 fixed，讓它絕對固定在網頁左上角 */
             top: 15px;
             left: 65px; 
             right: auto;
@@ -72,7 +72,7 @@
             color: #00f2fe;
             font-size: 1.5rem;
             cursor: pointer;
-            z-index: 20;
+            z-index: 9999; /* 確保不會被任何圖層覆蓋 */
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             pointer-events: auto;
@@ -82,7 +82,7 @@
 
         /* 回到首頁按鈕放在最左上角 */
         #homeBtn {
-            position: absolute;
+            position: fixed; /* 改為 fixed，讓它絕對固定在網頁左上角 */
             top: 15px;
             left: 15px;
             width: 40px;
@@ -96,7 +96,7 @@
             color: #00f2fe;
             font-size: 1.3rem;
             cursor: pointer;
-            z-index: 20;
+            z-index: 9999; /* 確保不會被任何圖層覆蓋 */
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             pointer-events: auto;
@@ -373,17 +373,11 @@
             .music-controls { margin-bottom: 1rem; }
             
             #fullscreenBtn {
-                width: 34px;
-                height: 34px;
-                font-size: 1.2rem;
                 top: 10px;
                 left: 54px;
                 right: auto;
             }
             #homeBtn {
-                width: 34px;
-                height: 34px;
-                font-size: 1.1rem;
                 top: 10px;
                 left: 10px;
             }
