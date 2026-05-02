@@ -863,13 +863,19 @@
         let baseScale = displayWidth / GAME_WIDTH;
         if ((displayHeight / baseScale) < GAME_HEIGHT) { baseScale = displayHeight / GAME_HEIGHT; }
 
-        let targetZoom = 1.0; 
+		let targetZoom = 1.0; 
         let targetCameraX = GAME_WIDTH / 2;
 
+        // 計算當前視窗的長寬比例 (高度 ÷ 寬度)
+        const screenRatio = displayHeight / displayWidth;
+        
+        // 動態補償倍率：如果是窄螢幕 (ratio > 1)，就根據比例自動平滑放大，並設定上限避免放太大
+        const dynamicMultiplier = screenRatio > 1 ? Math.min(2.2, screenRatio * 1.2) : 1.0;
+
         if (isCameraTracking) {
-            if (globalBall.state === 'flying') targetZoom = 1.05; 
-            else if (globalBall.state === 'loose') targetZoom = 1.15; 
-            else if (globalBall.state === 'held') targetZoom = 1.35;   
+            if (globalBall.state === 'flying') targetZoom = 1.05 * dynamicMultiplier; 
+            else if (globalBall.state === 'loose') targetZoom = 1.15 * dynamicMultiplier; 
+            else if (globalBall.state === 'held') targetZoom = 1.35 * dynamicMultiplier;   
             targetCameraX = globalBall.x;
         } else {
             // 全場模式：強制縮小到能看見整個球場寬度，並將目標強制鎖定在中心點
