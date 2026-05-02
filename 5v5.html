@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>十興國小-籃球隊 (5V5 真實對戰版)</title>
+    <title>十興國小-籃球隊 (5V5 真實對戰版 - 動態鏡頭)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;1,900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -24,14 +24,14 @@
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7) !important;
             width: 100%;
-            max-width: 1400px; /* 放寬最大限制，讓版面更大氣 */
+            max-width: 1400px; 
             margin: 0 auto;
             background: transparent;
         }
 
         .card-body {
             position: relative; 
-            background-color: #0f172a !important; /* 讓卡片背景與網頁融合 */
+            background-color: #0f172a !important; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -43,16 +43,16 @@
         #canvasContainer {
             position: relative;
             width: 100%;
-            height: 60vh; /* 使用視窗高度百分比，響應式更好 */
+            height: 60vh; 
             min-height: 400px; 
             margin: 0 auto;
-            background-color: #1e293b; /* 改用球場專屬深藍，消除黑塊感 */
+            background-color: #1e293b; 
         }
 
         #gameCanvas {
             background-color: #1e293b; 
             display: block;
-            width: 100%; /* 強制填滿容器 */
+            width: 100%; 
             height: 100%;
             cursor: crosshair; 
             border-radius: 12px;
@@ -106,8 +106,32 @@
             visibility: hidden;
         }
 
+        #cameraBtn {
+            position: fixed; 
+            top: 15px;
+            left: 115px; 
+            right: auto;
+            width: 40px;
+            height: 40px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1.5px solid rgba(0, 242, 254, 0.4);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00f2fe;
+            font-size: 1.3rem;
+            cursor: pointer;
+            z-index: 9999; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            pointer-events: auto;
+            opacity: 0;
+            visibility: hidden;
+        }
+
         @media (hover: hover) {
-            #fullscreenBtn:hover, #homeBtn:hover {
+            #fullscreenBtn:hover, #homeBtn:hover, #cameraBtn:hover {
                 transform: scale(1.1);
                 background: rgba(15, 23, 42, 0.95);
                 border-color: #00f2fe;
@@ -115,8 +139,8 @@
             }
         }
 
-        #fullscreenBtn:focus, #homeBtn:focus { outline: none; }
-        #fullscreenBtn.show-btn, #homeBtn.show-btn { opacity: 1; visibility: visible; }
+        #fullscreenBtn:focus, #homeBtn:focus, #cameraBtn:focus { outline: none; }
+        #fullscreenBtn.show-btn, #homeBtn.show-btn, #cameraBtn.show-btn { opacity: 1; visibility: visible; }
 
         #scoreboard {
             position: absolute;
@@ -137,7 +161,7 @@
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(4px);
-            white-space: nowrap; /* 新增：強制整個記分板內容不換行 */
+            white-space: nowrap; 
         }
 
         #scoreboard.show-board {
@@ -146,32 +170,12 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        .team-name { 
-            font-size: 1rem; 
-            font-weight: 800; 
-            letter-spacing: 1px; 
-            white-space: nowrap; /* 新增：防止隊名變垂直 */
-        }
-        
-        .team-score {
-            font-size: 2.2rem;
-            font-weight: 900;
-            font-family: 'Montserrat', sans-serif;
-            color: #ffffff;
-            min-width: 45px;
-            text-align: center;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            white-space: nowrap; /* 新增：防止雙位數分數上下疊加 */
-        }
-
+        .team-name { font-size: 1rem; font-weight: 800; letter-spacing: 1px; white-space: nowrap; }
+        .team-score { font-size: 2.2rem; font-weight: 900; font-family: 'Montserrat', sans-serif; color: #ffffff; min-width: 45px; text-align: center; text-shadow: 0 2px 5px rgba(0,0,0,0.5); white-space: nowrap; }
         .team-home { color: #00f2fe; }
         .team-away { color: #ef4444; }
 
-        #ballLayer {
-            position: fixed; 
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: 20; overflow: hidden; 
-        }
+        #ballLayer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 20; overflow: hidden; }
 
         .dom-basketball {
             position: absolute;
@@ -186,10 +190,7 @@
             will-change: left, top, opacity;
         }
 
-        @keyframes spinBall {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
+        @keyframes spinBall { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
 
         .menu-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -227,15 +228,8 @@
             letter-spacing: 1px; z-index: 10; animation: pulseBadge 2s infinite; pointer-events: none;
         }
 
-        @keyframes pulseBadge {
-            0%, 100% { transform: rotate(-12deg) scale(1); box-shadow: 0 4px 10px rgba(250, 204, 21, 0.4); }
-            50% { transform: rotate(-12deg) scale(1.08); box-shadow: 0 6px 15px rgba(250, 204, 21, 0.7); }
-        }
-
-        @keyframes floatTitle {
-            0%, 100% { transform: translateY(0); filter: drop-shadow(0px 5px 15px rgba(0, 242, 254, 0.3)); }
-            50% { transform: translateY(-8px); filter: drop-shadow(0px 10px 20px rgba(0, 242, 254, 0.7)); }
-        }
+        @keyframes pulseBadge { 0%, 100% { transform: rotate(-12deg) scale(1); box-shadow: 0 4px 10px rgba(250, 204, 21, 0.4); } 50% { transform: rotate(-12deg) scale(1.08); box-shadow: 0 6px 15px rgba(250, 204, 21, 0.7); } }
+        @keyframes floatTitle { 0%, 100% { transform: translateY(0); filter: drop-shadow(0px 5px 15px rgba(0, 242, 254, 0.3)); } 50% { transform: translateY(-8px); filter: drop-shadow(0px 10px 20px rgba(0, 242, 254, 0.7)); } }
         @keyframes gradientShine { to { background-position: 200% center; } }
 
         .instruction-box {
@@ -258,61 +252,36 @@
         }
 
         @keyframes sweepLight { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
-
         .btn-play:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 12px 30px rgba(0, 242, 254, 0.6); color: white; }
         .pulse-text { animation: pulseOpacity 2s infinite; }
         @keyframes pulseOpacity { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
         .music-controls { z-index: 50; margin-bottom: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .btn-music {
-            background: rgba(15, 23, 42, 0.6); border: 1px solid #4facfe; color: #4facfe; border-radius: 8px;
-            padding: 8px 16px; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
+        .btn-music { background: rgba(15, 23, 42, 0.6); border: 1px solid #4facfe; color: #4facfe; border-radius: 8px; padding: 8px 16px; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
         .btn-music:hover { background: #4facfe; color: #0f172a; }
 
         @media (max-width: 768px) and (orientation: portrait) {
             #canvasContainer { height: 60vh; }
             .game-title { font-size: 2.2rem; margin-bottom: 0.2rem; }
             .year-badge { top: -18px; left: -35px; font-size: 0.85rem; padding: 2px 8px; }
-            
             .instruction-box { padding: 12px 20px; margin-bottom: 0.8rem; width: 95%; min-height: 85px; }
             .btn-play { padding: 10px 30px; }
             .music-controls { margin-bottom: 1rem; }
-            
             #fullscreenBtn { top: 10px; left: 54px; right: auto; }
             #homeBtn { top: 10px; left: 10px; }
-            
-            /* 更新：手機直式記分板顯示與隱藏狀態的縮放 */
-            #scoreboard { 
-                transform: translateX(-50%) translateY(-10px) scale(0.65); 
-                top: 10px; 
-                padding: 5px 12px; 
-                gap: 10px; 
-            }
+            #cameraBtn { top: 10px; left: 98px; right: auto; } 
+            #scoreboard { transform: translateX(-50%) translateY(-10px) scale(0.65); top: 10px; padding: 5px 12px; gap: 10px; }
             #scoreboard.show-board { transform: translateX(-50%) translateY(0) scale(0.65); }
         }
 
-        /* 新增：手機橫向模式的縮放保護 */
         @media (max-width: 900px) and (orientation: landscape) {
             #scoreboard { transform: translateX(-50%) translateY(-10px) scale(0.75); }
             #scoreboard.show-board { transform: translateX(-50%) translateY(0) scale(0.75); }
         }
 
-        /* 完美無縫全螢幕設定 */
-        #gameWrapper:fullscreen, #gameWrapper:-webkit-full-screen, #gameWrapper:-moz-full-screen, #gameWrapper:-ms-fullscreen {
-            background-color: #1e293b !important; /* 與球場同色，消除外圍黑邊 */
-            display: flex; align-items: center; justify-content: center;
-            width: 100vw; height: 100vh; padding: 0; border-radius: 0;
-        }
-        
-        #gameWrapper:fullscreen #canvasContainer, #gameWrapper:-webkit-full-screen #canvasContainer, #gameWrapper:-moz-full-screen #canvasContainer, #gameWrapper:-ms-fullscreen #canvasContainer {
-            width: 100vw; height: 100vh; max-width: none; max-height: none; 
-            background-color: #1e293b;
-        }
-
-        #gameWrapper:fullscreen #gameCanvas, #gameWrapper:-webkit-full-screen #gameCanvas, #gameWrapper:-moz-full-screen #gameCanvas, #gameWrapper:-ms-fullscreen #gameCanvas { 
-            border-radius: 0; box-shadow: none; /* 全螢幕時移除畫布邊界陰影，視覺無限延伸 */
-        }
+        #gameWrapper:fullscreen, #gameWrapper:-webkit-full-screen, #gameWrapper:-moz-full-screen, #gameWrapper:-ms-fullscreen { background-color: #1e293b !important; display: flex; align-items: center; justify-content: center; width: 100vw; height: 100vh; padding: 0; border-radius: 0; }
+        #gameWrapper:fullscreen #canvasContainer, #gameWrapper:-webkit-full-screen #canvasContainer, #gameWrapper:-moz-full-screen #canvasContainer, #gameWrapper:-ms-fullscreen #canvasContainer { width: 100vw; height: 100vh; max-width: none; max-height: none; background-color: #1e293b; }
+        #gameWrapper:fullscreen #gameCanvas, #gameWrapper:-webkit-full-screen #gameCanvas, #gameWrapper:-moz-full-screen #gameCanvas, #gameWrapper:-ms-fullscreen #gameCanvas { border-radius: 0; box-shadow: none; }
     </style>
 </head>
 <body>
@@ -357,6 +326,8 @@
                     <div id="canvasContainer">
                         <div id="fullscreenBtn" title="全螢幕">⛶</div>
                         <div id="homeBtn" title="回到起始頁面">🏀</div>
+                        <!-- 攝影機按鈕 -->
+                        <div id="cameraBtn" title="切換視角 (追鏡/全場)">🎥</div>
                         
                         <div id="scoreboard">
                             <div class="team-name team-home">十興主場</div>
@@ -447,88 +418,15 @@
     [selectMusicBtn, playSavedMusicBtn].forEach(btn => btn.addEventListener('click', (e) => e.stopPropagation()));
     const DB_NAME = 'SHB_AudioDB'; const STORE_NAME = 'settings';
 
-    function openDB() {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, 1);
-            request.onupgradeneeded = (e) => {
-                if (!e.target.result.objectStoreNames.contains(STORE_NAME)) e.target.result.createObjectStore(STORE_NAME);
-            };
-            request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error);
-        });
-    }
-    async function saveFileHandle(handle) {
-        const db = await openDB();
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            const request = tx.objectStore(STORE_NAME).put(handle, 'bgmHandle');
-            request.onsuccess = () => resolve(); request.onerror = () => reject(request.error);
-        });
-    }
-    async function getFileHandle() {
-        const db = await openDB();
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction(STORE_NAME, 'readonly');
-            const request = tx.objectStore(STORE_NAME).get('bgmHandle');
-            request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error);
-        });
-    }
-    async function verifyPermission(fileHandle) {
-        const options = { mode: 'read' };
-        if ((await fileHandle.queryPermission(options)) === 'granted') return true;
-        if ((await fileHandle.requestPermission(options)) === 'granted') return true;
-        return false;
-    }
-    async function playFileFromHandle(fileHandle) {
-        try {
-            const file = await fileHandle.getFile();
-            if (bgmAudio.src) URL.revokeObjectURL(bgmAudio.src);
-            bgmAudio.src = URL.createObjectURL(file); await bgmAudio.play();
-            isMusicLoaded = true; playSavedMusicBtn.style.display = 'inline-block';
-            playSavedMusicBtn.textContent = '⏸️ 暫停音樂';
-            musicStatus.textContent = `🎵 正在播放: ${file.name}`; musicStatus.style.color = '#10b981';
-        } catch (error) {
-            musicStatus.textContent = '❌ 播放失敗，可能檔案已移動或損毀'; musicStatus.style.color = '#ef4444';
-        }
-    }
-    selectMusicBtn.addEventListener('click', async () => {
-        try {
-            if (!window.showOpenFilePicker) { alert("您的瀏覽器不支援 File System Access API。"); return; }
-            const [fileHandle] = await window.showOpenFilePicker({ types: [{ description: 'Audio Files', accept: { 'audio/*': ['.mp3', '.wav', '.ogg', '.m4a'] } }], excludeAcceptAllOption: true, multiple: false });
-            await saveFileHandle(fileHandle); await playFileFromHandle(fileHandle);
-        } catch (error) { if (error.name !== 'AbortError') musicStatus.textContent = '讀取檔案失敗'; }
-    });
-    playSavedMusicBtn.addEventListener('click', async () => {
-        if (isMusicLoaded) {
-            if (!bgmAudio.paused) { bgmAudio.pause(); playSavedMusicBtn.textContent = '▶️ 繼續播放音樂'; musicStatus.textContent = '⏸️ 音樂已暫停'; musicStatus.style.color = '#cbd5e1'; } 
-            else { await bgmAudio.play(); playSavedMusicBtn.textContent = '⏸️ 暫停音樂'; musicStatus.textContent = '🎵 音樂播放中...'; musicStatus.style.color = '#10b981'; }
-            return;
-        }
-        const handle = await getFileHandle();
-        if (handle) {
-            if (await verifyPermission(handle)) await playFileFromHandle(handle);
-            else musicStatus.textContent = '❌ 沒有權限讀取檔案，請重新選擇音樂';
-        }
-    });
-    window.addEventListener('DOMContentLoaded', async () => {
-        try {
-            const handle = await getFileHandle();
-            if (handle) {
-                playSavedMusicBtn.style.display = 'inline-block'; playSavedMusicBtn.textContent = '▶️ 播放上次音樂';
-                musicStatus.textContent = `📦 發現已儲存的音樂: ${handle.name} (點擊按鈕播放)`;
-            }
-        } catch (e) { }
-    });
-    let wasPlayingBeforeHidden = false;
-    document.addEventListener("visibilitychange", async () => {
-        if (document.hidden) {
-            if (!bgmAudio.paused) { wasPlayingBeforeHidden = true; bgmAudio.pause(); if (isMusicLoaded) { playSavedMusicBtn.textContent = '▶️ 繼續播放音樂'; musicStatus.textContent = '⏸️ 離開網頁，音樂已自動暫停'; musicStatus.style.color = '#cbd5e1'; } } 
-            else wasPlayingBeforeHidden = false;
-        } else {
-            if (wasPlayingBeforeHidden && isMusicLoaded) {
-                try { await bgmAudio.play(); playSavedMusicBtn.textContent = '⏸️ 暫停音樂'; musicStatus.textContent = '🎵 音樂播放中...'; musicStatus.style.color = '#10b981'; } catch (error) {}
-            }
-        }
-    });
+    function openDB() { return new Promise((resolve, reject) => { const request = indexedDB.open(DB_NAME, 1); request.onupgradeneeded = (e) => { if (!e.target.result.objectStoreNames.contains(STORE_NAME)) e.target.result.createObjectStore(STORE_NAME); }; request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); }); }
+    async function saveFileHandle(handle) { const db = await openDB(); return new Promise((resolve, reject) => { const tx = db.transaction(STORE_NAME, 'readwrite'); const request = tx.objectStore(STORE_NAME).put(handle, 'bgmHandle'); request.onsuccess = () => resolve(); request.onerror = () => reject(request.error); }); }
+    async function getFileHandle() { const db = await openDB(); return new Promise((resolve, reject) => { const tx = db.transaction(STORE_NAME, 'readonly'); const request = tx.objectStore(STORE_NAME).get('bgmHandle'); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); }); }
+    async function verifyPermission(fileHandle) { const options = { mode: 'read' }; if ((await fileHandle.queryPermission(options)) === 'granted') return true; if ((await fileHandle.requestPermission(options)) === 'granted') return true; return false; }
+    async function playFileFromHandle(fileHandle) { try { const file = await fileHandle.getFile(); if (bgmAudio.src) URL.revokeObjectURL(bgmAudio.src); bgmAudio.src = URL.createObjectURL(file); await bgmAudio.play(); isMusicLoaded = true; playSavedMusicBtn.style.display = 'inline-block'; playSavedMusicBtn.textContent = '⏸️ 暫停音樂'; musicStatus.textContent = `🎵 正在播放: ${file.name}`; musicStatus.style.color = '#10b981'; } catch (error) { musicStatus.textContent = '❌ 播放失敗，可能檔案已移動或損毀'; musicStatus.style.color = '#ef4444'; } }
+    selectMusicBtn.addEventListener('click', async () => { try { if (!window.showOpenFilePicker) { alert("您的瀏覽器不支援 File System Access API。"); return; } const [fileHandle] = await window.showOpenFilePicker({ types: [{ description: 'Audio Files', accept: { 'audio/*': ['.mp3', '.wav', '.ogg', '.m4a'] } }], excludeAcceptAllOption: true, multiple: false }); await saveFileHandle(fileHandle); await playFileFromHandle(fileHandle); } catch (error) { if (error.name !== 'AbortError') musicStatus.textContent = '讀取檔案失敗'; } });
+    playSavedMusicBtn.addEventListener('click', async () => { if (isMusicLoaded) { if (!bgmAudio.paused) { bgmAudio.pause(); playSavedMusicBtn.textContent = '▶️ 繼續播放音樂'; musicStatus.textContent = '⏸️ 音樂已暫停'; musicStatus.style.color = '#cbd5e1'; } else { await bgmAudio.play(); playSavedMusicBtn.textContent = '⏸️ 暫停音樂'; musicStatus.textContent = '🎵 音樂播放中...'; musicStatus.style.color = '#10b981'; } return; } const handle = await getFileHandle(); if (handle) { if (await verifyPermission(handle)) await playFileFromHandle(handle); else musicStatus.textContent = '❌ 沒有權限讀取檔案，請重新選擇音樂'; } });
+    window.addEventListener('DOMContentLoaded', async () => { try { const handle = await getFileHandle(); if (handle) { playSavedMusicBtn.style.display = 'inline-block'; playSavedMusicBtn.textContent = '▶️ 播放上次音樂'; musicStatus.textContent = `📦 發現已儲存的音樂: ${handle.name} (點擊按鈕播放)`; } } catch (e) { } });
+    let wasPlayingBeforeHidden = false; document.addEventListener("visibilitychange", async () => { if (document.hidden) { if (!bgmAudio.paused) { wasPlayingBeforeHidden = true; bgmAudio.pause(); if (isMusicLoaded) { playSavedMusicBtn.textContent = '▶️ 繼續播放音樂'; musicStatus.textContent = '⏸️ 離開網頁，音樂已自動暫停'; musicStatus.style.color = '#cbd5e1'; } } else wasPlayingBeforeHidden = false; } else { if (wasPlayingBeforeHidden && isMusicLoaded) { try { await bgmAudio.play(); playSavedMusicBtn.textContent = '⏸️ 暫停音樂'; musicStatus.textContent = '🎵 音樂播放中...'; musicStatus.style.color = '#10b981'; } catch (error) {} } } });
 
     // ================== 音效系統 ==================
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -536,54 +434,28 @@
     class SoundManager {
         constructor() { this.enabled = false; }
         init() { if (!audioCtx) audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); this.enabled = true; }
-        playShoot() {
-            if (!this.enabled || !audioCtx) return; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'sine';
-            osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
-            gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.1);
-        }
-        playBounce() {
-            if (!this.enabled || !audioCtx) return; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'triangle';
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.1);
-            gain.gain.setValueAtTime(0.4, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.1);
-        }
-        playSwish() {
-            if (!this.enabled || !audioCtx) return; const bufferSize = audioCtx.sampleRate * 0.35; 
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; 
-            const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
-            const filter = audioCtx.createBiquadFilter(); filter.type = 'highpass'; filter.frequency.value = 3000; 
-            const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.25, audioCtx.currentTime + 0.05); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start(audioCtx.currentTime);
-        }
-        playWhistle() {
-            if (!this.enabled || !audioCtx) return; const osc1 = audioCtx.createOscillator(); const osc2 = audioCtx.createOscillator();
-            const gain = audioCtx.createGain(); osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
-            osc1.type = 'square'; osc2.type = 'square';
-            osc1.frequency.setValueAtTime(2000, audioCtx.currentTime); osc2.frequency.setValueAtTime(2200, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.05);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            osc1.start(audioCtx.currentTime); osc2.start(audioCtx.currentTime);
-            osc1.stop(audioCtx.currentTime + 0.3); osc2.stop(audioCtx.currentTime + 0.3);
-        }
+        playShoot() { if (!this.enabled || !audioCtx) return; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'sine'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1); gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.02); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.1); }
+        playBounce() { if (!this.enabled || !audioCtx) return; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.type = 'triangle'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.1); gain.gain.setValueAtTime(0.4, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.1); }
+        playSwish() { if (!this.enabled || !audioCtx) return; const bufferSize = audioCtx.sampleRate * 0.35; const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; const noise = audioCtx.createBufferSource(); noise.buffer = buffer; const filter = audioCtx.createBiquadFilter(); filter.type = 'highpass'; filter.frequency.value = 3000; const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.25, audioCtx.currentTime + 0.05); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start(audioCtx.currentTime); }
+        playWhistle() { if (!this.enabled || !audioCtx) return; const osc1 = audioCtx.createOscillator(); const osc2 = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination); osc1.type = 'square'; osc2.type = 'square'; osc1.frequency.setValueAtTime(2000, audioCtx.currentTime); osc2.frequency.setValueAtTime(2200, audioCtx.currentTime); gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.05); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc1.start(audioCtx.currentTime); osc2.start(audioCtx.currentTime); osc1.stop(audioCtx.currentTime + 0.3); osc2.stop(audioCtx.currentTime + 0.3); }
     }
     const soundManager = new SoundManager(); 
 
     // ================== 核心遊戲機制 ==================
-    // 遊戲本體座標永遠鎖定 1000x300，保證球員跑動速度與物理機制不因螢幕改變而崩壞
     const GAME_WIDTH = 1000;
     const GAME_HEIGHT = 300;
     
-    // 全局縮放與位移參數（讓畫布自動適應全螢幕）
+    // 全局縮放與位移參數
     let globalScale = 1;
     let globalOffsetX = 0;
     let globalOffsetY = 0;
     let gameStarted = false; 
+
+    // --- 攝影機狀態變數 ---
+    let cameraX = GAME_WIDTH / 2;
+    let cameraY = GAME_HEIGHT / 2;
+    let currentZoom = 1.0;
+    let isCameraTracking = true; 
 
     // === 遊戲計分系統 ===
     let matchScores = { left: 0, right: 0 };
@@ -602,62 +474,38 @@
     const gameWrapper = document.getElementById('gameWrapper');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     const homeBtn = document.getElementById('homeBtn');
+    const cameraBtn = document.getElementById('cameraBtn'); 
 
-    mainMenuOverlay.addEventListener('click', () => {
-        mainMenuOverlay.classList.add('hidden');
-        soundManager.init(); gameStarted = true; scoreBoardEl.classList.add('show-board');
-        clearInterval(recruitTimer); 
-        globalBall.reset(); 
+    cameraBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cameraBtn.blur();
+        isCameraTracking = !isCameraTracking;
+        if (isCameraTracking) {
+            cameraBtn.innerHTML = '🎥';
+            cameraBtn.style.color = '#00f2fe';
+            cameraBtn.style.borderColor = 'rgba(0, 242, 254, 0.4)';
+        } else {
+            cameraBtn.innerHTML = '🔭'; 
+            cameraBtn.style.color = '#facc15'; 
+            cameraBtn.style.borderColor = 'rgba(250, 204, 21, 0.6)';
+        }
     });
 
-    function handleFullscreenChange() {
-        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-        const ballLayer = document.getElementById('ballLayer');
-        if (isFullscreen) {
-            fullscreenBtn.innerHTML = '✖'; fullscreenBtn.style.color = '#ef4444'; fullscreenBtn.style.borderColor = '#ef4444';
-            if (ballLayer) gameWrapper.appendChild(ballLayer);
-        } else {
-            fullscreenBtn.innerHTML = '⛶'; fullscreenBtn.style.color = '#00f2fe'; fullscreenBtn.style.borderColor = 'rgba(0, 242, 254, 0.4)'; 
-            if (ballLayer) document.body.appendChild(ballLayer);
-        }
-    }
+    mainMenuOverlay.addEventListener('click', () => { mainMenuOverlay.classList.add('hidden'); soundManager.init(); gameStarted = true; scoreBoardEl.classList.add('show-board'); clearInterval(recruitTimer); globalBall.reset(); });
+    function handleFullscreenChange() { const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement; const ballLayer = document.getElementById('ballLayer'); if (isFullscreen) { fullscreenBtn.innerHTML = '✖'; fullscreenBtn.style.color = '#ef4444'; fullscreenBtn.style.borderColor = '#ef4444'; if (ballLayer) gameWrapper.appendChild(ballLayer); } else { fullscreenBtn.innerHTML = '⛶'; fullscreenBtn.style.color = '#00f2fe'; fullscreenBtn.style.borderColor = 'rgba(0, 242, 254, 0.4)'; if (ballLayer) document.body.appendChild(ballLayer); } }
     document.addEventListener('fullscreenchange', handleFullscreenChange); document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-
-    fullscreenBtn.addEventListener('click', async (e) => {
-        e.stopPropagation(); fullscreenBtn.blur(); 
-        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-        if (!isFullscreen) {
-            try {
-                if (gameWrapper.requestFullscreen) await gameWrapper.requestFullscreen();
-                else if (gameWrapper.webkitRequestFullscreen) await gameWrapper.webkitRequestFullscreen();
-                if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape');
-            } catch (err) {}
-        } else {
-            if (document.exitFullscreen) document.exitFullscreen();
-            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        }
-    });
-
-    function goBackToHome() {
-        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-        if (isFullscreen) { if (document.exitFullscreen) document.exitFullscreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen(); }
-        mainMenuOverlay.classList.remove('hidden'); scoreBoardEl.classList.remove('show-board');
-        updateScoreDisplay('reset'); gameStarted = false; soundManager.enabled = false; 
-        clearInterval(recruitTimer); recruitTimer = setInterval(cycleRecruitMessage, RECRUIT_CONFIG.interval);
-        fullscreenBtn.classList.remove('show-btn'); homeBtn.classList.remove('show-btn');
-        fullscreenBtn.innerHTML = '⛶'; fullscreenBtn.style.color = '#00f2fe'; fullscreenBtn.style.borderColor = 'rgba(0, 242, 254, 0.4)';
-    }
+    fullscreenBtn.addEventListener('click', async (e) => { e.stopPropagation(); fullscreenBtn.blur(); const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement; if (!isFullscreen) { try { if (gameWrapper.requestFullscreen) await gameWrapper.requestFullscreen(); else if (gameWrapper.webkitRequestFullscreen) await gameWrapper.webkitRequestFullscreen(); if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape'); } catch (err) {} } else { if (document.exitFullscreen) document.exitFullscreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen(); } });
+    function goBackToHome() { const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement; if (isFullscreen) { if (document.exitFullscreen) document.exitFullscreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen(); } mainMenuOverlay.classList.remove('hidden'); scoreBoardEl.classList.remove('show-board'); updateScoreDisplay('reset'); gameStarted = false; soundManager.enabled = false; clearInterval(recruitTimer); recruitTimer = setInterval(cycleRecruitMessage, RECRUIT_CONFIG.interval); fullscreenBtn.classList.remove('show-btn'); homeBtn.classList.remove('show-btn'); cameraBtn.classList.remove('show-btn'); fullscreenBtn.innerHTML = '⛶'; fullscreenBtn.style.color = '#00f2fe'; fullscreenBtn.style.borderColor = 'rgba(0, 242, 254, 0.4)'; }
     homeBtn.addEventListener('click', (e) => { e.stopPropagation(); homeBtn.blur(); goBackToHome(); });
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && gameStarted) goBackToHome(); });
 
-    // === 全場畫線方法 (支援自動向外延伸無限繪製) ===
-    function drawCourtLines(ctx) {
+    // === 全場畫線方法 ===
+    function drawCourtLines(ctx, renderParams) {
         ctx.save();
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)'; ctx.lineWidth = 3;
         
-        // 邊界無限延伸以填滿全螢幕左右黑邊
-        let leftEdge = -globalOffsetX;
-        let rightEdge = GAME_WIDTH + globalOffsetX;
+        let leftEdge = -renderParams.offsetX - 200;
+        let rightEdge = -renderParams.offsetX + renderParams.logicalWidth + 200;
 
         ctx.beginPath(); ctx.moveTo(leftEdge, 120); ctx.lineTo(rightEdge, 120); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(leftEdge, 280); ctx.lineTo(rightEdge, 280); ctx.stroke();
@@ -678,161 +526,37 @@
 
     // === 雙籃框 ===
     class BasketballHoop {
-        constructor(side) {
-            this.side = side; this.rimY = 85; this.netAnim = 0; this.swishActive = false; this.baseY = 160; 
-        }
-        get poleX() { return this.side === 'right' ? GAME_WIDTH - 50 : 40; }
-        get backboardX() { return this.side === 'right' ? GAME_WIDTH - 58 : 50; }
-        get rimLeft() { return this.side === 'right' ? GAME_WIDTH - 78 : 58; }
-        get rimRight() { return this.side === 'right' ? GAME_WIDTH - 58 : 78; }
+        constructor(side) { this.side = side; this.rimY = 85; this.netAnim = 0; this.swishActive = false; this.baseY = 160; }
+        get poleX() { return this.side === 'right' ? GAME_WIDTH - 50 : 40; } get backboardX() { return this.side === 'right' ? GAME_WIDTH - 58 : 50; }
+        get rimLeft() { return this.side === 'right' ? GAME_WIDTH - 78 : 58; } get rimRight() { return this.side === 'right' ? GAME_WIDTH - 58 : 78; }
         get centerX() { return (this.rimLeft + this.rimRight) / 2; }
-
         triggerSwish() { this.netAnim = 1.0; this.swishActive = true; }
         update() { if (this.swishActive) { this.netAnim -= 0.035; if (this.netAnim <= 0) { this.netAnim = 0; this.swishActive = false; } } }
-        draw(ctx) {
-            ctx.save();
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'; ctx.beginPath(); ctx.ellipse(this.poleX + 5, this.baseY + 45, 18, 6, 0, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = '#475569'; ctx.fillRect(this.poleX, 40, 10, this.baseY); 
-            ctx.fillStyle = 'rgba(240, 248, 255, 0.85)'; ctx.fillRect(this.backboardX, 40, 8, 60); 
-            ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3; ctx.strokeRect(this.backboardX, 55, 8, 25); 
-
-            let sway = 0, stretch = 0; 
-            if (this.swishActive) { sway = Math.sin((1 - this.netAnim) * Math.PI * 6) * (10 * this.netAnim); stretch = Math.sin((1 - this.netAnim) * Math.PI * 2) * (7 * this.netAnim); }
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)'; ctx.lineWidth = 1.5; ctx.beginPath();
-            let netTopY = this.rimY, netBotY = netTopY + 22 + stretch, netBotLeft = this.rimLeft + 3.5 + sway, netBotRight = this.rimRight - 3.5 + sway;
-
-            for (let i = 0; i <= 6; i++) {
-                let ratio = i / 6; let topX = (this.rimLeft + 1) + (this.rimRight - this.rimLeft - 2) * ratio; let botX = netBotLeft + (netBotRight - netBotLeft) * ratio;
-                ctx.moveTo(topX, netTopY); ctx.quadraticCurveTo(topX + sway * 0.5, netTopY + 11 + stretch * 0.5, botX, netBotY);
-            }
-            for (let j = 1; j <= 3; j++) {
-                let ratio = j / 4; let y = netTopY + (netBotY - netTopY) * ratio;
-                let currentLeft = (this.rimLeft + 1) + ratio * (netBotLeft - (this.rimLeft + 1)); let currentRight = (this.rimRight - 1) + ratio * (netBotRight - (this.rimRight - 1));
-                ctx.moveTo(currentLeft, y); ctx.quadraticCurveTo(currentLeft + (currentRight - currentLeft) / 2, y + 4 * ratio + stretch * ratio, currentRight, y);
-            }
-            ctx.stroke();
-            ctx.strokeStyle = '#ea580c'; ctx.lineWidth = 4; ctx.lineCap = 'round';
-            ctx.beginPath(); ctx.moveTo(this.rimLeft, this.rimY); ctx.lineTo(this.rimRight, this.rimY); ctx.stroke();
-            ctx.restore();
-        }
+        draw(ctx) { ctx.save(); ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'; ctx.beginPath(); ctx.ellipse(this.poleX + 5, this.baseY + 45, 18, 6, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#475569'; ctx.fillRect(this.poleX, 40, 10, this.baseY); ctx.fillStyle = 'rgba(240, 248, 255, 0.85)'; ctx.fillRect(this.backboardX, 40, 8, 60); ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3; ctx.strokeRect(this.backboardX, 55, 8, 25); let sway = 0, stretch = 0; if (this.swishActive) { sway = Math.sin((1 - this.netAnim) * Math.PI * 6) * (10 * this.netAnim); stretch = Math.sin((1 - this.netAnim) * Math.PI * 2) * (7 * this.netAnim); } ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)'; ctx.lineWidth = 1.5; ctx.beginPath(); let netTopY = this.rimY, netBotY = netTopY + 22 + stretch, netBotLeft = this.rimLeft + 3.5 + sway, netBotRight = this.rimRight - 3.5 + sway; for (let i = 0; i <= 6; i++) { let ratio = i / 6; let topX = (this.rimLeft + 1) + (this.rimRight - this.rimLeft - 2) * ratio; let botX = netBotLeft + (netBotRight - netBotLeft) * ratio; ctx.moveTo(topX, netTopY); ctx.quadraticCurveTo(topX + sway * 0.5, netTopY + 11 + stretch * 0.5, botX, netBotY); } for (let j = 1; j <= 3; j++) { let ratio = j / 4; let y = netTopY + (netBotY - netTopY) * ratio; let currentLeft = (this.rimLeft + 1) + ratio * (netBotLeft - (this.rimLeft + 1)); let currentRight = (this.rimRight - 1) + ratio * (netBotRight - (this.rimRight - 1)); ctx.moveTo(currentLeft, y); ctx.quadraticCurveTo(currentLeft + (currentRight - currentLeft) / 2, y + 4 * ratio + stretch * ratio, currentRight, y); } ctx.stroke(); ctx.strokeStyle = '#ea580c'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(this.rimLeft, this.rimY); ctx.lineTo(this.rimRight, this.rimY); ctx.stroke(); ctx.restore(); }
     }
-    
     const gameHoops = { left: new BasketballHoop('left'), right: new BasketballHoop('right') };
 
     // === 全局單顆籃球物件 ===
     class GlobalBall {
-        constructor() {
-            this.domElement = document.getElementById('globalDOMBall');
-            this.reset();
-        }
-
-        reset() {
-            this.x = GAME_WIDTH / 2;
-            this.y = 50; 
-            this.vx = (Math.random() - 0.5) * 4;
-            this.vy = 0;
-            this.gravity = 0.6;
-            this.state = 'loose'; 
-            this.holder = null;
-            this.lastHolder = null;
-            this.scored = false;
-            this.missQuoteTriggered = false;
-            this.scale = 1; 
-            this.possessionLock = null; 
-            this.isPass = false;
-            this.targetPlayer = null;
-            this.isDunkShot = false; 
-            this.blockAttemptedBy = new Set(); 
-        }
-
-        shoot(shooter, targetHoop, willScore, isDunk = false) {
-            this.state = 'flying';
-            this.holder = null;
-            this.lastHolder = shooter;
-            this.scored = false;
-            this.missQuoteTriggered = false;
-            this.targetHoop = targetHoop;
-            this.willScore = willScore;
-            this.isPass = false; 
-            this.targetPlayer = null;
-            
-            this.isDunkShot = isDunk;
-            this.blockAttemptedBy.clear(); 
-
-            // --- 新增：判斷是否為三分球 ---
-            this.isThreePointer = false;
-            if (!isDunk) {
-                // 左隊投右框(960)，右隊投左框(40)，籃框 Y 軸中心點大約落在 200
-                let hoopCenterX = shooter.team === 'left' ? GAME_WIDTH - 40 : 40;
-                let hoopCenterY = 200;
-                
-                // 利用橢圓方程式 (x-h)²/a² + (y-k)²/b² > 1 判斷是否在三分線外
-                let distanceValue = Math.pow(shooter.x - hoopCenterX, 2) / Math.pow(200, 2) + Math.pow(shooter.y - hoopCenterY, 2) / Math.pow(72, 2);
-                if (distanceValue > 1) {
-                    this.isThreePointer = true;
-                }
-            }
-
-            soundManager.playShoot();
-
-            if (isDunk) {
-                this.vx = (targetHoop.centerX - this.x) * 0.1;
-                this.vy = 8; 
-                soundManager.playBounce(); 
-            } else {
-                let hoopTargetX = targetHoop.centerX;
-                let hoopTargetY = targetHoop.rimY;
-                
-                if (!willScore) {
-                    hoopTargetX += (Math.random() > 0.5 ? -20 : 20);
-                    hoopTargetY -= Math.random() * 15; 
-                }
-
-                let dx = hoopTargetX - this.x;
-                let flightFrames = Math.max(16, Math.abs(dx) / 12); 
-                
-                this.vx = (hoopTargetX - this.x) / flightFrames;
-                this.vy = (hoopTargetY - this.y - 0.5 * this.gravity * flightFrames * flightFrames) / flightFrames;
-            }
-        }
-
-        pass(shooter, targetPlayer) {
-            this.state = 'flying';
-            this.holder = null;
-            this.lastHolder = shooter;
-            this.targetPlayer = targetPlayer;
-            this.isPass = true;
-            this.scored = false;
-            
+        constructor() { this.domElement = document.getElementById('globalDOMBall'); this.reset(); }
+        reset() { this.x = GAME_WIDTH / 2; this.y = 50; this.vx = (Math.random() - 0.5) * 4; this.vy = 0; this.gravity = 0.6; this.state = 'loose'; this.holder = null; this.lastHolder = null; this.scored = false; this.missQuoteTriggered = false; this.scale = 1; this.possessionLock = null; this.isPass = false; this.targetPlayer = null; this.isDunkShot = false; this.blockAttemptedBy = new Set(); }
+        shoot(shooter, targetHoop, willScore, isDunk = false) { 
+            this.state = 'flying'; this.holder = null; this.lastHolder = shooter; this.scored = false; this.missQuoteTriggered = false; this.targetHoop = targetHoop; this.willScore = willScore; this.isPass = false; this.targetPlayer = null; this.isDunkShot = isDunk; this.blockAttemptedBy.clear(); 
+            // 移除三分球判定邏輯
             soundManager.playShoot(); 
-
-            let targetX = targetPlayer.x + targetPlayer.maxSpeed * targetPlayer.dir * 8; 
-            let targetY = targetPlayer.y - 20;
-
-            let dx = targetX - this.x;
-            let dy = targetY - this.y;
-            
-            let dist = Math.hypot(dx, dy);
-            let flightFrames = Math.max(10, dist / 15); 
-            
-            this.vx = dx / flightFrames;
-            this.vy = (dy - 0.5 * this.gravity * flightFrames * flightFrames) / flightFrames;
+            if (isDunk) { 
+                this.vx = (targetHoop.centerX - this.x) * 0.1; this.vy = 8; soundManager.playBounce(); 
+            } else { 
+                let hoopTargetX = targetHoop.centerX; let hoopTargetY = targetHoop.rimY; 
+                if (!willScore) { hoopTargetX += (Math.random() > 0.5 ? -20 : 20); hoopTargetY -= Math.random() * 15; } 
+                let dx = hoopTargetX - this.x; let flightFrames = Math.max(16, Math.abs(dx) / 12); 
+                this.vx = (hoopTargetX - this.x) / flightFrames; this.vy = (hoopTargetY - this.y - 0.5 * this.gravity * flightFrames * flightFrames) / flightFrames; 
+            } 
         }
-
+        pass(shooter, targetPlayer) { this.state = 'flying'; this.holder = null; this.lastHolder = shooter; this.targetPlayer = targetPlayer; this.isPass = true; this.scored = false; soundManager.playShoot(); let targetX = targetPlayer.x + targetPlayer.maxSpeed * targetPlayer.dir * 8; let targetY = targetPlayer.y - 20; let dx = targetX - this.x; let dy = targetY - this.y; let dist = Math.hypot(dx, dy); let flightFrames = Math.max(10, dist / 15); this.vx = dx / flightFrames; this.vy = (dy - 0.5 * this.gravity * flightFrames * flightFrames) / flightFrames; }
         update() {
-            if (this.state === 'held' && this.holder) {
-                this.x = this.holder.handWorldX;
-                this.y = this.holder.handWorldY;
-                this.scale = this.holder.scale;
-                return;
-            }
-
-            // loose or flying
-            let prevY = this.y;
-            this.x += this.vx;
-            this.y += this.vy;
-            this.vy += this.gravity;
-
+            if (this.state === 'held' && this.holder) { this.x = this.holder.handWorldX; this.y = this.holder.handWorldY; this.scale = this.holder.scale; return; }
+            let prevY = this.y; this.x += this.vx; this.y += this.vy; this.vy += this.gravity;
             if (this.state === 'flying') {
                 if (this.isPass) {
                     let caught = false;
@@ -840,24 +564,8 @@
                         let dist = Math.hypot(this.x - man.x, this.y - (man.y - 20));
                         if (dist < 40 * man.scale) {
                             if (man.team !== this.lastHolder.team) {
-                                if (Math.random() < 0.2) {
-                                    this.state = 'held';
-                                    this.holder = man;
-                                    this.isPass = false;
-                                    man.dribbleTimer = 0;
-                                    caught = true;
-                                    quoteManager.addQuote(`被 ${man.playerName} 抄截了！ 😱`, '#ef4444');
-                                    soundManager.playWhistle();
-                                    break;
-                                }
-                            } else if (man === this.targetPlayer) {
-                                this.state = 'held';
-                                this.holder = man;
-                                this.isPass = false;
-                                man.dribbleTimer = 0;
-                                caught = true;
-                                break;
-                            }
+                                if (Math.random() < 0.03) { this.state = 'held'; this.holder = man; this.isPass = false; man.dribbleTimer = 0; caught = true; quoteManager.addQuote(`被 ${man.playerName} 抄截了！ 😱`, '#ef4444'); soundManager.playWhistle(); break; }
+                            } else if (man === this.targetPlayer) { this.state = 'held'; this.holder = man; this.isPass = false; man.dribbleTimer = 0; caught = true; break; }
                         }
                     }
                 } 
@@ -869,109 +577,46 @@
                                 let handDist = Math.hypot(this.x - man.handWorldX, this.y - man.handWorldY);
                                 if (handDist < 30 * man.scale) {
                                     if (!this.blockAttemptedBy.has(man)) {
-                                        this.blockAttemptedBy.add(man);
-                                        
-                                        let isGoldenShooter = this.lastHolder.isGolden;
-                                        let successRate = isGoldenShooter ? 0.05 : 1.0; 
-                                        
-                                        if (Math.random() < successRate) {
-                                            this.vx = (Math.random() - 0.5) * 6; 
-                                            this.vy = Math.abs(this.vy) * 0.5 + 3; 
-                                            this.state = 'loose'; 
-                                            this.possessionLock = null; 
-                                            soundManager.playBounce(); 
-                                            
-                                            let blockQuotes = ["請你吃麻辣鍋啦！ 🍲💥", "蒼蠅拍！ 🪰💥", "想投？沒那麼容易！ 🖐️", "Not in my house! 🚫"];
-                                            if (isGoldenShooter) {
-                                                blockQuotes = ["竟然把 ZONE 給擋下來了！？ 😱", "奇蹟的火鍋！！ 🛑💥"];
-                                            }
-                                            quoteManager.addQuote(`${man.playerName}：${blockQuotes[Math.floor(Math.random() * blockQuotes.length)]}`, '#ef4444');
-                                            blockExecuted = true;
-                                            break; 
-                                        } else if (isGoldenShooter) {
-                                            quoteManager.addQuote(`${man.playerName}：力量太大了...擋不住！ 😭`, '#cbd5e1');
-                                        }
+                                        this.blockAttemptedBy.add(man); let isGoldenShooter = this.lastHolder.isGolden; let successRate = isGoldenShooter ? 0.05 : 1.0; 
+                                        if (Math.random() < successRate) { this.vx = (Math.random() - 0.5) * 6; this.vy = Math.abs(this.vy) * 0.5 + 3; this.state = 'loose'; this.possessionLock = null; soundManager.playBounce(); let blockQuotes = ["請你吃麻辣鍋啦！ 🍲💥", "蒼蠅拍！ 🪰💥", "想投？沒那麼容易！ 🖐️", "Not in my house! 🚫"]; if (isGoldenShooter) { blockQuotes = ["竟然把 ZONE 給擋下來了！？ 😱", "奇蹟的火鍋！！ 🛑💥"]; } quoteManager.addQuote(`${man.playerName}：${blockQuotes[Math.floor(Math.random() * blockQuotes.length)]}`, '#ef4444'); blockExecuted = true; break; } else if (isGoldenShooter) { quoteManager.addQuote(`${man.playerName}：力量太大了...擋不住！ 😭`, '#cbd5e1'); }
                                     }
                                 }
                             }
                         }
                         if (blockExecuted) return;
                     }
-
                     if (this.targetHoop) {
                         if (!this.scored && prevY < this.targetHoop.rimY && this.y >= this.targetHoop.rimY) {
                             if (this.willScore && this.x > this.targetHoop.rimLeft - 5 && this.x < this.targetHoop.rimRight + 5) {
-                                this.scored = true; 
-                                this.targetHoop.triggerSwish(); 
-                                soundManager.playSwish(); 
-                                
-                                // --- 修改：根據剛才記錄的三分球標記給予分數 ---
-                                let points = this.isThreePointer ? 3 : 2;
-                                updateScoreDisplay(this.lastHolder.team, points); 
-
-                                // --- 新增：三分球專屬文字播報 ---
-                                if (this.isThreePointer) {
-                                    quoteManager.addQuote(`${this.lastHolder.playerName} 飆進了一記漂亮的三分球！ 💦👌`, '#38bdf8');
-                                }
-
+                                this.scored = true; this.targetHoop.triggerSwish(); soundManager.playSwish(); 
+                                // 強制改為固定加 2 分
+                                updateScoreDisplay(this.lastHolder.team, 2); 
                                 this.possessionLock = this.lastHolder.team === 'left' ? 'right' : 'left';
-
                             } else if (!this.willScore && this.x > this.targetHoop.rimLeft - 20 && this.x < this.targetHoop.rimRight + 20) {
-                                this.vy = -this.vy * (0.4 + Math.random() * 0.3); 
-                                this.vx = this.vx * 0.5 + (Math.random() - 0.5) * 6; 
-                                this.y = this.targetHoop.rimY - 2; 
-                                soundManager.playBounce(); 
-
-                                if (!this.missQuoteTriggered && Math.random() > 0.5) {
-                                    this.missQuoteTriggered = true;
-                                    quoteManager.addQuote(`${this.lastHolder.playerName}，${MISS_QUOTES[Math.floor(Math.random() * MISS_QUOTES.length)]}`, '#ef4444');
-                                    soundManager.playWhistle(); 
-                                }
+                                this.vy = -this.vy * (0.4 + Math.random() * 0.3); this.vx = this.vx * 0.5 + (Math.random() - 0.5) * 6; this.y = this.targetHoop.rimY - 2; soundManager.playBounce(); 
+                                if (!this.missQuoteTriggered && Math.random() > 0.5) { this.missQuoteTriggered = true; quoteManager.addQuote(`${this.lastHolder.playerName}，${MISS_QUOTES[Math.floor(Math.random() * MISS_QUOTES.length)]}`, '#ef4444'); soundManager.playWhistle(); }
                             }
                         }
                     }
                 }
             }
-
-            // 地板反彈邏輯
             const groundY = GAME_HEIGHT - 8; 
             if (this.y >= groundY) {
-                this.y = groundY; 
-                this.vy = -this.vy * 0.6; 
-                this.vx = this.vx * 0.8;  
-
-                if (Math.abs(this.vy) > 3) {
-                    soundManager.playBounce(); 
-                } else {
-                    this.vy = 0;
-                    if (Math.abs(this.vx) < 0.2) this.vx = 0; 
-                }
-                
-                if (this.state === 'flying') {
-                    this.state = 'loose';
-                    this.isPass = false;
-                }
+                this.y = groundY; this.vy = -this.vy * 0.6; this.vx = this.vx * 0.8;  
+                if (Math.abs(this.vy) > 3) { soundManager.playBounce(); } else { this.vy = 0; if (Math.abs(this.vx) < 0.2) this.vx = 0; }
+                if (this.state === 'flying') { this.state = 'loose'; this.isPass = false; }
             }
-
             if (this.x < 10) { this.x = 10; this.vx = Math.abs(this.vx); }
             if (this.x > GAME_WIDTH - 10) { this.x = GAME_WIDTH - 10; this.vx = -Math.abs(this.vx); }
         }
-
         draw(ctx, renderParams) {
-            // 讓籃球隨時保持顯示
             this.domElement.style.display = 'block';
-            
-            // 計算真實螢幕投影位置 (加入偏移量，對應 Canvas Translation)
             let screenX = renderParams.canvasRect.left + (this.x + renderParams.offsetX) * renderParams.scale;
             let screenY = renderParams.canvasRect.top + (this.y + renderParams.offsetY) * renderParams.scale;
-
             let r = 8 * this.scale * renderParams.scale;
             let bw = 1.5 * this.scale * renderParams.scale;
-
-            this.domElement.style.width = `${r * 2}px`;
-            this.domElement.style.height = `${r * 2}px`;
-            this.domElement.style.left = `${screenX}px`;
-            this.domElement.style.top = `${screenY}px`;
+            this.domElement.style.width = `${r * 2}px`; this.domElement.style.height = `${r * 2}px`;
+            this.domElement.style.left = `${screenX}px`; this.domElement.style.top = `${screenY}px`;
             this.domElement.style.borderWidth = `${bw}px`;
         }
     }
@@ -982,92 +627,52 @@
     let availableNames = [...PLAYER_NAMES];
 
     class QuoteManager {
-        constructor() { 
-            this.quotes = []; 
-            this.lastRandomQuoteTime = 0; 
-            this.randomQuoteInterval = 6000; 
-        }
-
+        constructor() { this.quotes = []; this.lastRandomQuoteTime = 0; this.randomQuoteInterval = 6000; }
         addQuote(text, color = '#facc15') {
-            if (this.quotes.length >= 2) {
-                this.quotes.shift(); 
-            }
-
+            if (this.quotes.length >= 2) { this.quotes.shift(); }
             let isTeacherQuote = TEACHER_QUOTES.includes(text);
             let displayText = isTeacherQuote ? `💬 老師：「${text}」` : `🏀 ${text}`;
-
-            this.quotes.push({ 
-                text: displayText, 
-                targetY: GAME_HEIGHT - 20,
-                y: GAME_HEIGHT + 30,
-                alpha: 1.0, 
-                color: color, 
-                life: 100 
-            });
+            this.quotes.push({ text: displayText, targetY: 0, y: 500, alpha: 1.0, color: color, life: 100 });
         }
-
-        updateAndDraw(ctx) {
+        updateAndDraw(ctx, renderParams) {
             let currentTime = Date.now();
-            
             if (currentTime - this.lastRandomQuoteTime > this.randomQuoteInterval) {
-                if (Math.random() > 0.75) { 
-                    this.addQuote(TEACHER_QUOTES[Math.floor(Math.random() * TEACHER_QUOTES.length)]); 
-                    soundManager.playWhistle(); 
-                }
-                this.lastRandomQuoteTime = currentTime; 
-                this.randomQuoteInterval = 5000 + Math.random() * 5000; 
+                if (Math.random() > 0.75) { this.addQuote(TEACHER_QUOTES[Math.floor(Math.random() * TEACHER_QUOTES.length)]); soundManager.playWhistle(); }
+                this.lastRandomQuoteTime = currentTime; this.randomQuoteInterval = 5000 + Math.random() * 5000; 
             }
             
-            let dynamicFontSize = Math.max(12, Math.min(16, GAME_WIDTH * 0.03));
+            // 將字幕綁定在實際的攝影機底部位置
+            let screenCenterX = -renderParams.offsetX + renderParams.logicalWidth / 2;
+            let screenBottomY = -renderParams.offsetY + renderParams.logicalHeight;
+
+            let dynamicFontSize = Math.max(12, Math.min(16, renderParams.logicalWidth * 0.03));
             let lineSpacing = dynamicFontSize + 14;
             
             for (let i = 0; i < this.quotes.length; i++) {
-                this.quotes[i].targetY = GAME_HEIGHT - 25 - ((this.quotes.length - 1 - i) * lineSpacing);
+                if (this.quotes[i].y === 500) this.quotes[i].y = screenBottomY + 30;
+                this.quotes[i].targetY = screenBottomY - 25 - ((this.quotes.length - 1 - i) * lineSpacing);
             }
             
             for (let i = this.quotes.length - 1; i >= 0; i--) {
                 let q = this.quotes[i]; 
-                
                 q.y += (q.targetY - q.y) * 0.2; 
                 q.life--;
+                if (q.life < 20) q.alpha = q.life / 20; else q.alpha = 0.95;
+                if (q.life <= 0) { this.quotes.splice(i, 1); continue; }
                 
-                if (q.life < 20) q.alpha = q.life / 20; 
-                else q.alpha = 0.95;
-                
-                if (q.life <= 0) { 
-                    this.quotes.splice(i, 1); 
-                    continue; 
-                }
-                
-                ctx.save(); 
-                ctx.globalAlpha = q.alpha; 
+                ctx.save(); ctx.globalAlpha = q.alpha; 
                 ctx.font = `bold ${dynamicFontSize}px "Noto Sans TC", sans-serif`;
-                ctx.textAlign = 'center'; 
-                ctx.textBaseline = 'middle';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 
                 let textWidth = ctx.measureText(q.text).width;
-                
-                let bgX = GAME_WIDTH / 2 - textWidth / 2 - 15;
+                let bgX = screenCenterX - textWidth / 2 - 15;
                 let bgY = q.y - dynamicFontSize / 2 - 6;
-                let bgW = textWidth + 30;
-                let bgH = dynamicFontSize + 12;
-                let radius = 10;
+                let bgW = textWidth + 30; let bgH = dynamicFontSize + 12; let radius = 10;
                 
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
-                ctx.beginPath();
-                ctx.moveTo(bgX + radius, bgY);
-                ctx.lineTo(bgX + bgW - radius, bgY);
-                ctx.quadraticCurveTo(bgX + bgW, bgY, bgX + bgW, bgY + radius);
-                ctx.lineTo(bgX + bgW, bgY + bgH - radius);
-                ctx.quadraticCurveTo(bgX + bgW, bgY + bgH, bgX + bgW - radius, bgY + bgH);
-                ctx.lineTo(bgX + radius, bgY + bgH);
-                ctx.quadraticCurveTo(bgX, bgY + bgH, bgX, bgY + bgH - radius);
-                ctx.lineTo(bgX, bgY + radius);
-                ctx.quadraticCurveTo(bgX, bgY, bgX + radius, bgY);
-                ctx.fill();
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.75)'; ctx.beginPath();
+                ctx.moveTo(bgX + radius, bgY); ctx.lineTo(bgX + bgW - radius, bgY); ctx.quadraticCurveTo(bgX + bgW, bgY, bgX + bgW, bgY + radius); ctx.lineTo(bgX + bgW, bgY + bgH - radius); ctx.quadraticCurveTo(bgX + bgW, bgY + bgH, bgX + bgW - radius, bgY + bgH); ctx.lineTo(bgX + radius, bgY + bgH); ctx.quadraticCurveTo(bgX, bgY + bgH, bgX, bgY + bgH - radius); ctx.lineTo(bgX, bgY + radius); ctx.quadraticCurveTo(bgX, bgY, bgX + radius, bgY); ctx.fill();
                 
-                ctx.fillStyle = q.color;
-                ctx.fillText(q.text, GAME_WIDTH / 2, q.y); 
+                ctx.fillStyle = q.color; ctx.fillText(q.text, screenCenterX, q.y); 
                 ctx.restore();
             }
         }
@@ -1075,523 +680,262 @@
     const quoteManager = new QuoteManager();
 
     class Stickman {
-        constructor(teamMode, index) { 
-            this.initTeam(teamMode, index); 
-        }
-
+        constructor(teamMode, index) { this.initTeam(teamMode, index); }
         initTeam(teamMode, index) {
             if (this.playerName && !availableNames.includes(this.playerName)) availableNames.push(this.playerName);
             if (availableNames.length === 0) availableNames = [...PLAYER_NAMES];
             this.playerName = availableNames.splice(Math.floor(Math.random() * availableNames.length), 1)[0];
-
-            this.team = teamMode; 
-            this.index = index;
-            this.dir = this.team === 'left' ? 1 : -1;
-            
-            this.baseY = 95 + Math.random() * 125; 
-            this.y = this.baseY;
-            this.scale = 0.4 + (this.baseY / 300) * 0.8; 
+            this.team = teamMode; this.index = index; this.dir = this.team === 'left' ? 1 : -1;
+            this.baseY = 95 + Math.random() * 125; this.y = this.baseY; this.scale = 0.4 + (this.baseY / 300) * 0.8; 
             this.maxSpeed = (1.8 + Math.random() * 1.5) * this.scale; 
-            
             this.x = this.team === 'left' ? 100 + Math.random() * 100 : GAME_WIDTH - (100 + Math.random() * 100);
-
-            this.localFrames = Math.random() * 1000; 
-            this.color = this.team === 'left' ? '#00f2fe' : '#ef4444';
-            
-            this.state = 'run'; 
-            this.jumpVy = 0;
-            this.jumpStartY = this.y; 
-            this.isBlocking = false; 
-            this.targetHoop = this.team === 'left' ? gameHoops.right : gameHoops.left;
-
-            this.isGolden = false;
-            this.goldenTimer = 0;
-
-            this.dribbleTimer = 0;
-
-            this.handWorldX = 0;
-            this.handWorldY = 0;
+            this.localFrames = Math.random() * 1000; this.color = this.team === 'left' ? '#00f2fe' : '#ef4444';
+            this.state = 'run'; this.jumpVy = 0; this.jumpStartY = this.y; this.isBlocking = false; this.targetHoop = this.team === 'left' ? gameHoops.right : gameHoops.left;
+            this.isGolden = false; this.goldenTimer = 0; this.dribbleTimer = 0; this.handWorldX = 0; this.handWorldY = 0;
         }
-
-        forceShoot() {
-            if (this.state !== 'run' || globalBall.holder !== this) return; 
-            this.state = 'jump'; 
-            this.jumpVy = -8 * this.scale;
-            this.jumpStartY = this.y; 
-            this.willScore = Math.random() > 0.3; 
-        }
-
-        forceDunk() {
-            if (this.state !== 'run' || globalBall.holder !== this) return;
-            this.state = 'dunk';
-            this.jumpVy = -9.5 * this.scale; 
-            this.jumpStartY = this.y;
-            this.willScore = true; 
-            this.dunkPeakReached = false;
-
-            let framesToPeak = Math.abs(this.jumpVy) / (0.35 * this.scale);
-            let targetRimX = this.targetHoop.centerX + (this.team === 'left' ? -15 : 15);
-            this.dunkVx = (targetRimX - this.x) / framesToPeak;
-        }
-
-        forcePass(targetPlayer) {
-            if (this.state !== 'run' || globalBall.holder !== this) return;
-            globalBall.pass(this, targetPlayer);
-        }
-
+        forceShoot() { if (this.state !== 'run' || globalBall.holder !== this) return; this.state = 'jump'; this.jumpVy = -8 * this.scale; this.jumpStartY = this.y; this.willScore = Math.random() > 0.3; }
+        forceDunk() { if (this.state !== 'run' || globalBall.holder !== this) return; this.state = 'dunk'; this.jumpVy = -9.5 * this.scale; this.jumpStartY = this.y; this.willScore = true; this.dunkPeakReached = false; let framesToPeak = Math.abs(this.jumpVy) / (0.35 * this.scale); let targetRimX = this.targetHoop.centerX + (this.team === 'left' ? -15 : 15); this.dunkVx = (targetRimX - this.x) / framesToPeak; }
+        forcePass(targetPlayer) { if (this.state !== 'run' || globalBall.holder !== this) return; globalBall.pass(this, targetPlayer); }
         update() {
             let currentSpeed = this.maxSpeed;
-            if (this.isGolden) {
-                this.goldenTimer--;
-                currentSpeed = this.maxSpeed * 1.6; 
-                if (this.goldenTimer <= 0 && globalBall.holder !== this) {
-                    this.isGolden = false;
-                }
-            } else if (Math.random() < 0.00015) { 
-                this.isGolden = true;
-                this.goldenTimer = 300; 
-                quoteManager.addQuote(`${this.playerName} 進入了 ZONE 的境界！ ⚡`, '#facc15');
-            }
-
+            if (this.isGolden) { this.goldenTimer--; currentSpeed = this.maxSpeed * 1.6; if (this.goldenTimer <= 0 && globalBall.holder !== this) { this.isGolden = false; } } else if (Math.random() < 0.00015) { this.isGolden = true; this.goldenTimer = 300; quoteManager.addQuote(`${this.playerName} 進入了 ZONE 的境界！ ⚡`, '#facc15'); }
             if (this.state === 'run') {
-                this.localFrames += currentSpeed * 0.2; 
-                let distToBallX = globalBall.x - this.x;
-                let distToBallY = globalBall.y - this.y; 
-
+                this.localFrames += currentSpeed * 0.2; let distToBallX = globalBall.x - this.x; let distToBallY = globalBall.y - this.y; 
                 if (globalBall.state === 'loose') {
-                    
                     if (globalBall.possessionLock && globalBall.possessionLock !== this.team) {
-                        let myHoopX = this.team === 'left' ? gameHoops.left.centerX : gameHoops.right.centerX;
-                        let myTargetX = myHoopX + (this.team === 'left' ? 80 : -80);
-                        if (Math.abs(myTargetX - this.x) > 10) {
-                            this.dir = myTargetX > this.x ? 1 : -1;
-                            this.x += (currentSpeed * 0.9) * this.dir;
-                        }
-                        let distY = 160 - this.y;
-                        if (Math.abs(distY) > 5) {
-                            this.y += (currentSpeed * 0.6) * (distY > 0 ? 1 : -1);
-                        }
+                        let myHoopX = this.team === 'left' ? gameHoops.left.centerX : gameHoops.right.centerX; let myTargetX = myHoopX + (this.team === 'left' ? 80 : -80);
+                        if (Math.abs(myTargetX - this.x) > 10) { this.dir = myTargetX > this.x ? 1 : -1; this.x += (currentSpeed * 0.9) * this.dir; }
+                        let distY = 160 - this.y; if (Math.abs(distY) > 5) { this.y += (currentSpeed * 0.6) * (distY > 0 ? 1 : -1); }
                     } else {
-                        this.dir = distToBallX > 0 ? 1 : -1;
-                        this.x += currentSpeed * this.dir;
-                        
-                        if (Math.abs(distToBallY) > 5) {
-                            this.y += (currentSpeed * 0.7) * (distToBallY > 0 ? 1 : -1);
-                        }
-
-                        if (Math.abs(distToBallX) < 20 && Math.abs((this.y + 20) - globalBall.y) < 60) {
-                            globalBall.state = 'held';
-                            globalBall.holder = this;
-                            globalBall.possessionLock = null; 
-                            this.dribbleTimer = 0; 
-                        }
+                        this.dir = distToBallX > 0 ? 1 : -1; this.x += currentSpeed * this.dir;
+                        if (Math.abs(distToBallY) > 5) { this.y += (currentSpeed * 0.7) * (distToBallY > 0 ? 1 : -1); }
+                        if (Math.abs(distToBallX) < 20 && Math.abs((this.y + 20) - globalBall.y) < 60) { globalBall.state = 'held'; globalBall.holder = this; globalBall.possessionLock = null; this.dribbleTimer = 0; }
                     }
                 } 
                 else if (globalBall.state === 'held') {
                     if (globalBall.holder === this) {
                         if (!this.isGolden) {
-                            this.dribbleTimer++;
-                            let enemiesNearby = stickmen.filter(m => m.team !== this.team && Math.hypot(m.x - this.x, m.y - this.y) < 60).length;
-                            
-                            if ((enemiesNearby >= 1 && Math.random() < 0.05) || (this.dribbleTimer > 60 && Math.random() < 0.02)) {
+                            this.dribbleTimer++; let enemiesNearby = stickmen.filter(m => m.team !== this.team && Math.hypot(m.x - this.x, m.y - this.y) < 60).length;
+                            if ((enemiesNearby >= 1 && Math.random() < 0.01) || (this.dribbleTimer > 90 && Math.random() < 0.005)) {
                                 let allies = stickmen.filter(m => m.team === this.team && m !== this);
                                 if (allies.length > 0) {
                                     let targetAlly = allies[Math.floor(Math.random() * allies.length)];
-                                    
-                                    let myDistToHoop = Math.abs(this.targetHoop.centerX - this.x);
-                                    let betterAllies = allies.filter(m => Math.abs(this.targetHoop.centerX - m.x) < myDistToHoop);
-                                    
-                                    if (betterAllies.length > 0 && Math.random() > 0.4) {
-                                        targetAlly = betterAllies[Math.floor(Math.random() * betterAllies.length)];
-                                    }
-                                    
-                                    this.forcePass(targetAlly);
-                                    return; 
+                                    let myDistToHoop = Math.abs(this.targetHoop.centerX - this.x); let betterAllies = allies.filter(m => Math.abs(this.targetHoop.centerX - m.x) < myDistToHoop);
+                                    if (betterAllies.length > 0 && Math.random() > 0.4) { targetAlly = betterAllies[Math.floor(Math.random() * betterAllies.length)]; }
+                                    this.forcePass(targetAlly); return; 
                                 }
                             }
                         }
-
-                        let distToHoop = this.targetHoop.centerX - this.x;
-                        this.dir = distToHoop > 0 ? 1 : -1;
-                        this.x += currentSpeed * this.dir;
-                        
-                        let distYToCenter = 160 - this.y;
-                        if (Math.abs(distYToCenter) > 10) {
-                            this.y += (currentSpeed * 0.5) * (distYToCenter > 0 ? 1 : -1);
-                        }
-                        
-                        if (this.isGolden) {
-                            if (Math.abs(distToHoop) < 70 * this.scale) {
-                                this.forceDunk();
-                            }
-                        } else {
-                            if (Math.abs(distToHoop) < 150 * this.scale + Math.random() * 50) {
-                                this.forceShoot();
-                            }
-                        }
+                        let distToHoop = this.targetHoop.centerX - this.x; this.dir = distToHoop > 0 ? 1 : -1; this.x += currentSpeed * this.dir;
+                        let distYToCenter = 160 - this.y; if (Math.abs(distYToCenter) > 10) { this.y += (currentSpeed * 0.5) * (distYToCenter > 0 ? 1 : -1); }
+                        if (this.isGolden) { if (Math.abs(distToHoop) < 70 * this.scale) { this.forceDunk(); } } else { if (Math.abs(distToHoop) < 150 * this.scale + Math.random() * 50) { this.forceShoot(); } }
                     } 
                     else if (globalBall.holder.team === this.team) {
-                        let allyX = globalBall.holder.x;
-                        let offset = (this.index % 2 === 0 ? 60 : -60) * this.dir;
-                        let targetX = allyX + offset;
-                        
-                        if (Math.abs(targetX - this.x) > 10) {
-                            this.dir = targetX > this.x ? 1 : -1;
-                            this.x += (currentSpeed * 0.8) * this.dir; 
-                        } else {
-                            this.dir = globalBall.holder.dir; 
-                        }
-
-                        let distY = this.baseY - this.y;
-                        if (Math.abs(distY) > 5) {
-                            this.y += (currentSpeed * 0.6) * (distY > 0 ? 1 : -1);
-                        }
+                        let allyX = globalBall.holder.x; let offset = (this.index % 2 === 0 ? 60 : -60) * this.dir; let targetX = allyX + offset;
+                        if (Math.abs(targetX - this.x) > 10) { this.dir = targetX > this.x ? 1 : -1; this.x += (currentSpeed * 0.8) * this.dir; } else { this.dir = globalBall.holder.dir; }
+                        let distY = this.baseY - this.y; if (Math.abs(distY) > 5) { this.y += (currentSpeed * 0.6) * (distY > 0 ? 1 : -1); }
                     } 
                     else {
-                        let enemyX = globalBall.holder.x;
-                        let enemyY = globalBall.holder.y;
-                        
-                        let didBlockJump = false;
-
+                        let enemyX = globalBall.holder.x; let enemyY = globalBall.holder.y; let didBlockJump = false;
                         if (globalBall.holder.state === 'jump' || globalBall.holder.state === 'dunk') {
-                            let distX = Math.abs(enemyX - this.x);
-                            let distY = Math.abs(enemyY - this.y);
-                            
-                            let activeBlockers = stickmen.filter(m => m.team === this.team && m.isBlocking).length;
-
-                            if (activeBlockers < 2 && distX < 80 && distY < 40 && Math.random() < 0.25) {
-                                this.state = 'jump';
-                                this.jumpVy = -8.5 * this.scale; 
-                                this.jumpStartY = this.y;
-                                this.isBlocking = true;
-                                this.dir = enemyX > this.x ? 1 : -1; 
-                                didBlockJump = true;
-                            }
+                            let distX = Math.abs(enemyX - this.x); let distY = Math.abs(enemyY - this.y); let activeBlockers = stickmen.filter(m => m.team === this.team && m.isBlocking).length;
+                            if (activeBlockers < 2 && distX < 80 && distY < 40 && Math.random() < 0.25) { this.state = 'jump'; this.jumpVy = -8.5 * this.scale; this.jumpStartY = this.y; this.isBlocking = true; this.dir = enemyX > this.x ? 1 : -1; didBlockJump = true; }
                         }
-
                         if (!didBlockJump) {
                             if (this.index % 2 === 0) {
-                                let targetX = enemyX + (this.team === 'left' ? -30 : 30);
-                                if (Math.abs(targetX - this.x) > 5) {
-                                    this.dir = targetX > this.x ? 1 : -1;
-                                    this.x += currentSpeed * this.dir;
-                                }
-                                let targetY = enemyY + (this.index === 0 ? 15 : -15); 
-                                let distY = targetY - this.y;
-                                if (Math.abs(distY) > 5) {
-                                    this.y += (currentSpeed * 0.7) * (distY > 0 ? 1 : -1);
-                                }
+                                let targetX = enemyX + (this.team === 'left' ? -30 : 30); if (Math.abs(targetX - this.x) > 5) { this.dir = targetX > this.x ? 1 : -1; this.x += currentSpeed * this.dir; }
+                                let targetY = enemyY + (this.index === 0 ? 15 : -15); let distY = targetY - this.y; if (Math.abs(distY) > 5) { this.y += (currentSpeed * 0.7) * (distY > 0 ? 1 : -1); }
                             } else {
-                                let myHoopX = this.team === 'left' ? gameHoops.left.centerX : gameHoops.right.centerX;
-                                let myTargetX = myHoopX + (this.team === 'left' ? 80 : -80);
-                                if (Math.abs(myTargetX - this.x) > 10) {
-                                    this.dir = myTargetX > this.x ? 1 : -1;
-                                    this.x += (currentSpeed * 1.1) * this.dir; 
-                                } else {
-                                    this.dir = enemyX > this.x ? 1 : -1; 
-                                }
-                                let distY = 160 - this.y;
-                                if (Math.abs(distY) > 5) {
-                                    this.y += (currentSpeed * 0.8) * (distY > 0 ? 1 : -1);
-                                }
+                                let myHoopX = this.team === 'left' ? gameHoops.left.centerX : gameHoops.right.centerX; let myTargetX = myHoopX + (this.team === 'left' ? 80 : -80);
+                                if (Math.abs(myTargetX - this.x) > 10) { this.dir = myTargetX > this.x ? 1 : -1; this.x += (currentSpeed * 1.1) * this.dir; } else { this.dir = enemyX > this.x ? 1 : -1; }
+                                let distY = 160 - this.y; if (Math.abs(distY) > 5) { this.y += (currentSpeed * 0.8) * (distY > 0 ? 1 : -1); }
                             }
                         }
                     }
                 }
                 else if (globalBall.state === 'flying') {
                     if (globalBall.possessionLock && globalBall.possessionLock !== this.team) {
-                        let myHoopX = this.team === 'left' ? gameHoops.left.centerX : gameHoops.right.centerX;
-                        let myTargetX = myHoopX + (this.team === 'left' ? 80 : -80);
-                        if (Math.abs(myTargetX - this.x) > 10) {
-                            this.dir = myTargetX > this.x ? 1 : -1;
-                            this.x += (currentSpeed * 0.9) * this.dir;
-                        }
+                        let myHoopX = this.team === 'left' ? gameHoops.left.centerX : gameHoops.right.centerX; let myTargetX = myHoopX + (this.team === 'left' ? 80 : -80);
+                        if (Math.abs(myTargetX - this.x) > 10) { this.dir = myTargetX > this.x ? 1 : -1; this.x += (currentSpeed * 0.9) * this.dir; }
                     } else {
                         let targetX = globalBall.targetHoop ? globalBall.targetHoop.centerX : globalBall.x;
-                        if (globalBall.isPass && globalBall.targetPlayer === this) {
-                             targetX = globalBall.x; 
-                        }
-                        
-                        if (Math.abs(targetX - this.x) > 30) {
-                            this.dir = targetX > this.x ? 1 : -1;
-                            this.x += (currentSpeed * 0.6) * this.dir;
-                        }
-                        let distY = 160 - this.y;
-                        if (Math.abs(distY) > 5) {
-                            this.y += (currentSpeed * 0.5) * (distY > 0 ? 1 : -1);
-                        }
+                        if (globalBall.isPass && globalBall.targetPlayer === this) { targetX = globalBall.x; }
+                        if (Math.abs(targetX - this.x) > 30) { this.dir = targetX > this.x ? 1 : -1; this.x += (currentSpeed * 0.6) * this.dir; }
+                        let distY = 160 - this.y; if (Math.abs(distY) > 5) { this.y += (currentSpeed * 0.5) * (distY > 0 ? 1 : -1); }
                     }
                 }
-
-                if (this.x < 20) this.x = 20;
-                if (this.x > GAME_WIDTH - 20) this.x = GAME_WIDTH - 20;
-                
-                if (this.y < 80) this.y = 80;
-                if (this.y > 280) this.y = 280;
-
+                if (this.x < 20) this.x = 20; if (this.x > GAME_WIDTH - 20) this.x = GAME_WIDTH - 20;
+                if (this.y < 80) this.y = 80; if (this.y > 280) this.y = 280;
                 this.scale = 0.4 + (this.y / 300) * 0.8;
 
             } else if (this.state === 'jump') {
-                this.x += currentSpeed * 0.5 * this.dir; 
-                this.y += this.jumpVy;
-                this.jumpVy += 0.35 * this.scale; 
-
-                if (!this.isBlocking && this.jumpVy > -1 * this.scale && globalBall.holder === this) {
-                    globalBall.shoot(this, this.targetHoop, this.willScore);
-                }
-
-                if (this.y >= this.jumpStartY) {
-                    this.y = this.jumpStartY; 
-                    this.state = 'run';
-                    this.isBlocking = false; 
-                }
-
+                this.x += currentSpeed * 0.5 * this.dir; this.y += this.jumpVy; this.jumpVy += 0.35 * this.scale; 
+                if (!this.isBlocking && this.jumpVy > -1 * this.scale && globalBall.holder === this) { globalBall.shoot(this, this.targetHoop, this.willScore); }
+                if (this.y >= this.jumpStartY) { this.y = this.jumpStartY; this.state = 'run'; this.isBlocking = false; }
             } else if (this.state === 'dunk') {
-                this.x += this.dunkVx; 
-                this.y += this.jumpVy;
-                this.jumpVy += 0.35 * this.scale;
-
-                if (this.jumpVy > 0 && !this.dunkPeakReached && globalBall.holder === this) {
-                    this.dunkPeakReached = true;
-                    globalBall.shoot(this, this.targetHoop, true, true); 
-                    quoteManager.addQuote(`${this.playerName} 轟炸籃框！！ 🔥🔥🔥`, '#f97316');
-                }
-
-                if (this.y >= this.jumpStartY) {
-                    this.y = this.jumpStartY;
-                    this.state = 'run';
-                    this.isGolden = false; 
-                    this.goldenTimer = 0;
-                }
+                this.x += this.dunkVx; this.y += this.jumpVy; this.jumpVy += 0.35 * this.scale;
+                if (this.jumpVy > 0 && !this.dunkPeakReached && globalBall.holder === this) { this.dunkPeakReached = true; globalBall.shoot(this, this.targetHoop, true, true); quoteManager.addQuote(`${this.playerName} 轟炸籃框！！ 🔥🔥🔥`, '#f97316'); }
+                if (this.y >= this.jumpStartY) { this.y = this.jumpStartY; this.state = 'run'; this.isGolden = false; this.goldenTimer = 0; }
             }
         }
-
         draw(ctx) {
-            ctx.save();
-            ctx.translate(this.x, this.y); 
-            ctx.scale(this.scale * this.dir, this.scale);
+            ctx.save(); ctx.translate(this.x, this.y); ctx.scale(this.scale * this.dir, this.scale);
             const cx = 0, headY = 10, neckY = 20, hipY = 36, footY = 50;
-            
             let dynamicNameSize = Math.max(9, Math.min(13, GAME_WIDTH * 0.02));
-            ctx.save(); 
-            ctx.scale(this.dir, 1);
-            
+            ctx.save(); ctx.scale(this.dir, 1);
             let fontWeight = 'normal';
-            if (this.isGolden) {
-                ctx.fillStyle = '#facc15';
-                ctx.shadowColor = '#facc15'; ctx.shadowBlur = 10;
-                fontWeight = 'bold';
-            } else if (globalBall.holder === this) {
-                ctx.fillStyle = '#facc15';
-                ctx.shadowColor = '#000'; ctx.shadowBlur = 4;
-                fontWeight = 'bold';
-            } else {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; 
-                ctx.shadowColor = 'transparent'; 
-                ctx.shadowBlur = 0;
-            }
-
-            ctx.font = `${fontWeight} ${dynamicNameSize}px "Noto Sans TC", sans-serif`; 
-            ctx.textAlign = 'center'; 
-            ctx.fillText(this.playerName, cx, headY - 14, 80); 
-            ctx.restore();
-
-            if (this.isGolden) {
-                ctx.strokeStyle = '#facc15'; 
-                ctx.shadowColor = '#facc15'; 
-                ctx.shadowBlur = 15 + Math.sin(this.localFrames * 0.5) * 5; 
-            } else {
-                ctx.strokeStyle = this.color; 
-                ctx.shadowColor = this.color; 
-                ctx.shadowBlur = 4;
-            }
-
+            if (this.isGolden) { ctx.fillStyle = '#facc15'; ctx.shadowColor = '#facc15'; ctx.shadowBlur = 10; fontWeight = 'bold'; } 
+            else if (globalBall.holder === this) { ctx.fillStyle = '#facc15'; ctx.shadowColor = '#000'; ctx.shadowBlur = 4; fontWeight = 'bold'; } 
+            else { ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; }
+            ctx.font = `${fontWeight} ${dynamicNameSize}px "Noto Sans TC", sans-serif`; ctx.textAlign = 'center'; ctx.fillText(this.playerName, cx, headY - 14, 80); ctx.restore();
+            if (this.isGolden) { ctx.strokeStyle = '#facc15'; ctx.shadowColor = '#facc15'; ctx.shadowBlur = 15 + Math.sin(this.localFrames * 0.5) * 5; } else { ctx.strokeStyle = this.color; ctx.shadowColor = this.color; ctx.shadowBlur = 4; }
             ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-
             ctx.beginPath(); ctx.arc(cx, headY, 7, 0, Math.PI * 2); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(cx, hipY); ctx.stroke();
 
             let localHandX = cx, localHandY = neckY;
-
             if (this.state === 'run') {
-                let movement = 1; 
-                const runCycle = Math.sin(this.localFrames) * movement; 
+                let movement = 1; const runCycle = Math.sin(this.localFrames) * movement; 
                 let leftKneeX = cx - 12 * runCycle, leftKneeY = hipY + 6, leftFootX = cx - 18 * runCycle, leftFootY = footY;
                 let rightKneeX = cx + 12 * runCycle, rightKneeY = hipY + 6, rightFootX = cx + 18 * runCycle, rightFootY = footY;
-                ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(leftKneeX, leftKneeY); ctx.lineTo(leftFootX, leftFootY); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(rightKneeX, rightKneeY); ctx.lineTo(rightFootX, rightFootY); ctx.stroke();
-
+                ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(leftKneeX, leftKneeY); ctx.lineTo(leftFootX, leftFootY); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(rightKneeX, rightKneeY); ctx.lineTo(rightFootX, rightFootY); ctx.stroke();
                 let leftElbowX = cx - 8, leftElbowY = neckY + 8, leftHandX = cx - 15 + 10 * runCycle, leftHandY = neckY + 15;
                 ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(leftElbowX, leftElbowY); ctx.lineTo(leftHandX, leftHandY); ctx.stroke();
-
-                if (globalBall.holder === this) {
-                    localHandX = cx + 20; 
-                    localHandY = hipY + Math.sin(this.localFrames * 0.8) * 12;
-                    let rightElbowX = cx + 12, rightElbowY = neckY + 5;
-                    ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(localHandX, localHandY); ctx.stroke();
-                } else {
-                    let rightElbowX = cx + 8, rightElbowY = neckY + 8, rightHandX = cx + 15 - 10 * runCycle, rightHandY = neckY + 15;
-                    ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(rightHandX, rightHandY); ctx.stroke();
-                }
+                if (globalBall.holder === this) { localHandX = cx + 20; localHandY = hipY + Math.sin(this.localFrames * 0.8) * 12; let rightElbowX = cx + 12, rightElbowY = neckY + 5; ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(localHandX, localHandY); ctx.stroke(); } 
+                else { let rightElbowX = cx + 8, rightElbowY = neckY + 8, rightHandX = cx + 15 - 10 * runCycle, rightHandY = neckY + 15; ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(rightHandX, rightHandY); ctx.stroke(); }
             } else if (this.state === 'jump' || this.state === 'dunk') {
                 let leftKneeX = cx - 5, leftKneeY = hipY + 15, leftFootX = cx - 10, leftFootY = hipY + 30; 
                 let rightKneeX = cx + 15, rightKneeY = hipY - 5, rightFootX = cx + 15, rightFootY = hipY + 15; 
-                ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(leftKneeX, leftKneeY); ctx.lineTo(leftFootX, leftFootY); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(rightKneeX, rightKneeY); ctx.lineTo(rightFootX, rightFootY); ctx.stroke();
-
+                ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(leftKneeX, leftKneeY); ctx.lineTo(leftFootX, leftFootY); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx, hipY); ctx.lineTo(rightKneeX, rightKneeY); ctx.lineTo(rightFootX, rightFootY); ctx.stroke();
                 if (this.isBlocking) {
-                    let leftElbowX = cx - 10, leftElbowY = neckY - 10, leftHandX = cx - 15, leftHandY = headY - 25;
-                    ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(leftElbowX, leftElbowY); ctx.lineTo(leftHandX, leftHandY); ctx.stroke();
-
-                    localHandX = cx + 15; localHandY = headY - 25;
-                    let rightElbowX = cx + 10, rightElbowY = neckY - 10;
-                    ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(localHandX, localHandY); ctx.stroke();
-
+                    let leftElbowX = cx - 10, leftElbowY = neckY - 10, leftHandX = cx - 15, leftHandY = headY - 25; ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(leftElbowX, leftElbowY); ctx.lineTo(leftHandX, leftHandY); ctx.stroke();
+                    localHandX = cx + 15; localHandY = headY - 25; let rightElbowX = cx + 10, rightElbowY = neckY - 10; ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(localHandX, localHandY); ctx.stroke();
                 } else if (this.state === 'dunk' && globalBall.holder === this) {
-                    localHandX = cx + 15; localHandY = headY - 25; 
-                    ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(cx + 5, neckY - 15); ctx.lineTo(localHandX, localHandY); ctx.stroke();
-                    ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(cx + 10, neckY - 15); ctx.lineTo(localHandX, localHandY); ctx.stroke();
-
+                    localHandX = cx + 15; localHandY = headY - 25; ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(cx + 5, neckY - 15); ctx.lineTo(localHandX, localHandY); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(cx + 10, neckY - 15); ctx.lineTo(localHandX, localHandY); ctx.stroke();
                 } else {
-                    let leftElbowX = cx - 15, leftElbowY = neckY + 5, leftHandX = cx - 20, leftHandY = neckY - 5;
-                    ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(leftElbowX, leftElbowY); ctx.lineTo(leftHandX, leftHandY); ctx.stroke();
-
-                    if (globalBall.holder === this) {
-                        localHandX = cx + 20; localHandY = headY - 15;
-                        let rightElbowX = cx + 10, rightElbowY = neckY - 5;
-                        ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(localHandX, localHandY); ctx.stroke();
-                    } else {
-                        let rightElbowX = cx + 15, rightElbowY = neckY - 10, rightHandX = cx + 25, rightHandY = headY - 25;
-                        ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(rightHandX, rightHandY); ctx.stroke();
-                    }
+                    let leftElbowX = cx - 15, leftElbowY = neckY + 5, leftHandX = cx - 20, leftHandY = neckY - 5; ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(leftElbowX, leftElbowY); ctx.lineTo(leftHandX, leftHandY); ctx.stroke();
+                    if (globalBall.holder === this) { localHandX = cx + 20; localHandY = headY - 15; let rightElbowX = cx + 10, rightElbowY = neckY - 5; ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(localHandX, localHandY); ctx.stroke(); } 
+                    else { let rightElbowX = cx + 15, rightElbowY = neckY - 10, rightHandX = cx + 25, rightHandY = headY - 25; ctx.beginPath(); ctx.moveTo(cx, neckY); ctx.lineTo(rightElbowX, rightElbowY); ctx.lineTo(rightHandX, rightHandY); ctx.stroke(); }
                 }
             }
-            
             ctx.restore();
-
             this.handWorldX = this.x + (localHandX * this.scale * this.dir);
             this.handWorldY = this.y + (localHandY * this.scale);
         }
     }
 
     const stickmen = [];
-    for (let i = 0; i < 5; i++) {
-        stickmen.push(new Stickman('left', i));
-        stickmen.push(new Stickman('right', i));
-    }
-
+    for (let i = 0; i < 5; i++) { stickmen.push(new Stickman('left', i)); stickmen.push(new Stickman('right', i)); }
     const speedLines = [];
-    for(let i = 0; i < 15; i++) {
-        speedLines.push({
-            x: Math.random() * 2000, y: Math.random() * GAME_HEIGHT, 
-            length: Math.random() * 100 + 50, speed: Math.random() * 2 + 1, alpha: Math.random() * 0.15 + 0.05  
-        });
-    }
+    for(let i = 0; i < 15; i++) { speedLines.push({ x: Math.random() * 2000, y: Math.random() * GAME_HEIGHT, length: Math.random() * 100 + 50, speed: Math.random() * 2 + 1, alpha: Math.random() * 0.15 + 0.05 }); }
 
+    // 原有的點擊互動偵測完全保留，配合鏡頭做反向座標運算
     canvas.addEventListener('pointerdown', (e) => {
         if (!mainMenuOverlay.classList.contains('hidden')) return;
-        fullscreenBtn.classList.add('show-btn'); homeBtn.classList.add('show-btn');
-
+        fullscreenBtn.classList.add('show-btn'); homeBtn.classList.add('show-btn'); cameraBtn.classList.add('show-btn');
+        
         const rect = canvas.getBoundingClientRect();
-        // 加入對全局偏移量的補償，確保即使置中也能正確偵測點擊
         const mouseX = ((e.clientX - rect.left) / globalScale) - globalOffsetX; 
         const mouseY = ((e.clientY - rect.top) / globalScale) - globalOffsetY; 
-
-        if (globalBall.state === 'held' && globalBall.holder) {
-            let man = globalBall.holder;
-            if (Math.hypot(mouseX - man.x, mouseY - (man.y + 20)) < 80 * man.scale) {
-                if (man.isGolden && Math.abs(man.targetHoop.centerX - man.x) < 90 * man.scale) {
-                    man.forceDunk();
-                } else {
-                    man.forceShoot();
-                }
-            }
+        
+        if (globalBall.state === 'held' && globalBall.holder) { 
+            let man = globalBall.holder; 
+            if (Math.hypot(mouseX - man.x, mouseY - (man.y + 20)) < 80 * man.scale) { 
+                if (man.isGolden && Math.abs(man.targetHoop.centerX - man.x) < 90 * man.scale) { man.forceDunk(); } 
+                else { man.forceShoot(); } 
+            } 
         }
     });
 
     function animate() {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        
-        // --- 全新無限延伸 Canvas 計算邏輯 ---
         const container = document.getElementById('canvasContainer');
-        const displayWidth = container.clientWidth; 
-        const displayHeight = container.clientHeight;
+        const displayWidth = container.clientWidth; const displayHeight = container.clientHeight;
         
-        // 畫布強制 100% 填滿整個框，不要讓 CSS 留下黑邊
-        if (canvas.style.width !== '100%') {
-            canvas.style.width = '100%';
-            canvas.style.height = '100%';
-        }
-
-        const targetWidth = Math.round(displayWidth * dpr);
-        const targetHeight = Math.round(displayHeight * dpr);
-        
-        if (canvas.width !== targetWidth || canvas.height !== targetHeight) { 
-            canvas.width = targetWidth; 
-            canvas.height = targetHeight; 
-        }
+        if (canvas.style.width !== '100%') { canvas.style.width = '100%'; canvas.style.height = '100%'; }
+        const targetWidth = Math.round(displayWidth * dpr); const targetHeight = Math.round(displayHeight * dpr);
+        if (canvas.width !== targetWidth || canvas.height !== targetHeight) { canvas.width = targetWidth; canvas.height = targetHeight; }
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 動態計算放大倍率，確保 1000x300 的遊戲畫面絕對能在中心完整呈現
-        let scaleFactor = displayWidth / GAME_WIDTH;
-        let logicalHeight = displayHeight / scaleFactor;
+        // ================= 動態攝影機追蹤系統 (支援全場模式平滑切換) =================
+        let baseScale = displayWidth / GAME_WIDTH;
+        if ((displayHeight / baseScale) < GAME_HEIGHT) { baseScale = displayHeight / GAME_HEIGHT; }
 
-        if (logicalHeight < GAME_HEIGHT) {
-            // 如果畫面太寬，改以高度為基準
-            scaleFactor = displayHeight / GAME_HEIGHT;
-            let logicalWidth = displayWidth / scaleFactor;
-            globalOffsetX = (logicalWidth - GAME_WIDTH) / 2; // 將多出來的寬度平均分配給左右 (置中)
-            globalOffsetY = 0;
+        let targetZoom = 1.0; 
+        let targetCameraX = GAME_WIDTH / 2;
+
+        if (isCameraTracking) {
+            if (globalBall.state === 'flying') targetZoom = 1.05; 
+            else if (globalBall.state === 'loose') targetZoom = 1.15; 
+            else if (globalBall.state === 'held') targetZoom = 1.35;   
+            targetCameraX = globalBall.x;
         } else {
-            // 如果畫面太高，改以寬度為基準
-            globalOffsetX = 0;
-            globalOffsetY = (logicalHeight - GAME_HEIGHT) / 2; // 將多出來的高度平均分配給上下 (置中)
+            // 全場模式：強制縮小到能看見整個球場寬度，並將目標強制鎖定在中心點
+            let fullCourtZoom = (Math.min(displayWidth / GAME_WIDTH, displayHeight / GAME_HEIGHT) * 0.98) / baseScale;
+            targetZoom = fullCourtZoom;
+            targetCameraX = GAME_WIDTH / 2;
         }
-        
+
+        currentZoom += (targetZoom - currentZoom) * 0.05; 
+        let scaleFactor = baseScale * currentZoom;
         globalScale = scaleFactor;
 
+        let logicalWidth = displayWidth / scaleFactor;
+        let logicalHeight = displayHeight / scaleFactor;
+
+        cameraX += (targetCameraX - cameraX) * 0.08;
+        cameraY = GAME_HEIGHT / 2; // Y 軸始終固定置中
+
+        let minX = logicalWidth / 2 - 50;
+        let maxX = GAME_WIDTH - logicalWidth / 2 + 50;
+        
+        // 只有在追鏡模式下才需要限制 X 軸邊界避免穿出球場外
+        if (isCameraTracking) {
+            if (maxX < minX) cameraX = GAME_WIDTH / 2;
+            else cameraX = Math.max(minX, Math.min(maxX, cameraX));
+        }
+
+        globalOffsetX = (logicalWidth / 2) - cameraX;
+        globalOffsetY = (logicalHeight / 2) - cameraY;
+        // =========================================================================
+
         ctx.scale(scaleFactor * dpr, scaleFactor * dpr);
-        ctx.translate(globalOffsetX, globalOffsetY); // 移動繪製原點，完美置中
+        ctx.translate(globalOffsetX, globalOffsetY); 
 
         ctx.lineCap = 'round';
         
-        // 讓速度線可以跑進擴展出來的空白區域
-        let expandedWidth = GAME_WIDTH + globalOffsetX * 2;
-        let expandedHeight = GAME_HEIGHT + globalOffsetY * 2;
-
         for (let i = 0; i < speedLines.length; i++) {
             let line = speedLines[i]; line.x -= line.speed;
             if (line.x + line.length < -globalOffsetX) { 
-                line.x = GAME_WIDTH + globalOffsetX + Math.random() * 100; 
-                line.y = -globalOffsetY + Math.random() * expandedHeight; 
+                line.x = -globalOffsetX + logicalWidth + Math.random() * 100; 
+                line.y = -globalOffsetY + Math.random() * logicalHeight; 
             }
             ctx.beginPath(); ctx.moveTo(line.x, line.y); ctx.lineTo(line.x + line.length, line.y);
             ctx.strokeStyle = `rgba(56, 189, 248, ${line.alpha})`; ctx.lineWidth = 1.5; ctx.stroke();
         }
 
-        drawCourtLines(ctx);
-        gameHoops.left.update(); gameHoops.left.draw(ctx);
-        gameHoops.right.update(); gameHoops.right.draw(ctx);
-
         const canvasRect = canvas.getBoundingClientRect();
-        // 傳遞全局偏移與縮放給 HTML DOM 元素，讓籃球位置能精準疊加在 Canvas 上
         const renderParams = { 
             canvasRect, 
             scale: globalScale, 
             offsetX: globalOffsetX,
-            offsetY: globalOffsetY 
+            offsetY: globalOffsetY,
+            logicalWidth: logicalWidth,
+            logicalHeight: logicalHeight
         };
 
+        drawCourtLines(ctx, renderParams);
+        gameHoops.left.update(); gameHoops.left.draw(ctx);
+        gameHoops.right.update(); gameHoops.right.draw(ctx);
+
         stickmen.sort((a, b) => a.y - b.y);
-        
-        // 移除 if 判斷，讓背景在未點擊開始前也能自動跑動對戰
         stickmen.forEach(man => man.update());
         globalBall.update();
 
         stickmen.forEach(man => man.draw(ctx));
-        quoteManager.updateAndDraw(ctx);
+        quoteManager.updateAndDraw(ctx, renderParams); 
 
         globalBall.draw(ctx, renderParams);
 
@@ -1601,4 +945,5 @@
     animate(); 
 </script>
 </body>
+</html>
 </html>
