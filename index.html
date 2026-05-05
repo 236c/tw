@@ -9,7 +9,6 @@
     
     <style>
         :root {
-            /* 日式和色色彩計畫 */
             --bg-main: #FBF9F6;
             --bg-section: #F3EEE7;
             --primary-dark: #2F4F4F;
@@ -110,27 +109,16 @@
             position: relative;
         }
 
-        /* 卡片懸停效果與呼吸動畫 */
         .card:hover { 
             transform: translateY(-4px);
             animation: zenBorderBreathe 2.5s infinite ease-in-out; 
             cursor: pointer;
         }
 
-        /* 沉靜呼吸邊框動畫 */
         @keyframes zenBorderBreathe {
-            0% { 
-                border-color: rgba(211, 195, 163, 0.4); 
-                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04), 0 0 0px rgba(166, 124, 82, 0); 
-            }
-            50% { 
-                border-color: var(--accent-brass); 
-                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04), 0 0 12px rgba(166, 124, 82, 0.35); 
-            }
-            100% { 
-                border-color: rgba(211, 195, 163, 0.4); 
-                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04), 0 0 0px rgba(166, 124, 82, 0); 
-            }
+            0% { border-color: rgba(211, 195, 163, 0.4); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04), 0 0 0px rgba(166, 124, 82, 0); }
+            50% { border-color: var(--accent-brass); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04), 0 0 12px rgba(166, 124, 82, 0.35); }
+            100% { border-color: rgba(211, 195, 163, 0.4); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04), 0 0 0px rgba(166, 124, 82, 0); }
         }
         
         .icon-wrapper {
@@ -148,20 +136,17 @@
         .card-title { font-weight: 500; font-size: 1.2rem; letter-spacing: 2px; margin: 0; }
         .card-text { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 10px; font-weight: 300; }
 
-        /* 📱 手機優化：雙欄 + 隱藏文字 */
         @media (max-width: 768px) {
             body { padding-top: 100px; }
             .brand-logo { font-size: 2.2rem; margin-right: 10px; }
             .brand-text { font-size: 0.75rem; letter-spacing: 1px; white-space: normal; line-height: 1.4; max-width: 180px; }
-            
             .category-title { font-size: 1.1rem; margin-bottom: 1.5rem; }
             .section-tinted { padding: 3rem 0; margin: 3rem 0; }
-
             .card { padding: 1.5rem 0.8rem; text-align: center; align-items: center; }
-            .card-header-custom { flex-direction: column; margin-bottom: 0; } /* 減少底部間距 */
+            .card-header-custom { flex-direction: column; margin-bottom: 0; }
             .icon-wrapper { margin: 0 0 10px 0; width: 45px; height: 45px; font-size: 1.2rem; }
             .card-title { font-size: 0.95rem; letter-spacing: 1px; }
-            .card-text { display: none; } /* 隱藏描述節省空間 */
+            .card-text { display: none; }
         }
     </style>
 </head>
@@ -179,8 +164,8 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto mt-3 mt-lg-0">
                 <li class="nav-item"><a class="nav-link" href="#basketball-tools">專業籃球</a></li>
-                <li class="nav-item"><a class="nav-link" href="#calendar-planning">專注排程</a></li>
-                <li class="nav-item"><a class="nav-link" href="#gaming">數位休閒</a></li>
+                <li class="nav-item"><a class="nav-link" href="#calendar-planning">計畫排程</a></li>
+                <li class="nav-item"><a class="nav-link" href="#gaming">休閒娛樂</a></li>
             </ul>
         </div>
     </div>
@@ -205,7 +190,7 @@
                     <div class="icon-wrapper">⏱️</div>
                     <h5 class="card-title">專業記分板</h5>
                 </div>
-                <p class="card-text">精準掌握賽場節奏。</p>
+                <p class="card-text">精準掌握賽場節奏與分數。</p>
                 <a href="https://236c.github.io/tw/bsb.html" class="stretched-link" target="_blank"></a>
             </div>
         </div>
@@ -213,7 +198,7 @@
             <div class="card d-flex flex-column">
                 <div class="card-header-custom">
                     <div class="icon-wrapper">📊</div>
-                    <h5 class="card-title">籃球數據中心</h5>
+                    <h5 class="card-title">數據中心</h5>
                 </div>
                 <p class="card-text">全方位掌握球員與球隊數據。</p>
                 <a href="https://236c.github.io/tw/bdc.html" class="stretched-link" target="_blank"></a>
@@ -225,7 +210,7 @@
                     <div class="icon-wrapper">🖍️</div>
                     <h5 class="card-title">進攻戰術解析</h5>
                 </div>
-                <p class="card-text">PRO TACTICS BOARD 互動式戰術推演。</p>
+                <p class="card-text">PRO TACTICS BOARD 戰術推演。</p>
                 <a href="https://236c.github.io/tw/basketball-pro.html" class="stretched-link" target="_blank"></a>
             </div>
         </div>
@@ -242,6 +227,7 @@
                         <div class="icon-wrapper">💼</div>
                         <h5 class="card-title">商務行事曆</h5>
                     </div>
+                    <p class="card-text">專業的職場排程規劃工具。</p>
                     <a href="https://236c.github.io/tw/bc.html" class="stretched-link" target="_blank"></a>
                 </div>
             </div>
@@ -249,8 +235,9 @@
                 <div class="card d-flex flex-column border-0 shadow-sm">
                     <div class="card-header-custom">
                         <div class="icon-wrapper">☀️</div>
-                        <h5 class="card-title">暑期計畫</h5>
+                        <h5 class="card-title">暑期計畫表</h5>
                     </div>
+                    <p class="card-text">2026 暑期專屬目標規劃。</p>
                     <a href="https://236c.github.io/tw/spc2026.html" class="stretched-link" target="_blank"></a>
                 </div>
             </div>
@@ -282,9 +269,10 @@
         <div class="col-6 col-md-3">
             <div class="card d-flex flex-column">
                 <div class="card-header-custom">
-                    <div class="icon-wrapper">跑</div>
-                    <h5 class="card-title">跑酷：火柴人</h5>
+                    <div class="icon-wrapper">🏃</div>
+                    <h5 class="card-title">火柴人跑酷</h5>
                 </div>
+                <p class="card-text">籃球跑酷：火柴人特仕版。</p>
                 <a href="https://236c.github.io/tw/StickmanParkour.html" class="stretched-link" target="_blank"></a>
             </div>
         </div>
@@ -295,6 +283,16 @@
                     <h5 class="card-title">虛擬電風扇</h5>
                 </div>
                 <a href="https://236c.github.io/tw/eFan.html" class="stretched-link" target="_blank"></a>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card d-flex flex-column">
+                <div class="card-header-custom">
+                    <div class="icon-wrapper">✨</div>
+                    <h5 class="card-title">療癒動畫：7ball</h5>
+                </div>
+                <p class="card-text">沉靜心靈的動態視覺藝術。</p>
+                <a href="https://236c.github.io/tw/7ball.html" class="stretched-link" target="_blank"></a>
             </div>
         </div>
     </div>
