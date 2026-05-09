@@ -1,5 +1,3 @@
-<img width="452" height="247" alt="image" src="https://github.com/user-attachments/assets/b7df5995-c295-401a-a6c4-162920ddbd05" /># tw
-
 籃球戰術版
 https://236c.github.io/tw/bcb.html
 
