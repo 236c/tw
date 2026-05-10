@@ -10,7 +10,7 @@
     
     <style>
         html, body { 
-            height: 100%; margin: 0; background-color: #e9ecef; font-family: 'Inter', sans-serif; 
+            height: 100%; margin: 0; background-color: #2b3035; font-family: 'Inter', sans-serif; 
             overflow: hidden; 
             overscroll-behavior: none; 
             -webkit-user-select: none; user-select: none; 
@@ -19,7 +19,7 @@
         
         #canvas-container { 
             position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
-            background-color: #ffffff; 
+            background-color: #2b3035; 
             transition: background-color 0.3s ease; 
         }
         
@@ -126,6 +126,25 @@
             border-width: 6px 6px 0; border-style: solid; border-color: rgba(24, 24, 27, 0.9) transparent transparent transparent;
         }
 
+        /* 滑鼠旁的工具切換與大小提示 */
+        .cursor-tool-hint {
+            position: fixed;
+            background: rgba(33, 37, 41, 0.85);
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            pointer-events: none;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .cursor-tool-hint.show { opacity: 1; }
+
         @media (max-width: 768px) {
             .glass-toolbar { bottom: 10px; padding: 8px 12px; gap: 8px; border-radius: 16px; }
             .tool-btn, .action-btn { width: 38px; height: 38px; font-size: 1.1rem; }
@@ -147,35 +166,47 @@
         <div id="eraserCursor"></div>
     </div>
 
+    <div id="cursorToolHint" class="cursor-tool-hint"></div>
+
     <div class="glass-toolbar" id="mainToolbar">
         
         <div class="toolbar-group">
-            <button class="tool-btn active" data-tool="basic" data-title="基礎畫筆" data-desc="標準的實線繪圖工具"><i class="bi bi-pen-fill"></i></button>
-            <button class="tool-btn" data-tool="normal" data-title="質感筆觸" data-desc="具有動態粗細變化與平滑效果"><i class="bi bi-brush-fill"></i></button>
-            <button class="tool-btn" data-tool="sketch" data-title="素描鉛筆" data-desc="帶有隨機雜訊的素描疊加風格"><i class="bi bi-pencil"></i></button>
-            <button class="tool-btn" data-tool="highlighter" data-title="螢光彩筆" data-desc="半透明的重點色彩標記工具"><i class="bi bi-brush"></i></button>
-            <button class="tool-btn" data-tool="dashed" data-title="虛線畫筆" data-desc="自動產生平滑的虛線路徑軌跡">
+            <button class="tool-btn active" data-tool="basic" data-title="基礎畫筆 (1)" data-desc="標準的實線繪圖工具"><i class="bi bi-pen-fill"></i></button>
+            <button class="tool-btn" data-tool="normal" data-title="質感筆觸 (2)" data-desc="具有動態粗細變化與平滑效果"><i class="bi bi-brush-fill"></i></button>
+            <button class="tool-btn" data-tool="sketch" data-title="素描鉛筆 (3)" data-desc="帶有隨機雜訊的素描疊加風格"><i class="bi bi-pencil"></i></button>
+            <button class="tool-btn" data-tool="highlighter" data-title="螢光彩筆 (4)" data-desc="半透明的重點色彩標記工具"><i class="bi bi-brush"></i></button>
+            <button class="tool-btn" data-tool="dashed" data-title="虛線畫筆 (5)" data-desc="自動產生平滑的虛線路徑軌跡">
                 <span style="width: 18px; border-bottom: 3px dashed currentColor; display: inline-block; margin-bottom: 6px;"></span>
             </button>
-            <button class="tool-btn" data-tool="spray" data-title="藝術噴漆" data-desc="隨機散佈的粒子質感噴灑效果"><i class="bi bi-stars"></i></button>
-            <button class="tool-btn" data-tool="eraser" data-title="橡皮擦" data-desc="精準擦除畫布上已繪製的筆跡"><i class="bi bi-eraser-fill"></i></button>
+            <button class="tool-btn" data-tool="spray" data-title="藝術噴漆 (6)" data-desc="隨機散佈的粒子質感噴灑效果"><i class="bi bi-stars"></i></button>
+            <button class="tool-btn" data-tool="eraser" data-title="橡皮擦 (7)" data-desc="精準擦除畫布上已繪製的筆跡"><i class="bi bi-eraser-fill"></i></button>
+        </div>
+        
+        <div class="divider"></div>
+
+        <div class="toolbar-group">
+            <select id="themeSelect" class="form-select form-select-sm" style="width: auto; background: rgba(255,255,255,0.5); border: 1px solid #dee2e6; border-radius: 8px; font-weight: 600; cursor: pointer; color: #495057;" data-title="畫布風格" data-desc="快速套用預設的背景與畫筆配色">
+                <option value="dark">護眼暗夜</option>
+                <option value="chalkboard">經典黑板</option>
+                <option value="light">預設明亮</option>
+            </select>
         </div>
         
         <div class="divider"></div>
         
         <div class="toolbar-group">
             <div class="color-picker-wrapper" data-title="畫筆顏色" data-desc="更換目前使用的筆刷色彩" style="border-radius: 50%;">
-                <input type="color" id="colorPicker" value="#212529">
+                <input type="color" id="colorPicker" value="#00ff00">
             </div>
             <div class="color-picker-wrapper" data-title="畫布背景" data-desc="更換整體的畫布背景底色" style="border-radius: 8px;">
-                <input type="color" id="bgColorPicker" value="#ffffff">
+                <input type="color" id="bgColorPicker" value="#2b3035">
             </div>
             
             <div class="range-wrapper ms-2">
-                <i class="bi bi-circle-fill text-muted size-btn" id="decreaseBrushBtn" data-title="縮小筆刷" data-desc="點擊微調減小筆刷的粗細" style="font-size: 6px;"></i>
-                <input type="range" id="brushSize" min="2" max="60" value="8">
-                <i class="bi bi-circle-fill text-muted size-btn" id="increaseBrushBtn" data-title="放大筆刷" data-desc="點擊微調增加筆刷的粗細" style="font-size: 16px;"></i>
-                <div class="size-badge ms-1" id="brushSizeDisplay">8</div>
+                <i class="bi bi-circle-fill text-muted size-btn" id="decreaseBrushBtn" data-title="縮小筆刷 ([)" data-desc="點擊微調減小筆刷的粗細" style="font-size: 6px;"></i>
+                <input type="range" id="brushSize" min="2" max="60" value="4">
+                <i class="bi bi-circle-fill text-muted size-btn" id="increaseBrushBtn" data-title="放大筆刷 (])" data-desc="點擊微調增加筆刷的粗細" style="font-size: 16px;"></i>
+                <div class="size-badge ms-1" id="brushSizeDisplay">4</div>
             </div>
         </div>
         
@@ -183,14 +214,14 @@
         
         <div class="toolbar-group">
             <button class="action-btn" id="undoBtn" data-title="復原 (Ctrl+Z)" data-desc="撤銷並回到上一步的狀態"><i class="bi bi-arrow-counterclockwise"></i></button>
-            <button class="action-btn" id="gridBtn" data-title="輔助網格" data-desc="顯示或隱藏輔助對齊網格線"><i class="bi bi-grid-3x3"></i></button>
-            <button class="action-btn" id="fullscreenBtn" data-title="全螢幕模式" data-desc="放大畫板以沉浸於創作空間"><i class="bi bi-arrows-fullscreen"></i></button>
+            <button class="action-btn" id="gridBtn" data-title="輔助網格 (G)" data-desc="顯示或隱藏輔助對齊網格線"><i class="bi bi-grid-3x3"></i></button>
+            <button class="action-btn" id="fullscreenBtn" data-title="全螢幕模式 (F)" data-desc="放大畫板以沉浸於創作空間"><i class="bi bi-arrows-fullscreen"></i></button>
             <button class="action-btn text-warning" id="resetBtn" data-title="全部重置" data-desc="清空畫布與恢復所有初始設定"><i class="bi bi-arrow-repeat"></i></button>
-            <button class="action-btn text-danger" id="clearBtn" data-title="清空畫布" data-desc="一鍵清除畫面上的所有筆跡"><i class="bi bi-trash3"></i></button>
+            <button class="action-btn text-danger" id="clearBtn" data-title="清空畫布 (C)" data-desc="一鍵清除畫面上的所有筆跡"><i class="bi bi-trash3"></i></button>
             
-            <button class="action-btn text-success" id="uploadImageBtn" data-title="載入圖片" data-desc="上傳本機圖片置入畫布中"><i class="bi bi-image"></i></button>
+            <button class="action-btn text-success" id="uploadImageBtn" data-title="載入圖片 (U)" data-desc="上傳本機圖片置入畫布中"><i class="bi bi-image"></i></button>
             
-            <button class="action-btn text-primary" id="saveBtn" data-title="存檔下載" data-desc="將目前的畫面儲存為圖片檔"><i class="bi bi-download"></i></button>
+            <button class="action-btn text-primary" id="saveBtn" data-title="存檔下載 (S)" data-desc="將目前的畫面儲存為圖片檔"><i class="bi bi-download"></i></button>
         </div>
 
     </div>
@@ -199,7 +230,7 @@
         <div class="custom-modal">
             <div class="modal-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
             <h3 class="modal-title">確認重置畫板？</h3>
-            <p class="modal-desc">這將會清空畫布，並將所有顏色、筆刷與網格設定恢復為預設狀態。此動作無法復原。</p>
+            <p class="modal-desc">這將會清空畫布，並將顏色與筆刷設定恢復為目前的風格狀態。此動作無法復原。</p>
             <div class="modal-actions">
                 <button class="modal-btn btn-cancel" id="cancelResetBtn">取消</button>
                 <button class="modal-btn btn-confirm" id="confirmResetBtn">確認重置</button>
@@ -216,7 +247,10 @@
     const gridCtx = gridCanvas.getContext('2d');
     const canvasContainer = document.getElementById('canvas-container');
     const eraserCursor = document.getElementById('eraserCursor'); 
+    const cursorToolHint = document.getElementById('cursorToolHint');
+    let cursorHintTimeout; 
     
+    const themeSelect = document.getElementById('themeSelect');
     const colorPicker = document.getElementById('colorPicker');
     const bgColorPicker = document.getElementById('bgColorPicker');
     const brushSize = document.getElementById('brushSize');
@@ -234,7 +268,6 @@
     const cancelResetBtn = document.getElementById('cancelResetBtn');
     const confirmResetBtn = document.getElementById('confirmResetBtn');
 
-    // 載入圖片相關元素
     const uploadImageBtn = document.getElementById('uploadImageBtn');
     const imageUploadInput = document.getElementById('imageUploadInput');
     
@@ -249,15 +282,29 @@
     let hoverX = -1000, hoverY = -1000; 
     let isGridVisible = false; 
 
+    const themes = {
+        dark: { bg: '#2b3035', pen: '#00ff00' },
+        chalkboard: { bg: '#2c3e50', pen: '#ecf0f1' },
+        light: { bg: '#ffffff', pen: '#212529' }
+    };
+
     canvasContainer.style.backgroundColor = bgColorPicker.value;
     
     bgColorPicker.addEventListener('input', (e) => {
         canvasContainer.style.backgroundColor = e.target.value;
     });
 
-    // --- 新增：載入圖片的處理邏輯 ---
+    themeSelect.addEventListener('change', (e) => {
+        const selectedTheme = themes[e.target.value];
+        if (selectedTheme) {
+            bgColorPicker.value = selectedTheme.bg;
+            colorPicker.value = selectedTheme.pen;
+            canvasContainer.style.backgroundColor = selectedTheme.bg;
+        }
+    });
+
     uploadImageBtn.addEventListener('click', () => {
-        imageUploadInput.click(); // 點擊按鈕時觸發隱藏的 input
+        imageUploadInput.click();
     });
 
     imageUploadInput.addEventListener('change', function(e) {
@@ -268,27 +315,22 @@
         reader.onload = function(event) {
             const img = new Image();
             img.onload = function() {
-                // 計算完美的縮放比例，讓圖片完整顯示在畫布內不被裁切
                 const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
                 const drawWidth = img.width * scale;
                 const drawHeight = img.height * scale;
                 
-                // 計算置中的 X 與 Y 座標
                 const x = (canvas.width - drawWidth) / 2;
                 const y = (canvas.height - drawHeight) / 2;
                 
-                // 將圖片畫在主畫布上
                 ctx.drawImage(img, x, y, drawWidth, drawHeight);
-                saveState(); // 存入歷史紀錄，讓載入圖片也可以被 Undo
+                saveState();
                 
-                // 清空 input 的值，這樣連續上傳同一張圖片才會有反應
                 imageUploadInput.value = ''; 
             }
             img.src = event.target.result;
         }
         reader.readAsDataURL(file);
     });
-    // ----------------------------
 
     function drawGrid() {
         gridCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
@@ -413,14 +455,28 @@
         if (coords.x > rect.left - buffer && coords.x < rect.right + buffer && 
             coords.y > rect.top - buffer && coords.y < rect.bottom + buffer) {
             toolbar.classList.add('smart-hidden');
-        } else {
-            toolbar.classList.remove('smart-hidden');
         }
     }
 
+    function showFloatingHint(text, x, y) {
+        cursorToolHint.textContent = text;
+        cursorToolHint.style.left = (x + 15) + 'px';
+        cursorToolHint.style.top = (y + 15) + 'px';
+        cursorToolHint.classList.add('show');
+
+        clearTimeout(cursorHintTimeout);
+        cursorHintTimeout = setTimeout(() => {
+            cursorToolHint.classList.remove('show');
+        }, 1000); 
+    }
+
     function startDrawing(e) {
-        if (e.target !== draftCanvas || !e.isPrimary) return; 
+        if (e.target !== draftCanvas || !e.isPrimary || e.button !== 0) return; 
         isDrawing = true;
+
+        cursorToolHint.classList.remove('show');
+        clearTimeout(cursorHintTimeout);
+
         const coords = getCoordinates(e);
         
         points = [coords];
@@ -431,7 +487,7 @@
         
         if (currentTool === 'highlighter') {
             draftCanvas.style.opacity = '0.4';
-            draftCanvas.style.mixBlendMode = 'multiply';
+            draftCanvas.style.mixBlendMode = 'normal'; 
         } else {
             draftCanvas.style.opacity = '1';
             draftCanvas.style.mixBlendMode = 'normal';
@@ -585,7 +641,7 @@
         if (currentTool === 'basic' || currentTool === 'normal' || currentTool === 'highlighter' || currentTool === 'dashed') {
             if (currentTool === 'highlighter') {
                 ctx.globalAlpha = 0.4;
-                ctx.globalCompositeOperation = 'multiply';
+                ctx.globalCompositeOperation = 'source-over'; 
             } else {
                 ctx.globalAlpha = 1.0;
                 ctx.globalCompositeOperation = 'source-over';
@@ -604,7 +660,69 @@
         saveState(); 
     }
 
-    window.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 'z') undo(); });
+    // --- 鍵盤快捷鍵整合處理 ---
+    window.addEventListener('keydown', (e) => { 
+        // 如果焦點在輸入框或下拉選單，則不觸發快捷鍵
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+
+        // 取得提示文字位置 (若游標不在畫面中則顯示在中間)
+        const getHintX = () => hoverX !== -1000 ? hoverX : window.innerWidth / 2 - 20;
+        const getHintY = () => hoverY !== -1000 ? hoverY : window.innerHeight / 2 - 20;
+
+        // Ctrl+Z / Cmd+Z (復原)
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+            e.preventDefault();
+            undo();
+            showFloatingHint('復原上一步', getHintX(), getHintY());
+            return;
+        }
+
+        // Ctrl+S 或單按 S (存檔)
+        if (e.key.toLowerCase() === 's') {
+            if (e.ctrlKey || e.metaKey) e.preventDefault(); // 阻止瀏覽器預設存檔
+            document.getElementById('saveBtn').click();
+            showFloatingHint('下載儲存', getHintX(), getHintY());
+            return;
+        }
+
+        const key = e.key.toLowerCase();
+        
+        // 數字 1~7 切換工具
+        const toolsMap = {
+            '1': 'basic', '2': 'normal', '3': 'sketch', 
+            '4': 'highlighter', '5': 'dashed', '6': 'spray', '7': 'eraser'
+        };
+
+        if (toolsMap[key]) {
+            currentTool = toolsMap[key];
+            toolBtns.forEach(b => b.classList.remove('active'));
+            const activeBtn = document.querySelector(`[data-tool="${currentTool}"]`);
+            activeBtn.classList.add('active');
+            updateCursorPosition(hoverX, hoverY);
+            
+            const toolTitle = activeBtn.getAttribute('data-title');
+            showFloatingHint(toolTitle, getHintX(), getHintY());
+        } 
+        // 其他功能快捷鍵
+        else if (key === '[') {
+            decreaseBrushBtn.click();
+            showFloatingHint(`筆刷縮小: ${brushSize.value}`, getHintX(), getHintY());
+        } else if (key === ']') {
+            increaseBrushBtn.click();
+            showFloatingHint(`筆刷放大: ${brushSize.value}`, getHintX(), getHintY());
+        } else if (key === 'g') {
+            gridBtn.click();
+            showFloatingHint(isGridVisible ? '網格：開啟' : '網格：關閉', getHintX(), getHintY());
+        } else if (key === 'f') {
+            fullscreenBtn.click();
+        } else if (key === 'c') {
+            document.getElementById('clearBtn').click();
+            showFloatingHint('已清空畫布', getHintX(), getHintY());
+        } else if (key === 'u') {
+            uploadImageBtn.click();
+        }
+    });
+    // ------------------------------------
     
     fullscreenBtn.addEventListener('click', function() {
         if (!document.fullscreenElement) {
@@ -636,12 +754,14 @@
     cancelResetBtn.addEventListener('click', () => resetModal.classList.remove('active'));
 
     confirmResetBtn.addEventListener('click', () => {
-        colorPicker.value = '#212529';
-        bgColorPicker.value = '#ffffff';
-        canvasContainer.style.backgroundColor = '#ffffff';
+        const currentTheme = themes[themeSelect.value] || themes['dark'];
         
-        brushSize.value = 8;
-        brushSizeDisplay.textContent = '8';
+        colorPicker.value = currentTheme.pen;
+        bgColorPicker.value = currentTheme.bg;
+        canvasContainer.style.backgroundColor = currentTheme.bg;
+        
+        brushSize.value = 4;
+        brushSizeDisplay.textContent = '4';
         
         currentTool = 'basic';
         toolBtns.forEach(b => b.classList.remove('active'));
@@ -767,6 +887,49 @@
     window.addEventListener('pointerup', stopDrawing); 
     window.addEventListener('pointercancel', stopDrawing);
     draftCanvas.addEventListener('pointerleave', () => eraserCursor.style.display = 'none');
+
+    draftCanvas.addEventListener('wheel', (e) => {
+        e.preventDefault(); 
+        
+        let currentValue = parseInt(brushSize.value);
+        const min = parseInt(brushSize.min);
+        const max = parseInt(brushSize.max);
+        
+        const step = 1; 
+        
+        if (e.deltaY < 0) {
+            currentValue = Math.min(currentValue + step, max);
+        } else if (e.deltaY > 0) {
+            currentValue = Math.max(currentValue - step, min);
+        }
+        
+        brushSize.value = currentValue;
+        brushSizeDisplay.textContent = currentValue;
+        
+        updateCursorPosition(hoverX, hoverY);
+
+        showFloatingHint(`筆刷大小: ${currentValue}`, e.clientX, e.clientY);
+    }, { passive: false });
+
+    draftCanvas.addEventListener('contextmenu', (e) => {
+        e.preventDefault(); 
+        
+        const toolsList = ['basic', 'normal', 'sketch', 'highlighter', 'dashed', 'spray', 'eraser'];
+        
+        let currentIndex = toolsList.indexOf(currentTool);
+        let nextIndex = (currentIndex + 1) % toolsList.length;
+        currentTool = toolsList[nextIndex];
+        
+        toolBtns.forEach(b => b.classList.remove('active'));
+        const activeBtn = document.querySelector(`[data-tool="${currentTool}"]`);
+        activeBtn.classList.add('active');
+        
+        updateCursorPosition(e.clientX, e.clientY);
+
+        const toolTitle = activeBtn.getAttribute('data-title');
+        
+        showFloatingHint(toolTitle, e.clientX, e.clientY);
+    });
 
     setTimeout(resizeCanvas, 0);
 
