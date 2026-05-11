@@ -46,24 +46,24 @@
             border: 1px solid rgba(255, 255, 255, 0.2); z-index: 1001;
             display: flex; flex-direction: column; align-items: center;
             box-shadow: 0 8px 30px rgba(0,0,0,0.15); transition: opacity 0.3s, transform 0.3s;
-            touch-action: none; user-select: none;
+            touch-action: none; user-select: none; padding: 6px 0;
         }
         .side-touch-bar.hidden { opacity: 0; transform: translateY(-50%) scale(0.8); pointer-events: none; }
         
         .size-control {
             display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            height: 110px; padding: 16px 0; width: 100%; cursor: ns-resize;
+            height: 100px; padding: 12px 0; width: 100%; cursor: ns-resize;
             color: rgba(255, 255, 255, 0.8); transition: 0.2s;
         }
         .size-control:active { background: rgba(255, 255, 255, 0.1); border-radius: 24px 24px 0 0; }
         
-        .divider-horizontal { width: 60%; height: 1px; background: rgba(255, 255, 255, 0.2); margin: 2px 0; }
+        .divider-horizontal { width: 60%; height: 1px; background: rgba(255, 255, 255, 0.2); margin: 4px 0; }
         
         /* 側邊畫筆切換選單 */
         .brush-selector {
-            width: 100%; height: 56px; display: flex; justify-content: center; align-items: center;
+            width: 100%; height: 48px; display: flex; justify-content: center; align-items: center;
             cursor: pointer; font-size: 1.3rem; color: rgba(255, 255, 255, 0.8); position: relative;
-            transition: 0.2s;
+            transition: 0.2s; margin: 2px 0;
         }
         .brush-selector:active { background: rgba(255, 255, 255, 0.1); }
         
@@ -84,9 +84,23 @@
         }
         .mini-tool-btn.active { background: #ffffff; color: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
+        /* 側邊顏色選擇器 */
+        .side-color-btn {
+            width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.7); cursor: pointer;
+            position: relative; margin: 4px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .side-color-btn.bg-color { border-radius: 10px; } /* 背景色用方角區分 */
+        .side-color-btn:active { transform: scale(0.85); }
+        .side-color-btn input[type="color"] {
+            position: absolute; top: -15px; left: -15px; width: 64px; height: 64px; border: none; cursor: pointer; padding: 0;
+        }
+
         .eraser-toggle {
-            width: 100%; height: 56px; display: flex; justify-content: center; align-items: center;
+            width: 100%; height: 48px; display: flex; justify-content: center; align-items: center;
             cursor: pointer; font-size: 1.3rem; transition: all 0.2s; color: rgba(255, 255, 255, 0.8);
+            margin-top: 2px;
         }
         .eraser-toggle:active { background: rgba(255, 255, 255, 0.1); border-radius: 0 0 24px 24px; transform: scale(0.9); }
         .eraser-toggle.active { color: #ffeb3b; text-shadow: 0 0 10px rgba(255,235,59,0.4); }
@@ -135,11 +149,6 @@
         
         .divider { width: 100%; height: 1px; background: rgba(0,0,0,0.08); margin: 4px 0; }
         
-        .color-picker-wrapper {
-            width: 38px; height: 38px; overflow: hidden; border-radius: 10px;
-            border: 2px solid #fff; cursor: pointer; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        input[type="color"] { position: absolute; top: -20px; left: -20px; width: 80px; height: 80px; border: none; cursor: pointer; }
         input[type="range"] { -webkit-appearance: none; flex-grow: 1; height: 4px; background: #dee2e6; border-radius: 2px; outline: none; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #212529; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
@@ -208,6 +217,16 @@
 
         <div class="divider-horizontal"></div>
         
+        <div class="side-color-btn" title="畫筆顏色">
+            <input type="color" id="colorPicker" value="#00ff00">
+        </div>
+        
+        <div class="side-color-btn bg-color" title="背景顏色">
+            <input type="color" id="bgColorPicker" value="#2b3035">
+        </div>
+
+        <div class="divider-horizontal"></div>
+        
         <div class="eraser-toggle" id="sideEraserToggle" title="點擊快速切換橡皮擦/畫筆">
             <i class="bi bi-eraser-fill"></i>
         </div>
@@ -240,9 +259,8 @@
                 <option value="chalkboard">經典黑板</option>
                 <option value="light">預設明亮</option>
             </select>
-            <div class="d-flex w-100 align-items-center gap-2">
-                <div class="color-picker-wrapper" title="畫筆顏色"><input type="color" id="colorPicker" value="#00ff00"></div>
-                <div class="color-picker-wrapper" title="背景顏色" style="border-radius: 4px;"><input type="color" id="bgColorPicker" value="#2b3035"></div>
+            <div class="d-flex w-100 align-items-center gap-2 mt-1">
+                <span style="font-size: 0.8rem; font-weight: 600; color: #495057;">大小</span>
                 <input type="range" id="brushSize" min="2" max="60" value="4">
                 <div class="size-badge" id="brushSizeDisplay">4</div>
             </div>
