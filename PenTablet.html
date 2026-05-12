@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
-        /* 💡 修復：移除 touch-action: none，恢復網頁內部元素的正常滑動能力 */
+        /* 💡 修復：移除不必要的全域 touch-action: none，恢復原生滑動能力 */
         html, body { 
             height: 100%; margin: 0; background-color: #2c3e50; font-family: 'Inter', sans-serif; 
             overflow: hidden; overscroll-behavior: none; 
@@ -22,7 +22,7 @@
             background-color: #2c3e50; transition: background-color 0.3s ease; 
         }
         
-        /* 💡 修復：將防止滑動干擾的指令單獨綁定到畫布上 */
+        /* 💡 修復：將防止滑動干擾的指令單獨且嚴格地綁定在畫布上 */
         #gridCanvas, #drawingCanvas, #draftCanvas { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; 
         }
@@ -37,6 +37,7 @@
             border-radius: 50%; z-index: 9999;
             transform: translate(-50%, -50%); display: none;
             box-sizing: border-box; box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            transition: border-radius 0.2s;
         }
 
         #imageTransformOverlay {
@@ -46,9 +47,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             background: rgba(255,255,255,0.05);
         }
-        #imageTransformOverlay img {
-            width: 100%; height: 100%; display: block; pointer-events: none;
-        }
+        #imageTransformOverlay img { width: 100%; height: 100%; display: block; pointer-events: none; }
         
         .transform-handle {
             position: absolute; width: 24px; height: 24px;
@@ -74,7 +73,7 @@
         }
         
         .transform-controls-fixed {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 30px); left: 50%; transform: translateX(-50%);
             display: none; gap: 20px; z-index: 10001; cursor: default;
             background: rgba(0,0,0,0.7); padding: 12px 24px; border-radius: 40px; 
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -106,7 +105,6 @@
             color: rgba(255, 255, 255, 0.8); transition: 0.2s;
         }
         .size-control:active { background: rgba(255, 255, 255, 0.1); border-radius: 24px 24px 0 0; }
-        
         .divider-horizontal { width: 60%; height: 1px; background: rgba(255, 255, 255, 0.2); margin: 4px 0; transition: background 0.3s; }
         
         .brush-selector {
@@ -120,7 +118,8 @@
             position: absolute; left: 60px; top: 50%; transform: translateY(-50%) translateX(-10px);
             background: rgba(24, 24, 27, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px; padding: 10px;
-            display: flex; flex-wrap: wrap; align-content: flex-start; gap: 6px; width: 200px;
+            display: flex; flex-wrap: wrap; align-content: flex-start; gap: 6px; 
+            width: 200px; max-width: calc(100vw - 90px);
             opacity: 0; pointer-events: none; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
@@ -132,11 +131,7 @@
             transition: all 0.2s;
         }
         .mini-tool-btn.active { background: #ffffff; color: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        
-        .popup-divider {
-            width: 2px; height: 28px; background: rgba(255,255,255,0.15);
-            border-radius: 2px; margin: 0 4px;
-        }
+        .popup-divider { width: 2px; height: 28px; background: rgba(255,255,255,0.15); border-radius: 2px; margin: 0 4px; }
 
         .side-color-btn {
             width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
@@ -146,9 +141,7 @@
         }
         .side-color-btn.bg-color { border-radius: 10px; } 
         .side-color-btn:active { transform: scale(0.85); }
-        .side-color-btn input[type="color"] {
-            position: absolute; top: -15px; left: -15px; width: 64px; height: 64px; border: none; cursor: pointer; padding: 0;
-        }
+        .side-color-btn input[type="color"] { position: absolute; top: -15px; left: -15px; width: 64px; height: 64px; border: none; cursor: pointer; padding: 0; }
 
         .eraser-toggle {
             width: 100%; height: 48px; display: flex; justify-content: center; align-items: center;
@@ -158,21 +151,16 @@
         .eraser-toggle:active { background: rgba(255, 255, 255, 0.1); border-radius: 0 0 24px 24px; transform: scale(0.9); }
         .eraser-toggle.active { color: #ffeb3b; text-shadow: 0 0 10px rgba(255,235,59,0.4); }
 
-        /* --- 亮色主題自動適配 --- */
         body.theme-light .side-touch-bar { background: rgba(0, 0, 0, 0.04); border-color: rgba(0, 0, 0, 0.12); }
-        body.theme-light .size-control, 
-        body.theme-light .brush-selector, 
-        body.theme-light .eraser-toggle:not(.active) { color: rgba(0, 0, 0, 0.65); }
-        body.theme-light .size-control:active, 
-        body.theme-light .brush-selector:active, 
-        body.theme-light .eraser-toggle:active { background: rgba(0, 0, 0, 0.05); }
+        body.theme-light .size-control, body.theme-light .brush-selector, body.theme-light .eraser-toggle:not(.active) { color: rgba(0, 0, 0, 0.65); }
+        body.theme-light .size-control:active, body.theme-light .brush-selector:active, body.theme-light .eraser-toggle:active { background: rgba(0, 0, 0, 0.05); }
         body.theme-light .divider-horizontal { background: rgba(0, 0, 0, 0.12); }
         body.theme-light .side-color-btn { border-color: rgba(0, 0, 0, 0.25); }
         body.theme-light .eraser-toggle.active { color: #f57f17; text-shadow: none; }
         body.theme-light .glass-toolbar, body.theme-light .menu-toggle { border-color: rgba(0, 0, 0, 0.15); }
 
         .menu-toggle {
-            position: fixed; top: 20px; left: 20px; z-index: 1000;
+            position: fixed; top: calc(env(safe-area-inset-top, 0px) + 20px); left: 20px; z-index: 1000;
             width: 52px; height: 52px; border-radius: 16px;
             background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.4);
@@ -183,9 +171,9 @@
         }
         .menu-toggle:active { transform: scale(0.95); }
 
-        /* 💡 修復：為懸浮選單啟用原生垂直滑動 (pan-y)，完美適配小螢幕手機 */
+        /* 💡 修復：選單響應式滑動解鎖，適配小螢幕手機 */
         .glass-toolbar {
-            position: fixed; top: 84px; left: 20px; z-index: 1000;
+            position: fixed; top: calc(env(safe-area-inset-top, 0px) + 84px); left: 20px; z-index: 1000;
             background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 22px; padding: 18px;
             box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
@@ -194,14 +182,20 @@
             transform-origin: top left;
             opacity: 0; transform: scale(0.8) translateY(-10px); pointer-events: none;
             
+            /* 行動版防爆版與原生滑動設定 */
             width: 340px; 
-            max-width: calc(100vw - 40px); /* 防超出螢幕 */
-            max-height: 70vh; /* 限制最大高度 */
-            overflow-y: auto; /* 啟用捲動條 */
-            touch-action: pan-y; /* 💡 允許手指上下滑動 */
-            overscroll-behavior: contain; /* 💡 防止滑到底時拉扯到背景 */
-            padding-bottom: 25px;
+            max-width: calc(100vw - 40px); 
+            max-height: calc(100vh - 120px - env(safe-area-inset-bottom, 0px)); 
+            overflow-y: auto; 
+            touch-action: pan-y; /* 允許垂直滑動 */
+            overscroll-behavior: contain; /* 防止拉動到底時背景被拉扯 */
+            -webkit-overflow-scrolling: touch; /* iOS 原生滑動加速 */
+            padding-bottom: 25px; 
         }
+        /* 美化捲動條 */
+        .glass-toolbar::-webkit-scrollbar { width: 5px; }
+        .glass-toolbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+
         .glass-toolbar.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
         
         .menu-toggle.drawing-mode, .side-touch-bar.drawing-mode { opacity: 0.12 !important; pointer-events: none !important; }
@@ -252,7 +246,6 @@
 <body class="theme-chalkboard">
 
     <input type="file" id="imageUploadInput" accept="image/*" style="display: none;">
-
     <input type="color" id="hiddenBrushColorPicker" value="#ecf0f1" style="position: fixed; opacity: 0; width: 1px; height: 1px; pointer-events: none; z-index: 9999;">
     <input type="color" id="hiddenBgColorPicker" value="#2c3e50" style="position: fixed; opacity: 0; width: 1px; height: 1px; pointer-events: none; z-index: 9999;">
 
@@ -297,16 +290,12 @@
                 <button class="mini-tool-btn" data-tool="sketch" title="素描筆 (3)"><i class="bi bi-pencil"></i></button>
                 <button class="mini-tool-btn" data-tool="crayon" title="蠟筆 (4)"><i class="bi bi-pencil-fill"></i></button>
                 
-                <div class="popup-divider"></div>
-                
                 <button class="mini-tool-btn" data-tool="highlighter" title="螢光筆 (5)"><i class="bi bi-brush"></i></button>
                 <button class="mini-tool-btn" data-tool="dashed" title="虛線筆 (6)">
                     <span style="width: 14px; border-bottom: 3px dashed currentColor; display: inline-block; margin-bottom: 4px;"></span>
                 </button>
                 <button class="mini-tool-btn" data-tool="spray" title="藝術噴漆 (7)"><i class="bi bi-stars"></i></button>
                 <button class="mini-tool-btn" data-tool="fill" title="油漆桶 (8)"><i class="bi bi-paint-bucket"></i></button>
-
-                <div class="popup-divider"></div>
 
                 <button class="mini-tool-btn" data-tool="eraser" title="圓形橡皮擦 (9)"><i class="bi bi-eraser-fill"></i></button>
                 <button class="mini-tool-btn" data-tool="eraser-square" title="方形橡皮擦 (0)"><i class="bi bi-eraser"></i></button>
@@ -555,7 +544,6 @@
         canvasContainer.style.backgroundColor = e.target.value;
     });
 
-    // 💡 修復 1：將所有的 UI 操作從 pointerdown 改為 click，防止干擾觸控狀態機
     sideBrushSelector.addEventListener('click', (e) => {
         e.stopPropagation();
         brushPopup.classList.toggle('show');
@@ -665,13 +653,17 @@
             menuToggle.releasePointerCapture(e.pointerId);
             window.removeEventListener('pointermove', moveHandler);
             window.removeEventListener('pointerup', upHandler);
+            window.removeEventListener('pointercancel', upHandler);
             if (!isDraggingMenu) toggleToolbar();
         };
         window.addEventListener('pointermove', moveHandler);
         window.addEventListener('pointerup', upHandler);
+        window.addEventListener('pointercancel', upHandler);
     });
 
-    // 💡 針對手機版 UX 優化：點選任何按鈕後，自動收起懸浮選單
+    // 💡 行動版觸控體驗優化：保證懸浮工具列也能用手指順滑滾動，並且點選後自動收合
+    mainToolbar.addEventListener('touchmove', (e) => { e.stopPropagation(); }, { passive: true });
+    
     mainToolbar.addEventListener('click', (e) => {
         if (window.innerWidth <= 768) {
             if (e.target.closest('.tool-btn') || e.target.closest('.action-btn')) {
@@ -763,7 +755,7 @@
         cursorHintTimeout = setTimeout(() => cursorToolHint.classList.remove('show'), 1000); 
     }
 
-    /* --- 🛠️ 掃描線油漆桶填色演算法 (Scanline Flood Fill) --- */
+    /* --- 🛠️ 掃描線油漆桶填色演算法 --- */
     function floodFill(startX, startY, fillColorHex) {
         const w = canvas.width;
         const h = canvas.height;
@@ -870,8 +862,18 @@
     function startDrawing(e) {
         if (transformOverlay.style.display === 'block') return;
 
+        // 確認觸控發生在畫布上，並擋下非左鍵滑鼠點擊
+        if (e.target !== draftCanvas) return; 
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+        // 💡 終極防當機修復：一旦主觸控點（第一根手指）落下，強制清空所有幽靈觸控狀態
+        if (e.isPrimary) {
+            touchPoints = {}; 
+        }
+
         if (e.pointerType === 'touch') {
             touchPoints[e.pointerId] = { x: e.clientX, y: e.clientY, startX: e.clientX, startY: e.clientY };
+            // 如果超過兩根手指，停止繪畫狀態並跳出
             if (Object.keys(touchPoints).length >= 2) {
                 touchStartTime = Date.now();
                 isDrawing = false;
@@ -881,10 +883,9 @@
             }
         }
 
-        // 💡 修復：移除 !e.isPrimary，提升在手機上的觸控抗干擾能力
-        if (e.target !== draftCanvas || e.button !== 0) return; 
+        // 💡 關鍵修復：鎖定游標，確保就算滑出邊界也不會丟失 pointerup 事件
+        draftCanvas.setPointerCapture(e.pointerId);
         
-        // 觸發油漆桶填色
         if (currentTool === 'fill') {
             floodFill(e.clientX, e.clientY, colorPicker.value);
             saveState();
@@ -1057,13 +1058,19 @@
 
     function stopDrawing(e) {
         clearTimeout(longPressTimer);
+        
+        // 💡 釋放游標鎖定，且防呆處理
+        if (e && e.target === draftCanvas) {
+            try { draftCanvas.releasePointerCapture(e.pointerId); } catch(err){}
+        }
+
         if (e && e.pointerType === 'touch') {
-            if (Object.keys(touchPoints).length === 0) touchPoints.swiped = false;
             delete touchPoints[e.pointerId];
         }
+        
         if (longPressTriggered) { longPressTriggered = false; return; }
         
-        // 💡 修正：移除多餘的 !e.isPrimary 判斷，確保手指離開一定會終止繪畫狀態
+        // 確保我們是真的在繪畫狀態才執行結束動作
         if (!isDrawing) return; 
         isDrawing = false;
         
@@ -1077,6 +1084,10 @@
         }
         points = []; saveState(); 
     }
+
+    // 💡 終極防干擾：強制在 iOS 上阻擋雙指拉扯與滑動
+    draftCanvas.addEventListener('touchstart', function(e) { e.preventDefault(); }, { passive: false });
+    draftCanvas.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
 
     /* --- 8. 貼上與載入圖片的變形、縮放、旋轉控制核心 --- */
     const transformOverlay = document.getElementById('imageTransformOverlay');
@@ -1169,7 +1180,7 @@
 
     transformOverlay.addEventListener('pointerup', (e) => {
         activeTransformObj = null;
-        transformOverlay.releasePointerCapture(e.pointerId);
+        try { transformOverlay.releasePointerCapture(e.pointerId); } catch(err){}
     });
 
     function closeTransformMode() {
