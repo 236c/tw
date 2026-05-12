@@ -9,12 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
+        /* 💡 修復 1：移除 body 的 touch-action: none，改用 overscroll-behavior 防止下拉刷新 */
         html, body { 
             height: 100%; margin: 0; background-color: #2c3e50; font-family: 'Inter', sans-serif; 
             overflow: hidden; overscroll-behavior: none; 
             -webkit-user-select: none; user-select: none; 
             -webkit-touch-callout: none;
-            touch-action: none; /* 防止瀏覽器預設手勢干擾繪圖 */
         }
         
         #canvas-container { 
@@ -22,6 +22,7 @@
             background-color: #2c3e50; transition: background-color 0.3s ease; 
         }
         
+        /* 💡 將防干擾的 touch-action: none 獨立綁定在畫布上，確保畫畫不亂動 */
         #gridCanvas, #drawingCanvas, #draftCanvas { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; 
         }
@@ -36,10 +37,9 @@
             border-radius: 50%; z-index: 9999;
             transform: translate(-50%, -50%); display: none;
             box-sizing: border-box; box-shadow: 0 0 5px rgba(0,0,0,0.1);
-            transition: border-radius 0.2s; /* 平滑切換圓形/方形游標 */
+            transition: border-radius 0.2s;
         }
 
-        /* --- 圖片變形與旋轉覆蓋層 --- */
         #imageTransformOverlay {
             position: absolute; display: none; z-index: 10000;
             border: 2px dashed #0d6efd; touch-action: none;
@@ -47,11 +47,8 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             background: rgba(255,255,255,0.05);
         }
-        #imageTransformOverlay img {
-            width: 100%; height: 100%; display: block; pointer-events: none;
-        }
+        #imageTransformOverlay img { width: 100%; height: 100%; display: block; pointer-events: none; }
         
-        /* 縮放手柄 */
         .transform-handle {
             position: absolute; width: 24px; height: 24px;
             background: #fff; border: 3px solid #0d6efd; border-radius: 50%;
@@ -62,7 +59,6 @@
         .handle-bl { bottom: -12px; left: -12px; cursor: nesw-resize; }
         .handle-br { bottom: -12px; right: -12px; cursor: nwse-resize; }
         
-        /* 旋轉控制桿 */
         .handle-rotate {
             position: absolute; top: -55px; left: 50%; margin-left: -18px;
             width: 36px; height: 36px; background: #fff; border: 3px solid #0d6efd;
@@ -76,7 +72,6 @@
             width: 2px; height: 22px; background: #0d6efd; z-index: -1;
         }
         
-        /* 底部固定的變形確認列 */
         .transform-controls-fixed {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             display: none; gap: 20px; z-index: 10001; cursor: default;
@@ -93,7 +88,6 @@
         .btn-confirm { background: #198754; }
         .btn-cancel { background: #dc3545; }
 
-        /* --- 觸控專用：側邊快捷控制列 --- */
         .side-touch-bar {
             position: fixed; left: 15px; top: 50%; transform: translateY(-50%);
             width: 48px; border-radius: 24px;
@@ -111,10 +105,8 @@
             color: rgba(255, 255, 255, 0.8); transition: 0.2s;
         }
         .size-control:active { background: rgba(255, 255, 255, 0.1); border-radius: 24px 24px 0 0; }
-        
         .divider-horizontal { width: 60%; height: 1px; background: rgba(255, 255, 255, 0.2); margin: 4px 0; transition: background 0.3s; }
         
-        /* 側邊畫筆切換選單 */
         .brush-selector {
             width: 100%; height: 48px; display: flex; justify-content: center; align-items: center;
             cursor: pointer; font-size: 1.3rem; color: rgba(255, 255, 255, 0.8); position: relative;
@@ -122,7 +114,6 @@
         }
         .brush-selector:active { background: rgba(255, 255, 255, 0.1); }
         
-        /* 💡 優化：改為網格排列以容納更多筆刷 */
         .brush-popup {
             position: absolute; left: 60px; top: 50%; transform: translateY(-50%) translateX(-10px);
             background: rgba(24, 24, 27, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -139,8 +130,8 @@
             transition: all 0.2s;
         }
         .mini-tool-btn.active { background: #ffffff; color: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .popup-divider { width: 2px; height: 28px; background: rgba(255,255,255,0.15); border-radius: 2px; margin: 0 4px; }
 
-        /* 側邊顏色選擇器 */
         .side-color-btn {
             width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.7); cursor: pointer;
@@ -149,9 +140,7 @@
         }
         .side-color-btn.bg-color { border-radius: 10px; } 
         .side-color-btn:active { transform: scale(0.85); }
-        .side-color-btn input[type="color"] {
-            position: absolute; top: -15px; left: -15px; width: 64px; height: 64px; border: none; cursor: pointer; padding: 0;
-        }
+        .side-color-btn input[type="color"] { position: absolute; top: -15px; left: -15px; width: 64px; height: 64px; border: none; cursor: pointer; padding: 0; }
 
         .eraser-toggle {
             width: 100%; height: 48px; display: flex; justify-content: center; align-items: center;
@@ -161,20 +150,14 @@
         .eraser-toggle:active { background: rgba(255, 255, 255, 0.1); border-radius: 0 0 24px 24px; transform: scale(0.9); }
         .eraser-toggle.active { color: #ffeb3b; text-shadow: 0 0 10px rgba(255,235,59,0.4); }
 
-        /* --- 亮色主題自動適配 --- */
         body.theme-light .side-touch-bar { background: rgba(0, 0, 0, 0.04); border-color: rgba(0, 0, 0, 0.12); }
-        body.theme-light .size-control, 
-        body.theme-light .brush-selector, 
-        body.theme-light .eraser-toggle:not(.active) { color: rgba(0, 0, 0, 0.65); }
-        body.theme-light .size-control:active, 
-        body.theme-light .brush-selector:active, 
-        body.theme-light .eraser-toggle:active { background: rgba(0, 0, 0, 0.05); }
+        body.theme-light .size-control, body.theme-light .brush-selector, body.theme-light .eraser-toggle:not(.active) { color: rgba(0, 0, 0, 0.65); }
+        body.theme-light .size-control:active, body.theme-light .brush-selector:active, body.theme-light .eraser-toggle:active { background: rgba(0, 0, 0, 0.05); }
         body.theme-light .divider-horizontal { background: rgba(0, 0, 0, 0.12); }
         body.theme-light .side-color-btn { border-color: rgba(0, 0, 0, 0.25); }
         body.theme-light .eraser-toggle.active { color: #f57f17; text-shadow: none; }
         body.theme-light .glass-toolbar, body.theme-light .menu-toggle { border-color: rgba(0, 0, 0, 0.15); }
 
-        /* 懸浮按鈕與面板核心樣式 */
         .menu-toggle {
             position: fixed; top: 20px; left: 20px; z-index: 1000;
             width: 52px; height: 52px; border-radius: 16px;
@@ -187,6 +170,7 @@
         }
         .menu-toggle:active { transform: scale(0.95); }
 
+        /* 💡 修復 2：懸浮選單響應式優化與滑動解鎖 */
         .glass-toolbar {
             position: fixed; top: 84px; left: 20px; z-index: 1000;
             background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
@@ -196,8 +180,15 @@
             transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.3s;
             transform-origin: top left;
             opacity: 0; transform: scale(0.8) translateY(-10px); pointer-events: none;
-            max-height: 80vh; overflow-y: auto; width: 340px;
-            touch-action: none;
+            
+            /* 讓小螢幕不會超出畫面，並啟用上下滑動 */
+            width: 340px; 
+            max-width: calc(100vw - 40px); 
+            max-height: 70vh; 
+            overflow-y: auto; 
+            touch-action: pan-y; /* 允許手指上下滑動 */
+            overscroll-behavior: contain; /* 防止滑到底時拉動背景畫布 */
+            padding-bottom: 25px; /* 底部多留白一點好滑動 */
         }
         .glass-toolbar.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
         
@@ -294,12 +285,16 @@
                 <button class="mini-tool-btn" data-tool="sketch" title="素描筆 (3)"><i class="bi bi-pencil"></i></button>
                 <button class="mini-tool-btn" data-tool="crayon" title="蠟筆 (4)"><i class="bi bi-pencil-fill"></i></button>
                 
+                <div class="popup-divider"></div>
+                
                 <button class="mini-tool-btn" data-tool="highlighter" title="螢光筆 (5)"><i class="bi bi-brush"></i></button>
                 <button class="mini-tool-btn" data-tool="dashed" title="虛線筆 (6)">
                     <span style="width: 14px; border-bottom: 3px dashed currentColor; display: inline-block; margin-bottom: 4px;"></span>
                 </button>
                 <button class="mini-tool-btn" data-tool="spray" title="藝術噴漆 (7)"><i class="bi bi-stars"></i></button>
                 <button class="mini-tool-btn" data-tool="fill" title="油漆桶 (8)"><i class="bi bi-paint-bucket"></i></button>
+
+                <div class="popup-divider"></div>
 
                 <button class="mini-tool-btn" data-tool="eraser" title="圓形橡皮擦 (9)"><i class="bi bi-eraser-fill"></i></button>
                 <button class="mini-tool-btn" data-tool="eraser-square" title="方形橡皮擦 (0)"><i class="bi bi-eraser"></i></button>
@@ -457,7 +452,7 @@
     let isDrawing = false;
     let currentTool = 'basic';
     let lastUsedBrush = 'basic'; 
-    let lastUsedEraser = 'eraser'; // 💡 記憶使用者最後使用的橡皮擦種類
+    let lastUsedEraser = 'eraser'; 
     let historyStack = [];
     const maxHistory = 20;
 
@@ -489,7 +484,6 @@
 
     /* --- 2. 工具與顏色切換邏輯 --- */
     function setTool(toolName, x, y) {
-        // 記錄最後使用的畫筆與最後使用的橡皮擦
         if (!toolName.startsWith('eraser')) {
             lastUsedBrush = toolName;
         } else {
@@ -664,6 +658,18 @@
         window.addEventListener('pointerup', upHandler);
     });
 
+    // 💡 針對手機版 UX 優化：點選任何功能後自動收起龐大的選單
+    mainToolbar.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+            if (e.target.closest('.tool-btn') || e.target.closest('.action-btn')) {
+                // 給予微小延遲讓按鈕視覺效果呈現，然後自動關閉
+                setTimeout(() => {
+                    if (isToolbarOpen) toggleToolbar(false);
+                }, 200);
+            }
+        }
+    });
+
     /* --- 5. 繪圖視窗同步與網格 --- */
     function resizeCanvas() {
         const tempCanvas = document.createElement('canvas');
@@ -717,14 +723,12 @@
     }
 
     function updateCursorPosition(x, y) {
-        // 💡 優化：判斷是否為任意橡皮擦模式
         if (currentTool.startsWith('eraser')) {
             const size = parseInt(brushSize.value) * 2.5;
             eraserCursor.style.width = size + 'px'; 
             eraserCursor.style.height = size + 'px';
             eraserCursor.style.left = x + 'px'; 
             eraserCursor.style.top = y + 'px';
-            // 動態切換圓形或方形游標邊框
             eraserCursor.style.borderRadius = currentTool === 'eraser-square' ? '4px' : '50%';
             eraserCursor.style.display = 'block';
             draftCanvas.style.cursor = 'none'; 
@@ -770,7 +774,7 @@
         const fb = parseInt(fillColorHex.slice(5, 7), 16);
         const fa = 255;
 
-        const tolerance = 30; // 容差值
+        const tolerance = 30;
         const match = (p) => {
             return Math.abs(data[p] - tr) <= tolerance &&
                    Math.abs(data[p+1] - tg) <= tolerance &&
@@ -839,7 +843,6 @@
     let longPressTriggered = false;
 
     function cycleBrush(direction) {
-        // 💡 輪切陣列加入雙橡皮擦
         const toolsList = ['basic', 'normal', 'sketch', 'crayon', 'highlighter', 'dashed', 'spray', 'fill', 'eraser', 'eraser-square'];
         let currentIndex = toolsList.indexOf(currentTool);
         if (currentIndex === -1) currentIndex = toolsList.indexOf(lastUsedBrush);
@@ -868,7 +871,6 @@
 
         if (e.target !== draftCanvas || !e.isPrimary || e.button !== 0) return; 
         
-        // 觸發油漆桶填色
         if (currentTool === 'fill') {
             floodFill(e.clientX, e.clientY, colorPicker.value);
             saveState();
@@ -927,7 +929,6 @@
         const coords = { x: e.clientX, y: e.clientY, time: Date.now() };
         points.push(coords);
 
-        // 💡 雙形態橡皮擦運算核心
         if (currentTool.startsWith('eraser')) {
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath(); 
@@ -936,7 +937,6 @@
             ctx.strokeStyle = 'rgba(0,0,0,1)'; 
             ctx.lineWidth = brushSize.value * 2.5;
             
-            // 根據選擇切換線條端點樣式
             if (currentTool === 'eraser-square') {
                 ctx.lineCap = 'square';
                 ctx.lineJoin = 'miter';
@@ -1188,6 +1188,10 @@
             
             document.body.classList.remove('theme-dark', 'theme-chalkboard', 'theme-light');
             document.body.classList.add(`theme-${themeName}`);
+            
+            if (window.innerWidth <= 768 && isToolbarOpen) {
+                toggleToolbar(false);
+            }
         }
     });
 
@@ -1262,7 +1266,6 @@
             return; 
         }
 
-        // 💡 完整支援最新分類的快捷鍵對應陣列
         const toolsMap = { 
             '1': 'basic', '2': 'normal', '3': 'sketch', '4': 'crayon', 
             '5': 'highlighter', '6': 'dashed', '7': 'spray', '8': 'fill', 
