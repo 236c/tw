@@ -45,7 +45,7 @@
             background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.2); z-index: 1001;
             display: flex; flex-direction: column; align-items: center;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15); transition: opacity 0.3s, transform 0.3s;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15); transition: opacity 0.3s, transform 0.3s, background 0.3s, border-color 0.3s;
             touch-action: none; user-select: none; padding: 6px 0;
         }
         .side-touch-bar.hidden { opacity: 0; transform: translateY(-50%) scale(0.8); pointer-events: none; }
@@ -57,7 +57,7 @@
         }
         .size-control:active { background: rgba(255, 255, 255, 0.1); border-radius: 24px 24px 0 0; }
         
-        .divider-horizontal { width: 60%; height: 1px; background: rgba(255, 255, 255, 0.2); margin: 4px 0; }
+        .divider-horizontal { width: 60%; height: 1px; background: rgba(255, 255, 255, 0.2); margin: 4px 0; transition: background 0.3s; }
         
         /* 側邊畫筆切換選單 */
         .brush-selector {
@@ -84,12 +84,12 @@
         }
         .mini-tool-btn.active { background: #ffffff; color: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        /* 側邊顏色選擇器 */
+        /* 側邊/懸浮通用顏色選擇器樣式 */
         .side-color-btn {
             width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.7); cursor: pointer;
             position: relative; margin: 4px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
+            transition: transform 0.2s, border-color 0.3s; flex-shrink: 0;
         }
         .side-color-btn.bg-color { border-radius: 10px; } /* 背景色用方角區分 */
         .side-color-btn:active { transform: scale(0.85); }
@@ -105,6 +105,19 @@
         .eraser-toggle:active { background: rgba(255, 255, 255, 0.1); border-radius: 0 0 24px 24px; transform: scale(0.9); }
         .eraser-toggle.active { color: #ffeb3b; text-shadow: 0 0 10px rgba(255,235,59,0.4); }
 
+        /* --- 亮色主題自動適配 (反轉側邊列與選單邊框顏色) --- */
+        body.theme-light .side-touch-bar { background: rgba(0, 0, 0, 0.04); border-color: rgba(0, 0, 0, 0.12); }
+        body.theme-light .size-control, 
+        body.theme-light .brush-selector, 
+        body.theme-light .eraser-toggle:not(.active) { color: rgba(0, 0, 0, 0.65); }
+        body.theme-light .size-control:active, 
+        body.theme-light .brush-selector:active, 
+        body.theme-light .eraser-toggle:active { background: rgba(0, 0, 0, 0.05); }
+        body.theme-light .divider-horizontal { background: rgba(0, 0, 0, 0.12); }
+        body.theme-light .side-color-btn { border-color: rgba(0, 0, 0, 0.25); }
+        body.theme-light .eraser-toggle.active { color: #f57f17; text-shadow: none; }
+        body.theme-light .glass-toolbar, body.theme-light .menu-toggle { border-color: rgba(0, 0, 0, 0.15); }
+
         /* 懸浮按鈕與面板核心樣式 */
         .menu-toggle {
             position: fixed; top: 20px; left: 20px; z-index: 1000;
@@ -113,7 +126,7 @@
             border: 1px solid rgba(255, 255, 255, 0.4);
             box-shadow: 0 8px 25px rgba(0,0,0,0.2);
             display: flex; justify-content: center; align-items: center;
-            font-size: 1.4rem; color: #212529; cursor: move; transition: opacity 0.2s ease, transform 0.2s;
+            font-size: 1.4rem; color: #212529; cursor: move; transition: opacity 0.2s ease, transform 0.2s, border-color 0.3s;
             touch-action: none;
         }
         .menu-toggle:active { transform: scale(0.95); }
@@ -124,7 +137,7 @@
             border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 22px; padding: 18px;
             box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
             display: flex; flex-direction: column; gap: 15px;
-            transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.3s;
             transform-origin: top left;
             opacity: 0; transform: scale(0.8) translateY(-10px); pointer-events: none;
             max-height: 80vh; overflow-y: auto; width: 320px;
@@ -178,9 +191,12 @@
         .custom-modal-overlay.active .custom-modal { transform: translateY(0) scale(1); }
     </style>
 </head>
-<body>
+<body class="theme-dark">
 
     <input type="file" id="imageUploadInput" accept="image/*" style="display: none;">
+
+    <input type="color" id="hiddenBrushColorPicker" style="position: fixed; opacity: 0; width: 1px; height: 1px; pointer-events: none; z-index: 9999;">
+    <input type="color" id="hiddenBgColorPicker" style="position: fixed; opacity: 0; width: 1px; height: 1px; pointer-events: none; z-index: 9999;">
 
     <div id="canvas-container">
         <canvas id="gridCanvas"></canvas> 
@@ -217,11 +233,11 @@
 
         <div class="divider-horizontal"></div>
         
-        <div class="side-color-btn" title="畫筆顏色">
+        <div class="side-color-btn" title="畫筆顏色 (P)">
             <input type="color" id="colorPicker" value="#00ff00">
         </div>
         
-        <div class="side-color-btn bg-color" title="背景顏色">
+        <div class="side-color-btn bg-color" title="背景顏色 (B)">
             <input type="color" id="bgColorPicker" value="#2b3035">
         </div>
 
@@ -253,16 +269,32 @@
         <div class="divider"></div>
 
         <div class="toolbar-group">
-            <div class="group-title">畫布屬性</div>
-            <select id="themeSelect" class="form-select form-select-sm mb-2">
+            <div class="group-title">畫布與顏色屬性</div>
+            <div class="d-flex w-100 align-items-center gap-2 mb-3">
+                <span style="font-size: 0.8rem; font-weight: 600; color: #495057;">大小</span>
+                <input type="range" id="brushSize" min="2" max="60" value="4">
+                <div class="size-badge" id="brushSizeDisplay">4</div>
+            </div>
+            
+            <select id="themeSelect" class="form-select form-select-sm mb-3">
                 <option value="dark">護眼暗夜</option>
                 <option value="chalkboard">經典黑板</option>
                 <option value="light">預設明亮</option>
             </select>
-            <div class="d-flex w-100 align-items-center gap-2 mt-1">
-                <span style="font-size: 0.8rem; font-weight: 600; color: #495057;">大小</span>
-                <input type="range" id="brushSize" min="2" max="60" value="4">
-                <div class="size-badge" id="brushSizeDisplay">4</div>
+
+            <div class="d-flex w-100 gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="side-color-btn" title="畫筆顏色 (P)" style="margin:0;">
+                        <input type="color" id="mainColorPicker" value="#00ff00">
+                    </div>
+                    <span style="font-size: 0.8rem; color: #495057;">畫筆 (P)</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="side-color-btn bg-color" title="背景顏色 (B)" style="margin:0;">
+                        <input type="color" id="mainBgColorPicker" value="#2b3035">
+                    </div>
+                    <span style="font-size: 0.8rem; color: #495057;">背景 (B)</span>
+                </div>
             </div>
         </div>
         
@@ -316,8 +348,15 @@
     const menuToggle = document.getElementById('menuToggle');
     const mainToolbar = document.getElementById('mainToolbar');
     
+    // 顏色選擇器變數
     const colorPicker = document.getElementById('colorPicker');
+    const mainColorPicker = document.getElementById('mainColorPicker');
+    const hiddenBrushColorPicker = document.getElementById('hiddenBrushColorPicker');
+    
     const bgColorPicker = document.getElementById('bgColorPicker');
+    const mainBgColorPicker = document.getElementById('mainBgColorPicker');
+    const hiddenBgColorPicker = document.getElementById('hiddenBgColorPicker');
+    
     const brushSize = document.getElementById('brushSize');
     const brushSizeDisplay = document.getElementById('brushSizeDisplay');
     const themeSelect = document.getElementById('themeSelect');
@@ -355,7 +394,7 @@
         'spray': '<i class="bi bi-stars"></i>'
     };
 
-    /* --- 2. 工具切換統一邏輯 (核心控制中樞) --- */
+    /* --- 2. 工具與顏色切換邏輯 --- */
     function setTool(toolName, x, y) {
         if (currentTool !== 'eraser' && toolName === 'eraser') {
             lastUsedBrush = currentTool;
@@ -365,26 +404,24 @@
         
         currentTool = toolName;
         
-        // 更新主選單 UI
         toolBtns.forEach(b => b.classList.remove('active'));
         const activeBtn = document.querySelector(`.tool-btn[data-tool="${currentTool}"]`);
         if(activeBtn) activeBtn.classList.add('active');
 
-        // 更新側邊欄彈出視窗 UI
         miniToolBtns.forEach(b => b.classList.remove('active'));
         const activeMiniBtn = document.querySelector(`.mini-tool-btn[data-tool="${currentTool}"]`);
         if(activeMiniBtn) activeMiniBtn.classList.add('active');
         
-        // 更新側邊欄橡皮擦與畫筆圖示狀態
+        // 將 style.color 移除，交由 CSS 中的 theme class 來控制顏色變化
         if (currentTool === 'eraser') {
             sideEraserToggle.classList.add('active');
             sideEraserToggle.innerHTML = '<i class="bi bi-pen-fill"></i>';
-            sideEraserToggle.style.color = '#ffeb3b';
+            sideEraserToggle.style.color = ''; 
             sideEraserToggle.title = "切換回畫筆";
         } else {
             sideEraserToggle.classList.remove('active');
             sideEraserToggle.innerHTML = '<i class="bi bi-eraser-fill"></i>';
-            sideEraserToggle.style.color = 'rgba(255, 255, 255, 0.8)';
+            sideEraserToggle.style.color = ''; 
             sideEraserToggle.title = "切換橡皮擦";
             currentBrushIcon.innerHTML = brushIcons[currentTool] || '<i class="bi bi-pen-fill"></i>';
         }
@@ -402,7 +439,24 @@
         }
     }
 
-    // 側邊欄：畫筆調色盤開關
+    // --- 顏色同步邏輯 ---
+    colorPicker.addEventListener('input', (e) => { mainColorPicker.value = hiddenBrushColorPicker.value = e.target.value; });
+    mainColorPicker.addEventListener('input', (e) => { colorPicker.value = hiddenBrushColorPicker.value = e.target.value; });
+    hiddenBrushColorPicker.addEventListener('input', (e) => { colorPicker.value = mainColorPicker.value = e.target.value; });
+    
+    bgColorPicker.addEventListener('input', (e) => { 
+        mainBgColorPicker.value = hiddenBgColorPicker.value = e.target.value;
+        canvasContainer.style.backgroundColor = e.target.value;
+    });
+    mainBgColorPicker.addEventListener('input', (e) => { 
+        bgColorPicker.value = hiddenBgColorPicker.value = e.target.value;
+        canvasContainer.style.backgroundColor = e.target.value;
+    });
+    hiddenBgColorPicker.addEventListener('input', (e) => { 
+        bgColorPicker.value = mainBgColorPicker.value = e.target.value;
+        canvasContainer.style.backgroundColor = e.target.value;
+    });
+
     sideBrushSelector.addEventListener('pointerdown', (e) => {
         e.stopPropagation();
         brushPopup.classList.toggle('show');
@@ -425,14 +479,19 @@
         });
     });
 
-    // 側邊欄：橡皮擦快速切換鍵
     sideEraserToggle.addEventListener('pointerdown', (e) => {
         e.stopPropagation(); 
         toggleEraser(window.innerWidth / 2, window.innerHeight / 2);
         if(navigator.vibrate) navigator.vibrate(40);
     });
 
-    /* --- 3. 側邊快捷筆刷縮放帶邏輯 --- */
+    /* --- 全域滑鼠座標追蹤，確保快捷鍵取得最新位置 --- */
+    window.addEventListener('pointermove', (e) => {
+        hoverX = e.clientX;
+        hoverY = e.clientY;
+    });
+
+    /* --- 3. 側邊快捷筆刷縮放帶 --- */
     let isTouchingBar = false;
     let barStartY = 0;
     let barStartSize = 4;
@@ -450,13 +509,11 @@
         const deltaY = e.clientY - barStartY;
         const sizeDelta = Math.round(-deltaY * 0.4);
         let targetSize = barStartSize + sizeDelta;
-        
         targetSize = Math.max(parseInt(brushSize.min), Math.min(parseInt(brushSize.max), targetSize));
-        
         brushSize.value = targetSize;
         brushSizeDisplay.textContent = targetSize;
-        updateCursorPosition(window.innerWidth / 2, window.innerHeight / 2);
-        showFloatingHint(`筆刷大小: ${targetSize}`, window.innerWidth / 2, window.innerHeight / 2);
+        updateCursorPosition(hoverX, hoverY);
+        showFloatingHint(`筆刷大小: ${targetSize}`, hoverX, hoverY);
         e.stopPropagation();
     });
 
@@ -469,7 +526,7 @@
     sizeControl.addEventListener('pointerup', endBarTouch);
     sizeControl.addEventListener('pointercancel', endBarTouch);
 
-    /* --- 4. 懸浮工具列聯動邏輯 --- */
+    /* --- 4. 懸浮工具列聯動 --- */
     let isDraggingMenu = false;
     let menuOffset = { x: 0, y: 0 };
 
@@ -485,7 +542,6 @@
         isToolbarOpen = (typeof forceState === 'boolean') ? forceState : !isToolbarOpen;
         mainToolbar.classList.toggle('active', isToolbarOpen);
         menuToggle.innerHTML = isToolbarOpen ? '<i class="bi bi-x-lg"></i>' : '<i class="bi bi-layers-half"></i>';
-        
         sideTouchBar.classList.toggle('hidden', isToolbarOpen); 
         updateToolbarPosition();
         if (!isToolbarOpen) document.activeElement.blur();
@@ -516,12 +572,6 @@
         window.addEventListener('pointermove', moveHandler);
         window.addEventListener('pointerup', upHandler);
     });
-
-    menuToggle.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); });
-    mainToolbar.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); });
-    sideTouchBar.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); });
-    menuToggle.addEventListener('wheel', (e) => { e.stopPropagation(); });
-    mainToolbar.addEventListener('wheel', (e) => { e.stopPropagation(); });
 
     /* --- 5. 繪圖視窗同步與網格 --- */
     function resizeCanvas() {
@@ -576,7 +626,6 @@
     }
 
     function updateCursorPosition(x, y) {
-        hoverX = x; hoverY = y;
         if (currentTool === 'eraser') {
             const size = parseInt(brushSize.value) * 2.5;
             eraserCursor.style.width = size + 'px'; eraserCursor.style.height = size + 'px';
@@ -602,13 +651,12 @@
         cursorHintTimeout = setTimeout(() => cursorToolHint.classList.remove('show'), 1000); 
     }
 
-    /* --- 7. 手繪與多指觸控、長按偵測核心 --- */
+    /* --- 7. 手繪與核心引擎 --- */
     let touchPoints = {}; 
     let touchStartTime = 0;
     let longPressTimer = null;
     let longPressTriggered = false;
 
-    // 輪切畫筆輔助函式 (雙指滑動觸發)
     function cycleBrush(direction) {
         const toolsList = ['basic', 'normal', 'sketch', 'highlighter', 'dashed', 'spray'];
         let currentIndex = toolsList.indexOf(currentTool);
@@ -625,19 +673,11 @@
     function startDrawing(e) {
         if (e.pointerType === 'touch') {
             touchPoints[e.pointerId] = { x: e.clientX, y: e.clientY, startX: e.clientX, startY: e.clientY };
-            const activeTouches = Object.keys(touchPoints).length;
-
-            if (activeTouches === 2) {
+            if (Object.keys(touchPoints).length >= 2) {
                 touchStartTime = Date.now();
                 isDrawing = false;
                 clearTimeout(longPressTimer);
                 draftCtx.clearRect(0,0,draftCanvas.width, draftCanvas.height);
-                return;
-            }
-            if (activeTouches === 3) {
-                document.getElementById('clearBtn').click();
-                showFloatingHint('已清空 (三指觸控)', e.clientX, e.clientY);
-                isDrawing = false;
                 return;
             }
         }
@@ -645,18 +685,16 @@
         if (e.target !== draftCanvas || !e.isPrimary || e.button !== 0) return; 
         isDrawing = true;
         cursorToolHint.classList.remove('show');
-        brushPopup.classList.remove('show'); // 點擊畫布時關閉彈出選單
+        brushPopup.classList.remove('show');
         if (isToolbarOpen) toggleToolbar(false);
 
-        // 單指長按偵測切換橡皮擦
         if (e.isPrimary && e.pointerType === 'touch' && Object.keys(touchPoints).length === 1) {
             longPressTriggered = false;
             longPressTimer = setTimeout(() => {
                 longPressTriggered = true;
                 if(navigator.vibrate) navigator.vibrate(50);
                 toggleEraser(e.clientX, e.clientY);
-                isDrawing = false; 
-                points = []; 
+                isDrawing = false; points = []; 
                 draftCtx.clearRect(0, 0, draftCanvas.width, draftCanvas.height);
             }, 400); 
         }
@@ -675,48 +713,26 @@
 
     function draw(e) {
         updateCursorPosition(e.clientX, e.clientY);
-        
         if (e.pointerType === 'touch') {
             const keys = Object.keys(touchPoints);
             if (touchPoints[e.pointerId]) {
-                touchPoints[e.pointerId].x = e.clientX;
-                touchPoints[e.pointerId].y = e.clientY;
+                touchPoints[e.pointerId].x = e.clientX; touchPoints[e.pointerId].y = e.clientY;
             }
-
-            if (keys.length === 1 && Math.abs(e.clientX - points[0].x) > 10) {
-                clearTimeout(longPressTimer);
-            }
-
-            // 雙指左右滑動判定 (輪切畫筆)
+            if (keys.length === 1 && Math.abs(e.clientX - points[0].x) > 10) clearTimeout(longPressTimer);
             if (keys.length === 2) {
                 const p1 = touchPoints[keys[0]], p2 = touchPoints[keys[1]];
                 if (p1 && p2) {
                     const dx1 = p1.x - p1.startX, dx2 = p2.x - p2.startX;
-                    
-                    if (dx1 > 80 && dx2 > 80) { // 往右滑
-                        if (!touchPoints.swiped) {
-                            touchPoints.swiped = true;
-                            if(navigator.vibrate) navigator.vibrate(40);
-                            cycleBrush(1);
-                        }
-                    } else if (dx1 < -80 && dx2 < -80) { // 往左滑
-                        if (!touchPoints.swiped) {
-                            touchPoints.swiped = true;
-                            if(navigator.vibrate) navigator.vibrate(40);
-                            cycleBrush(-1);
-                        }
-                    }
+                    if (dx1 > 80 && dx2 > 80) { if (!touchPoints.swiped) { touchPoints.swiped = true; cycleBrush(1); }
+                    } else if (dx1 < -80 && dx2 < -80) { if (!touchPoints.swiped) { touchPoints.swiped = true; cycleBrush(-1); } }
                 }
                 return;
             }
         }
-
         if (longPressTriggered || !isDrawing || !e.isPrimary) return;
-        
         const coords = { x: e.clientX, y: e.clientY, time: Date.now() };
         points.push(coords);
 
-        // --- 繪製引擎邏輯 ---
         if (currentTool === 'spray') {
             const dist = Math.sqrt((coords.x - lastX)**2 + (coords.y - lastY)**2);
             const steps = Math.max(1, Math.floor(dist / (brushSize.value / 2)));
@@ -770,14 +786,12 @@
             const p0 = points[points.length - 3], p1 = points[points.length - 2], p2 = points[points.length - 1];
             const mid1 = { x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2 }, mid2 = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
             draftCtx.lineCap = 'round'; draftCtx.lineJoin = 'round';
-
             if (currentTool === 'normal' || currentTool === 'basic') {
                 const baseWidth = parseInt(brushSize.value);
                 if (currentTool === 'normal') {
                     const speed = Math.sqrt((p2.x - p1.x)**2 + (p2.y - p1.y)**2) / ((p2.time - p1.time) || 1);
                     currentSmoothWidth += (Math.max(baseWidth * 0.2, baseWidth - (speed * 3)) - currentSmoothWidth) * 0.4;
                 } else currentSmoothWidth = baseWidth;
-
                 draftCtx.beginPath(); draftCtx.moveTo(mid1.x, mid1.y); draftCtx.quadraticCurveTo(p1.x, p1.y, mid2.x, mid2.y);
                 draftCtx.strokeStyle = colorPicker.value; draftCtx.lineWidth = currentSmoothWidth; draftCtx.stroke();
             } else if (currentTool === 'highlighter') {
@@ -789,53 +803,40 @@
 
     function stopDrawing(e) {
         clearTimeout(longPressTimer);
-        
         if (e && e.pointerType === 'touch') {
-            const keys = Object.keys(touchPoints);
-            if (keys.length === 2 && !touchPoints.swiped) {
-                if (Date.now() - touchStartTime < 300) {
-                    undo();
-                    showFloatingHint('復原 (雙指輕點)', window.innerWidth/2, window.innerHeight/2);
-                }
-            }
-            if (keys.length === 0) touchPoints.swiped = false;
+            if (Object.keys(touchPoints).length === 0) touchPoints.swiped = false;
             delete touchPoints[e.pointerId];
         }
-
-        if (longPressTriggered) {
-            longPressTriggered = false;
-            return;
-        }
-
+        if (longPressTriggered) { longPressTriggered = false; return; }
         if (!isDrawing || (e && !e.isPrimary)) return; 
         isDrawing = false;
-        
         menuToggle.classList.remove('drawing-mode');
         mainToolbar.classList.remove('drawing-mode');
         sideTouchBar.classList.remove('drawing-mode');
-        
-        if (currentTool === 'basic' || currentTool === 'normal' || currentTool === 'highlighter' || currentTool === 'dashed') {
+        if (['basic','normal','highlighter','dashed'].includes(currentTool)) {
             ctx.globalAlpha = (currentTool === 'highlighter') ? 0.4 : 1.0;
-            ctx.drawImage(draftCanvas, 0, 0);
-            ctx.globalAlpha = 1.0;
+            ctx.drawImage(draftCanvas, 0, 0); ctx.globalAlpha = 1.0;
             draftCtx.clearRect(0, 0, draftCanvas.width, draftCanvas.height);
-            draftCanvas.style.opacity = '1';
         }
         points = []; saveState(); 
     }
 
-    /* --- 8. UI綁定與功能 --- */
+    /* --- 8. UI綁定與快捷鍵 --- */
     themeSelect.addEventListener('change', (e) => {
-        const t = themes[e.target.value];
-        if (t) { bgColorPicker.value = t.bg; colorPicker.value = t.pen; canvasContainer.style.backgroundColor = t.bg; }
+        const themeName = e.target.value;
+        const t = themes[themeName];
+        if (t) { 
+            bgColorPicker.value = mainBgColorPicker.value = hiddenBgColorPicker.value = t.bg; 
+            colorPicker.value = mainColorPicker.value = hiddenBrushColorPicker.value = t.pen; 
+            canvasContainer.style.backgroundColor = t.bg; 
+            
+            // 動態切換 body class，套用自動變色 CSS
+            document.body.classList.remove('theme-dark', 'theme-chalkboard', 'theme-light');
+            document.body.classList.add(`theme-${themeName}`);
+        }
     });
-    bgColorPicker.addEventListener('input', (e) => canvasContainer.style.backgroundColor = e.target.value);
 
-    toolBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            setTool(e.currentTarget.getAttribute('data-tool'), hoverX, hoverY);
-        });
-    });
+    toolBtns.forEach(btn => { btn.addEventListener('click', (e) => setTool(e.currentTarget.getAttribute('data-tool'), hoverX, hoverY)); });
 
     uploadImageBtn.addEventListener('click', () => imageUploadInput.click());
     imageUploadInput.addEventListener('change', function(e) {
@@ -845,9 +846,8 @@
             const img = new Image();
             img.onload = function() {
                 const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-                const drawWidth = img.width * scale, drawHeight = img.height * scale;
-                ctx.drawImage(img, (canvas.width - drawWidth) / 2, (canvas.height - drawHeight) / 2, drawWidth, drawHeight);
-                saveState(); imageUploadInput.value = ''; 
+                ctx.drawImage(img, (canvas.width - img.width * scale) / 2, (canvas.height - img.height * scale) / 2, img.width * scale, img.height * scale);
+                saveState();
             }
             img.src = event.target.result;
         }
@@ -861,59 +861,61 @@
         if (isGridVisible) exportCtx.drawImage(gridCanvas, 0, 0);
         exportCtx.drawImage(canvas, 0, 0);
         const link = document.createElement('a'); link.download = `Jing_Board_${Date.now()}.png`; link.href = exportCanvas.toDataURL('image/png'); 
-        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        link.click();
     });
 
     window.addEventListener('keydown', (e) => { 
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-        const getHintX = () => hoverX !== -1000 ? hoverX : window.innerWidth / 2;
-        const getHintY = () => hoverY !== -1000 ? hoverY : window.innerHeight / 2;
+        const getX = () => hoverX !== -1000 ? hoverX : window.innerWidth / 2;
+        const getY = () => hoverY !== -1000 ? hoverY : window.innerHeight / 2;
         const key = e.key.toLowerCase();
 
-        if (e.key === 'Escape') { if (isToolbarOpen) { toggleToolbar(false); showFloatingHint('關閉選單', getHintX(), getHintY()); } return; }
-        if (key === 'm') { toggleToolbar(); showFloatingHint(isToolbarOpen ? '開啟選單' : '關閉選單', getHintX(), getHintY()); return; }
-        if ((e.ctrlKey || e.metaKey) && key === 'z') { e.preventDefault(); undo(); showFloatingHint('復原上一步', getHintX(), getHintY()); return; }
-        if (key === 's') { if (e.ctrlKey || e.metaKey) e.preventDefault(); document.getElementById('saveBtn').click(); showFloatingHint('下載儲存', getHintX(), getHintY()); return; }
+        if (e.key === 'Escape') { if (isToolbarOpen) toggleToolbar(false); return; }
+        if (key === 'm') { toggleToolbar(); showFloatingHint(isToolbarOpen ? '開啟選單' : '關閉選單', getX(), getY()); return; }
+        if ((e.ctrlKey || e.metaKey) && key === 'z') { e.preventDefault(); undo(); showFloatingHint('復原上一步', getX(), getY()); return; }
+        
+        if (key === 'p') { 
+            hiddenBrushColorPicker.style.left = getX() + 'px';
+            hiddenBrushColorPicker.style.top = getY() + 'px';
+            void hiddenBrushColorPicker.offsetWidth; 
+            hiddenBrushColorPicker.click(); 
+            showFloatingHint('設置畫筆顏色', getX(), getY()); 
+            return; 
+        }
+        if (key === 'b') { 
+            hiddenBgColorPicker.style.left = getX() + 'px';
+            hiddenBgColorPicker.style.top = getY() + 'px';
+            void hiddenBgColorPicker.offsetWidth; 
+            hiddenBgColorPicker.click(); 
+            showFloatingHint('設置背景顏色', getX(), getY()); 
+            return; 
+        }
 
         const toolsMap = { '1': 'basic', '2': 'normal', '3': 'sketch', '4': 'highlighter', '5': 'dashed', '6': 'spray', '7': 'eraser' };
         if (toolsMap[key]) {
-            setTool(toolsMap[key], getHintX(), getHintY());
-            showFloatingHint(document.querySelector(`[data-tool="${currentTool}"]`).getAttribute('title'), getHintX(), getHintY());
+            setTool(toolsMap[key], getX(), getY());
+            showFloatingHint(document.querySelector(`[data-tool="${currentTool}"]`).getAttribute('title'), getX(), getY());
         } 
         else if (key === '[') {
-            brushSize.value = Math.max(parseInt(brushSize.min), parseInt(brushSize.value) - 1);
+            brushSize.value = Math.max(2, parseInt(brushSize.value) - 1);
             brushSizeDisplay.textContent = brushSize.value; updateCursorPosition(hoverX, hoverY);
-            showFloatingHint(`筆刷縮小: ${brushSize.value}`, getHintX(), getHintY());
+            showFloatingHint(`筆刷縮小: ${brushSize.value}`, getX(), getY());
         } else if (key === ']') {
-            brushSize.value = Math.min(parseInt(brushSize.max), parseInt(brushSize.value) + 1);
+            brushSize.value = Math.min(60, parseInt(brushSize.value) + 1);
             brushSizeDisplay.textContent = brushSize.value; updateCursorPosition(hoverX, hoverY);
-            showFloatingHint(`筆刷放大: ${brushSize.value}`, getHintX(), getHintY());
-        } else if (key === 'g') { gridBtn.click(); showFloatingHint(isGridVisible ? '網格：開啟' : '網格：關閉', getHintX(), getHintY());
+            showFloatingHint(`筆刷放大: ${brushSize.value}`, getX(), getY());
+        } else if (key === 'g') { gridBtn.click(); showFloatingHint(isGridVisible ? '網格：開啟' : '網格：關閉', getX(), getY());
         } else if (key === 'f') fullscreenBtn.click();
-        else if (key === 'c') { document.getElementById('clearBtn').click(); showFloatingHint('已清空畫布', getHintX(), getHintY()); }
+        else if (key === 'c') { document.getElementById('clearBtn').click(); showFloatingHint('已清空畫布', getX(), getY()); }
         else if (key === 'u') uploadImageBtn.click();
+        else if (key === 's') { if (e.ctrlKey || e.metaKey) e.preventDefault(); document.getElementById('saveBtn').click(); }
     });
 
     fullscreenBtn.addEventListener('click', () => {
         if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-        else if (document.exitFullscreen) document.exitFullscreen();
+        else document.exitFullscreen();
     });
     document.addEventListener('fullscreenchange', () => fullscreenBtn.innerHTML = document.fullscreenElement ? '<i class="bi bi-fullscreen-exit"></i>' : '<i class="bi bi-arrows-fullscreen"></i>');
-
-    draftCanvas.addEventListener('wheel', (e) => {
-        e.preventDefault(); 
-        let val = parseInt(brushSize.value);
-        val = e.deltaY < 0 ? Math.min(val + 1, parseInt(brushSize.max)) : Math.max(val - 1, parseInt(brushSize.min));
-        brushSize.value = val; brushSizeDisplay.textContent = val; updateCursorPosition(hoverX, hoverY);
-        showFloatingHint(`筆刷大小: ${val}`, e.clientX, e.clientY);
-    }, { passive: false });
-
-    draftCanvas.addEventListener('contextmenu', (e) => {
-        e.preventDefault(); 
-        const toolsList = ['basic', 'normal', 'sketch', 'highlighter', 'dashed', 'spray', 'eraser'];
-        setTool(toolsList[(toolsList.indexOf(currentTool) + 1) % toolsList.length], e.clientX, e.clientY);
-        showFloatingHint(document.querySelector(`[data-tool="${currentTool}"]`).getAttribute('title'), e.clientX, e.clientY);
-    });
 
     const resetModal = document.getElementById('resetModal');
     document.getElementById('resetBtn').addEventListener('click', () => resetModal.classList.add('active'));
@@ -928,6 +930,21 @@
     window.addEventListener('pointerup', stopDrawing); 
     window.addEventListener('pointercancel', stopDrawing);
     draftCanvas.addEventListener('pointerleave', () => eraserCursor.style.display = 'none');
+    
+    draftCanvas.addEventListener('wheel', (e) => {
+        e.preventDefault(); 
+        let val = parseInt(brushSize.value);
+        val = e.deltaY < 0 ? Math.min(val + 1, parseInt(brushSize.max)) : Math.max(val - 1, parseInt(brushSize.min));
+        brushSize.value = val; brushSizeDisplay.textContent = val; updateCursorPosition(hoverX, hoverY);
+        showFloatingHint(`筆刷大小: ${val}`, e.clientX, e.clientY);
+    }, { passive: false });
+
+    draftCanvas.addEventListener('contextmenu', (e) => {
+        e.preventDefault(); 
+        const toolsList = ['basic', 'normal', 'sketch', 'highlighter', 'dashed', 'spray', 'eraser'];
+        setTool(toolsList[(toolsList.indexOf(currentTool) + 1) % toolsList.length], e.clientX, e.clientY);
+        showFloatingHint(document.querySelector(`[data-tool="${currentTool}"]`).getAttribute('title'), e.clientX, e.clientY);
+    });
 
     setTimeout(() => { resizeCanvas(); updateToolbarPosition(); }, 0);
 </script>
