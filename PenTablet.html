@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
-        /* 💡 修復 1：移除 body 的 touch-action: none，改用 overscroll-behavior 防止下拉刷新 */
+        /* 💡 修復：移除 touch-action: none，恢復網頁內部元素的正常滑動能力 */
         html, body { 
             height: 100%; margin: 0; background-color: #2c3e50; font-family: 'Inter', sans-serif; 
             overflow: hidden; overscroll-behavior: none; 
@@ -22,7 +22,7 @@
             background-color: #2c3e50; transition: background-color 0.3s ease; 
         }
         
-        /* 💡 將防干擾的 touch-action: none 獨立綁定在畫布上，確保畫畫不亂動 */
+        /* 💡 修復：將防止滑動干擾的指令單獨綁定到畫布上 */
         #gridCanvas, #drawingCanvas, #draftCanvas { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; 
         }
@@ -37,7 +37,6 @@
             border-radius: 50%; z-index: 9999;
             transform: translate(-50%, -50%); display: none;
             box-sizing: border-box; box-shadow: 0 0 5px rgba(0,0,0,0.1);
-            transition: border-radius 0.2s;
         }
 
         #imageTransformOverlay {
@@ -47,7 +46,9 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             background: rgba(255,255,255,0.05);
         }
-        #imageTransformOverlay img { width: 100%; height: 100%; display: block; pointer-events: none; }
+        #imageTransformOverlay img {
+            width: 100%; height: 100%; display: block; pointer-events: none;
+        }
         
         .transform-handle {
             position: absolute; width: 24px; height: 24px;
@@ -105,6 +106,7 @@
             color: rgba(255, 255, 255, 0.8); transition: 0.2s;
         }
         .size-control:active { background: rgba(255, 255, 255, 0.1); border-radius: 24px 24px 0 0; }
+        
         .divider-horizontal { width: 60%; height: 1px; background: rgba(255, 255, 255, 0.2); margin: 4px 0; transition: background 0.3s; }
         
         .brush-selector {
@@ -130,7 +132,11 @@
             transition: all 0.2s;
         }
         .mini-tool-btn.active { background: #ffffff; color: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .popup-divider { width: 2px; height: 28px; background: rgba(255,255,255,0.15); border-radius: 2px; margin: 0 4px; }
+        
+        .popup-divider {
+            width: 2px; height: 28px; background: rgba(255,255,255,0.15);
+            border-radius: 2px; margin: 0 4px;
+        }
 
         .side-color-btn {
             width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
@@ -140,7 +146,9 @@
         }
         .side-color-btn.bg-color { border-radius: 10px; } 
         .side-color-btn:active { transform: scale(0.85); }
-        .side-color-btn input[type="color"] { position: absolute; top: -15px; left: -15px; width: 64px; height: 64px; border: none; cursor: pointer; padding: 0; }
+        .side-color-btn input[type="color"] {
+            position: absolute; top: -15px; left: -15px; width: 64px; height: 64px; border: none; cursor: pointer; padding: 0;
+        }
 
         .eraser-toggle {
             width: 100%; height: 48px; display: flex; justify-content: center; align-items: center;
@@ -150,9 +158,14 @@
         .eraser-toggle:active { background: rgba(255, 255, 255, 0.1); border-radius: 0 0 24px 24px; transform: scale(0.9); }
         .eraser-toggle.active { color: #ffeb3b; text-shadow: 0 0 10px rgba(255,235,59,0.4); }
 
+        /* --- 亮色主題自動適配 --- */
         body.theme-light .side-touch-bar { background: rgba(0, 0, 0, 0.04); border-color: rgba(0, 0, 0, 0.12); }
-        body.theme-light .size-control, body.theme-light .brush-selector, body.theme-light .eraser-toggle:not(.active) { color: rgba(0, 0, 0, 0.65); }
-        body.theme-light .size-control:active, body.theme-light .brush-selector:active, body.theme-light .eraser-toggle:active { background: rgba(0, 0, 0, 0.05); }
+        body.theme-light .size-control, 
+        body.theme-light .brush-selector, 
+        body.theme-light .eraser-toggle:not(.active) { color: rgba(0, 0, 0, 0.65); }
+        body.theme-light .size-control:active, 
+        body.theme-light .brush-selector:active, 
+        body.theme-light .eraser-toggle:active { background: rgba(0, 0, 0, 0.05); }
         body.theme-light .divider-horizontal { background: rgba(0, 0, 0, 0.12); }
         body.theme-light .side-color-btn { border-color: rgba(0, 0, 0, 0.25); }
         body.theme-light .eraser-toggle.active { color: #f57f17; text-shadow: none; }
@@ -170,7 +183,7 @@
         }
         .menu-toggle:active { transform: scale(0.95); }
 
-        /* 💡 修復 2：懸浮選單響應式優化與滑動解鎖 */
+        /* 💡 修復：為懸浮選單啟用原生垂直滑動 (pan-y)，完美適配小螢幕手機 */
         .glass-toolbar {
             position: fixed; top: 84px; left: 20px; z-index: 1000;
             background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
@@ -181,14 +194,13 @@
             transform-origin: top left;
             opacity: 0; transform: scale(0.8) translateY(-10px); pointer-events: none;
             
-            /* 讓小螢幕不會超出畫面，並啟用上下滑動 */
             width: 340px; 
-            max-width: calc(100vw - 40px); 
-            max-height: 70vh; 
-            overflow-y: auto; 
-            touch-action: pan-y; /* 允許手指上下滑動 */
-            overscroll-behavior: contain; /* 防止滑到底時拉動背景畫布 */
-            padding-bottom: 25px; /* 底部多留白一點好滑動 */
+            max-width: calc(100vw - 40px); /* 防超出螢幕 */
+            max-height: 70vh; /* 限制最大高度 */
+            overflow-y: auto; /* 啟用捲動條 */
+            touch-action: pan-y; /* 💡 允許手指上下滑動 */
+            overscroll-behavior: contain; /* 💡 防止滑到底時拉扯到背景 */
+            padding-bottom: 25px;
         }
         .glass-toolbar.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
         
@@ -543,7 +555,8 @@
         canvasContainer.style.backgroundColor = e.target.value;
     });
 
-    sideBrushSelector.addEventListener('pointerdown', (e) => {
+    // 💡 修復 1：將所有的 UI 操作從 pointerdown 改為 click，防止干擾觸控狀態機
+    sideBrushSelector.addEventListener('click', (e) => {
         e.stopPropagation();
         brushPopup.classList.toggle('show');
         if(navigator.vibrate) navigator.vibrate(30);
@@ -556,7 +569,7 @@
     });
 
     miniToolBtns.forEach(btn => {
-        btn.addEventListener('pointerdown', (e) => {
+        btn.addEventListener('click', (e) => {
             e.stopPropagation();
             setTool(e.currentTarget.getAttribute('data-tool'), window.innerWidth/2, window.innerHeight/2);
             brushPopup.classList.remove('show');
@@ -565,7 +578,7 @@
         });
     });
 
-    sideEraserToggle.addEventListener('pointerdown', (e) => {
+    sideEraserToggle.addEventListener('click', (e) => {
         e.stopPropagation(); 
         toggleEraser(window.innerWidth / 2, window.innerHeight / 2);
         if(navigator.vibrate) navigator.vibrate(40);
@@ -658,11 +671,10 @@
         window.addEventListener('pointerup', upHandler);
     });
 
-    // 💡 針對手機版 UX 優化：點選任何功能後自動收起龐大的選單
+    // 💡 針對手機版 UX 優化：點選任何按鈕後，自動收起懸浮選單
     mainToolbar.addEventListener('click', (e) => {
         if (window.innerWidth <= 768) {
             if (e.target.closest('.tool-btn') || e.target.closest('.action-btn')) {
-                // 給予微小延遲讓按鈕視覺效果呈現，然後自動關閉
                 setTimeout(() => {
                     if (isToolbarOpen) toggleToolbar(false);
                 }, 200);
@@ -869,8 +881,10 @@
             }
         }
 
-        if (e.target !== draftCanvas || !e.isPrimary || e.button !== 0) return; 
+        // 💡 修復：移除 !e.isPrimary，提升在手機上的觸控抗干擾能力
+        if (e.target !== draftCanvas || e.button !== 0) return; 
         
+        // 觸發油漆桶填色
         if (currentTool === 'fill') {
             floodFill(e.clientX, e.clientY, colorPicker.value);
             saveState();
@@ -1048,8 +1062,11 @@
             delete touchPoints[e.pointerId];
         }
         if (longPressTriggered) { longPressTriggered = false; return; }
-        if (!isDrawing || (e && !e.isPrimary)) return; 
+        
+        // 💡 修正：移除多餘的 !e.isPrimary 判斷，確保手指離開一定會終止繪畫狀態
+        if (!isDrawing) return; 
         isDrawing = false;
+        
         menuToggle.classList.remove('drawing-mode');
         mainToolbar.classList.remove('drawing-mode');
         sideTouchBar.classList.remove('drawing-mode');
