@@ -38,6 +38,61 @@
             box-sizing: border-box; box-shadow: 0 0 5px rgba(0,0,0,0.1);
         }
 
+        /* --- 圖片變形與旋轉覆蓋層 --- */
+        #imageTransformOverlay {
+            position: absolute; display: none; z-index: 10000;
+            border: 2px dashed #0d6efd; touch-action: none;
+            box-sizing: border-box; cursor: move;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            background: rgba(255,255,255,0.05);
+            /* Transform 會透過 JS 動態寫入 */
+        }
+        #imageTransformOverlay img {
+            width: 100%; height: 100%; display: block; pointer-events: none;
+        }
+        
+        /* 縮放手柄 */
+        .transform-handle {
+            position: absolute; width: 24px; height: 24px;
+            background: #fff; border: 3px solid #0d6efd; border-radius: 50%;
+            z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .handle-tl { top: -12px; left: -12px; cursor: nwse-resize; }
+        .handle-tr { top: -12px; right: -12px; cursor: nesw-resize; }
+        .handle-bl { bottom: -12px; left: -12px; cursor: nesw-resize; }
+        .handle-br { bottom: -12px; right: -12px; cursor: nwse-resize; }
+        
+        /* 旋轉控制桿 */
+        .handle-rotate {
+            position: absolute; top: -45px; left: 50%; margin-left: -14px;
+            width: 28px; height: 28px; background: #fff; border: 3px solid #0d6efd;
+            border-radius: 50%; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: grab; display: flex; justify-content: center; align-items: center;
+            color: #0d6efd; font-size: 14px;
+        }
+        .handle-rotate:active { cursor: grabbing; }
+        .handle-rotate::after {
+            content: ''; position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
+            width: 2px; height: 20px; background: #0d6efd; z-index: -1;
+        }
+        
+        /* 底部固定的變形確認列 */
+        .transform-controls-fixed {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: none; gap: 20px; z-index: 10001; cursor: default;
+            background: rgba(0,0,0,0.7); padding: 12px 24px; border-radius: 40px; 
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+        }
+        .transform-btn {
+            width: 48px; height: 48px; border-radius: 50%; border: none;
+            display: flex; justify-content: center; align-items: center; font-size: 1.4rem;
+            color: white; cursor: pointer; transition: transform 0.2s; outline: none;
+        }
+        .transform-btn:active { transform: scale(0.85); }
+        .btn-confirm { background: #198754; }
+        .btn-cancel { background: #dc3545; }
+
         /* --- 觸控專用：側邊快捷控制列 --- */
         .side-touch-bar {
             position: fixed; left: 15px; top: 50%; transform: translateY(-50%);
@@ -84,12 +139,12 @@
         }
         .mini-tool-btn.active { background: #ffffff; color: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        /* 側邊/懸浮通用顏色選擇器樣式 */
+        /* 側邊顏色選擇器 */
         .side-color-btn {
             width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.7); cursor: pointer;
             position: relative; margin: 4px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: transform 0.2s, border-color 0.3s; flex-shrink: 0;
+            transition: transform 0.2s, border-color 0.3s;
         }
         .side-color-btn.bg-color { border-radius: 10px; } /* 背景色用方角區分 */
         .side-color-btn:active { transform: scale(0.85); }
@@ -203,6 +258,20 @@
         <canvas id="drawingCanvas"></canvas> 
         <canvas id="draftCanvas"></canvas>   
         <div id="eraserCursor"></div>
+        
+        <div id="imageTransformOverlay">
+            <img id="transformImg" src="">
+            <div class="transform-handle handle-rotate" data-handle="rotate" title="旋轉 (按住 Shift 鎖定 45 度)"><i class="bi bi-arrow-clockwise"></i></div>
+            <div class="transform-handle handle-tl" data-handle="tl"></div>
+            <div class="transform-handle handle-tr" data-handle="tr"></div>
+            <div class="transform-handle handle-bl" data-handle="bl"></div>
+            <div class="transform-handle handle-br" data-handle="br"></div>
+        </div>
+    </div>
+    
+    <div id="transformControlsFixed" class="transform-controls-fixed">
+        <button class="transform-btn btn-cancel" id="transformCancel" title="取消 (Esc)"><i class="bi bi-x-lg"></i></button>
+        <button class="transform-btn btn-confirm" id="transformConfirm" title="確認印上畫布 (Enter)"><i class="bi bi-check-lg"></i></button>
     </div>
 
     <div id="cursorToolHint" class="cursor-tool-hint"></div>
@@ -307,7 +376,7 @@
             <button class="action-btn" id="fullscreenBtn" title="全螢幕模式 (F)"><i class="bi bi-arrows-fullscreen"></i></button>
             <button class="action-btn text-warning" id="resetBtn" title="全部重置"><i class="bi bi-arrow-repeat"></i></button>
             <button class="action-btn text-danger" id="clearBtn" title="清空畫布 (C)"><i class="bi bi-trash3"></i></button>
-            <button class="action-btn text-success" id="uploadImageBtn" title="載入圖片 (U)"><i class="bi bi-image"></i></button>
+            <button class="action-btn text-success" id="uploadImageBtn" title="載入/貼上圖片 (U)"><i class="bi bi-image"></i></button>
             <button class="action-btn text-primary" id="saveBtn" title="存檔下載 (S)"><i class="bi bi-download"></i></button>
         </div>
     </div>
@@ -671,6 +740,9 @@
     }
 
     function startDrawing(e) {
+        // 若圖片變形框開啟中，禁止畫布底層產生畫筆軌跡
+        if (transformOverlay.style.display === 'block') return;
+
         if (e.pointerType === 'touch') {
             touchPoints[e.pointerId] = { x: e.clientX, y: e.clientY, startX: e.clientX, startY: e.clientY };
             if (Object.keys(touchPoints).length >= 2) {
@@ -821,7 +893,138 @@
         points = []; saveState(); 
     }
 
-    /* --- 8. UI綁定與快捷鍵 --- */
+    /* --- 8. 貼上與載入圖片的變形、縮放、旋轉控制核心 --- */
+    const transformOverlay = document.getElementById('imageTransformOverlay');
+    const transformControlsFixed = document.getElementById('transformControlsFixed');
+    const transformImg = document.getElementById('transformImg');
+    
+    // tCx, tCy 代表圖片中心點坐標；tW, tH 為圖片長寬；tAngle 為旋轉角度(弧度)
+    let tCx = 0, tCy = 0, tW = 0, tH = 0, tAngle = 0;
+    let activeTransformObj = null; 
+    let startPointer = {x:0, y:0};
+    let startRect = {};
+    let startAngleOffset = 0;
+
+    // 更新圖片覆蓋層的位置與角度
+    function updateTransformUI() {
+        transformOverlay.style.left = (tCx - tW / 2) + 'px';
+        transformOverlay.style.top = (tCy - tH / 2) + 'px';
+        transformOverlay.style.width = tW + 'px';
+        transformOverlay.style.height = tH + 'px';
+        transformOverlay.style.transform = `rotate(${tAngle}rad)`;
+    }
+
+    // 啟動圖片變形模式
+    function openImageTransform(src) {
+        const img = new Image();
+        img.onload = () => {
+            // 讓圖片預設最多只佔螢幕的 60% 大小
+            const scale = Math.min(1, Math.min((canvas.width * 0.6) / img.width, (canvas.height * 0.6) / img.height));
+            tW = img.width * scale;
+            tH = img.height * scale;
+            tCx = canvas.width / 2;
+            tCy = canvas.height / 2;
+            tAngle = 0;
+            
+            transformImg.src = src;
+            updateTransformUI();
+            transformOverlay.style.display = 'block';
+            transformControlsFixed.style.display = 'flex'; // 顯示底部的確認列
+            
+            // 加入這行：如果懸浮面板開著，自動幫使用者關閉，避免擋住圖片
+            if (isToolbarOpen) toggleToolbar(false);
+            
+            // 顯示提示
+            const getX = () => hoverX !== -1000 ? hoverX : window.innerWidth / 2;
+            const getY = () => hoverY !== -1000 ? hoverY : window.innerHeight / 2;
+            showFloatingHint('拖曳中心移動，拖曳手柄縮放與旋轉', getX(), getY());
+        };
+        img.src = src;
+    }
+
+    // 變形控制的事件監聽 (捕捉滑鼠或手指)
+    transformOverlay.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        
+        // 判斷是點擊到哪個控制點，或者只是點擊圖片本體(drag)
+        activeTransformObj = e.target.getAttribute('data-handle') || 'drag';
+        startPointer = { x: e.clientX, y: e.clientY };
+        startRect = { cx: tCx, cy: tCy, w: tW, h: tH, angle: tAngle };
+        
+        // 計算旋轉起始點與中心點的角度差
+        if (activeTransformObj === 'rotate') {
+            startAngleOffset = Math.atan2(e.clientY - tCy, e.clientX - tCx) - tAngle;
+        }
+        transformOverlay.setPointerCapture(e.pointerId);
+    });
+
+    transformOverlay.addEventListener('pointermove', (e) => {
+        if (!activeTransformObj) return;
+        e.stopPropagation();
+        
+        const dx = e.clientX - startPointer.x;
+        const dy = e.clientY - startPointer.y;
+        
+        if (activeTransformObj === 'drag') {
+            // 中心點移動
+            tCx = startRect.cx + dx;
+            tCy = startRect.cy + dy;
+            
+        } else if (activeTransformObj === 'rotate') {
+            // 計算新角度
+            tAngle = Math.atan2(e.clientY - tCy, e.clientX - tCx) - startAngleOffset;
+            // 若按住 Shift 則每 45 度 (Math.PI / 4) 吸附對齊一次
+            if (e.shiftKey) {
+                const snapAngle = Math.PI / 4; 
+                tAngle = Math.round(tAngle / snapAngle) * snapAngle;
+            }
+            
+        } else { 
+            // 角落縮放 (以中心為基準，解決旋轉後的縮放座標計算問題)
+            let d = Math.hypot(e.clientX - startRect.cx, e.clientY - startRect.cy);
+            let d0 = Math.hypot(startRect.w / 2, startRect.h / 2);
+            let scale = d / d0;
+            
+            // 防止縮放得太小
+            if (startRect.w * scale > 40 && startRect.h * scale > 40) {
+                tW = startRect.w * scale;
+                tH = startRect.h * scale;
+            }
+        }
+        updateTransformUI();
+    });
+
+    transformOverlay.addEventListener('pointerup', (e) => {
+        activeTransformObj = null;
+        transformOverlay.releasePointerCapture(e.pointerId);
+    });
+
+    // 關閉變形模式的清理工作
+    function closeTransformMode() {
+        transformOverlay.style.display = 'none';
+        transformControlsFixed.style.display = 'none';
+        URL.revokeObjectURL(transformImg.src); 
+        transformImg.src = '';
+    }
+
+    // 確認按鈕：將變形後的結果真實印上畫布
+    document.getElementById('transformConfirm').addEventListener('click', () => {
+        ctx.save();
+        ctx.translate(tCx, tCy);         // 將畫布中心移至圖片中心
+        ctx.rotate(tAngle);              // 旋轉畫布
+        ctx.drawImage(transformImg, -tW / 2, -tH / 2, tW, tH); // 繪製圖片 (座標為相對於中心的負半寬高)
+        ctx.restore();                   // 恢復畫布狀態
+        
+        saveState();
+        closeTransformMode();
+    });
+    
+    // 取消按鈕
+    document.getElementById('transformCancel').addEventListener('click', () => {
+        closeTransformMode();
+    });
+
+    /* --- 9. UI綁定與快捷鍵 --- */
     themeSelect.addEventListener('change', (e) => {
         const themeName = e.target.value;
         const t = themes[themeName];
@@ -830,7 +1033,6 @@
             colorPicker.value = mainColorPicker.value = hiddenBrushColorPicker.value = t.pen; 
             canvasContainer.style.backgroundColor = t.bg; 
             
-            // 動態切換 body class，套用自動變色 CSS
             document.body.classList.remove('theme-dark', 'theme-chalkboard', 'theme-light');
             document.body.classList.add(`theme-${themeName}`);
         }
@@ -839,19 +1041,38 @@
     toolBtns.forEach(btn => { btn.addEventListener('click', (e) => setTool(e.currentTarget.getAttribute('data-tool'), hoverX, hoverY)); });
 
     uploadImageBtn.addEventListener('click', () => imageUploadInput.click());
+    
+    // ==========================================
+    // 💡 載入圖片 (匯入) 走變形控制層
+    // ==========================================
     imageUploadInput.addEventListener('change', function(e) {
         const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = function(event) {
-            const img = new Image();
-            img.onload = function() {
-                const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-                ctx.drawImage(img, (canvas.width - img.width * scale) / 2, (canvas.height - img.height * scale) / 2, img.width * scale, img.height * scale);
-                saveState();
-            }
-            img.src = event.target.result;
+            // 呼叫變形控制框
+            openImageTransform(event.target.result);
+            imageUploadInput.value = ''; // 清空，允許連續匯入同一張圖
         }
         reader.readAsDataURL(file);
+    });
+
+    // ==========================================
+    // 💡 監聽鍵盤貼上事件 (Ctrl+V) 走變形控制層
+    // ==========================================
+    window.addEventListener('paste', (e) => {
+        // 如果變形框已經開啟，就不允許連續貼上覆蓋
+        if (transformOverlay.style.display === 'block') return;
+
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                const blob = items[i].getAsFile();
+                // 呼叫變形控制框
+                openImageTransform(URL.createObjectURL(blob));
+                e.preventDefault(); // 阻止瀏覽器預設行為
+                break; // 每次只處理第一張圖片
+            }
+        }
     });
 
     document.getElementById('saveBtn').addEventListener('click', () => {
@@ -866,6 +1087,13 @@
 
     window.addEventListener('keydown', (e) => { 
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+        
+        // 若變形框開啟中，Enter 可確認，Esc 可取消
+        if (transformOverlay.style.display === 'block') {
+            if (e.key === 'Enter') { document.getElementById('transformConfirm').click(); return; }
+            if (e.key === 'Escape') { document.getElementById('transformCancel').click(); return; }
+        }
+
         const getX = () => hoverX !== -1000 ? hoverX : window.innerWidth / 2;
         const getY = () => hoverY !== -1000 ? hoverY : window.innerHeight / 2;
         const key = e.key.toLowerCase();
