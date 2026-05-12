@@ -36,6 +36,7 @@
             border-radius: 50%; z-index: 9999;
             transform: translate(-50%, -50%); display: none;
             box-sizing: border-box; box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            transition: border-radius 0.2s; /* 平滑切換圓形/方形游標 */
         }
 
         /* --- 圖片變形與旋轉覆蓋層 --- */
@@ -121,11 +122,12 @@
         }
         .brush-selector:active { background: rgba(255, 255, 255, 0.1); }
         
+        /* 💡 優化：改為網格排列以容納更多筆刷 */
         .brush-popup {
             position: absolute; left: 60px; top: 50%; transform: translateY(-50%) translateX(-10px);
             background: rgba(24, 24, 27, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px; padding: 8px;
-            display: flex; flex-direction: row; align-items: center; gap: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px; padding: 10px;
+            display: flex; flex-wrap: wrap; align-content: flex-start; gap: 6px; width: 200px;
             opacity: 0; pointer-events: none; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
@@ -137,12 +139,6 @@
             transition: all 0.2s;
         }
         .mini-tool-btn.active { background: #ffffff; color: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        
-        /* 側邊筆刷選單分類分隔線 */
-        .popup-divider {
-            width: 2px; height: 28px; background: rgba(255,255,255,0.15);
-            border-radius: 2px; margin: 0 4px;
-        }
 
         /* 側邊顏色選擇器 */
         .side-color-btn {
@@ -293,18 +289,20 @@
             <div id="currentBrushIcon"><i class="bi bi-pen-fill"></i></div>
             
             <div class="brush-popup" id="brushPopup">
-                <button class="mini-tool-btn active" data-tool="basic" title="基礎筆"><i class="bi bi-pen-fill"></i></button>
-                <button class="mini-tool-btn" data-tool="normal" title="水彩筆"><i class="bi bi-brush-fill"></i></button>
-                <button class="mini-tool-btn" data-tool="sketch" title="素描筆"><i class="bi bi-pencil"></i></button>
-                <button class="mini-tool-btn" data-tool="crayon" title="蠟筆"><i class="bi bi-pencil-fill"></i></button>
+                <button class="mini-tool-btn active" data-tool="basic" title="基礎筆 (1)"><i class="bi bi-pen-fill"></i></button>
+                <button class="mini-tool-btn" data-tool="normal" title="水彩筆 (2)"><i class="bi bi-brush-fill"></i></button>
+                <button class="mini-tool-btn" data-tool="sketch" title="素描筆 (3)"><i class="bi bi-pencil"></i></button>
+                <button class="mini-tool-btn" data-tool="crayon" title="蠟筆 (4)"><i class="bi bi-pencil-fill"></i></button>
                 
-                <div class="popup-divider"></div>
-                
-                <button class="mini-tool-btn" data-tool="highlighter" title="螢光筆"><i class="bi bi-brush"></i></button>
-                <button class="mini-tool-btn" data-tool="dashed" title="虛線筆">
+                <button class="mini-tool-btn" data-tool="highlighter" title="螢光筆 (5)"><i class="bi bi-brush"></i></button>
+                <button class="mini-tool-btn" data-tool="dashed" title="虛線筆 (6)">
                     <span style="width: 14px; border-bottom: 3px dashed currentColor; display: inline-block; margin-bottom: 4px;"></span>
                 </button>
-                <button class="mini-tool-btn" data-tool="spray" title="藝術噴漆"><i class="bi bi-stars"></i></button>
+                <button class="mini-tool-btn" data-tool="spray" title="藝術噴漆 (7)"><i class="bi bi-stars"></i></button>
+                <button class="mini-tool-btn" data-tool="fill" title="油漆桶 (8)"><i class="bi bi-paint-bucket"></i></button>
+
+                <button class="mini-tool-btn" data-tool="eraser" title="圓形橡皮擦 (9)"><i class="bi bi-eraser-fill"></i></button>
+                <button class="mini-tool-btn" data-tool="eraser-square" title="方形橡皮擦 (0)"><i class="bi bi-eraser"></i></button>
             </div>
         </div>
 
@@ -347,7 +345,15 @@
                 <span style="width: 18px; border-bottom: 3px dashed currentColor; display: inline-block; margin-bottom: 6px;"></span>
             </button>
             <button class="tool-btn" data-tool="spray" title="藝術噴漆 (7)"><i class="bi bi-stars"></i></button>
-            <button class="tool-btn" data-tool="eraser" title="橡皮擦 (8)"><i class="bi bi-eraser-fill"></i></button>
+            <button class="tool-btn" data-tool="fill" title="油漆桶填充 (8)"><i class="bi bi-paint-bucket"></i></button>
+        </div>
+        
+        <div class="divider"></div>
+
+        <div class="toolbar-group">
+            <div class="group-title">橡皮擦類別</div>
+            <button class="tool-btn" data-tool="eraser" title="圓形橡皮擦 (9)"><i class="bi bi-eraser-fill"></i></button>
+            <button class="tool-btn" data-tool="eraser-square" title="方形橡皮擦 (0)"><i class="bi bi-eraser"></i></button>
         </div>
         
         <div class="divider"></div>
@@ -451,6 +457,7 @@
     let isDrawing = false;
     let currentTool = 'basic';
     let lastUsedBrush = 'basic'; 
+    let lastUsedEraser = 'eraser'; // 💡 記憶使用者最後使用的橡皮擦種類
     let historyStack = [];
     const maxHistory = 20;
 
@@ -474,15 +481,19 @@
         'crayon': '<i class="bi bi-pencil-fill"></i>',
         'highlighter': '<i class="bi bi-brush"></i>',
         'dashed': '<span style="width: 14px; border-bottom: 3px dashed currentColor; display: inline-block; margin-bottom: 4px;"></span>',
-        'spray': '<i class="bi bi-stars"></i>'
+        'spray': '<i class="bi bi-stars"></i>',
+        'fill': '<i class="bi bi-paint-bucket"></i>',
+        'eraser': '<i class="bi bi-eraser-fill"></i>',
+        'eraser-square': '<i class="bi bi-eraser"></i>'
     };
 
     /* --- 2. 工具與顏色切換邏輯 --- */
     function setTool(toolName, x, y) {
-        if (currentTool !== 'eraser' && toolName === 'eraser') {
-            lastUsedBrush = currentTool;
-        } else if (toolName !== 'eraser') {
+        // 記錄最後使用的畫筆與最後使用的橡皮擦
+        if (!toolName.startsWith('eraser')) {
             lastUsedBrush = toolName;
+        } else {
+            lastUsedEraser = toolName;
         }
         
         currentTool = toolName;
@@ -495,7 +506,7 @@
         const activeMiniBtn = document.querySelector(`.mini-tool-btn[data-tool="${currentTool}"]`);
         if(activeMiniBtn) activeMiniBtn.classList.add('active');
         
-        if (currentTool === 'eraser') {
+        if (currentTool.startsWith('eraser')) {
             sideEraserToggle.classList.add('active');
             sideEraserToggle.innerHTML = '<i class="bi bi-pen-fill"></i>';
             sideEraserToggle.style.color = ''; 
@@ -512,12 +523,12 @@
     }
 
     function toggleEraser(x, y) {
-        if (currentTool === 'eraser') {
+        if (currentTool.startsWith('eraser')) {
             setTool(lastUsedBrush, x, y);
             showFloatingHint('切換：畫筆', x, y);
         } else {
-            setTool('eraser', x, y);
-            showFloatingHint('切換：橡皮擦', x, y);
+            setTool(lastUsedEraser, x, y);
+            showFloatingHint(lastUsedEraser === 'eraser-square' ? '切換：方形橡皮擦' : '切換：圓形橡皮擦', x, y);
         }
     }
 
@@ -706,15 +717,20 @@
     }
 
     function updateCursorPosition(x, y) {
-        if (currentTool === 'eraser') {
+        // 💡 優化：判斷是否為任意橡皮擦模式
+        if (currentTool.startsWith('eraser')) {
             const size = parseInt(brushSize.value) * 2.5;
-            eraserCursor.style.width = size + 'px'; eraserCursor.style.height = size + 'px';
-            eraserCursor.style.left = x + 'px'; eraserCursor.style.top = y + 'px';
+            eraserCursor.style.width = size + 'px'; 
+            eraserCursor.style.height = size + 'px';
+            eraserCursor.style.left = x + 'px'; 
+            eraserCursor.style.top = y + 'px';
+            // 動態切換圓形或方形游標邊框
+            eraserCursor.style.borderRadius = currentTool === 'eraser-square' ? '4px' : '50%';
             eraserCursor.style.display = 'block';
             draftCanvas.style.cursor = 'none'; 
         } else {
             eraserCursor.style.display = 'none';
-            draftCanvas.style.cursor = 'crosshair'; 
+            draftCanvas.style.cursor = (currentTool === 'fill') ? 'crosshair' : 'crosshair'; 
         }
     }
 
@@ -731,6 +747,91 @@
         cursorHintTimeout = setTimeout(() => cursorToolHint.classList.remove('show'), 1000); 
     }
 
+    /* --- 🛠️ 掃描線油漆桶填色演算法 (Scanline Flood Fill) --- */
+    function floodFill(startX, startY, fillColorHex) {
+        const w = canvas.width;
+        const h = canvas.height;
+        const xInt = Math.floor(startX);
+        const yInt = Math.floor(startY);
+
+        if (xInt < 0 || yInt < 0 || xInt >= w || yInt >= h) return;
+
+        const imgData = ctx.getImageData(0, 0, w, h);
+        const data = imgData.data;
+        const startPos = (yInt * w + xInt) * 4;
+
+        const tr = data[startPos];
+        const tg = data[startPos + 1];
+        const tb = data[startPos + 2];
+        const ta = data[startPos + 3];
+
+        const fr = parseInt(fillColorHex.slice(1, 3), 16);
+        const fg = parseInt(fillColorHex.slice(3, 5), 16);
+        const fb = parseInt(fillColorHex.slice(5, 7), 16);
+        const fa = 255;
+
+        const tolerance = 30; // 容差值
+        const match = (p) => {
+            return Math.abs(data[p] - tr) <= tolerance &&
+                   Math.abs(data[p+1] - tg) <= tolerance &&
+                   Math.abs(data[p+2] - tb) <= tolerance &&
+                   Math.abs(data[p+3] - ta) <= tolerance;
+        };
+
+        if (Math.abs(fr - tr) <= tolerance && Math.abs(fg - tg) <= tolerance && 
+            Math.abs(fb - tb) <= tolerance && Math.abs(fa - ta) <= tolerance) return;
+
+        const stack = [xInt, yInt];
+
+        while (stack.length > 0) {
+            let y = stack.pop();
+            let x = stack.pop();
+            let pos = (y * w + x) * 4;
+
+            while (y >= 0 && match(pos)) {
+                y--;
+                pos -= w * 4;
+            }
+            pos += w * 4;
+            y++;
+
+            let reachLeft = false;
+            let reachRight = false;
+
+            while (y < h && match(pos)) {
+                data[pos] = fr;
+                data[pos + 1] = fg;
+                data[pos + 2] = fb;
+                data[pos + 3] = fa;
+
+                if (x > 0) {
+                    if (match(pos - 4)) {
+                        if (!reachLeft) {
+                            stack.push(x - 1, y);
+                            reachLeft = true;
+                        }
+                    } else if (reachLeft) {
+                        reachLeft = false;
+                    }
+                }
+
+                if (x < w - 1) {
+                    if (match(pos + 4)) {
+                        if (!reachRight) {
+                            stack.push(x + 1, y);
+                            reachRight = true;
+                        }
+                    } else if (reachRight) {
+                        reachRight = false;
+                    }
+                }
+                y++;
+                pos += w * 4;
+            }
+        }
+        ctx.putImageData(imgData, 0, 0);
+    }
+
     /* --- 7. 手繪與核心引擎 --- */
     let touchPoints = {}; 
     let touchStartTime = 0;
@@ -738,8 +839,8 @@
     let longPressTriggered = false;
 
     function cycleBrush(direction) {
-        // 更新按照視覺分類順序的輪切陣列
-        const toolsList = ['basic', 'normal', 'sketch', 'crayon', 'highlighter', 'dashed', 'spray'];
+        // 💡 輪切陣列加入雙橡皮擦
+        const toolsList = ['basic', 'normal', 'sketch', 'crayon', 'highlighter', 'dashed', 'spray', 'fill', 'eraser', 'eraser-square'];
         let currentIndex = toolsList.indexOf(currentTool);
         if (currentIndex === -1) currentIndex = toolsList.indexOf(lastUsedBrush);
         if (currentIndex === -1) currentIndex = 0;
@@ -766,6 +867,16 @@
         }
 
         if (e.target !== draftCanvas || !e.isPrimary || e.button !== 0) return; 
+        
+        // 觸發油漆桶填色
+        if (currentTool === 'fill') {
+            floodFill(e.clientX, e.clientY, colorPicker.value);
+            saveState();
+            brushPopup.classList.remove('show');
+            if (isToolbarOpen) toggleToolbar(false);
+            return; 
+        }
+
         isDrawing = true;
         cursorToolHint.classList.remove('show');
         brushPopup.classList.remove('show');
@@ -816,6 +927,31 @@
         const coords = { x: e.clientX, y: e.clientY, time: Date.now() };
         points.push(coords);
 
+        // 💡 雙形態橡皮擦運算核心
+        if (currentTool.startsWith('eraser')) {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath(); 
+            ctx.moveTo(lastX, lastY); 
+            ctx.lineTo(coords.x, coords.y);
+            ctx.strokeStyle = 'rgba(0,0,0,1)'; 
+            ctx.lineWidth = brushSize.value * 2.5;
+            
+            // 根據選擇切換線條端點樣式
+            if (currentTool === 'eraser-square') {
+                ctx.lineCap = 'square';
+                ctx.lineJoin = 'miter';
+            } else {
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+            }
+            
+            ctx.stroke();
+            ctx.globalCompositeOperation = 'source-over'; 
+            lastX = coords.x; 
+            lastY = coords.y; 
+            return;
+        }
+
         if (currentTool === 'crayon') {
             const dist = Math.sqrt((coords.x - lastX)**2 + (coords.y - lastY)**2);
             const radius = parseInt(brushSize.value);
@@ -857,13 +993,7 @@
             }
             ctx.globalAlpha = 1.0; lastX = coords.x; lastY = coords.y; return;
         } 
-        if (currentTool === 'eraser') {
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(coords.x, coords.y);
-            ctx.strokeStyle = 'rgba(0,0,0,1)'; ctx.lineWidth = brushSize.value * 2.5;
-            ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
-            ctx.globalCompositeOperation = 'source-over'; lastX = coords.x; lastY = coords.y; return;
-        }
+        
         if (currentTool === 'dashed') {
             draftCtx.clearRect(0, 0, draftCanvas.width, draftCanvas.height); draftCtx.beginPath();
             if (points.length > 0) {
@@ -1132,8 +1262,12 @@
             return; 
         }
 
-        // 更新鍵盤快捷鍵對應陣列
-        const toolsMap = { '1': 'basic', '2': 'normal', '3': 'sketch', '4': 'crayon', '5': 'highlighter', '6': 'dashed', '7': 'spray', '8': 'eraser' };
+        // 💡 完整支援最新分類的快捷鍵對應陣列
+        const toolsMap = { 
+            '1': 'basic', '2': 'normal', '3': 'sketch', '4': 'crayon', 
+            '5': 'highlighter', '6': 'dashed', '7': 'spray', '8': 'fill', 
+            '9': 'eraser', '0': 'eraser-square' 
+        };
         if (toolsMap[key]) {
             setTool(toolsMap[key], getX(), getY());
             showFloatingHint(document.querySelector(`[data-tool="${currentTool}"]`).getAttribute('title'), getX(), getY());
@@ -1181,10 +1315,9 @@
         showFloatingHint(`筆刷大小: ${val}`, e.clientX, e.clientY);
     }, { passive: false });
 
-    // 更新右鍵輪切順序
     draftCanvas.addEventListener('contextmenu', (e) => {
         e.preventDefault(); 
-        const toolsList = ['basic', 'normal', 'sketch', 'crayon', 'highlighter', 'dashed', 'spray', 'eraser'];
+        const toolsList = ['basic', 'normal', 'sketch', 'crayon', 'highlighter', 'dashed', 'spray', 'fill', 'eraser', 'eraser-square'];
         setTool(toolsList[(toolsList.indexOf(currentTool) + 1) % toolsList.length], e.clientX, e.clientY);
         showFloatingHint(document.querySelector(`[data-tool="${currentTool}"]`).getAttribute('title'), e.clientX, e.clientY);
     });
