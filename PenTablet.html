@@ -10,7 +10,7 @@
     
     <style>
         html, body { 
-            height: 100%; margin: 0; background-color: #2b3035; font-family: 'Inter', sans-serif; 
+            height: 100%; margin: 0; background-color: #2c3e50; font-family: 'Inter', sans-serif; 
             overflow: hidden; overscroll-behavior: none; 
             -webkit-user-select: none; user-select: none; 
             -webkit-touch-callout: none;
@@ -19,7 +19,7 @@
         
         #canvas-container { 
             position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
-            background-color: #2b3035; transition: background-color 0.3s ease; 
+            background-color: #2c3e50; transition: background-color 0.3s ease; 
         }
         
         #gridCanvas, #drawingCanvas, #draftCanvas { 
@@ -45,7 +45,6 @@
             box-sizing: border-box; cursor: move;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             background: rgba(255,255,255,0.05);
-            /* Transform 會透過 JS 動態寫入 */
         }
         #imageTransformOverlay img {
             width: 100%; height: 100%; display: block; pointer-events: none;
@@ -62,18 +61,18 @@
         .handle-bl { bottom: -12px; left: -12px; cursor: nesw-resize; }
         .handle-br { bottom: -12px; right: -12px; cursor: nwse-resize; }
         
-        /* 旋轉控制桿 */
+        /* 💡 放大並提高的旋轉控制桿 */
         .handle-rotate {
-            position: absolute; top: -45px; left: 50%; margin-left: -14px;
-            width: 28px; height: 28px; background: #fff; border: 3px solid #0d6efd;
-            border-radius: 50%; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: absolute; top: -55px; left: 50%; margin-left: -18px;
+            width: 36px; height: 36px; background: #fff; border: 3px solid #0d6efd;
+            border-radius: 50%; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             cursor: grab; display: flex; justify-content: center; align-items: center;
-            color: #0d6efd; font-size: 14px;
+            color: #0d6efd; font-size: 18px;
         }
         .handle-rotate:active { cursor: grabbing; }
         .handle-rotate::after {
-            content: ''; position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
-            width: 2px; height: 20px; background: #0d6efd; z-index: -1;
+            content: ''; position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+            width: 2px; height: 22px; background: #0d6efd; z-index: -1;
         }
         
         /* 底部固定的變形確認列 */
@@ -246,12 +245,12 @@
         .custom-modal-overlay.active .custom-modal { transform: translateY(0) scale(1); }
     </style>
 </head>
-<body class="theme-dark">
+<body class="theme-chalkboard">
 
     <input type="file" id="imageUploadInput" accept="image/*" style="display: none;">
 
-    <input type="color" id="hiddenBrushColorPicker" style="position: fixed; opacity: 0; width: 1px; height: 1px; pointer-events: none; z-index: 9999;">
-    <input type="color" id="hiddenBgColorPicker" style="position: fixed; opacity: 0; width: 1px; height: 1px; pointer-events: none; z-index: 9999;">
+    <input type="color" id="hiddenBrushColorPicker" value="#ecf0f1" style="position: fixed; opacity: 0; width: 1px; height: 1px; pointer-events: none; z-index: 9999;">
+    <input type="color" id="hiddenBgColorPicker" value="#2c3e50" style="position: fixed; opacity: 0; width: 1px; height: 1px; pointer-events: none; z-index: 9999;">
 
     <div id="canvas-container">
         <canvas id="gridCanvas"></canvas> 
@@ -303,11 +302,11 @@
         <div class="divider-horizontal"></div>
         
         <div class="side-color-btn" title="畫筆顏色 (P)">
-            <input type="color" id="colorPicker" value="#00ff00">
+            <input type="color" id="colorPicker" value="#ecf0f1">
         </div>
         
         <div class="side-color-btn bg-color" title="背景顏色 (B)">
-            <input type="color" id="bgColorPicker" value="#2b3035">
+            <input type="color" id="bgColorPicker" value="#2c3e50">
         </div>
 
         <div class="divider-horizontal"></div>
@@ -347,20 +346,20 @@
             
             <select id="themeSelect" class="form-select form-select-sm mb-3">
                 <option value="dark">護眼暗夜</option>
-                <option value="chalkboard">經典黑板</option>
+                <option value="chalkboard" selected>經典黑板</option>
                 <option value="light">預設明亮</option>
             </select>
 
             <div class="d-flex w-100 gap-3">
                 <div class="d-flex align-items-center gap-2">
                     <div class="side-color-btn" title="畫筆顏色 (P)" style="margin:0;">
-                        <input type="color" id="mainColorPicker" value="#00ff00">
+                        <input type="color" id="mainColorPicker" value="#ecf0f1">
                     </div>
                     <span style="font-size: 0.8rem; color: #495057;">畫筆 (P)</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <div class="side-color-btn bg-color" title="背景顏色 (B)" style="margin:0;">
-                        <input type="color" id="mainBgColorPicker" value="#2b3035">
+                        <input type="color" id="mainBgColorPicker" value="#2c3e50">
                     </div>
                     <span style="font-size: 0.8rem; color: #495057;">背景 (B)</span>
                 </div>
@@ -905,7 +904,6 @@
     let startRect = {};
     let startAngleOffset = 0;
 
-    // 更新圖片覆蓋層的位置與角度
     function updateTransformUI() {
         transformOverlay.style.left = (tCx - tW / 2) + 'px';
         transformOverlay.style.top = (tCy - tH / 2) + 'px';
@@ -914,11 +912,9 @@
         transformOverlay.style.transform = `rotate(${tAngle}rad)`;
     }
 
-    // 啟動圖片變形模式
     function openImageTransform(src) {
         const img = new Image();
         img.onload = () => {
-            // 讓圖片預設最多只佔螢幕的 60% 大小
             const scale = Math.min(1, Math.min((canvas.width * 0.6) / img.width, (canvas.height * 0.6) / img.height));
             tW = img.width * scale;
             tH = img.height * scale;
@@ -929,12 +925,10 @@
             transformImg.src = src;
             updateTransformUI();
             transformOverlay.style.display = 'block';
-            transformControlsFixed.style.display = 'flex'; // 顯示底部的確認列
+            transformControlsFixed.style.display = 'flex';
             
-            // 加入這行：如果懸浮面板開著，自動幫使用者關閉，避免擋住圖片
             if (isToolbarOpen) toggleToolbar(false);
             
-            // 顯示提示
             const getX = () => hoverX !== -1000 ? hoverX : window.innerWidth / 2;
             const getY = () => hoverY !== -1000 ? hoverY : window.innerHeight / 2;
             showFloatingHint('拖曳中心移動，拖曳手柄縮放與旋轉', getX(), getY());
@@ -942,16 +936,18 @@
         img.src = src;
     }
 
-    // 變形控制的事件監聽 (捕捉滑鼠或手指)
+    // ==========================================
+    // 💡 精準捕捉點擊目標，解決誤判拖曳問題
+    // ==========================================
     transformOverlay.addEventListener('pointerdown', (e) => {
         e.stopPropagation();
         
-        // 判斷是點擊到哪個控制點，或者只是點擊圖片本體(drag)
-        activeTransformObj = e.target.getAttribute('data-handle') || 'drag';
+        const handle = e.target.closest('.transform-handle');
+        activeTransformObj = handle ? handle.getAttribute('data-handle') : 'drag';
+        
         startPointer = { x: e.clientX, y: e.clientY };
         startRect = { cx: tCx, cy: tCy, w: tW, h: tH, angle: tAngle };
         
-        // 計算旋轉起始點與中心點的角度差
         if (activeTransformObj === 'rotate') {
             startAngleOffset = Math.atan2(e.clientY - tCy, e.clientX - tCx) - tAngle;
         }
@@ -966,26 +962,21 @@
         const dy = e.clientY - startPointer.y;
         
         if (activeTransformObj === 'drag') {
-            // 中心點移動
             tCx = startRect.cx + dx;
             tCy = startRect.cy + dy;
             
         } else if (activeTransformObj === 'rotate') {
-            // 計算新角度
             tAngle = Math.atan2(e.clientY - tCy, e.clientX - tCx) - startAngleOffset;
-            // 若按住 Shift 則每 45 度 (Math.PI / 4) 吸附對齊一次
             if (e.shiftKey) {
                 const snapAngle = Math.PI / 4; 
                 tAngle = Math.round(tAngle / snapAngle) * snapAngle;
             }
             
         } else { 
-            // 角落縮放 (以中心為基準，解決旋轉後的縮放座標計算問題)
             let d = Math.hypot(e.clientX - startRect.cx, e.clientY - startRect.cy);
             let d0 = Math.hypot(startRect.w / 2, startRect.h / 2);
             let scale = d / d0;
             
-            // 防止縮放得太小
             if (startRect.w * scale > 40 && startRect.h * scale > 40) {
                 tW = startRect.w * scale;
                 tH = startRect.h * scale;
@@ -999,7 +990,6 @@
         transformOverlay.releasePointerCapture(e.pointerId);
     });
 
-    // 關閉變形模式的清理工作
     function closeTransformMode() {
         transformOverlay.style.display = 'none';
         transformControlsFixed.style.display = 'none';
@@ -1007,19 +997,17 @@
         transformImg.src = '';
     }
 
-    // 確認按鈕：將變形後的結果真實印上畫布
     document.getElementById('transformConfirm').addEventListener('click', () => {
         ctx.save();
-        ctx.translate(tCx, tCy);         // 將畫布中心移至圖片中心
-        ctx.rotate(tAngle);              // 旋轉畫布
-        ctx.drawImage(transformImg, -tW / 2, -tH / 2, tW, tH); // 繪製圖片 (座標為相對於中心的負半寬高)
-        ctx.restore();                   // 恢復畫布狀態
+        ctx.translate(tCx, tCy);         
+        ctx.rotate(tAngle);              
+        ctx.drawImage(transformImg, -tW / 2, -tH / 2, tW, tH); 
+        ctx.restore();                   
         
         saveState();
         closeTransformMode();
     });
     
-    // 取消按鈕
     document.getElementById('transformCancel').addEventListener('click', () => {
         closeTransformMode();
     });
@@ -1042,35 +1030,26 @@
 
     uploadImageBtn.addEventListener('click', () => imageUploadInput.click());
     
-    // ==========================================
-    // 💡 載入圖片 (匯入) 走變形控制層
-    // ==========================================
     imageUploadInput.addEventListener('change', function(e) {
         const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = function(event) {
-            // 呼叫變形控制框
             openImageTransform(event.target.result);
-            imageUploadInput.value = ''; // 清空，允許連續匯入同一張圖
+            imageUploadInput.value = ''; 
         }
         reader.readAsDataURL(file);
     });
 
-    // ==========================================
-    // 💡 監聽鍵盤貼上事件 (Ctrl+V) 走變形控制層
-    // ==========================================
     window.addEventListener('paste', (e) => {
-        // 如果變形框已經開啟，就不允許連續貼上覆蓋
         if (transformOverlay.style.display === 'block') return;
 
         const items = (e.clipboardData || e.originalEvent.clipboardData).items;
         for (let i = 0; i < items.length; i++) {
             if (items[i].type.indexOf('image') !== -1) {
                 const blob = items[i].getAsFile();
-                // 呼叫變形控制框
                 openImageTransform(URL.createObjectURL(blob));
-                e.preventDefault(); // 阻止瀏覽器預設行為
-                break; // 每次只處理第一張圖片
+                e.preventDefault(); 
+                break; 
             }
         }
     });
@@ -1088,7 +1067,6 @@
     window.addEventListener('keydown', (e) => { 
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
         
-        // 若變形框開啟中，Enter 可確認，Esc 可取消
         if (transformOverlay.style.display === 'block') {
             if (e.key === 'Enter') { document.getElementById('transformConfirm').click(); return; }
             if (e.key === 'Escape') { document.getElementById('transformCancel').click(); return; }
