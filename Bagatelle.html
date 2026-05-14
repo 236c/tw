@@ -2,18 +2,18 @@
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>經典夜市彈珠檯 - 手動加碼版</title>
+    <title>經典夜市彈珠檯 - 手動加碼版 (擬真音效升級)</title>
     <link href="./經典夜市彈珠檯 - 手動加碼版_files/bootstrap.min.css" rel="stylesheet">
     <style>
         body { 
-            background-color: #2c3e50; /* 恢復為原本的深藍灰色背景 */
+            background-color: #2c3e50; 
             min-height: 100vh; 
             width: 100vw;
             margin: 0; 
             font-family: "Microsoft JhengHei", sans-serif; 
             user-select: none; 
-            overflow: hidden; /* 防止手機螢幕被拖拉 */
-            touch-action: none; /* 禁用瀏覽器預設手勢 */
+            overflow: hidden; 
+            touch-action: none; 
             position: relative; 
         }
         
@@ -24,50 +24,33 @@
             box-shadow: 10px 10px 30px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.5); 
             width: 450px; 
             padding: 10px; 
-            
-            /* 絕對置中 */
             position: absolute; 
             top: 50%;
             left: 50%;
             transform-origin: center center; 
         }
         
-        /* 確保按鈕不會觸發手機預設行為 */
-        .plunger, .btn-red, .coin-panel {
-            touch-action: none; 
-        }
+        .plunger, .btn-red, .coin-panel { touch-action: none; }
 
-        /* 記分板區塊 */
         .scoreboard { 
-            box-sizing: border-box; 
-            background-color: #f8f9fa; 
-            border: 3px solid #333; 
-            border-radius: 5px; 
-            padding: 10px 12px; 
-            margin-bottom: 10px; 
-            height: 126px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.1); 
-            overflow: hidden; 
+            box-sizing: border-box; background-color: #f8f9fa; border: 3px solid #333; 
+            border-radius: 5px; padding: 10px 12px; margin-bottom: 10px; height: 126px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1); overflow: hidden; 
         }
         
-        /* 左上角：1~20 累加倍率燈板 */
         .odds-board { display: flex; gap: 6px; padding: 5px; height: 100px; font-family: "Courier New", Courier, monospace; box-sizing: border-box; flex-shrink: 0; }
         .odds-col { display: flex; flex-direction: column; justify-content: flex-start; gap: 4px; }
         .odds-item { display: flex; align-items: center; font-size: 0.75rem; line-height: 1; font-weight: bold; color: #444; width: 26px; height: 8px; }
         .odds-led { width: 6px; height: 6px; background-color: #4a0000; border-radius: 50%; margin-right: 4px; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.6); flex-shrink: 0; }
         .odds-led.active { background-color: #ff3333; box-shadow: 0 0 6px #ff3333, 0 0 12px #ff0000; }
 
-        /* 中間：實體洞口基準燈號 */
         .scores-container { display: flex; justify-content: center; gap: 15px; flex: 1 1 auto; margin: 0 10px; height: 100px; }
         .score-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100px; }
         .score-text { writing-mode: vertical-rl; font-weight: bold; font-size: 1.2rem; letter-spacing: 2px; color: #333; margin-bottom: 5px; }
         .led { width: 14px; height: 14px; background-color: #4a0000; border-radius: 50%; margin-bottom: 6px; transition: 0.1s; }
         .led.active { background-color: #ff3333; box-shadow: 0 0 12px #ff3333, 0 0 25px #ff0000; }
 
-        /* 右側：投幣區與呼吸燈動畫 */
         .coin-panel { 
             width: 50px; height: 100px; box-sizing: border-box; flex-shrink: 0; margin-right: 8px; 
             background: linear-gradient(135deg, #e0e0e0, #999999); border: 2px solid #666; border-radius: 5px; 
@@ -84,7 +67,6 @@
         }
         .coin-panel.highlight { animation: breathe-glow 1.5s ease-in-out infinite; }
         
-        /* 遊戲區域與操作按鈕 */
         .playfield { background-color: #222; border: 5px solid #333; border-radius: 5px; position: relative; height: 530px; overflow: hidden; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); }
         .controls { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
         .red-btn-container { background-color: #ddd; padding: 10px; border-radius: 5px; border: 2px solid #999; }
@@ -94,7 +76,6 @@
         .plunger { width: 40px; height: 50px; background-color: #e6c200; border-radius: 5px 5px 15px 15px; border: 2px solid #b39700; cursor: pointer; position: absolute; top: 0; z-index: 10; box-shadow: 0 5px #998000; display: flex; justify-content: center; align-items: center; font-weight: bold; color: #4a2508; }
         .dom-spring { width: 14px; height: 40px; background: repeating-linear-gradient(to bottom, #999, #999 4px, #444 4px, #444 8px); position: absolute; top: 50px; z-index: 5; border-radius: 3px; transform-origin: top; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5); }
 
-        /* 彈幕系統 CSS */
         #danmakuContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; overflow: hidden; }
         .danmaku-msg {
             position: absolute; white-space: nowrap; font-weight: bold; font-family: "Microsoft JhengHei", sans-serif;
@@ -172,6 +153,123 @@
 </div>
 
 <script>
+    // ==========================================
+    // 擬真音效系統 (Web Audio API)
+    // ==========================================
+    let audioCtx;
+    let noiseBuffer;
+    
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            // 建立白噪音緩衝區 (用於模擬撞擊聲與機械聲)
+            const bufferSize = audioCtx.sampleRate * 1;
+            noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) { output[i] = Math.random() * 2 - 1; }
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    // 輔助函數：多頻率金屬敲擊聲
+    function playPing(freqs, duration, vol) {
+        if (!audioCtx) return;
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        gainNode.connect(audioCtx.destination);
+
+        freqs.forEach(freq => {
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            osc.connect(gainNode);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        });
+    }
+
+    // 輔助函數：帶濾波的噪音 (用於機械喀喀聲、木頭撞擊)
+    function playNoise(filterFreq, type, duration, vol) {
+        if (!audioCtx || !noiseBuffer) return;
+        const source = audioCtx.createBufferSource();
+        source.buffer = noiseBuffer;
+        
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = type;
+        filter.frequency.value = filterFreq;
+        filter.Q.value = 1;
+        
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        
+        source.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        source.start();
+        source.stop(audioCtx.currentTime + duration);
+    }
+
+    // 1. 真實硬幣掉落聲
+    function playCoinSound() {
+        playPing([2000, 3100, 4300], 0.3, 0.15); // 第一下撞擊
+        setTimeout(() => playPing([1800, 2800, 3900], 0.2, 0.08), 80); // 彈跳
+        setTimeout(() => playPing([2100, 3200, 4400], 0.4, 0.1), 160); // 最終落下
+    }
+
+    // 2. 跑燈繼電器喀喀聲 (短促的機械雜音)
+    function playTickSound() {
+        playNoise(1500, 'bandpass', 0.04, 0.8); 
+    }
+
+    // 3. 鎖定時較重的機械聲
+    function playRouletteStop() {
+        playNoise(800, 'lowpass', 0.1, 1.2);
+        playPing([600, 900], 0.15, 0.2);
+    }
+
+    // 4. 拉桿發射聲 (粗彈簧聲)
+    function playLaunchSound() {
+        playNoise(300, 'lowpass', 0.2, 1.0); // 沉悶的底座撞擊
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.4);
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+        osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+    }
+
+    // 5. 球體碰撞聲
+    function playBounceSound(isOrange) {
+        if (isOrange) {
+            // 橘色大釘/木頭：沉悶的叩叩聲
+            playNoise(500, 'bandpass', 0.08, 0.8);
+            playPing([300, 450], 0.06, 0.1);
+        } else {
+            // 銀色金屬釘：清脆的高頻叮叮聲
+            playPing([1800, 2600, 3800], 0.12, 0.15);
+            playNoise(5000, 'highpass', 0.03, 0.3); // 些許金屬摩擦聲
+        }
+    }
+
+    // 6. 中獎老式電鈴
+    function playWinSound() {
+        let t = 0;
+        for(let i=0; i<12; i++) {
+            setTimeout(() => playPing([1200, 1500, 2200], 0.15, 0.25), t);
+            t += 60; // 快速連續敲擊
+        }
+    }
+
+
+    // ==========================================
+    // 遊戲主邏輯
+    // ==========================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -188,6 +286,7 @@
     let currentLedIndex = -1; 
     let topLeftMultiplier = 1;  
     let flashInterval = null;
+    let lastBounceTime = 0; 
     
     const multiplierValues = [10, 8, 6, 4, 2];
 
@@ -229,7 +328,6 @@
         }
     }
 
-    // 繪製銀色金屬質感彈珠
     function drawMetallicBall(ctx, x, y, radius) {
         ctx.save();
         const startX = x - radius * 0.3;
@@ -275,10 +373,13 @@
     }
 
     function insertCoin() {
+        initAudio(); 
+        
         if (isFlashing || isLoadingBall || isLocking) return; 
 
         if (isLocked && (!hasLaunched || ball !== null)) {
             if (topLeftMultiplier < 20) {
+                playCoinSound(); 
                 topLeftMultiplier++;
                 document.querySelectorAll('.odds-led').forEach(l => l.classList.remove('active'));
                 document.getElementById(`odds-led-${topLeftMultiplier}`).classList.add('active');
@@ -288,6 +389,7 @@
 
         if (ball !== null || ballInPlunger || (ballInTrough.active && ballInTrough.x < 365)) return;
 
+        playCoinSound(); 
         isFlashing = true; 
         isLocked = false;
         hasLaunched = false;
@@ -297,7 +399,9 @@
         document.getElementById('odds-led-1').classList.add('active'); 
 
         if (flashInterval) clearInterval(flashInterval);
+        // 加入跑馬燈運轉的機械喀喀聲
         flashInterval = setInterval(() => {
+            playTickSound(); 
             document.querySelectorAll('.led').forEach(l => l.classList.remove('active'));
             currentLedIndex = (currentLedIndex + 1) % 5;
             document.getElementById(`led-${currentLedIndex}`).classList.add('active');
@@ -305,6 +409,7 @@
     }
 
     function pressRedButton() {
+        initAudio(); 
         if (!isFlashing) return;
         clearInterval(flashInterval);
         isFlashing = false; 
@@ -323,12 +428,14 @@
         
         let bc = 0;
         let bi = setInterval(() => {
+            playTickSound(); // 減速時的機械聲
             activeLedMiddle.classList.toggle('active');
             let currentLeftLed = document.getElementById(`odds-led-${topLeftMultiplier}`);
             if (currentLeftLed) currentLeftLed.classList.toggle('active');
             
             if (++bc >= 6) { 
                 clearInterval(bi); 
+                playRouletteStop(); // 鎖定聲
                 activeLedMiddle.classList.add('active'); 
                 let finalLeftLed = document.getElementById(`odds-led-${topLeftMultiplier}`);
                 if (finalLeftLed) finalLeftLed.classList.add('active'); 
@@ -342,7 +449,6 @@
     const domSpring = document.getElementById('domSpring');
     const coinPanelEl = document.getElementById('coinPanel');
 
-    // 精準滿版縮放
     function resizeGame() {
         const casing = document.querySelector('.machine-casing');
         const scaleX = window.innerWidth / casing.offsetWidth; 
@@ -355,6 +461,7 @@
     setTimeout(resizeGame, 0); 
 
     window.addEventListener('keydown', function(e) {
+        initAudio();
         if (e.code === 'KeyC' || e.key === 'c' || e.key === 'C') {
             insertCoin();
         } else if (e.code === 'Space') {
@@ -372,6 +479,7 @@
             if (!isPulling) return;
             isPulling = false;
             if (pullStrength > 10 && ballInPlunger) {
+                playLaunchSound(); 
                 ball = { x: 380, y: 489 + pullStrength, vx: (Math.random()-0.5)*0.5, vy: -(14 + pullStrength * 0.28) };
                 ballInPlunger = false; hasLaunched = true; 
             }
@@ -382,6 +490,7 @@
     });
 
     launchBtn.addEventListener('pointerdown', (e) => {
+        initAudio();
         e.preventDefault();
         if (!isLocked || isLocking || !ballInPlunger) return; 
         isPulling = true;
@@ -393,6 +502,7 @@
         if (!isPulling) return;
         isPulling = false;
         if (pullStrength > 10 && ballInPlunger) {
+            playLaunchSound(); 
             ball = { x: 380, y: 489 + pullStrength, vx: (Math.random()-0.5)*0.5, vy: -(14 + pullStrength * 0.28) };
             ballInPlunger = false; hasLaunched = true; 
         }
@@ -435,6 +545,12 @@
                         let currentBounce = (p.type==='orange') ? bounce * 1.15 : bounce;
                         ball.vx = (ball.vx - 2 * dot * nx) * currentBounce + (Math.random()-0.5)*0.4;
                         ball.vy = (ball.vy - 2 * dot * ny) * currentBounce + (Math.random()-0.5)*0.4;
+                        
+                        let now = Date.now();
+                        if (now - lastBounceTime > 30) {
+                            playBounceSound(p.type === 'orange');
+                            lastBounceTime = now;
+                        }
                     }
                 }
             });
@@ -465,6 +581,7 @@
                     let landedLedIndex = slotMapping[slotIndex];
                     
                     if (landedLedIndex === currentLedIndex) {
+                        playWinSound(); 
                         let baseScore = multiplierValues[landedLedIndex]; 
                         let totalScore = baseScore * topLeftMultiplier;   
                         shootDanmaku(`🎉 恭喜中獎！打中【${baseScore}粒】洞口，加碼 ${topLeftMultiplier} 倍，總計贏得：${totalScore} 粒！`, true);
