@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>經典夜市彈珠檯 - 手動加碼版</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #2c3e50; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; font-family: "Microsoft JhengHei", sans-serif; user-select: none; }
+        .machine-casing { background: linear-gradient(145deg, #8b4513, #5c2e0b); border: 15px solid #4a2508; border-radius: 10px; box-shadow: 10px 10px 30px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.5); width: 450px; padding: 10px; position: relative; }
+        
+        /* 記分板區塊 */
+        .scoreboard { 
+            box-sizing: border-box; 
+            background-color: #f8f9fa; 
+            border: 3px solid #333; 
+            border-radius: 5px; 
+            padding: 10px 12px; 
+            margin-bottom: 10px; 
+            height: 126px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1); 
+            overflow: hidden; 
+        }
+        
+        /* 左上角：1~20 累加倍率燈板 */
+        .odds-board { display: flex; gap: 6px; padding: 5px; height: 100px; font-family: "Courier New", Courier, monospace; box-sizing: border-box; flex-shrink: 0; }
+        .odds-col { display: flex; flex-direction: column; justify-content: flex-start; gap: 4px; }
+        .odds-item { display: flex; align-items: center; font-size: 0.75rem; line-height: 1; font-weight: bold; color: #444; width: 26px; height: 8px; }
+        .odds-led { width: 6px; height: 6px; background-color: #4a0000; border-radius: 50%; margin-right: 4px; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.6); flex-shrink: 0; }
+        .odds-led.active { background-color: #ff3333; box-shadow: 0 0 6px #ff3333, 0 0 12px #ff0000; }
+
+        /* 中間：實體洞口基準燈號 */
+        .scores-container { display: flex; justify-content: center; gap: 15px; flex: 1 1 auto; margin: 0 10px; height: 100px; }
+        .score-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100px; }
+        .score-text { writing-mode: vertical-rl; font-weight: bold; font-size: 1.2rem; letter-spacing: 2px; color: #333; margin-bottom: 5px; }
+        .led { width: 14px; height: 14px; background-color: #4a0000; border-radius: 50%; margin-bottom: 6px; transition: 0.1s; }
+        .led.active { background-color: #ff3333; box-shadow: 0 0 12px #ff3333, 0 0 25px #ff0000; }
+
+        /* 右側：投幣區與呼吸燈動畫 */
+        .coin-panel { 
+            width: 50px; height: 100px; box-sizing: border-box; flex-shrink: 0; margin-right: 8px; 
+            background: linear-gradient(135deg, #e0e0e0, #999999); border: 2px solid #666; border-radius: 5px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 10px; cursor: pointer; 
+            box-shadow: inset 1px 1px 5px rgba(255,255,255,0.8), 2px 2px 5px rgba(0,0,0,0.3); transition: 0.3s; 
+        }
+        .coin-slot { width: 6px; height: 30px; background-color: #111; border: 1px solid #444; border-radius: 3px; margin-bottom: 6px; }
+        .coin-text { font-size: 0.8rem; font-weight: bold; color: #222; writing-mode: vertical-rl; line-height: 1.1; }
+        
+        @keyframes breathe-glow {
+            0% { box-shadow: 0 0 5px #ffeb3b, inset 1px 1px 5px rgba(255,255,255,0.8), 2px 2px 5px rgba(0,0,0,0.3); border-color: #ffc107; }
+            50% { box-shadow: 0 0 15px #ff9800, 0 0 25px #ffeb3b, inset 1px 1px 5px rgba(255,255,255,0.8), 2px 2px 5px rgba(0,0,0,0.3); border-color: #fff; }
+            100% { box-shadow: 0 0 5px #ffeb3b, inset 1px 1px 5px rgba(255,255,255,0.8), 2px 2px 5px rgba(0,0,0,0.3); border-color: #ffc107; }
+        }
+        .coin-panel.highlight { animation: breathe-glow 1.5s ease-in-out infinite; }
+        
+        /* 遊戲區域與操作按鈕 */
+        .playfield { background-color: #222; border: 5px solid #333; border-radius: 5px; position: relative; height: 530px; overflow: hidden; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); }
+        .controls { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
+        .red-btn-container { background-color: #ddd; padding: 10px; border-radius: 5px; border: 2px solid #999; }
+        .btn-red { width: 50px; height: 50px; background: radial-gradient(circle, #ff4444, #cc0000); border-radius: 50%; border: 3px solid #fff; box-shadow: 0 5px #880000; cursor: pointer; }
+        .btn-red:active, .btn-red.active { transform: translateY(5px); box-shadow: 0 0px #880000; }
+        .plunger-container { position: relative; display: flex; flex-direction: column; align-items: center; height: 90px; justify-content: flex-start; }
+        .plunger { width: 40px; height: 50px; background-color: #e6c200; border-radius: 5px 5px 15px 15px; border: 2px solid #b39700; cursor: pointer; position: absolute; top: 0; z-index: 10; box-shadow: 0 5px #998000; display: flex; justify-content: center; align-items: center; font-weight: bold; color: #4a2508; }
+        .dom-spring { width: 14px; height: 40px; background: repeating-linear-gradient(to bottom, #999, #999 4px, #444 4px, #444 8px); position: absolute; top: 50px; z-index: 5; border-radius: 3px; transform-origin: top; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5); }
+
+        /* 彈幕系統 CSS */
+        #danmakuContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; overflow: hidden; }
+        .danmaku-msg {
+            position: absolute; white-space: nowrap; font-weight: bold; font-family: "Microsoft JhengHei", sans-serif;
+            text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            animation: scrollDanmaku 4s linear forwards; pointer-events: none;
+        }
+        .danmaku-win { color: #ffeb3b; font-size: 1.4rem; z-index: 22; }
+        @keyframes scrollDanmaku {
+            0% { left: 100%; transform: translateX(0); }
+            100% { left: 0%; transform: translateX(-100%); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="machine-casing">
+    <div class="scoreboard">
+        <div class="odds-board">
+            <div class="odds-col">
+                <div class="odds-item"><div class="odds-led" id="odds-led-1"></div>1</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-2"></div>2</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-3"></div>3</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-4"></div>4</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-5"></div>5</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-6"></div>6</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-7"></div>7</div>
+            </div>
+            <div class="odds-col">
+                <div class="odds-item"><div class="odds-led" id="odds-led-8"></div>8</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-9"></div>9</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-10"></div>10</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-11"></div>11</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-12"></div>12</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-13"></div>13</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-14"></div>14</div>
+            </div>
+            <div class="odds-col">
+                <div class="odds-item"><div class="odds-led" id="odds-led-15"></div>15</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-16"></div>16</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-17"></div>17</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-18"></div>18</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-19"></div>19</div>
+                <div class="odds-item"><div class="odds-led" id="odds-led-20"></div>20</div>
+            </div>
+        </div>
+
+        <div class="scores-container">
+            <div class="score-column"><div class="led" id="led-0"></div><div class="score-text">十粒</div></div>
+            <div class="score-column"><div class="led" id="led-1"></div><div class="score-text">八粒</div></div>
+            <div class="score-column"><div class="led" id="led-2"></div><div class="score-text">六粒</div></div>
+            <div class="score-column"><div class="led" id="led-3"></div><div class="score-text">四粒</div></div>
+            <div class="score-column"><div class="led" id="led-4"></div><div class="score-text">二粒</div></div>
+        </div>
+
+        <div class="coin-panel" id="coinPanel" title="快速鍵: C" onclick="insertCoin()">
+            <div class="coin-slot"></div>
+            <div class="coin-text" id="coinActionText">投幣放球</div>
+        </div>
+    </div>
+
+    <div class="playfield">
+        <canvas id="gameCanvas" width="410" height="530"></canvas>
+        <div id="danmakuContainer"></div> 
+    </div>
+
+    <div class="controls">
+        <div class="red-btn-container" title="快速鍵: 空白鍵">
+            <div class="btn-red" id="redBtn" onmousedown="pressRedButton()"></div>
+        </div>
+        <div class="plunger-container" title="快速鍵: 向下方向鍵(↓)">
+            <div class="plunger" id="launchBtn">拉</div>
+            <div class="dom-spring" id="domSpring"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let ball = null;            
+    let ballInTrough = { x: 365, y: 489, active: true }; 
+    let ballInPlunger = false;  
+    let isLoadingBall = false;  
+    
+    let isFlashing = false;
+    let isLocked = false;
+    let isLocking = false;      
+    let hasLaunched = false;    
+    
+    let currentLedIndex = -1; 
+    let topLeftMultiplier = 1;  
+    let flashInterval = null;
+    
+    const multiplierValues = [10, 8, 6, 4, 2];
+
+    const pegs = [];
+    const ballRadius = 6;
+    const pegRadius = 3;
+    
+    const gravity = 0.32;       
+    const bounce = 0.62;        
+    const friction = 0.995;     
+
+    const playfieldLeft = 5, playfieldRight = 365;
+    const slotCount = 12;
+    const slotWidth = (playfieldRight - playfieldLeft) / slotCount;
+    const slotMapping = [3, 4, 2, 1, 4, 3, 1, 2, 4, 0, 3, 4];
+
+    function initPegs() {
+        pegs.length = 0;
+        for (let a = 0; a >= -Math.PI/3.5; a -= 0.15) {
+            pegs.push({ x: 205 + 160 * Math.cos(a), y: 205 + 160 * Math.sin(a), type: 'metal' });
+        }
+        pegs.push({ x: 120, y: 70, type: 'orange' }, { x: 70, y: 90, type: 'orange' });
+        for(let i = 0; i < 9; i++) pegs.push({ x: 40 + i * 35, y: 135, type: (i%2==0)?'orange':'metal' });
+        
+        for (let row = 0; row < 9; row++) {
+            let cols = (row % 2 === 0) ? 11 : 10;
+            let startX = (row % 2 === 0) ? 25 : 41;
+            for (let col = 0; col < cols; col++) {
+                let px = startX + col * 32;
+                if (px < 355) pegs.push({ x: px, y: 165 + row * 25, type: 'metal' });
+            }
+        }
+
+        for (let i = 1; i < slotCount; i++) {
+            let px = 5 + i * slotWidth;
+            pegs.push({ x: px, y: 395, type: 'metal' });
+            pegs.push({ x: px, y: 415, type: 'metal' });
+            pegs.push({ x: px, y: 435, type: 'metal' });
+        }
+    }
+
+    // 產生彈幕的函式
+    function shootDanmaku(text, isWin) {
+        const container = document.getElementById('danmakuContainer');
+        const msg = document.createElement('div');
+        msg.className = 'danmaku-msg ' + (isWin ? 'danmaku-win' : '');
+        msg.innerText = text;
+        
+        const randomTop = Math.random() * 40 + 20; 
+        msg.style.top = `${randomTop}%`;
+        
+        container.appendChild(msg);
+        
+        setTimeout(() => {
+            if (container.contains(msg)) {
+                container.removeChild(msg);
+            }
+        }, 4000);
+    }
+
+    function insertCoin() {
+        if (isFlashing || isLoadingBall || isLocking) return; 
+
+        if (isLocked && (!hasLaunched || ball !== null)) {
+            if (topLeftMultiplier < 20) {
+                topLeftMultiplier++;
+                document.querySelectorAll('.odds-led').forEach(l => l.classList.remove('active'));
+                document.getElementById(`odds-led-${topLeftMultiplier}`).classList.add('active');
+            }
+            return;
+        }
+
+        if (ball !== null || ballInPlunger || (ballInTrough.active && ballInTrough.x < 365)) return;
+
+        isFlashing = true; 
+        isLocked = false;
+        hasLaunched = false;
+        topLeftMultiplier = 1; 
+
+        document.querySelectorAll('.odds-led').forEach(l => l.classList.remove('active'));
+        document.getElementById('odds-led-1').classList.add('active'); 
+
+        if (flashInterval) clearInterval(flashInterval);
+        flashInterval = setInterval(() => {
+            document.querySelectorAll('.led').forEach(l => l.classList.remove('active'));
+            currentLedIndex = (currentLedIndex + 1) % 5;
+            document.getElementById(`led-${currentLedIndex}`).classList.add('active');
+        }, 60);
+    }
+
+    function pressRedButton() {
+        if (!isFlashing) return;
+        clearInterval(flashInterval);
+        isFlashing = false; 
+        isLocked = true;
+        isLocking = true; 
+        
+        // 視覺回饋 (給鍵盤操作用)
+        const btn = document.getElementById('redBtn');
+        btn.classList.add('active');
+        setTimeout(() => btn.classList.remove('active'), 150);
+
+        document.querySelectorAll('.led').forEach(l => l.classList.remove('active'));
+        let activeLedMiddle = document.getElementById(`led-${currentLedIndex}`);
+        
+        topLeftMultiplier = 1; 
+        document.querySelectorAll('.odds-led').forEach(l => l.classList.remove('active'));
+        
+        let bc = 0;
+        let bi = setInterval(() => {
+            activeLedMiddle.classList.toggle('active');
+            let currentLeftLed = document.getElementById(`odds-led-${topLeftMultiplier}`);
+            if (currentLeftLed) currentLeftLed.classList.toggle('active');
+            
+            if (++bc >= 6) { 
+                clearInterval(bi); 
+                activeLedMiddle.classList.add('active'); 
+                let finalLeftLed = document.getElementById(`odds-led-${topLeftMultiplier}`);
+                if (finalLeftLed) finalLeftLed.classList.add('active'); 
+                isLocking = false; isLoadingBall = true;  
+            }
+        }, 80);
+    }
+
+    let isPulling = false, pullStrength = 0;
+    const launchBtn = document.getElementById('launchBtn');
+    const domSpring = document.getElementById('domSpring');
+    const coinPanelEl = document.getElementById('coinPanel');
+
+    // 鍵盤事件監聽
+    window.addEventListener('keydown', function(e) {
+        if (e.code === 'KeyC' || e.key === 'c' || e.key === 'C') {
+            insertCoin();
+        } else if (e.code === 'Space') {
+            e.preventDefault(); // 防止空白鍵往下捲動網頁
+            pressRedButton();
+        } else if (e.code === 'ArrowDown') {
+            e.preventDefault();
+            if (!isLocked || isLocking || !ballInPlunger) return;
+            isPulling = true;
+        }
+    });
+
+    window.addEventListener('keyup', function(e) {
+        if (e.code === 'ArrowDown') {
+            if (!isPulling) return;
+            isPulling = false;
+            if (pullStrength > 10 && ballInPlunger) {
+                ball = { x: 380, y: 489 + pullStrength, vx: (Math.random()-0.5)*0.5, vy: -(14 + pullStrength * 0.28) };
+                ballInPlunger = false; hasLaunched = true; 
+            }
+            pullStrength = 0; 
+            launchBtn.style.transform = `translateY(0px)`;
+            domSpring.style.top = `50px`; domSpring.style.height = `40px`;
+        }
+    });
+
+    launchBtn.onmousedown = () => {
+        if (!isLocked || isLocking || !ballInPlunger) return; 
+        isPulling = true;
+    };
+
+    window.onmouseup = () => {
+        if (!isPulling) return;
+        isPulling = false;
+        if (pullStrength > 10 && ballInPlunger) {
+            ball = { x: 380, y: 489 + pullStrength, vx: (Math.random()-0.5)*0.5, vy: -(14 + pullStrength * 0.28) };
+            ballInPlunger = false; hasLaunched = true; 
+        }
+        pullStrength = 0; 
+        launchBtn.style.transform = `translateY(0px)`;
+        domSpring.style.top = `50px`; domSpring.style.height = `40px`;
+    };
+
+    function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        let isWaitingForNewGame = (ball === null && !ballInPlunger && !isLoadingBall && !isFlashing && !isLocking && ballInTrough.x >= 365);
+        if (isWaitingForNewGame) {
+            if (!coinPanelEl.classList.contains('highlight')) coinPanelEl.classList.add('highlight');
+        } else {
+            if (coinPanelEl.classList.contains('highlight')) coinPanelEl.classList.remove('highlight');
+        }
+
+        if (ball) {
+            ball.vy += gravity; ball.vx *= friction; ball.vy *= friction;
+            ball.x += ball.vx; ball.y += ball.vy;
+
+            pegs.forEach(p => {
+                let dx = ball.x - p.x, dy = ball.y - p.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                let r = (p.type==='orange') ? ballRadius + pegRadius + 1.5 : ballRadius + pegRadius;
+                if (dist < r) {
+                    let nx = dx / dist, ny = dy / dist;
+                    ball.x = p.x + nx * (r + 0.1);
+                    ball.y = p.y + ny * (r + 0.1);
+                    let dot = ball.vx * nx + ball.vy * ny;
+                    if (dot < 0) {
+                        let currentBounce = (p.type==='orange') ? bounce * 1.15 : bounce;
+                        ball.vx = (ball.vx - 2 * dot * nx) * currentBounce + (Math.random()-0.5)*0.4;
+                        ball.vy = (ball.vy - 2 * dot * ny) * currentBounce + (Math.random()-0.5)*0.4;
+                    }
+                }
+            });
+            
+            if (ball.y < 205) {
+                let dx = ball.x - 205, dy = ball.y - 205, dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist > 200 - ballRadius) {
+                    let nx = dx / dist, ny = dy / dist; 
+                    ball.x = 205 + nx * (200 - ballRadius); 
+                    ball.y = 205 + ny * (200 - ballRadius);
+                    let dot = ball.vx * nx + ball.vy * ny; 
+                    if (dot > 0) { ball.vx = (ball.vx - 2 * dot * nx) * bounce; ball.vy = (ball.vy - 2 * dot * ny) * bounce; }
+                }
+            } else {
+                if (ball.x < 11 + ballRadius) { ball.x = 11 + ballRadius; ball.vx *= -bounce; }
+                if (ball.x > 400 - ballRadius) { ball.x = 400 - ballRadius; ball.vx *= -bounce; }
+                if (ball.y < 425 && ball.x > 360 - ballRadius && ball.x < 370) { ball.x = 360 - ballRadius; ball.vx *= -bounce; }
+            }
+            
+            if (ball.y > 440 && ball.x < 365) {
+                ballInTrough = { x: ball.x, y: ball.y, active: true };
+                
+                // === 僅中獎時觸發彈幕 ===
+                if (isLocked && hasLaunched) {
+                    let slotIndex = Math.floor((ball.x - playfieldLeft) / slotWidth);
+                    if (slotIndex < 0) slotIndex = 0;
+                    if (slotIndex >= slotCount) slotIndex = slotCount - 1;
+                    
+                    let landedLedIndex = slotMapping[slotIndex];
+                    
+                    if (landedLedIndex === currentLedIndex) {
+                        let baseScore = multiplierValues[landedLedIndex]; 
+                        let totalScore = baseScore * topLeftMultiplier;   
+                        shootDanmaku(`🎉 恭喜中獎！打中【${baseScore}粒】洞口，加碼 ${topLeftMultiplier} 倍，總計贏得：${totalScore} 粒！`, true);
+                    }
+                }
+                
+                ball = null; 
+            }
+        }
+
+        if (ballInTrough.active) {
+            let targetYFloor = 445 + (ballInTrough.x - 5) * (50/365); 
+            if (!isLoadingBall) {
+                if (ballInTrough.x < 365) {
+                    ballInTrough.x += 2.0; ballInTrough.y = targetYFloor - ballRadius;
+                } else {
+                    ballInTrough.x = 365; ballInTrough.y = 489; 
+                }
+            } else {
+                let targetX = 380; let targetY = 489; 
+                let dx = targetX - ballInTrough.x; let dy = targetY - ballInTrough.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 2) {
+                    ballInTrough.x = targetX; ballInTrough.y = targetY;
+                    isLoadingBall = false; ballInPlunger = true; ballInTrough.active = false;
+                } else {
+                    ballInTrough.x += (dx / dist) * 2.5; ballInTrough.y += (dy / dist) * 2.5;
+                }
+            }
+        }
+
+        if (isPulling && pullStrength < 45) { 
+            pullStrength += 1.5; 
+            launchBtn.style.transform = `translateY(${pullStrength}px)`; 
+            domSpring.style.top = `${50 + pullStrength}px`;
+            domSpring.style.height = `${Math.max(5, 40 - pullStrength)}px`;
+        }
+
+        // ==========================================
+        // 視覺繪製層
+        // ==========================================
+        ctx.save(); ctx.strokeStyle = '#888'; ctx.lineWidth = 2; ctx.beginPath();
+        let springTopCanvas = 495 + pullStrength; let springBottomCanvas = 525; 
+        let coils = 8; let coilHeight = (springBottomCanvas - springTopCanvas) / coils;
+        ctx.moveTo(380, springTopCanvas);
+        for(let i=1; i<=coils; i++) {
+            let cx = 380 + (i%2===0 ? -6 : 6); let cy = springTopCanvas + coilHeight * (i - 0.5);
+            ctx.lineTo(cx, cy); ctx.lineTo(380, springTopCanvas + coilHeight * i);
+        }
+        ctx.stroke();
+        ctx.fillStyle = '#666'; ctx.fillRect(366, springTopCanvas, 28, 4); 
+        ctx.restore();
+
+        for (let i = 0; i < slotCount; i++) {
+            let cx = playfieldLeft + (i + 0.5) * slotWidth; let cy = 410;
+            let isActive = (currentLedIndex === slotMapping[i] && (isFlashing || isLocked));
+            ctx.fillStyle = isActive ? '#ffffff' : '#888888';
+            ctx.font = 'bold 12px "Courier New"'; ctx.textAlign = 'center'; ctx.fillText(multiplierValues[slotMapping[i]], cx, cy - 16);
+            ctx.fillStyle = isActive ? '#ff3333' : '#330000';
+            if (isActive) { ctx.shadowBlur = 10; ctx.shadowColor = '#ff3333'; }
+            ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI*2); ctx.fill(); ctx.shadowBlur = 0;
+        }
+
+        if (ball) { ctx.fillStyle = '#ff6666'; ctx.beginPath(); ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI*2); ctx.fill(); }
+        if (ballInTrough.active) { ctx.fillStyle = '#cc5555'; ctx.beginPath(); ctx.arc(ballInTrough.x, ballInTrough.y, ballRadius, 0, Math.PI*2); ctx.fill(); }
+        if (ballInPlunger) { let ballY = 489 + pullStrength; ctx.fillStyle = '#ff6666'; ctx.beginPath(); ctx.arc(380, ballY, ballRadius, 0, Math.PI*2); ctx.fill(); }
+
+        ctx.save(); ctx.fillStyle = '#f2f2f2'; ctx.shadowBlur = 4; ctx.shadowColor = 'black';
+        ctx.beginPath(); ctx.moveTo(5, 445); ctx.lineTo(370, 495); ctx.lineTo(370, 515); ctx.lineTo(5, 465); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(370, 410); ctx.lineTo(370, 495); ctx.lineTo(280, 495); ctx.fill();
+        ctx.restore();
+
+        ctx.fillStyle = '#fff'; ctx.fillRect(365, 205, 5, 220); ctx.fillRect(405, 205, 5, 320); 
+        ctx.beginPath(); ctx.arc(205, 205, 200, 0, Math.PI, true); ctx.strokeStyle = '#fff'; ctx.lineWidth = 5; ctx.stroke();
+
+        pegs.forEach(p => {
+            ctx.fillStyle = p.type==='orange'?'#f90':'#aaa';
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.type==='orange'?pegRadius+1.5:pegRadius, 0, Math.PI*2); ctx.fill();
+        });
+
+        requestAnimationFrame(loop);
+    }
+
+    initPegs(); loop();
+</script>
+
+</body>
+</html>
