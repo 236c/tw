@@ -1,14 +1,42 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>經典夜市彈珠檯 - 手動加碼版</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./經典夜市彈珠檯 - 手動加碼版_files/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #2c3e50; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; font-family: "Microsoft JhengHei", sans-serif; user-select: none; }
-        .machine-casing { background: linear-gradient(145deg, #8b4513, #5c2e0b); border: 15px solid #4a2508; border-radius: 10px; box-shadow: 10px 10px 30px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.5); width: 450px; padding: 10px; position: relative; }
+        body { 
+            background-color: #2c3e50; /* 恢復為原本的深藍灰色背景 */
+            min-height: 100vh; 
+            width: 100vw;
+            margin: 0; 
+            font-family: "Microsoft JhengHei", sans-serif; 
+            user-select: none; 
+            overflow: hidden; /* 防止手機螢幕被拖拉 */
+            touch-action: none; /* 禁用瀏覽器預設手勢 */
+            position: relative; 
+        }
         
+        .machine-casing { 
+            background: linear-gradient(145deg, #8b4513, #5c2e0b); 
+            border: 15px solid #4a2508; 
+            border-radius: 10px; 
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.5); 
+            width: 450px; 
+            padding: 10px; 
+            
+            /* 絕對置中 */
+            position: absolute; 
+            top: 50%;
+            left: 50%;
+            transform-origin: center center; 
+        }
+        
+        /* 確保按鈕不會觸發手機預設行為 */
+        .plunger, .btn-red, .coin-panel {
+            touch-action: none; 
+        }
+
         /* 記分板區塊 */
         .scoreboard { 
             box-sizing: border-box; 
@@ -86,7 +114,7 @@
     <div class="scoreboard">
         <div class="odds-board">
             <div class="odds-col">
-                <div class="odds-item"><div class="odds-led" id="odds-led-1"></div>1</div>
+                <div class="odds-item"><div class="odds-led active" id="odds-led-1"></div>1</div>
                 <div class="odds-item"><div class="odds-led" id="odds-led-2"></div>2</div>
                 <div class="odds-item"><div class="odds-led" id="odds-led-3"></div>3</div>
                 <div class="odds-item"><div class="odds-led" id="odds-led-4"></div>4</div>
@@ -116,12 +144,12 @@
         <div class="scores-container">
             <div class="score-column"><div class="led" id="led-0"></div><div class="score-text">十粒</div></div>
             <div class="score-column"><div class="led" id="led-1"></div><div class="score-text">八粒</div></div>
-            <div class="score-column"><div class="led" id="led-2"></div><div class="score-text">六粒</div></div>
+            <div class="score-column"><div class="led active" id="led-2"></div><div class="score-text">六粒</div></div>
             <div class="score-column"><div class="led" id="led-3"></div><div class="score-text">四粒</div></div>
             <div class="score-column"><div class="led" id="led-4"></div><div class="score-text">二粒</div></div>
         </div>
 
-        <div class="coin-panel" id="coinPanel" title="快速鍵: C" onclick="insertCoin()">
+        <div class="coin-panel highlight" id="coinPanel" title="快速鍵: C" onpointerdown="insertCoin()">
             <div class="coin-slot"></div>
             <div class="coin-text" id="coinActionText">投幣放球</div>
         </div>
@@ -134,11 +162,11 @@
 
     <div class="controls">
         <div class="red-btn-container" title="快速鍵: 空白鍵">
-            <div class="btn-red" id="redBtn" onmousedown="pressRedButton()"></div>
+            <div class="btn-red" id="redBtn" onpointerdown="pressRedButton()"></div>
         </div>
         <div class="plunger-container" title="快速鍵: 向下方向鍵(↓)">
-            <div class="plunger" id="launchBtn">拉</div>
-            <div class="dom-spring" id="domSpring"></div>
+            <div class="plunger" id="launchBtn" style="transform: translateY(0px);">拉</div>
+            <div class="dom-spring" id="domSpring" style="top: 50px; height: 40px;"></div>
         </div>
     </div>
 </div>
@@ -201,7 +229,33 @@
         }
     }
 
-    // 產生彈幕的函式
+    // 繪製銀色金屬質感彈珠
+    function drawMetallicBall(ctx, x, y, radius) {
+        ctx.save();
+        const startX = x - radius * 0.3;
+        const startY = y - radius * 0.3;
+        const metallicGradient = ctx.createRadialGradient(
+            startX, startY, 0,
+            x, y, radius
+        );
+        
+        metallicGradient.addColorStop(0, '#FFFFFF');    
+        metallicGradient.addColorStop(0.2, '#E0E0E0');  
+        metallicGradient.addColorStop(0.5, '#C0C0C0');  
+        metallicGradient.addColorStop(0.8, '#808080');  
+        metallicGradient.addColorStop(1, '#404040');    
+        
+        ctx.fillStyle = metallicGradient;
+        ctx.strokeStyle = '#606060';
+        ctx.lineWidth = 0.5;
+        
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+    }
+
     function shootDanmaku(text, isWin) {
         const container = document.getElementById('danmakuContainer');
         const msg = document.createElement('div');
@@ -257,7 +311,6 @@
         isLocked = true;
         isLocking = true; 
         
-        // 視覺回饋 (給鍵盤操作用)
         const btn = document.getElementById('redBtn');
         btn.classList.add('active');
         setTimeout(() => btn.classList.remove('active'), 150);
@@ -289,12 +342,23 @@
     const domSpring = document.getElementById('domSpring');
     const coinPanelEl = document.getElementById('coinPanel');
 
-    // 鍵盤事件監聽
+    // 精準滿版縮放
+    function resizeGame() {
+        const casing = document.querySelector('.machine-casing');
+        const scaleX = window.innerWidth / casing.offsetWidth; 
+        const scaleY = window.innerHeight / casing.offsetHeight; 
+        const scale = Math.min(scaleX, scaleY); 
+        casing.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    }
+    
+    window.addEventListener('resize', resizeGame);
+    setTimeout(resizeGame, 0); 
+
     window.addEventListener('keydown', function(e) {
         if (e.code === 'KeyC' || e.key === 'c' || e.key === 'C') {
             insertCoin();
         } else if (e.code === 'Space') {
-            e.preventDefault(); // 防止空白鍵往下捲動網頁
+            e.preventDefault(); 
             pressRedButton();
         } else if (e.code === 'ArrowDown') {
             e.preventDefault();
@@ -317,12 +381,15 @@
         }
     });
 
-    launchBtn.onmousedown = () => {
+    launchBtn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
         if (!isLocked || isLocking || !ballInPlunger) return; 
         isPulling = true;
-    };
+        launchBtn.setPointerCapture(e.pointerId);
+    });
 
-    window.onmouseup = () => {
+    launchBtn.addEventListener('pointerup', (e) => {
+        e.preventDefault();
         if (!isPulling) return;
         isPulling = false;
         if (pullStrength > 10 && ballInPlunger) {
@@ -332,7 +399,14 @@
         pullStrength = 0; 
         launchBtn.style.transform = `translateY(0px)`;
         domSpring.style.top = `50px`; domSpring.style.height = `40px`;
-    };
+        launchBtn.releasePointerCapture(e.pointerId);
+    });
+
+    window.addEventListener('pointerup', (e) => {
+        if(isPulling) {
+           launchBtn.dispatchEvent(new PointerEvent('pointerup', e));
+        }
+    });
 
     function loop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -383,7 +457,6 @@
             if (ball.y > 440 && ball.x < 365) {
                 ballInTrough = { x: ball.x, y: ball.y, active: true };
                 
-                // === 僅中獎時觸發彈幕 ===
                 if (isLocked && hasLaunched) {
                     let slotIndex = Math.floor((ball.x - playfieldLeft) / slotWidth);
                     if (slotIndex < 0) slotIndex = 0;
@@ -430,9 +503,6 @@
             domSpring.style.height = `${Math.max(5, 40 - pullStrength)}px`;
         }
 
-        // ==========================================
-        // 視覺繪製層
-        // ==========================================
         ctx.save(); ctx.strokeStyle = '#888'; ctx.lineWidth = 2; ctx.beginPath();
         let springTopCanvas = 495 + pullStrength; let springBottomCanvas = 525; 
         let coils = 8; let coilHeight = (springBottomCanvas - springTopCanvas) / coils;
@@ -455,9 +525,9 @@
             ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI*2); ctx.fill(); ctx.shadowBlur = 0;
         }
 
-        if (ball) { ctx.fillStyle = '#ff6666'; ctx.beginPath(); ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI*2); ctx.fill(); }
-        if (ballInTrough.active) { ctx.fillStyle = '#cc5555'; ctx.beginPath(); ctx.arc(ballInTrough.x, ballInTrough.y, ballRadius, 0, Math.PI*2); ctx.fill(); }
-        if (ballInPlunger) { let ballY = 489 + pullStrength; ctx.fillStyle = '#ff6666'; ctx.beginPath(); ctx.arc(380, ballY, ballRadius, 0, Math.PI*2); ctx.fill(); }
+        if (ball) { drawMetallicBall(ctx, ball.x, ball.y, ballRadius); }
+        if (ballInTrough.active) { drawMetallicBall(ctx, ballInTrough.x, ballInTrough.y, ballRadius); }
+        if (ballInPlunger) { let ballY = 489 + pullStrength; drawMetallicBall(ctx, 380, ballY, ballRadius); }
 
         ctx.save(); ctx.fillStyle = '#f2f2f2'; ctx.shadowBlur = 4; ctx.shadowColor = 'black';
         ctx.beginPath(); ctx.moveTo(5, 445); ctx.lineTo(370, 495); ctx.lineTo(370, 515); ctx.lineTo(5, 465); ctx.fill();
@@ -478,5 +548,5 @@
     initPegs(); loop();
 </script>
 
-</body>
-</html>
+
+</body></html>
