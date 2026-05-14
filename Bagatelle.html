@@ -162,7 +162,6 @@
     function initAudio() {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            // 建立白噪音緩衝區 (用於模擬撞擊聲與機械聲)
             const bufferSize = audioCtx.sampleRate * 1;
             noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const output = noiseBuffer.getChannelData(0);
@@ -171,7 +170,6 @@
         if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    // 輔助函數：多頻率金屬敲擊聲
     function playPing(freqs, duration, vol) {
         if (!audioCtx) return;
         const gainNode = audioCtx.createGain();
@@ -189,7 +187,6 @@
         });
     }
 
-    // 輔助函數：帶濾波的噪音 (用於機械喀喀聲、木頭撞擊)
     function playNoise(filterFreq, type, duration, vol) {
         if (!audioCtx || !noiseBuffer) return;
         const source = audioCtx.createBufferSource();
@@ -212,27 +209,23 @@
         source.stop(audioCtx.currentTime + duration);
     }
 
-    // 1. 真實硬幣掉落聲
     function playCoinSound() {
-        playPing([2000, 3100, 4300], 0.3, 0.15); // 第一下撞擊
-        setTimeout(() => playPing([1800, 2800, 3900], 0.2, 0.08), 80); // 彈跳
-        setTimeout(() => playPing([2100, 3200, 4400], 0.4, 0.1), 160); // 最終落下
+        playPing([2000, 3100, 4300], 0.3, 0.15); 
+        setTimeout(() => playPing([1800, 2800, 3900], 0.2, 0.08), 80); 
+        setTimeout(() => playPing([2100, 3200, 4400], 0.4, 0.1), 160); 
     }
 
-    // 2. 跑燈繼電器喀喀聲 (短促的機械雜音)
     function playTickSound() {
         playNoise(1500, 'bandpass', 0.04, 0.8); 
     }
 
-    // 3. 鎖定時較重的機械聲
     function playRouletteStop() {
         playNoise(800, 'lowpass', 0.1, 1.2);
         playPing([600, 900], 0.15, 0.2);
     }
 
-    // 4. 拉桿發射聲 (粗彈簧聲)
     function playLaunchSound() {
-        playNoise(300, 'lowpass', 0.2, 1.0); // 沉悶的底座撞擊
+        playNoise(300, 'lowpass', 0.2, 1.0); 
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
         osc.type = 'sawtooth';
@@ -244,31 +237,27 @@
         osc.start(); osc.stop(audioCtx.currentTime + 0.4);
     }
 
-    // 5. 球體碰撞聲
     function playBounceSound(isOrange) {
         if (isOrange) {
-            // 橘色大釘/木頭：沉悶的叩叩聲
             playNoise(500, 'bandpass', 0.08, 0.8);
             playPing([300, 450], 0.06, 0.1);
         } else {
-            // 銀色金屬釘：清脆的高頻叮叮聲
             playPing([1800, 2600, 3800], 0.12, 0.15);
-            playNoise(5000, 'highpass', 0.03, 0.3); // 些許金屬摩擦聲
+            playNoise(5000, 'highpass', 0.03, 0.3); 
         }
     }
 
-    // 6. 中獎老式電鈴
     function playWinSound() {
         let t = 0;
         for(let i=0; i<12; i++) {
             setTimeout(() => playPing([1200, 1500, 2200], 0.15, 0.25), t);
-            t += 60; // 快速連續敲擊
+            t += 60; 
         }
     }
 
 
     // ==========================================
-    // 遊戲主邏輯
+    // 遊戲主邏輯與雙重拉桿系統
     // ==========================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -291,7 +280,7 @@
     const multiplierValues = [10, 8, 6, 4, 2];
 
     const pegs = [];
-    const ballRadius = 6;
+    const ballRadius = 7;
     const pegRadius = 3;
     
     const gravity = 0.32;       
@@ -399,7 +388,6 @@
         document.getElementById('odds-led-1').classList.add('active'); 
 
         if (flashInterval) clearInterval(flashInterval);
-        // 加入跑馬燈運轉的機械喀喀聲
         flashInterval = setInterval(() => {
             playTickSound(); 
             document.querySelectorAll('.led').forEach(l => l.classList.remove('active'));
@@ -428,14 +416,14 @@
         
         let bc = 0;
         let bi = setInterval(() => {
-            playTickSound(); // 減速時的機械聲
+            playTickSound(); 
             activeLedMiddle.classList.toggle('active');
             let currentLeftLed = document.getElementById(`odds-led-${topLeftMultiplier}`);
             if (currentLeftLed) currentLeftLed.classList.toggle('active');
             
             if (++bc >= 6) { 
                 clearInterval(bi); 
-                playRouletteStop(); // 鎖定聲
+                playRouletteStop(); 
                 activeLedMiddle.classList.add('active'); 
                 let finalLeftLed = document.getElementById(`odds-led-${topLeftMultiplier}`);
                 if (finalLeftLed) finalLeftLed.classList.add('active'); 
@@ -444,10 +432,29 @@
         }, 80);
     }
 
-    let isPulling = false, pullStrength = 0;
+    // ==========================================
+    // 全新拉桿與螢幕滑動支援系統
+    // ==========================================
+    let isAutoPulling = false;    // 自動蓄力狀態 (鍵盤按住、或按著按鈕不放)
+    let isManualPulling = false;  // 手動拖曳狀態 (螢幕下滑)
+    let pullStrength = 0;
+    let dragStartY = 0;
+    
     const launchBtn = document.getElementById('launchBtn');
     const domSpring = document.getElementById('domSpring');
     const coinPanelEl = document.getElementById('coinPanel');
+
+    function firePlunger() {
+        if (pullStrength > 10 && ballInPlunger) {
+            playLaunchSound(); 
+            ball = { x: 380, y: 489 + pullStrength, vx: (Math.random()-0.5)*0.5, vy: -(14 + pullStrength * 0.28) };
+            ballInPlunger = false; hasLaunched = true; 
+        }
+        pullStrength = 0; 
+        launchBtn.style.transform = `translateY(0px)`;
+        domSpring.style.top = `50px`;
+        domSpring.style.height = `40px`;
+    }
 
     function resizeGame() {
         const casing = document.querySelector('.machine-casing');
@@ -456,10 +463,10 @@
         const scale = Math.min(scaleX, scaleY); 
         casing.style.transform = `translate(-50%, -50%) scale(${scale})`;
     }
-    
     window.addEventListener('resize', resizeGame);
     setTimeout(resizeGame, 0); 
 
+    // --- 1. 鍵盤事件 ---
     window.addEventListener('keydown', function(e) {
         initAudio();
         if (e.code === 'KeyC' || e.key === 'c' || e.key === 'C') {
@@ -470,51 +477,85 @@
         } else if (e.code === 'ArrowDown') {
             e.preventDefault();
             if (!isLocked || isLocking || !ballInPlunger) return;
-            isPulling = true;
+            isAutoPulling = true;
         }
     });
 
     window.addEventListener('keyup', function(e) {
         if (e.code === 'ArrowDown') {
-            if (!isPulling) return;
-            isPulling = false;
-            if (pullStrength > 10 && ballInPlunger) {
-                playLaunchSound(); 
-                ball = { x: 380, y: 489 + pullStrength, vx: (Math.random()-0.5)*0.5, vy: -(14 + pullStrength * 0.28) };
-                ballInPlunger = false; hasLaunched = true; 
-            }
-            pullStrength = 0; 
-            launchBtn.style.transform = `translateY(0px)`;
-            domSpring.style.top = `50px`; domSpring.style.height = `40px`;
+            if (!isAutoPulling) return;
+            isAutoPulling = false;
+            firePlunger();
         }
     });
 
+    // --- 2. 拉桿按鈕事件 (支援點按自動拉，或拖曳手動拉) ---
     launchBtn.addEventListener('pointerdown', (e) => {
         initAudio();
         e.preventDefault();
         if (!isLocked || isLocking || !ballInPlunger) return; 
-        isPulling = true;
+        isAutoPulling = true;
+        isManualPulling = false;
+        dragStartY = e.clientY;
         launchBtn.setPointerCapture(e.pointerId);
+    });
+
+    launchBtn.addEventListener('pointermove', (e) => {
+        if (!isAutoPulling && !isManualPulling) return;
+        let deltaY = e.clientY - dragStartY;
+        if (deltaY > 5) {
+            isAutoPulling = false;
+            isManualPulling = true;
+            pullStrength = Math.max(0, Math.min(deltaY * 0.6, 45)); 
+        }
     });
 
     launchBtn.addEventListener('pointerup', (e) => {
         e.preventDefault();
-        if (!isPulling) return;
-        isPulling = false;
-        if (pullStrength > 10 && ballInPlunger) {
-            playLaunchSound(); 
-            ball = { x: 380, y: 489 + pullStrength, vx: (Math.random()-0.5)*0.5, vy: -(14 + pullStrength * 0.28) };
-            ballInPlunger = false; hasLaunched = true; 
+        if (isAutoPulling || isManualPulling) {
+            isAutoPulling = false;
+            isManualPulling = false;
+            firePlunger();
+            launchBtn.releasePointerCapture(e.pointerId);
         }
-        pullStrength = 0; 
-        launchBtn.style.transform = `translateY(0px)`;
-        domSpring.style.top = `50px`; domSpring.style.height = `40px`;
-        launchBtn.releasePointerCapture(e.pointerId);
     });
 
+    // --- 3. 觸控螢幕全局下滑支援 ---
+    window.addEventListener('touchstart', (e) => {
+        initAudio();
+        // 如果按到其他按鈕就不要干擾
+        if (e.target.closest('.coin-panel') || e.target.closest('.btn-red') || e.target.closest('.plunger-container')) return;
+        if (!isLocked || isLocking || !ballInPlunger) return;
+        dragStartY = e.touches[0].clientY;
+        isManualPulling = false;
+    }, {passive: false});
+
+    window.addEventListener('touchmove', (e) => {
+        if (!isLocked || isLocking || !ballInPlunger) return;
+        if (e.target.closest('.coin-panel') || e.target.closest('.btn-red') || e.target.closest('.plunger-container')) return;
+
+        let deltaY = e.touches[0].clientY - dragStartY;
+        if (deltaY > 10) { // 往下超過 10px 視為拉彈簧
+            e.preventDefault();
+            isManualPulling = true;
+            isAutoPulling = false; 
+            pullStrength = Math.max(0, Math.min((deltaY - 10) * 0.5, 45)); // 根據滑動距離設定力度
+        }
+    }, {passive: false});
+
+    window.addEventListener('touchend', (e) => {
+        if (isManualPulling) {
+            isManualPulling = false;
+            firePlunger();
+        }
+    });
+
+    // 全局防呆釋放
     window.addEventListener('pointerup', (e) => {
-        if(isPulling) {
-           launchBtn.dispatchEvent(new PointerEvent('pointerup', e));
+        if(isAutoPulling || isManualPulling) {
+            isAutoPulling = false;
+            isManualPulling = false;
+            firePlunger();
         }
     });
 
@@ -613,8 +654,14 @@
             }
         }
 
-        if (isPulling && pullStrength < 45) { 
-            pullStrength += 1.5; 
+        // ==========================================
+        // 彈簧動畫渲染更新 (加快自動蓄力速度)
+        // ==========================================
+        if (isAutoPulling && pullStrength < 45) { 
+            pullStrength += 3.5; // 速度從 1.5 提升到 3.5
+        }
+
+        if (isAutoPulling || isManualPulling) {
             launchBtn.style.transform = `translateY(${pullStrength}px)`; 
             domSpring.style.top = `${50 + pullStrength}px`;
             domSpring.style.height = `${Math.max(5, 40 - pullStrength)}px`;
@@ -664,6 +711,5 @@
 
     initPegs(); loop();
 </script>
-
 
 </body></html>
