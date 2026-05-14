@@ -31,3 +31,5 @@ https://236c.github.io/tw/StickmanParkour.html
 動畫1 https://236c.github.io/tw/7ball.html
 
 專業級手繪板 https://236c.github.io/tw/PenTablet.html
+
+經典夜市彈珠檯 https://236c.github.io/tw/Bagatelle.html
