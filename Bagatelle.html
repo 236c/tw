@@ -25,9 +25,9 @@
             width: 450px; 
             padding: 10px; 
             position: absolute; 
-            top: 50%;
+            top: 0;
             left: 50%;
-            transform-origin: center center; 
+            transform-origin: top center; 
         }
         
         .plunger, .btn-red, .coin-panel { touch-action: none; }
@@ -46,9 +46,12 @@
         .odds-led.active { background-color: #ff3333; box-shadow: 0 0 6px #ff3333, 0 0 12px #ff0000; }
 
         .scores-container { display: flex; justify-content: center; gap: 15px; flex: 1 1 auto; margin: 0 10px; height: 100px; }
-        .score-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100px; }
-        .score-text { writing-mode: vertical-rl; font-weight: bold; font-size: 1.2rem; letter-spacing: 2px; color: #333; margin-bottom: 5px; }
-        .led { width: 14px; height: 14px; background-color: #4a0000; border-radius: 50%; margin-bottom: 6px; transition: 0.1s; }
+        /* 改為垂直置中排版，配合字在上、燈在下的佈局 */
+        .score-column { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100px; }
+        /* 調整文字大小以容納四個字 */
+        .score-text { writing-mode: vertical-rl; font-weight: bold; font-size: 1.1rem; letter-spacing: 2px; color: #333; }
+        /* 燈號移到文字下方，改為使用 margin-top */
+        .led { width: 14px; height: 14px; background-color: #4a0000; border-radius: 50%; margin-top: 6px; transition: 0.1s; }
         .led.active { background-color: #ff3333; box-shadow: 0 0 12px #ff3333, 0 0 25px #ff0000; }
 
         .coin-panel { 
@@ -123,11 +126,11 @@
         </div>
 
         <div class="scores-container">
-            <div class="score-column"><div class="led" id="led-0"></div><div class="score-text">十粒</div></div>
-            <div class="score-column"><div class="led" id="led-1"></div><div class="score-text">八粒</div></div>
-            <div class="score-column"><div class="led active" id="led-2"></div><div class="score-text">六粒</div></div>
-            <div class="score-column"><div class="led" id="led-3"></div><div class="score-text">四粒</div></div>
-            <div class="score-column"><div class="led" id="led-4"></div><div class="score-text">二粒</div></div>
+            <div class="score-column"><div class="score-text">糖菓二粒</div><div class="led" id="led-0"></div></div>
+            <div class="score-column"><div class="score-text">糖菓四粒</div><div class="led" id="led-1"></div></div>
+            <div class="score-column"><div class="score-text">糖菓六粒</div><div class="led active" id="led-2"></div></div>
+            <div class="score-column"><div class="score-text">糖菓八粒</div><div class="led" id="led-3"></div></div>
+            <div class="score-column"><div class="score-text">糖菓十粒</div><div class="led" id="led-4"></div></div>
         </div>
 
         <div class="coin-panel highlight" id="coinPanel" title="快速鍵: C" onpointerdown="insertCoin()">
@@ -277,10 +280,11 @@
     let flashInterval = null;
     let lastBounceTime = 0; 
     
-    const multiplierValues = [10, 8, 6, 4, 2];
+    // 倍率陣列與對應邏輯同步修改：配合上方二至十粒的順序 (index 0=2, 1=4, 2=6, 3=8, 4=10)
+    const multiplierValues = [2, 4, 6, 8, 10];
 
     const pegs = [];
-    const ballRadius = 7;
+    const ballRadius = 8;
     const pegRadius = 3;
     
     const gravity = 0.32;       
@@ -290,7 +294,8 @@
     const playfieldLeft = 5, playfieldRight = 365;
     const slotCount = 12;
     const slotWidth = (playfieldRight - playfieldLeft) / slotCount;
-    const slotMapping = [3, 4, 2, 1, 4, 3, 1, 2, 4, 0, 3, 4];
+    // 下方洞口的對應邏輯：配合新的 multiplierValues 做轉換，以維持原始機台配率
+    const slotMapping = [1, 0, 2, 3, 0, 1, 3, 2, 0, 4, 1, 0];
 
     function initPegs() {
         pegs.length = 0;
@@ -435,10 +440,9 @@
     // ==========================================
     // 全新拉桿與螢幕滑動支援系統
     // ==========================================
-    let isAutoPulling = false;    // 自動蓄力狀態 (鍵盤按住、或按著按鈕不放)
-    let isManualPulling = false;  // 手動拖曳狀態 (螢幕下滑)
+    let isAutoPulling = false;    
+    let isManualPulling = false;  
     let pullStrength = 0;
-    let dragStartY = 0;
     
     const launchBtn = document.getElementById('launchBtn');
     const domSpring = document.getElementById('domSpring');
@@ -461,7 +465,7 @@
         const scaleX = window.innerWidth / casing.offsetWidth; 
         const scaleY = window.innerHeight / casing.offsetHeight; 
         const scale = Math.min(scaleX, scaleY); 
-        casing.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        casing.style.transform = `translate(-50%, 0) scale(${scale})`;
     }
     window.addEventListener('resize', resizeGame);
     setTimeout(resizeGame, 0); 
@@ -490,19 +494,20 @@
     });
 
     // --- 2. 拉桿按鈕事件 (支援點按自動拉，或拖曳手動拉) ---
+    let dragStartYBtn = 0;
     launchBtn.addEventListener('pointerdown', (e) => {
         initAudio();
         e.preventDefault();
         if (!isLocked || isLocking || !ballInPlunger) return; 
         isAutoPulling = true;
         isManualPulling = false;
-        dragStartY = e.clientY;
+        dragStartYBtn = e.clientY;
         launchBtn.setPointerCapture(e.pointerId);
     });
 
     launchBtn.addEventListener('pointermove', (e) => {
         if (!isAutoPulling && !isManualPulling) return;
-        let deltaY = e.clientY - dragStartY;
+        let deltaY = e.clientY - dragStartYBtn;
         if (deltaY > 5) {
             isAutoPulling = false;
             isManualPulling = true;
@@ -520,33 +525,58 @@
         }
     });
 
-    // --- 3. 觸控螢幕全局下滑支援 ---
+    // --- 3. 觸控螢幕全局手勢支援 (上滑投幣、點擊停燈、下滑拉桿) ---
+    let touchStartY = 0;
+    let touchLastY = 0;
+    let isTouchClick = false;
+
     window.addEventListener('touchstart', (e) => {
         initAudio();
-        // 如果按到其他按鈕就不要干擾
+        // 如果按到專屬按鈕就交給按鈕原本的事件處理
         if (e.target.closest('.coin-panel') || e.target.closest('.btn-red') || e.target.closest('.plunger-container')) return;
-        if (!isLocked || isLocking || !ballInPlunger) return;
-        dragStartY = e.touches[0].clientY;
+        
+        touchStartY = e.touches[0].clientY;
+        touchLastY = touchStartY;
+        isTouchClick = true;
         isManualPulling = false;
     }, {passive: false});
 
     window.addEventListener('touchmove', (e) => {
-        if (!isLocked || isLocking || !ballInPlunger) return;
         if (e.target.closest('.coin-panel') || e.target.closest('.btn-red') || e.target.closest('.plunger-container')) return;
 
-        let deltaY = e.touches[0].clientY - dragStartY;
-        if (deltaY > 10) { // 往下超過 10px 視為拉彈簧
-            e.preventDefault();
+        touchLastY = e.touches[0].clientY;
+        let deltaY = touchLastY - touchStartY;
+
+        // 滑動超過一定距離取消點擊判定
+        if (Math.abs(deltaY) > 10) {
+            isTouchClick = false;
+        }
+
+        // 下滑拉桿 (需在已鎖定且球在發射區的狀態)
+        if (deltaY > 10 && isLocked && !isLocking && ballInPlunger) {
+            e.preventDefault(); // 防止畫面滾動
             isManualPulling = true;
             isAutoPulling = false; 
-            pullStrength = Math.max(0, Math.min((deltaY - 10) * 0.5, 45)); // 根據滑動距離設定力度
+            pullStrength = Math.max(0, Math.min((deltaY - 10) * 0.5, 45));
         }
     }, {passive: false});
 
     window.addEventListener('touchend', (e) => {
+        // 如果有按專屬按鈕，跳過
+        if (e.target.closest('.coin-panel') || e.target.closest('.btn-red') || e.target.closest('.plunger-container')) return;
+
+        let deltaY = touchLastY - touchStartY;
+
         if (isManualPulling) {
+            // 釋放拉桿
             isManualPulling = false;
             firePlunger();
+        } else if (deltaY < -30) {
+            // 往上滑投幣 / 加碼
+            insertCoin();
+        } else if (isTouchClick && isFlashing) {
+            // 跑馬燈中點一下螢幕停止
+            pressRedButton();
         }
     });
 
@@ -625,7 +655,7 @@
                         playWinSound(); 
                         let baseScore = multiplierValues[landedLedIndex]; 
                         let totalScore = baseScore * topLeftMultiplier;   
-                        shootDanmaku(`🎉 恭喜中獎！打中【${baseScore}粒】洞口，加碼 ${topLeftMultiplier} 倍，總計贏得：${totalScore} 粒！`, true);
+                        shootDanmaku(`🎉 恭喜中獎！打中【糖菓 ${baseScore} 粒】洞口，加碼 ${topLeftMultiplier} 倍，總計贏得：${totalScore} 粒！`, true);
                     }
                 }
                 
@@ -658,7 +688,7 @@
         // 彈簧動畫渲染更新 (加快自動蓄力速度)
         // ==========================================
         if (isAutoPulling && pullStrength < 45) { 
-            pullStrength += 3.5; // 速度從 1.5 提升到 3.5
+            pullStrength += 3.5; 
         }
 
         if (isAutoPulling || isManualPulling) {
