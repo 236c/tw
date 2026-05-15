@@ -2,7 +2,7 @@
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>經典夜市彈珠檯 - 手動加碼版 (擬真音效升級)</title>
+    <title>經典夜市彈珠檯 - 離屏渲染效能優化版</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { 
@@ -59,7 +59,7 @@
             box-shadow: inset 1px 1px 5px rgba(255,255,255,0.8), 2px 2px 5px rgba(0,0,0,0.3); transition: 0.3s; 
         }
         .coin-slot { width: 6px; height: 30px; background-color: #111; border: 1px solid #444; border-radius: 3px; margin-bottom: 6px; }
-        .coin-text { font-size: 0.8rem; font-weight: bold; color: #222; writing-mode: vertical-rl; line-height: 1.1; }
+        .coin-text { font-size: 1.2rem; font-weight: bold; color: #222; writing-mode: vertical-rl; line-height: 1.1; letter-spacing: 2px; }
         
         @keyframes breathe-glow {
             0% { box-shadow: 0 0 5px #ffeb3b, inset 1px 1px 5px rgba(255,255,255,0.8), 2px 2px 5px rgba(0,0,0,0.3); border-color: #ffc107; }
@@ -90,17 +90,6 @@
         .dom-spring { width: 14px; height: 25px; background: repeating-linear-gradient(to bottom, #999, #999 4px, #444 4px, #444 8px); position: absolute; top: -10px; z-index: 5; border-radius: 2px; box-shadow: inset 2px 0 5px rgba(0,0,0,0.5); }
         .plunger { width: 40px; height: 50px; background-color: #e6c200; border-radius: 5px 5px 15px 15px; cursor: pointer; position: absolute; top: 15px; z-index: 10; box-shadow: 0 5px #998000; display: flex; justify-content: center; align-items: center; font-weight: bold; color: #4a2508; }
 
-        #danmakuContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; overflow: hidden; }
-        .danmaku-msg {
-            position: absolute; white-space: nowrap; font-weight: bold; font-family: "Microsoft JhengHei", sans-serif;
-            text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-            animation: scrollDanmaku 4s linear forwards; pointer-events: none;
-        }
-        .danmaku-win { color: #ffeb3b; font-size: 1.4rem; z-index: 22; }
-        @keyframes scrollDanmaku {
-            0% { left: 100%; transform: translateX(0); }
-            100% { left: 0%; transform: translateX(-100%); }
-        }
     </style>
 </head>
 <body>
@@ -146,13 +135,12 @@
 
         <div class="coin-panel highlight" id="coinPanel" title="快速鍵: C" onpointerdown="insertCoin()">
             <div class="coin-slot"></div>
-            <div class="coin-text" id="coinActionText">投幣放球</div>
+            <div class="coin-text" id="coinActionText">投幣</div>
         </div>
     </div>
 
     <div class="playfield">
         <canvas id="gameCanvas" width="410" height="530"></canvas>
-        <div id="danmakuContainer"></div> 
     </div>
 
     <div class="controls">
@@ -168,7 +156,7 @@
 
 <script>
     // ==========================================
-    // 擬真音效系統 (Web Audio API)
+    // 擬真音效系統
     // ==========================================
     let audioCtx;
     let noiseBuffer;
@@ -190,7 +178,6 @@
         gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
         gainNode.connect(audioCtx.destination);
-
         freqs.forEach(freq => {
             const osc = audioCtx.createOscillator();
             osc.type = 'sine';
@@ -205,62 +192,27 @@
         if (!audioCtx || !noiseBuffer) return;
         const source = audioCtx.createBufferSource();
         source.buffer = noiseBuffer;
-        
         const filter = audioCtx.createBiquadFilter();
         filter.type = type;
         filter.frequency.value = filterFreq;
-        filter.Q.value = 1;
-        
         const gainNode = audioCtx.createGain();
         gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-        
         source.connect(filter);
         filter.connect(gainNode);
         gainNode.connect(audioCtx.destination);
-        
         source.start();
         source.stop(audioCtx.currentTime + duration);
     }
 
-    function playCoinSound() {
-        playPing([2000, 3100, 4300], 0.3, 0.15); 
-        setTimeout(() => playPing([1800, 2800, 3900], 0.2, 0.08), 80); 
-        setTimeout(() => playPing([2100, 3200, 4400], 0.4, 0.1), 160); 
-    }
-
-    function playTickSound() {
-        playNoise(1500, 'bandpass', 0.04, 0.8); 
-    }
-
-    function playRouletteStop() {
-        playNoise(800, 'lowpass', 0.1, 1.2);
-        playPing([600, 900], 0.15, 0.2);
-    }
-
-    function playLaunchSound() {
-        playNoise(300, 'lowpass', 0.2, 1.0); 
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(80, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.4);
-        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-        osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.4);
-    }
-
+    function playCoinSound() { playPing([2000, 3100, 4300], 0.3, 0.15); }
+    function playTickSound() { playNoise(1500, 'bandpass', 0.04, 0.8); }
+    function playRouletteStop() { playNoise(800, 'lowpass', 0.1, 1.2); playPing([600, 900], 0.15, 0.2); }
+    function playLaunchSound() { playNoise(300, 'lowpass', 0.2, 1.0); }
     function playBounceSound(isOrange) {
-        if (isOrange) {
-            playNoise(500, 'bandpass', 0.08, 0.8);
-            playPing([300, 450], 0.06, 0.1);
-        } else {
-            playPing([1800, 2600, 3800], 0.12, 0.15);
-            playNoise(5000, 'highpass', 0.03, 0.3); 
-        }
+        if (isOrange) { playPing([300, 450], 0.06, 0.1); } 
+        else { playPing([1800, 2600], 0.08, 0.1); }
     }
-
     function playWinSound() {
         let t = 0;
         for(let i=0; i<12; i++) {
@@ -269,16 +221,65 @@
         }
     }
 
+    // ==========================================
+    // 效能優化：離屏快取金幣 (Off-screen Caching)
+    // ==========================================
+    const offscreenCoin = document.createElement('canvas');
+    offscreenCoin.width = 64;
+    offscreenCoin.height = 64;
+    const oCtx = offscreenCoin.getContext('2d');
+    oCtx.font = '48px serif';
+    oCtx.textAlign = 'center';
+    oCtx.textBaseline = 'middle';
+    oCtx.fillText('🪙', 32, 32);
 
     // ==========================================
-    // 遊戲主邏輯與雙重拉桿系統
+    // 中獎特效系統 (金幣噴發)
+    // ==========================================
+    const winEffects = [];
+    class WinCoin {
+        constructor(x) {
+            this.x = x;
+            this.y = -40;
+            this.vy = Math.random() * 4 + 2;
+            this.vx = (Math.random() - 0.5) * 6;
+            this.rotation = Math.random() * 360;
+            this.rotationSpeed = (Math.random() - 0.5) * 15;
+            this.size = Math.floor(Math.random() * 15) + 25;
+        }
+        update() {
+            this.vy += 0.25; 
+            this.y += this.vy;
+            this.x += this.vx;
+            this.rotation += this.rotationSpeed;
+            return this.y < 580; 
+        }
+        draw(ctx) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation * Math.PI / 180);
+            ctx.drawImage(offscreenCoin, -this.size/2, -this.size/2, this.size, this.size);
+            ctx.restore();
+        }
+    }
+
+    function triggerWinCoins(count) {
+        const actualCount = Math.min(count, 100); 
+        for (let i = 0; i < actualCount; i++) {
+            setTimeout(() => {
+                winEffects.push(new WinCoin(Math.random() * 340 + 30));
+            }, i * 25);
+        }
+    }
+
+    // ==========================================
+    // 遊戲核心與物理優化
     // ==========================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
     let ball = null;            
     let ballInTrough = { x: 350, y: 482, active: true }; 
-    let ballInPlunger = false;  
     let isLoadingBall = false;  
     
     let isFlashing = false;
@@ -292,125 +293,143 @@
     let lastBounceTime = 0; 
     
     const multiplierValues = [2, 4, 6, 8, 10];
-
     const pegs = [];
     const ballRadius = 10;
     const pegRadius = 3;
-    
     const gravity = 0.32;       
     const bounce = 0.62;        
     const friction = 0.995;     
+
+    const PLUNGER_BASE_Y = 490;
+    function getPlungerSurfaceY() { return PLUNGER_BASE_Y + pullStrength; }
 
     const playfieldLeft = 5, playfieldRight = 365;
     const slotCount = 12;
     const slotWidth = (playfieldRight - playfieldLeft) / slotCount;
     const slotMapping = [1, 0, 2, 3, 0, 1, 3, 2, 0, 4, 1, 0];
 
-    function initPegs() {
-        pegs.length = 0;
-        // 修正：大幅縮小間距，增加釘子數量，形成堅固的圓弧引導，絕對不卡彈珠
-        for (let a = 0; a >= -Math.PI/2.8; a -= 0.06) {
-            // 判斷是否為圓拱最上方的一根 (最後一次進入迴圈的釘子)
-            let isTopPeg = (a - 0.06 < -Math.PI/2.8);
-            pegs.push({ 
-                x: 205 + 160 * Math.cos(a), 
-                y: 205 + 160 * Math.sin(a), 
-                type: isTopPeg ? 'orange' : 'metal' // 最上方改為橘色
+    // ==========================================
+    // 提示框系統 (替換原有的跑馬燈)
+    // ==========================================
+    class QuoteManager {
+        constructor() { 
+            this.quotes = []; 
+        }
+        addQuote(text, color = '#ffeb3b') {
+            if (this.quotes.length >= 2) { this.quotes.shift(); }
+            this.quotes.push({ 
+                text: text, 
+                targetY: 0, 
+                y: 550, // 從畫面下方移入
+                alpha: 1.0, 
+                color: color, 
+                life: 180 // 顯示時間 (大約 3 秒)
             });
         }
-        
-        pegs.push({ x: 120, y: 80, type: 'orange' }, { x: 70, y: 100, type: 'orange' });
-        
-        for(let i = 0; i < 9; i++) {
-            pegs.push({ x: 50 + i * 34, y: 160, type: (i%2==0)?'orange':'metal' });
+        updateAndDraw(ctx) {
+            let screenCenterX = 185; // 遊戲區中央(扣除右邊發射器道)
+            let screenBottomY = 430; // 顯示在下半部
+            let dynamicFontSize = 16;
+            let lineSpacing = dynamicFontSize + 20;
+            
+            for (let i = 0; i < this.quotes.length; i++) {
+                if (this.quotes[i].y >= 550) this.quotes[i].y = screenBottomY + 30; 
+                this.quotes[i].targetY = screenBottomY - 25 - ((this.quotes.length - 1 - i) * lineSpacing);
+            }
+            
+            for (let i = this.quotes.length - 1; i >= 0; i--) {
+                let q = this.quotes[i]; 
+                q.y += (q.targetY - q.y) * 0.15; // 平滑位移
+                q.life--;
+                
+                if (q.life < 20) q.alpha = Math.max(0, q.life / 20); else q.alpha = 0.95;
+                if (q.life <= 0) { this.quotes.splice(i, 1); continue; }
+                
+                ctx.save(); 
+                ctx.globalAlpha = q.alpha; 
+                ctx.font = `bold ${dynamicFontSize}px "Microsoft JhengHei", sans-serif`;
+                ctx.textAlign = 'center'; 
+                ctx.textBaseline = 'middle';
+                
+                let textWidth = ctx.measureText(q.text).width;
+                let bgX = screenCenterX - textWidth / 2 - 15;
+                let bgY = q.y - dynamicFontSize / 2 - 8;
+                let bgW = textWidth + 30; 
+                let bgH = dynamicFontSize + 16; 
+                let radius = 10;
+                
+                // 繪製半透明圓角背景
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)'; 
+                ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                ctx.shadowBlur = 6;
+                ctx.beginPath();
+                ctx.moveTo(bgX + radius, bgY); 
+                ctx.lineTo(bgX + bgW - radius, bgY); 
+                ctx.quadraticCurveTo(bgX + bgW, bgY, bgX + bgW, bgY + radius); 
+                ctx.lineTo(bgX + bgW, bgY + bgH - radius); 
+                ctx.quadraticCurveTo(bgX + bgW, bgY + bgH, bgX + bgW - radius, bgY + bgH); 
+                ctx.lineTo(bgX + radius, bgY + bgH); 
+                ctx.quadraticCurveTo(bgX, bgY + bgH, bgX, bgY + bgH - radius); 
+                ctx.lineTo(bgX, bgY + radius); 
+                ctx.quadraticCurveTo(bgX, bgY, bgX + radius, bgY); 
+                ctx.fill();
+                
+                // 繪製文字
+                ctx.shadowBlur = 0; 
+                ctx.fillStyle = q.color; 
+                ctx.fillText(q.text, screenCenterX, q.y); 
+                ctx.restore();
+            }
         }
-        
+    }
+    const quoteManager = new QuoteManager();
+
+    function initPegs() {
+        pegs.length = 0;
+        for (let a = 0; a >= -Math.PI/2.8; a -= 0.06) {
+            let isTopPeg = (a - 0.06 < -Math.PI/2.8);
+            pegs.push({ x: 205 + 160 * Math.cos(a), y: 205 + 160 * Math.sin(a), type: isTopPeg ? 'orange' : 'metal' });
+        }
+        pegs.push({ x: 120, y: 80, type: 'orange' }, { x: 70, y: 100, type: 'orange' });
+        for(let i = 0; i < 9; i++) { pegs.push({ x: 50 + i * 34, y: 160, type: (i%2==0)?'orange':'metal' }); }
         for (let row = 0; row < 4; row++) {
             let cols = (row % 2 === 0) ? 10 : 9;
             let startX = (row % 2 === 0) ? 33 : 50;
             for (let col = 0; col < cols; col++) {
-                let px = startX + col * 34;
-                pegs.push({ x: px, y: 190 + row * 25, type: 'metal' });
+                pegs.push({ x: startX + col * 34, y: 190 + row * 25, type: 'metal' });
             }
         }
-
         for (let i = 1; i < slotCount; i++) {
             let px = 5 + i * slotWidth;
-            pegs.push({ x: px, y: 355, type: 'metal' });
-            pegs.push({ x: px, y: 369, type: 'metal' });
-            pegs.push({ x: px, y: 383, type: 'metal' });
-            pegs.push({ x: px, y: 397, type: 'metal' });
-            pegs.push({ x: px, y: 411, type: 'metal' });
+            for(let j=0; j<5; j++) pegs.push({ x: px, y: 355 + j*14, type: 'metal' });
         }
     }
 
     function drawMetallicBall(ctx, x, y, radius) {
         ctx.save();
-        const startX = x - radius * 0.3;
-        const startY = y - radius * 0.3;
-        const metallicGradient = ctx.createRadialGradient(
-            startX, startY, 0,
-            x, y, radius
-        );
-        
+        const metallicGradient = ctx.createRadialGradient(x - radius*0.3, y - radius*0.3, 0, x, y, radius);
         metallicGradient.addColorStop(0, '#FFFFFF');    
-        metallicGradient.addColorStop(0.2, '#E0E0E0');  
         metallicGradient.addColorStop(0.5, '#C0C0C0');  
-        metallicGradient.addColorStop(0.8, '#808080');  
         metallicGradient.addColorStop(1, '#404040');    
-        
         ctx.fillStyle = metallicGradient;
-        ctx.strokeStyle = '#606060';
-        ctx.lineWidth = 0.5;
-        
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
-    }
-
-    function shootDanmaku(text, isWin) {
-        const container = document.getElementById('danmakuContainer');
-        const msg = document.createElement('div');
-        msg.className = 'danmaku-msg ' + (isWin ? 'danmaku-win' : '');
-        msg.innerText = text;
-        
-        const randomTop = Math.random() * 40 + 20; 
-        msg.style.top = `${randomTop}%`;
-        
-        container.appendChild(msg);
-        
-        setTimeout(() => {
-            if (container.contains(msg)) {
-                container.removeChild(msg);
-            }
-        }, 4000);
     }
 
     function insertCoin() {
         initAudio(); 
-        
         if (isFlashing || isLoadingBall || isLocking) return; 
-
         if (isLocked && (!hasLaunched || ball !== null)) {
             if (topLeftMultiplier < 20) {
-                playCoinSound(); 
-                topLeftMultiplier++;
+                playCoinSound(); topLeftMultiplier++;
                 document.querySelectorAll('.odds-led').forEach(l => l.classList.remove('active'));
                 document.getElementById(`odds-led-${topLeftMultiplier}`).classList.add('active');
             }
             return;
         }
+        if (ball !== null || (ballInTrough.active && ballInTrough.x < 350)) return;
 
-        if (ball !== null || ballInPlunger || (ballInTrough.active && ballInTrough.x < 350)) return;
-
-        playCoinSound(); 
-        isFlashing = true; 
-        isLocked = false;
-        hasLaunched = false;
-        topLeftMultiplier = 1; 
-
+        playCoinSound(); isFlashing = true; isLocked = false; hasLaunched = false; topLeftMultiplier = 1; 
         document.querySelectorAll('.odds-led').forEach(l => l.classList.remove('active'));
         document.getElementById('odds-led-1').classList.add('active'); 
 
@@ -424,36 +443,21 @@
     }
 
     function pressRedButton() {
-        initAudio(); 
-        if (!isFlashing) return;
-        clearInterval(flashInterval);
-        isFlashing = false; 
-        isLocked = true;
-        isLocking = true; 
-        
-        const btn = document.getElementById('redBtn');
-        btn.classList.add('active');
+        initAudio(); if (!isFlashing) return;
+        clearInterval(flashInterval); isFlashing = false; isLocked = true; isLocking = true; 
+        const btn = document.getElementById('redBtn'); btn.classList.add('active');
         setTimeout(() => btn.classList.remove('active'), 150);
-
         document.querySelectorAll('.led').forEach(l => l.classList.remove('active'));
-        let activeLedMiddle = document.getElementById(`led-${currentLedIndex}`);
-        
         topLeftMultiplier = 1; 
         document.querySelectorAll('.odds-led').forEach(l => l.classList.remove('active'));
-        
         let bc = 0;
         let bi = setInterval(() => {
             playTickSound(); 
-            activeLedMiddle.classList.toggle('active');
-            let currentLeftLed = document.getElementById(`odds-led-${topLeftMultiplier}`);
-            if (currentLeftLed) currentLeftLed.classList.toggle('active');
-            
+            document.getElementById(`led-${currentLedIndex}`).classList.toggle('active');
             if (++bc >= 6) { 
-                clearInterval(bi); 
-                playRouletteStop(); 
-                activeLedMiddle.classList.add('active'); 
-                let finalLeftLed = document.getElementById(`odds-led-${topLeftMultiplier}`);
-                if (finalLeftLed) finalLeftLed.classList.add('active'); 
+                clearInterval(bi); playRouletteStop(); 
+                document.getElementById(`led-${currentLedIndex}`).classList.add('active'); 
+                document.getElementById(`odds-led-1`).classList.add('active'); 
                 isLocking = false; isLoadingBall = true;  
             }
         }, 80);
@@ -462,171 +466,98 @@
     let isAutoPulling = false;    
     let isManualPulling = false;  
     let pullStrength = 0;
-    
     const launchBtn = document.getElementById('launchBtn');
     const domSpring = document.getElementById('domSpring');
     const coinPanelEl = document.getElementById('coinPanel');
 
     function firePlunger() {
-        if (pullStrength > 10 && ballInPlunger) {
-            playLaunchSound(); 
-            ball = { x: 387.5, y: 485 + pullStrength, vx: (Math.random()-0.5)*0.5, vy: -(14 + pullStrength * 0.28) };
-            ballInPlunger = false; hasLaunched = true; 
+        if (pullStrength > 5) {
+            playLaunchSound();
+            if (ball && ball.x > 370 && ball.y > 400) {
+                let surfaceY = getPlungerSurfaceY();
+                let dist = Math.abs(ball.y - (surfaceY - ballRadius));
+                if (dist < 15) {
+                    ball.vy = -(14 + pullStrength * 0.35);
+                    ball.vx = (Math.random() - 0.5) * 0.5;
+                    hasLaunched = true;
+                }
+            }
         }
         pullStrength = 0; 
     }
 
     function resizeGame() {
         const casing = document.querySelector('.machine-casing');
-        const scaleX = window.innerWidth / casing.offsetWidth; 
-        const scaleY = window.innerHeight / casing.offsetHeight; 
-        const scale = Math.min(scaleX, scaleY); 
+        const scale = Math.min(window.innerWidth / casing.offsetWidth, window.innerHeight / casing.offsetHeight); 
         casing.style.transform = `translate(-50%, 0) scale(${scale})`;
     }
     window.addEventListener('resize', resizeGame);
     setTimeout(resizeGame, 0); 
 
-    window.addEventListener('keydown', function(e) {
+    window.addEventListener('keydown', (e) => {
         initAudio();
-        if (e.code === 'KeyC' || e.key === 'c' || e.key === 'C') {
-            insertCoin();
-        } else if (e.code === 'Space') {
-            e.preventDefault(); 
-            pressRedButton();
-        } else if (e.code === 'ArrowDown') {
-            e.preventDefault();
-            if (!isLocked || isLocking || !ballInPlunger) return;
-            isAutoPulling = true;
-        }
+        if (e.code === 'KeyC' || e.key === 'c') insertCoin();
+        else if (e.code === 'Space') { e.preventDefault(); pressRedButton(); }
+        else if (e.code === 'ArrowDown') { e.preventDefault(); if (!isLocked || isLocking) return; isAutoPulling = true; }
     });
-
-    window.addEventListener('keyup', function(e) {
-        if (e.code === 'ArrowDown') {
-            if (!isAutoPulling) return;
-            isAutoPulling = false;
-            firePlunger();
-        }
-    });
+    window.addEventListener('keyup', (e) => { if (e.code === 'ArrowDown') { isAutoPulling = false; firePlunger(); } });
 
     let dragStartYBtn = 0;
     launchBtn.addEventListener('pointerdown', (e) => {
-        initAudio();
-        e.preventDefault();
-        if (!isLocked || isLocking || !ballInPlunger) return; 
-        isAutoPulling = true;
-        isManualPulling = false;
-        dragStartYBtn = e.clientY;
-        launchBtn.setPointerCapture(e.pointerId);
+        initAudio(); e.preventDefault();
+        if (!isLocked || isLocking) return; 
+        isAutoPulling = true; isManualPulling = false;
+        dragStartYBtn = e.clientY; launchBtn.setPointerCapture(e.pointerId);
     });
-
     launchBtn.addEventListener('pointermove', (e) => {
         if (!isAutoPulling && !isManualPulling) return;
         let deltaY = e.clientY - dragStartYBtn;
-        if (deltaY > 5) {
-            isAutoPulling = false;
-            isManualPulling = true;
-            pullStrength = Math.max(0, Math.min(deltaY * 0.6, 45)); 
-        }
+        if (deltaY > 5) { isAutoPulling = false; isManualPulling = true; pullStrength = Math.max(0, Math.min(deltaY * 0.6, 45)); }
     });
-
     launchBtn.addEventListener('pointerup', (e) => {
-        e.preventDefault();
-        if (isAutoPulling || isManualPulling) {
-            isAutoPulling = false;
-            isManualPulling = false;
-            firePlunger();
-            launchBtn.releasePointerCapture(e.pointerId);
-        }
+        isAutoPulling = false; isManualPulling = false; firePlunger();
+        launchBtn.releasePointerCapture(e.pointerId);
     });
 
-    let touchStartY = 0;
-    let touchLastY = 0;
-    let isTouchClick = false;
-
-    window.addEventListener('touchstart', (e) => {
-        initAudio();
-        if (e.target.closest('.coin-panel') || e.target.closest('.btn-red') || e.target.closest('.plunger-container')) return;
-        
-        touchStartY = e.touches[0].穩定;
-        touchLastY = touchStartY;
-        isTouchClick = true;
-        isManualPulling = false;
-    }, {passive: false});
-
-    window.addEventListener('touchmove', (e) => {
-        if (e.target.closest('.coin-panel') || e.target.closest('.btn-red') || e.target.closest('.plunger-container')) return;
-
-        touchLastY = e.touches[0].clientY;
-        let deltaY = touchLastY - touchStartY;
-
-        if (Math.abs(deltaY) > 10) {
-            isTouchClick = false;
-        }
-
-        if (deltaY > 10 && isLocked && !isLocking && ballInPlunger) {
-            e.preventDefault(); 
-            isManualPulling = true;
-            isAutoPulling = false; 
-            pullStrength = Math.max(0, Math.min((deltaY - 10) * 0.5, 45));
-        }
-    }, {passive: false});
-
-    window.addEventListener('touchend', (e) => {
-        if (e.target.closest('.coin-panel') || e.target.closest('.btn-red') || e.target.closest('.plunger-container')) return;
-
-        let deltaY = touchLastY - touchStartY;
-
-        if (isManualPulling) {
-            isManualPulling = false;
-            firePlunger();
-        } else if (deltaY < -30) {
-            insertCoin();
-        } else if (isTouchClick && isFlashing) {
-            pressRedButton();
-        }
-    });
-
-    window.addEventListener('pointerup', (e) => {
-        if(isAutoPulling || isManualPulling) {
-            isAutoPulling = false;
-            isManualPulling = false;
-            firePlunger();
-        }
-    });
-
+    // ==========================================
+    // 遊戲主循環
+    // ==========================================
     function loop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        let isWaitingForNewGame = (ball === null && !ballInPlunger && !isLoadingBall && !isFlashing && !isLocking && ballInTrough.x >= 350);
-        if (isWaitingForNewGame) {
-            if (!coinPanelEl.classList.contains('highlight')) coinPanelEl.classList.add('highlight');
-        } else {
-            if (coinPanelEl.classList.contains('highlight')) coinPanelEl.classList.remove('highlight');
-        }
+        let isWaiting = (ball === null && !isLoadingBall && !isFlashing && !isLocking && ballInTrough.x >= 350);
+        if (isWaiting) coinPanelEl.classList.add('highlight');
+        else coinPanelEl.classList.remove('highlight');
 
         if (ball) {
             ball.vy += gravity; ball.vx *= friction; ball.vy *= friction;
             ball.x += ball.vx; ball.y += ball.vy;
 
+            if (ball.x > 370) {
+                ball.x = 387.5; 
+                let surfaceY = getPlungerSurfaceY();
+                if (ball.y > surfaceY - ballRadius) {
+                    ball.y = surfaceY - ballRadius;
+                    if (ball.vy > 0) {
+                        ball.vy *= -0.3; 
+                        if (ball.vy < 0.2) ball.vy = 0;
+                        if (Math.abs(ball.vy) > 0.05) playBounceSound(false);
+                    }
+                }
+            }
+
             pegs.forEach(p => {
-                let dx = ball.x - p.x, dy = ball.y - p.y;
-                let dist = Math.sqrt(dx*dx + dy*dy);
+                let dx = ball.x - p.x, dy = ball.y - p.y, dist = Math.sqrt(dx*dx + dy*dy);
                 let r = (p.type==='orange') ? ballRadius + pegRadius + 1.5 : ballRadius + pegRadius;
                 if (dist < r) {
                     let nx = dx / dist, ny = dy / dist;
-                    ball.x = p.x + nx * (r + 0.1);
-                    ball.y = p.y + ny * (r + 0.1);
+                    ball.x = p.x + nx * (r + 0.1); ball.y = p.y + ny * (r + 0.1);
                     let dot = ball.vx * nx + ball.vy * ny;
                     if (dot < 0) {
                         let currentBounce = (p.type==='orange') ? bounce * 1.15 : bounce;
                         ball.vx = (ball.vx - 2 * dot * nx) * currentBounce + (Math.random()-0.5)*0.4;
                         ball.vy = (ball.vy - 2 * dot * ny) * currentBounce + (Math.random()-0.5)*0.4;
-                        
-                        let now = Date.now();
-                        if (now - lastBounceTime > 30) {
-                            playBounceSound(p.type === 'orange');
-                            lastBounceTime = now;
-                        }
+                        if (Date.now() - lastBounceTime > 30) { playBounceSound(p.type === 'orange'); lastBounceTime = Date.now(); }
                     }
                 }
             });
@@ -635,15 +566,13 @@
                 let dx = ball.x - 205, dy = ball.y - 205, dist = Math.sqrt(dx*dx + dy*dy);
                 if (dist > 200 - ballRadius) {
                     let nx = dx / dist, ny = dy / dist; 
-                    ball.x = 205 + nx * (200 - ballRadius); 
-                    ball.y = 205 + ny * (200 - ballRadius);
+                    ball.x = 205 + nx * (200 - ballRadius); ball.y = 205 + ny * (200 - ballRadius);
                     let dot = ball.vx * nx + ball.vy * ny; 
                     if (dot > 0) { ball.vx = (ball.vx - 2 * dot * nx) * bounce; ball.vy = (ball.vy - 2 * dot * ny) * bounce; }
                 }
             } else {
                 if (ball.x < 5 + ballRadius) { ball.x = 5 + ballRadius; ball.vx *= -bounce; }
                 if (ball.x > 405 - ballRadius) { ball.x = 405 - ballRadius; ball.vx *= -bounce; }
-                
                 if (ball.y < 425) {
                     if (ball.x > 365 - ballRadius && ball.x <= 367.5) { ball.x = 365 - ballRadius; ball.vx *= -bounce; }
                     else if (ball.x < 370 + ballRadius && ball.x > 367.5) { ball.x = 370 + ballRadius; ball.vx *= -bounce; }
@@ -652,122 +581,105 @@
             
             if (ball.y > 440 && ball.x < 365) {
                 ballInTrough = { x: ball.x, y: ball.y, active: true };
-                
                 if (isLocked && hasLaunched) {
                     let slotIndex = Math.floor((ball.x - playfieldLeft) / slotWidth);
-                    if (slotIndex < 0) slotIndex = 0;
-                    if (slotIndex >= slotCount) slotIndex = slotCount - 1;
-                    
-                    let landedLedIndex = slotMapping[slotIndex];
-                    
-                    if (landedLedIndex === currentLedIndex) {
+                    if (slotMapping[slotIndex] === currentLedIndex) {
                         playWinSound(); 
-                        let baseScore = multiplierValues[landedLedIndex]; 
-                        let totalScore = baseScore * topLeftMultiplier;   
-                        shootDanmaku(`🎉 恭喜中獎！打中【糖菓 ${baseScore} 粒】洞口，加碼 ${topLeftMultiplier} 倍，總計贏得：${totalScore} 粒！`, true);
+                        let base = multiplierValues[currentLedIndex];
+                        let totalWin = base * topLeftMultiplier;
+                        
+                        // 替換為使用 QuoteManager 提示
+                        quoteManager.addQuote(`🎉 恭喜中獎！【糖菓 ${base} 粒】x ${topLeftMultiplier} = ${totalWin} 粒！`, '#ffeb3b');
+                        
+                        triggerWinCoins(totalWin); 
                     }
                 }
-                
                 ball = null; 
-            } else if (ball.y >= 485 && ball.x >= 365 && ball.vy > 0) {
-                ball = null;
-                ballInPlunger = true;
-                playBounceSound(true); 
             }
         }
 
+        // ==========================================
+        // 優化下滑與送球動畫速度
+        // ==========================================
         if (ballInTrough.active) {
-            let targetYFloor = 445 + (ballInTrough.x - 5) * (50/365); 
             if (!isLoadingBall) {
-                if (ballInTrough.x < 350) {
-                    ballInTrough.x += 2.0; ballInTrough.y = targetYFloor - ballRadius;
-                } else {
-                    ballInTrough.x = 350; ballInTrough.y = 482; 
+                // 水平位移加速 (由 2.0 提升至 3.5)
+                if (ballInTrough.x < 350) { 
+                    ballInTrough.x += 3.5; 
+                    ballInTrough.y = (445 + (ballInTrough.x-5)*50/360) - ballRadius; 
+                } else { 
+                    ballInTrough.x = 350; 
+                    ballInTrough.y = 482; 
                 }
             } else {
-                let targetX = 387.5; let targetY = 485; 
-                let dx = targetX - ballInTrough.x; let dy = targetY - ballInTrough.y;
-                let dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist < 2) {
-                    ballInTrough.x = targetX; ballInTrough.y = targetY;
-                    isLoadingBall = false; ballInPlunger = true; ballInTrough.active = false;
-                } else {
-                    ballInTrough.x += (dx / dist) * 2.5; ballInTrough.y += (dy / dist) * 2.5;
-                }
+                let tx = 387.5;
+                let ty = getPlungerSurfaceY() - ballRadius; 
+                let dx = tx - ballInTrough.x, dy = ty - ballInTrough.y, dist = Math.sqrt(dx*dx + dy*dy);
+                // 送球過程速度優化 (由 5 提升至 7)
+                if (dist < 4) {
+                    ball = { x: tx, y: ty, vx: 0, vy: 0 }; 
+                    isLoadingBall = false; ballInTrough.active = false;
+                } else { ballInTrough.x += dx/dist*7; ballInTrough.y += dy/dist*7; }
             }
         }
 
-        if (isAutoPulling && pullStrength < 45) { 
-            pullStrength += 3.5; 
+        // 渲染特效
+        for (let i = winEffects.length - 1; i >= 0; i--) {
+            if (winEffects[i].update()) {
+                winEffects[i].draw(ctx);
+            } else {
+                winEffects.splice(i, 1);
+            }
         }
 
+        if (isAutoPulling && pullStrength < 45) pullStrength += 3.5;
         launchBtn.style.transform = `translateY(${pullStrength}px)`; 
         domSpring.style.height = `${25 + pullStrength}px`;
 
-        ctx.save(); ctx.strokeStyle = '#888'; ctx.lineWidth = 2; ctx.beginPath();
-        let springTopCanvas = 495 + pullStrength; let springBottomCanvas = 525; 
-        let coils = 8; let coilHeight = (springBottomCanvas - springTopCanvas) / coils;
-        
-        ctx.fillStyle = '#444';
-        ctx.fillRect(380.5, springTopCanvas, 14, springBottomCanvas - springTopCanvas);
-
+        ctx.save();
+        let springTop = getPlungerSurfaceY(); 
+        let sBottom = 525;
+        ctx.fillStyle = '#444'; ctx.fillRect(380.5, springTop, 14, sBottom - springTop);
         ctx.strokeStyle = '#aaa'; ctx.lineWidth = 3; ctx.beginPath();
-        ctx.moveTo(387.5, springTopCanvas);
-        for(let i=1; i<=coils; i++) {
-            let cx = 387.5 + (i%2===0 ? -9 : 9); let cy = springTopCanvas + coilHeight * (i - 0.5);
-            ctx.lineTo(cx, cy); ctx.lineTo(387.5, springTopCanvas + coilHeight * i);
+        ctx.moveTo(387.5, springTop);
+        for(let i=1; i<=8; i++) {
+            ctx.lineTo(387.5 + (i%2==0?-9:9), springTop + (sBottom-springTop)/8*(i-0.5));
+            ctx.lineTo(387.5, springTop + (sBottom-springTop)/8*i);
         }
         ctx.stroke();
-
-        ctx.fillStyle = '#666'; 
-        ctx.fillRect(373.5, springTopCanvas, 28, 5); 
+        ctx.fillStyle = '#666'; ctx.fillRect(373.5, springTop - 2, 28, 4); 
         ctx.restore();
 
         for (let i = 0; i < slotCount; i++) {
-            let cx = playfieldLeft + (i + 0.5) * slotWidth; 
-            let cy = 320; 
-            let isActive = (currentLedIndex === slotMapping[i] && (isFlashing || isLocked));
-            
-            ctx.fillStyle = isActive ? '#ff3333' : '#330000';
-            if (isActive) { ctx.shadowBlur = 18; ctx.shadowColor = '#ff3333'; }
-            ctx.beginPath(); 
-            ctx.arc(cx, cy, 9, 0, Math.PI*2); 
-            ctx.fill(); 
-            ctx.shadowBlur = 0;
-            
-            ctx.fillStyle = isActive ? '#ffffff' : '#888888';
-            ctx.font = 'bold 12px "Courier New"'; ctx.textAlign = 'center'; 
+            let cx = playfieldLeft + (i + 0.5) * slotWidth, cy = 320; 
+            let active = (currentLedIndex === slotMapping[i] && (isFlashing || isLocked));
+            ctx.fillStyle = active ? '#ff3333' : '#330000';
+            if (active) { ctx.shadowBlur = 15; ctx.shadowColor = '#ff3333'; }
+            ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0; ctx.fillStyle = active ? '#fff' : '#888';
+            ctx.font = 'bold 12px Arial'; ctx.textAlign = 'center'; 
             ctx.fillText(multiplierValues[slotMapping[i]], cx, cy + 22);
         }
 
-        if (ball) { drawMetallicBall(ctx, ball.x, ball.y, ballRadius); }
-        if (ballInTrough.active) { drawMetallicBall(ctx, ballInTrough.x, ballInTrough.y, ballRadius); }
-        if (ballInPlunger) { let ballY = 485 + pullStrength; drawMetallicBall(ctx, 387.5, ballY, ballRadius); }
+        if (ball) drawMetallicBall(ctx, ball.x, ball.y, ballRadius);
+        if (ballInTrough.active) drawMetallicBall(ctx, ballInTrough.x, ballInTrough.y, ballRadius);
 
-        ctx.save(); ctx.fillStyle = '#f2f2f2'; ctx.shadowBlur = 4; ctx.shadowColor = 'black';
+        ctx.fillStyle = '#f2f2f2';
         ctx.beginPath(); ctx.moveTo(5, 445); ctx.lineTo(370, 495); ctx.lineTo(370, 515); ctx.lineTo(5, 465); ctx.fill();
         ctx.beginPath(); ctx.moveTo(370, 410); ctx.lineTo(370, 495); ctx.lineTo(280, 495); ctx.fill();
-        ctx.restore();
-
-        ctx.fillStyle = '#fff'; 
-        ctx.fillRect(0, 205, 5, 320);     
-        ctx.fillRect(365, 205, 5, 220);   
-        ctx.fillRect(405, 205, 5, 320);   
-        ctx.beginPath(); 
-        ctx.arc(205, 205, 202.5, 0, Math.PI, true); 
-        ctx.strokeStyle = '#fff'; 
-        ctx.lineWidth = 5; 
-        ctx.stroke();
-
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 205, 5, 320); ctx.fillRect(365, 205, 5, 220); ctx.fillRect(405, 205, 5, 320);
+        ctx.beginPath(); ctx.arc(205, 205, 202.5, 0, Math.PI, true); ctx.strokeStyle = '#fff'; ctx.lineWidth = 5; ctx.stroke();
         pegs.forEach(p => {
             ctx.fillStyle = p.type==='orange'?'#f90':'#aaa';
             ctx.beginPath(); ctx.arc(p.x, p.y, p.type==='orange'?pegRadius+1.5:pegRadius, 0, Math.PI*2); ctx.fill();
         });
+
+        // 渲染文字提示系統
+        quoteManager.updateAndDraw(ctx);
 
         requestAnimationFrame(loop);
     }
 
     initPegs(); loop();
 </script>
-
 </body></html>
