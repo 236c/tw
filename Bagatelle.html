@@ -2,7 +2,7 @@
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>經典夜市彈珠檯 - 離屏渲染效能優化版</title>
+    <title>經典夜市彈珠檯 - 離屏渲染效能優化版 (逼真木紋版)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { 
@@ -18,7 +18,20 @@
         }
         
         .machine-casing { 
-            background: linear-gradient(145deg, #8b4513, #5c2e0b); 
+            /* === 逼真木紋背景效果 === */
+            background-color: #724c32; /* 木色基調 */
+            background-image: 
+                /* 噪點層，增加真實感 */
+                radial-gradient(ellipse at center, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 70%),
+                /* 木條紋層 1 */
+                linear-gradient(4deg, transparent 0, rgba(100, 60, 30, 0.1) 1px, transparent 1px, transparent 100%),
+                /* 木條紋層 2，不同的角度和強度 */
+                linear-gradient(-3deg, transparent 0, rgba(100, 60, 30, 0.05) 1px, transparent 1px, transparent 100%),
+                /* 木紋整體顏色層 */
+                linear-gradient(145deg, #8b4513 0%, #5c2e0b 100%);
+            background-blend-mode: overlay, normal, normal, normal; /* 疊加噪點 */
+            background-size: auto, 100px 100px, 120px 120px, 100% 100%;
+            
             border: 15px solid #4a2508; 
             border-radius: 10px; 
             box-shadow: 10px 10px 30px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.5); 
@@ -82,9 +95,65 @@
         }
         
         .controls { position: relative; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; height: 90px; }
-        .red-btn-container { background-color: #ddd; padding: 10px; border-radius: 5px; border: 2px solid #999; }
-        .btn-red { width: 50px; height: 50px; background: radial-gradient(circle, #ff4444, #cc0000); border-radius: 50%; border: 3px solid #fff; box-shadow: 0 5px #880000; cursor: pointer; }
-        .btn-red:active, .btn-red.active { transform: translateY(5px); box-shadow: 0 0px #880000; }
+        
+        /* === 逼真金屬按鈕面板與螺絲效果 === */
+        .red-btn-container { 
+            background-color: #ddd; 
+            padding: 10px; 
+            border-radius: 5px; 
+            /* 金屬面板效果 */
+            background: linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 40%, #a0a0a0 60%, #e0e0e0 100%);
+            border: 2px solid #a0a0a0; 
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.8), 2px 2px 4px rgba(0,0,0,0.4);
+            position: relative; /* 為了螺絲定位 */
+        }
+        
+        /* 添加螺絲效果 */
+        .red-btn-container::before {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #888;
+            border-radius: 50%;
+            top: 8px; left: 8px;
+            box-shadow: 
+                56px 0 0 #888, /* 右上 */
+                0 56px 0 #888, /* 左下 */
+                56px 56px 0 #888; /* 右下 */
+        }
+
+        /* === 逼真按鈕效果：白色圈 + 紅色中心 === */
+        .btn-red { 
+            width: 50px; height: 50px; 
+            /* 白色塑料圈 */
+            background-color: #fff; 
+            border-radius: 50%; 
+            border: 2px solid #ccc; /* 輕微的塑料邊界 */
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.1); 
+            cursor: pointer; 
+            display: flex; justify-content: center; align-items: center; 
+            position: relative; /* 為了紅色按鈕中心定位 */
+            transition: 0.1s;
+        }
+
+        /* 紅色按鈕中心 */
+        .btn-red::after {
+            content: '';
+            position: absolute;
+            width: 32px; height: 32px; /* 比外圈小，留下白色邊框 */
+            /* 比以前更豐富的紅色，像圖片中的光澤 */
+            background: radial-gradient(circle, #ff6666 0%, #dd0000 70%, #aa0000 100%); 
+            border-radius: 50%;
+            box-shadow: 0 4px #880000; /* 按鈕按下前的高度感 */
+            transition: transform 0.05s, box-shadow 0.05s;
+        }
+
+        /* 按下時的按鈕樣式 (模擬圖片) */
+        .btn-red:active::after, .btn-red.active::after { 
+            transform: translateY(3px); 
+            box-shadow: 0 1px #880000; 
+        }
         
         .plunger-container { position: absolute; left: 372.5px; top: 0; width: 40px; display: flex; flex-direction: column; align-items: center; height: 90px; justify-content: flex-start; }
         .dom-spring { width: 14px; height: 25px; background: repeating-linear-gradient(to bottom, #999, #999 4px, #444 4px, #444 8px); position: absolute; top: -10px; z-index: 5; border-radius: 2px; box-shadow: inset 2px 0 5px rgba(0,0,0,0.5); }
@@ -222,7 +291,7 @@
     }
 
     // ==========================================
-    // 效能優化：離屏快取金幣 (Off-screen Caching)
+    // 效能優化：離屏快取金幣
     // ==========================================
     const offscreenCoin = document.createElement('canvas');
     offscreenCoin.width = 64;
@@ -234,7 +303,7 @@
     oCtx.fillText('🪙', 32, 32);
 
     // ==========================================
-    // 中獎特效系統 (金幣噴發)
+    // 中獎特效系統
     // ==========================================
     const winEffects = [];
     class WinCoin {
@@ -273,7 +342,7 @@
     }
 
     // ==========================================
-    // 遊戲核心與物理優化
+    // 遊戲核心與物理
     // ==========================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -317,14 +386,7 @@
         }
         addQuote(text, color = '#ffeb3b') {
             if (this.quotes.length >= 2) { this.quotes.shift(); }
-            this.quotes.push({ 
-                text: text, 
-                targetY: 0, 
-                y: 550, 
-                alpha: 1.0, 
-                color: color, 
-                life: 180
-            });
+            this.quotes.push({ text: text, targetY: 0, y: 550, alpha: 1.0, color: color, life: 180 });
         }
         updateAndDraw(ctx) {
             let screenCenterX = 185; 
@@ -500,49 +562,36 @@
     });
     window.addEventListener('keyup', (e) => { if (e.code === 'ArrowDown') { isAutoPulling = false; firePlunger(); } });
 
-    let dragStartYBtn = 0;
-    launchBtn.addEventListener('pointerdown', (e) => {
-        initAudio(); e.preventDefault();
-        if (!isLocked || isLocking) return; 
-        isAutoPulling = true; isManualPulling = false;
-        dragStartYBtn = e.clientY; launchBtn.setPointerCapture(e.pointerId);
-    });
-    launchBtn.addEventListener('pointermove', (e) => {
-        if (!isAutoPulling && !isManualPulling) return;
-        let deltaY = e.clientY - dragStartYBtn;
-        if (deltaY > 5) { isAutoPulling = false; isManualPulling = true; pullStrength = Math.max(0, Math.min(deltaY * 0.6, 45)); }
-    });
-    launchBtn.addEventListener('pointerup', (e) => {
-        isAutoPulling = false; isManualPulling = false; firePlunger();
-        launchBtn.releasePointerCapture(e.pointerId);
-    });
+    // 全域手勢控制
+    let gestureStartY = 0;
+    let isGestureActive = false;
 
-    // ==========================================
-    // 新增：全域手勢控制 (往上滑動投幣、點擊螢幕停止跑燈)
-    // ==========================================
-    let swipeStartY = 0;
-    
-    document.addEventListener('touchstart', (e) => {
-        // 如果點到的是發射器，就交給發射器的邏輯處理，不要干擾
-        if (e.target.id === 'launchBtn') return; 
-        swipeStartY = e.touches[0].clientY;
-    }, { passive: true });
-
-    document.addEventListener('touchend', (e) => {
-        if (e.target.id === 'launchBtn') return;
-        let swipeEndY = e.changedTouches[0].clientY;
-        
-        // 判斷是否為往上滑動 (Y 座標減少大於 40px)
-        if (swipeStartY - swipeEndY > 40) {
-            insertCoin();
+    document.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('.btn-red') || e.target.closest('.coin-panel')) return;
+        initAudio(); 
+        if (isFlashing) { pressRedButton(); return; }
+        gestureStartY = e.clientY; isGestureActive = true;
+        if (e.target.id === 'launchBtn') {
+            if (!isLocked || isLocking) return;
+            isAutoPulling = true; isManualPulling = false; e.target.setPointerCapture(e.pointerId);
         }
-    }, { passive: true });
+    });
 
-    // 點擊遊戲畫面(Canvas)停止跑燈
-    canvas.addEventListener('pointerdown', (e) => {
-        if (isFlashing) {
-            pressRedButton();
+    document.addEventListener('pointermove', (e) => {
+        if (!isGestureActive) return;
+        let deltaY = e.clientY - gestureStartY;
+        if (deltaY > 10 && isLocked && !isLocking) {
+            isAutoPulling = false; isManualPulling = true; pullStrength = Math.max(0, Math.min(deltaY * 0.6, 45));
         }
+    });
+
+    document.addEventListener('pointerup', (e) => {
+        if (!isGestureActive) return;
+        isGestureActive = false;
+        let deltaY = e.clientY - gestureStartY;
+        if (deltaY < -40) insertCoin();
+        if (isManualPulling || isAutoPulling) { isAutoPulling = false; isManualPulling = false; firePlunger(); }
+        if (e.target.id === 'launchBtn') e.target.releasePointerCapture(e.pointerId);
     });
 
     // ==========================================
@@ -559,6 +608,7 @@
             ball.vy += gravity; ball.vx *= friction; ball.vy *= friction;
             ball.x += ball.vx; ball.y += ball.vy;
 
+            // 發射台底部
             if (ball.x > 370) {
                 ball.x = 387.5; 
                 let surfaceY = getPlungerSurfaceY();
@@ -572,6 +622,7 @@
                 }
             }
 
+            // 釘子碰撞
             pegs.forEach(p => {
                 let dx = ball.x - p.x, dy = ball.y - p.y, dist = Math.sqrt(dx*dx + dy*dy);
                 let r = (p.type==='orange') ? ballRadius + pegRadius + 1.5 : ballRadius + pegRadius;
@@ -588,15 +639,30 @@
                 }
             });
             
+            // 外圍牆壁碰撞 (包含修復圓弧卡頓的邏輯)
             if (ball.y < 205) {
+                // 上方半圓弧判定
                 let dx = ball.x - 205, dy = ball.y - 205, dist = Math.sqrt(dx*dx + dy*dy);
                 if (dist > 200 - ballRadius) {
                     let nx = dx / dist, ny = dy / dist; 
-                    ball.x = 205 + nx * (200 - ballRadius); ball.y = 205 + ny * (200 - ballRadius);
+                    ball.x = 205 + nx * (200 - ballRadius); 
+                    ball.y = 205 + ny * (200 - ballRadius);
                     let dot = ball.vx * nx + ball.vy * ny; 
-                    if (dot > 0) { ball.vx = (ball.vx - 2 * dot * nx) * bounce; ball.vy = (ball.vy - 2 * dot * ny) * bounce; }
+                    
+                    if (dot > 0) { 
+                        // 改進的物理碰撞：分離法線速度與切線速度
+                        // 讓法向順利反彈，但「保留切線方向的滑動動能」，避免黏在牆上
+                        let vn_x = dot * nx;
+                        let vn_y = dot * ny;
+                        let vt_x = ball.vx - vn_x;
+                        let vt_y = ball.vy - vn_y;
+                        
+                        ball.vx = vt_x * 0.70 - vn_x * bounce; 
+                        ball.vy = vt_y * 0.70 - vn_y * bounce; 
+                    }
                 }
             } else {
+                // 左右直線牆壁判定
                 if (ball.x < 5 + ballRadius) { ball.x = 5 + ballRadius; ball.vx *= -bounce; }
                 if (ball.x > 405 - ballRadius) { ball.x = 405 - ballRadius; ball.vx *= -bounce; }
                 if (ball.y < 425) {
@@ -605,6 +671,7 @@
                 }
             }
             
+            // 掉入底部洞口判定
             if (ball.y > 440 && ball.x < 365) {
                 ballInTrough = { x: ball.x, y: ball.y, active: true };
                 if (isLocked && hasLaunched) {
@@ -623,6 +690,7 @@
             }
         }
 
+        // 底部回送軌道邏輯
         if (ballInTrough.active) {
             if (!isLoadingBall) {
                 if (ballInTrough.x < 350) { 
@@ -643,6 +711,7 @@
             }
         }
 
+        // 更新中獎金幣動畫
         for (let i = winEffects.length - 1; i >= 0; i--) {
             if (winEffects[i].update()) {
                 winEffects[i].draw(ctx);
@@ -651,6 +720,7 @@
             }
         }
 
+        // 繪製拉桿
         if (isAutoPulling && pullStrength < 45) pullStrength += 3.5;
         launchBtn.style.transform = `translateY(${pullStrength}px)`; 
         domSpring.style.height = `${25 + pullStrength}px`;
@@ -669,6 +739,7 @@
         ctx.fillStyle = '#666'; ctx.fillRect(373.5, springTop - 2, 28, 4); 
         ctx.restore();
 
+        // 繪製洞口燈號
         for (let i = 0; i < slotCount; i++) {
             let cx = playfieldLeft + (i + 0.5) * slotWidth, cy = 320; 
             let active = (currentLedIndex === slotMapping[i] && (isFlashing || isLocked));
@@ -683,16 +754,20 @@
         if (ball) drawMetallicBall(ctx, ball.x, ball.y, ballRadius);
         if (ballInTrough.active) drawMetallicBall(ctx, ballInTrough.x, ballInTrough.y, ballRadius);
 
+        // 繪製機台遮罩與軌道
         ctx.fillStyle = '#f2f2f2';
         ctx.beginPath(); ctx.moveTo(5, 445); ctx.lineTo(370, 495); ctx.lineTo(370, 515); ctx.lineTo(5, 465); ctx.fill();
         ctx.beginPath(); ctx.moveTo(370, 410); ctx.lineTo(370, 495); ctx.lineTo(280, 495); ctx.fill();
         ctx.fillStyle = '#fff'; ctx.fillRect(0, 205, 5, 320); ctx.fillRect(365, 205, 5, 220); ctx.fillRect(405, 205, 5, 320);
         ctx.beginPath(); ctx.arc(205, 205, 202.5, 0, Math.PI, true); ctx.strokeStyle = '#fff'; ctx.lineWidth = 5; ctx.stroke();
+        
+        // 繪製釘子
         pegs.forEach(p => {
             ctx.fillStyle = p.type==='orange'?'#f90':'#aaa';
             ctx.beginPath(); ctx.arc(p.x, p.y, p.type==='orange'?pegRadius+1.5:pegRadius, 0, Math.PI*2); ctx.fill();
         });
 
+        // 繪製提示文字
         quoteManager.updateAndDraw(ctx);
 
         requestAnimationFrame(loop);
