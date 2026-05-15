@@ -309,7 +309,7 @@
     const slotMapping = [1, 0, 2, 3, 0, 1, 3, 2, 0, 4, 1, 0];
 
     // ==========================================
-    // 提示框系統 (替換原有的跑馬燈)
+    // 提示框系統 
     // ==========================================
     class QuoteManager {
         constructor() { 
@@ -320,15 +320,15 @@
             this.quotes.push({ 
                 text: text, 
                 targetY: 0, 
-                y: 550, // 從畫面下方移入
+                y: 550, 
                 alpha: 1.0, 
                 color: color, 
-                life: 180 // 顯示時間 (大約 3 秒)
+                life: 180
             });
         }
         updateAndDraw(ctx) {
-            let screenCenterX = 185; // 遊戲區中央(扣除右邊發射器道)
-            let screenBottomY = 430; // 顯示在下半部
+            let screenCenterX = 185; 
+            let screenBottomY = 430; 
             let dynamicFontSize = 16;
             let lineSpacing = dynamicFontSize + 20;
             
@@ -339,7 +339,7 @@
             
             for (let i = this.quotes.length - 1; i >= 0; i--) {
                 let q = this.quotes[i]; 
-                q.y += (q.targetY - q.y) * 0.15; // 平滑位移
+                q.y += (q.targetY - q.y) * 0.15; 
                 q.life--;
                 
                 if (q.life < 20) q.alpha = Math.max(0, q.life / 20); else q.alpha = 0.95;
@@ -358,7 +358,6 @@
                 let bgH = dynamicFontSize + 16; 
                 let radius = 10;
                 
-                // 繪製半透明圓角背景
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.85)'; 
                 ctx.shadowColor = 'rgba(0,0,0,0.6)';
                 ctx.shadowBlur = 6;
@@ -374,7 +373,6 @@
                 ctx.quadraticCurveTo(bgX, bgY, bgX + radius, bgY); 
                 ctx.fill();
                 
-                // 繪製文字
                 ctx.shadowBlur = 0; 
                 ctx.fillStyle = q.color; 
                 ctx.fillText(q.text, screenCenterX, q.y); 
@@ -520,6 +518,34 @@
     });
 
     // ==========================================
+    // 新增：全域手勢控制 (往上滑動投幣、點擊螢幕停止跑燈)
+    // ==========================================
+    let swipeStartY = 0;
+    
+    document.addEventListener('touchstart', (e) => {
+        // 如果點到的是發射器，就交給發射器的邏輯處理，不要干擾
+        if (e.target.id === 'launchBtn') return; 
+        swipeStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+        if (e.target.id === 'launchBtn') return;
+        let swipeEndY = e.changedTouches[0].clientY;
+        
+        // 判斷是否為往上滑動 (Y 座標減少大於 40px)
+        if (swipeStartY - swipeEndY > 40) {
+            insertCoin();
+        }
+    }, { passive: true });
+
+    // 點擊遊戲畫面(Canvas)停止跑燈
+    canvas.addEventListener('pointerdown', (e) => {
+        if (isFlashing) {
+            pressRedButton();
+        }
+    });
+
+    // ==========================================
     // 遊戲主循環
     // ==========================================
     function loop() {
@@ -588,7 +614,6 @@
                         let base = multiplierValues[currentLedIndex];
                         let totalWin = base * topLeftMultiplier;
                         
-                        // 替換為使用 QuoteManager 提示
                         quoteManager.addQuote(`🎉 恭喜中獎！【糖菓 ${base} 粒】x ${topLeftMultiplier} = ${totalWin} 粒！`, '#ffeb3b');
                         
                         triggerWinCoins(totalWin); 
@@ -598,12 +623,8 @@
             }
         }
 
-        // ==========================================
-        // 優化下滑與送球動畫速度
-        // ==========================================
         if (ballInTrough.active) {
             if (!isLoadingBall) {
-                // 水平位移加速 (由 2.0 提升至 3.5)
                 if (ballInTrough.x < 350) { 
                     ballInTrough.x += 3.5; 
                     ballInTrough.y = (445 + (ballInTrough.x-5)*50/360) - ballRadius; 
@@ -615,7 +636,6 @@
                 let tx = 387.5;
                 let ty = getPlungerSurfaceY() - ballRadius; 
                 let dx = tx - ballInTrough.x, dy = ty - ballInTrough.y, dist = Math.sqrt(dx*dx + dy*dy);
-                // 送球過程速度優化 (由 5 提升至 7)
                 if (dist < 4) {
                     ball = { x: tx, y: ty, vx: 0, vy: 0 }; 
                     isLoadingBall = false; ballInTrough.active = false;
@@ -623,7 +643,6 @@
             }
         }
 
-        // 渲染特效
         for (let i = winEffects.length - 1; i >= 0; i--) {
             if (winEffects[i].update()) {
                 winEffects[i].draw(ctx);
@@ -674,7 +693,6 @@
             ctx.beginPath(); ctx.arc(p.x, p.y, p.type==='orange'?pegRadius+1.5:pegRadius, 0, Math.PI*2); ctx.fill();
         });
 
-        // 渲染文字提示系統
         quoteManager.updateAndDraw(ctx);
 
         requestAnimationFrame(loop);
