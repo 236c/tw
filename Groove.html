@@ -69,6 +69,74 @@
             transition: background 1s ease-in-out;
         }
 
+        .concert-title-overlay {
+            position: absolute;
+            top: 38%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 15;
+            pointer-events: none;
+            width: 90%;
+            max-width: 700px;
+            transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .concert-title-overlay.hidden {
+            opacity: 0;
+            transform: translate(-50%, -45%) scale(0.92);
+        }
+
+        .concert-title-overlay .show-subtitle {
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 7px;
+            color: #00e5ff;
+            text-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        .concert-title-overlay .show-main-title {
+            font-size: 3.8rem;
+            font-weight: 900;
+            letter-spacing: 6px;
+            line-height: 1.1;
+            background: linear-gradient(to bottom, #ffffff 40%, #8e9bb0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.15));
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .concert-title-overlay .show-featuring {
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #b700ff;
+            text-shadow: 0 0 10px rgba(183, 0, 255, 0.5);
+            margin-bottom: 28px;
+        }
+
+        .concert-title-overlay .show-hint {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            padding: 8px 24px;
+            border-radius: 30px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.02);
+        }
+
+        @keyframes pulse-glow {
+            0% { opacity: 0.8; text-shadow: 0 0 10px rgba(0, 229, 255, 0.4); }
+            100% { opacity: 1; text-shadow: 0 0 18px rgba(0, 229, 255, 0.8); }
+        }
+
         .crew-container {
             display: flex;
             justify-content: center;
@@ -237,6 +305,13 @@
     </header>
 
     <section class="stage-container" id="stage">
+        <div id="concert-title-box" class="concert-title-overlay">
+            <div class="show-subtitle">Live Performance Visualizer</div>
+            <h1 class="show-main-title">Ultimate Crew</h1>
+            <div class="show-featuring">FEATURING MICHAEL JACKSON STREET STYLE</div>
+            <div class="show-hint">🔥 點擊下方「載入音樂」啟動 360° 音頻互動舞台</div>
+        </div>
+
         <canvas id="bg-bokeh-canvas"></canvas>
         <div class="stage-lights" id="stage-lights"></div>
         <canvas id="particle-canvas"></canvas>
@@ -280,7 +355,8 @@
             { id: 'treble2', class: 'dancer-treble', baseScale: 0.85 }
         ];
 
-        const DANCE_STYLES = ['toprock', 'locking', 'popping', 'c_walk', 'moonwalk', 'anti_gravity_lean', 'clapping', 'hands_on_hips', 'salute', 'point_sky', 'splits', 'jumping_splits'];
+        // 新增了 'freestyle' 到舞步清單中
+        const DANCE_STYLES = ['toprock', 'locking', 'popping', 'c_walk', 'moonwalk', 'anti_gravity_lean', 'clapping', 'hands_on_hips', 'salute', 'point_sky', 'splits', 'jumping_splits', 'freestyle'];
         const SLOT_SPACING = 140; 
         
         const crewContainer = document.getElementById('crew');
@@ -331,7 +407,7 @@
                 
                 bodyTilt: 0, 
                 
-                currentStyle: 'locking',
+                currentStyle: 'freestyle', // 將開頭人物動作從 locking 更改為 freestyle
                 trickCooldown: Math.floor(Math.random() * 300),
                 isTricking: false,
                 trickType: '',
@@ -347,6 +423,7 @@
         const bgCanvas = document.getElementById('bg-bokeh-canvas'); 
         const tempoBadge = document.getElementById('tempo-badge');
         const appTitle = document.getElementById('app-title');
+        const concertTitleBox = document.getElementById('concert-title-box');
         
         const ctx = canvas.getContext('2d');
         const pCtx = pCanvas.getContext('2d'); 
@@ -841,6 +918,10 @@
             const file = e.target.files[0];
             if (!file) return;
             
+            if (concertTitleBox) {
+                concertTitleBox.classList.add('hidden');
+            }
+
             const uploadBtn = document.querySelector('.upload-btn');
             uploadBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: text-bottom;"><polyline points="20 6 9 17 4 12"></polyline></svg>讀取成功';
             uploadBtn.classList.add('success-state');
@@ -860,7 +941,10 @@
             if (!audioContext) initWebAudio();
         });
 
-        audioPlayer.addEventListener('play', () => { isMusicPlaying = true; });
+        audioPlayer.addEventListener('play', () => { 
+            isMusicPlaying = true; 
+            if (concertTitleBox) concertTitleBox.classList.add('hidden');
+        });
         audioPlayer.addEventListener('pause', () => { isMusicPlaying = false; });
 
         function initWebAudio() {
@@ -887,7 +971,6 @@
             dancer.trickStartTime = performance.now();
             const svg = dancer.stickman.querySelector('.stickman');
 
-            // 【進一步放慢特技動畫時間】確保每個特技招式不會做太快
             const speedFactor = Math.max(1.0, 1.3 - (typeof smoothEnergy !== 'undefined' ? smoothEnergy * 0.2 : 0.1)); 
             let duration = 800 * speedFactor;
 
@@ -932,7 +1015,6 @@
                 smoothTreble += (rawTreble - smoothTreble) * 0.3;
                 smoothEnergy += (rawEnergy - smoothEnergy) * 0.1; 
 
-                // 【大幅降低節奏推進速度】強調依賴音樂低音來驅動，避免純隨時間快轉
                 const tempoMultiplier = 0.005 + (smoothEnergy * 0.06) + (smoothBass * 0.04); 
                 dancePhase += tempoMultiplier;
             } else {
@@ -940,7 +1022,7 @@
                 smoothMid += (0 - smoothMid) * 0.1;
                 smoothTreble += (0 - smoothTreble) * 0.1;
                 smoothEnergy += (0 - smoothEnergy) * 0.1;
-                dancePhase += 0.005; // 沒音樂時非常緩慢的待機動作
+                dancePhase += 0.005; 
             }
 
             if (isMusicPlaying && globalChoreoTimer % 30 === 0) {
@@ -1174,6 +1256,7 @@
 
             dancers.forEach((dancer, index) => {
                 let targetBodyTilt = 0; 
+                let targetY = 0; // 預設身體垂直高度為 0
 
                 if (isSoloMode) {
                     dancer.mover.style.opacity = index === soloIndex ? '1' : '0.25';
@@ -1228,18 +1311,16 @@
 
                 let tHead=0, tArmL=0, tForearmL=0, tArmR=0, tForearmR=0;
                 let tLegL=0, tCalfL=0, tLegR=0, tCalfR=0;
-                let targetY = 0;
                 
-                // 【顯著降低關節的補間速度】讓動作移動時有阻尼感，消除抽搐與瞬移現象
                 let currentJointSpeed = isMusicPlaying ? (0.03 + (smoothEnergy * 0.08) + (smoothBass * 0.05)) : 0.02;
 
                 const beatStep = Math.floor(localPhase * 2) % 4;
                 const cycle = Math.sin(localPhase);
                 const fastCycle = Math.sin(localPhase * 2);
-                const isFreeze = isHeavyBass && !dancer.isTricking && !isWalking;
+                const isFreeze = isMusicPlaying && isHeavyBass && !dancer.isTricking && !isWalking; // 只有在音樂播放時才 freeze
 
                 if (dancer.isTricking) {
-                    currentJointSpeed = 0.2; // 特技時關節變化也再慢一點
+                    currentJointSpeed = 0.2; 
                     const elapsed = performance.now() - dancer.trickStartTime;
                     
                     const speedFactor = Math.max(1.0, 1.3 - smoothEnergy * 0.2);
@@ -1300,7 +1381,8 @@
                         targetY = 10 + (smoothBass * 10); 
                     }
                 } else {
-                    targetY = smoothBass * 25; // 利用 smoothBass 來產生天然的 Bounce 感
+                    targetY = 0; // 預設沒有垂直位移
+
                     const effectiveStyle = isWalking ? 'walk' : ((isSoloMode && index !== soloIndex) ? 'bounce' : dancer.currentStyle);
 
                     switch(effectiveStyle) {
@@ -1373,6 +1455,7 @@
                             tLegL = 10 + smoothBass * 30; tCalfL = -(smoothBass * 40);
                             tLegR = -10 - smoothBass * 30; tCalfR = smoothBass * 40;
                             tArmL = -20; tForearmL = -20; tArmR = 20; tForearmR = 20;
+                            targetY = smoothBass * 10; // bounce 保留一點跳動
                             break;
 
                         case 'toprock':
@@ -1382,6 +1465,7 @@
                             const armSwing = cycle * (50 + smoothMid * 50);
                             tArmL = armSwing - 20; tForearmL = -60;
                             tArmR = armSwing + 20; tForearmR = 60;
+                            targetY = smoothBass * 10; // toprock 保留一點跳動
                             break;
 
                         case 'locking': 
@@ -1397,8 +1481,8 @@
                                 tArmL = 80; tForearmL = 20; tArmR = 100; tForearmR = 20;
                             } else {
                                 tArmL = 40; tForearmL = -30; tArmR = -40; tForearmR = 30;
-                                targetY += 20; 
                             }
+                            targetY = 20 + smoothBass * 5; // locking 有預設高度位移
                             break;
 
                         case 'popping':
@@ -1410,6 +1494,7 @@
                             tForearmL = Math.cos(localPhase)*60;
                             tArmR = 80 + Math.sin(localPhase + Math.PI)*40 + popTwitch;
                             tForearmR = Math.cos(localPhase + Math.PI)*60;
+                            targetY = smoothBass * 5; // popping 跳動極小
                             break;
 
                         case 'c_walk':
@@ -1464,11 +1549,35 @@
                             tArmR = 130; 
                             tForearmL = clapPulse * 55; 
                             tForearmR = clapPulse * -55; 
-                            targetY = smoothMid * 20;
                             tLegL = 20 + smoothBass * 30; 
                             tCalfL = -(smoothBass * 30);
                             tLegR = -20 - smoothBass * 30; 
                             tCalfR = smoothBass * 30;
+                            targetY = smoothBass * 15;
+                            break;
+                            
+                        case 'freestyle':
+                            // 這裡設定隨意舞動的邏輯
+                            
+                            // 身體輕微隨機傾斜，增加隨機感
+                            targetBodyTilt = Math.sin(localPhase * 0.5) * (5 + smoothEnergy * 5);
+
+                            // 頭部獨立且有機地擺動
+                            tHead = Math.sin(localPhase * 0.8) * 15 + Math.cos(localPhase * 1.2) * 8;
+                            
+                            // 雙臂不規則且不同步地揮舞
+                            tArmL = -80 + Math.sin(localPhase * 1.1) * 30 + Math.cos(localPhase * 0.7) * 20;
+                            tForearmL = -30 + Math.sin(localPhase * 0.9) * 40;
+                            tArmR = 80 + Math.sin(localPhase * 0.9) * 30 + Math.cos(localPhase * 1.1) * 20;
+                            tForearmR = 30 + Math.sin(localPhase * 1.3) * 40;
+
+                            // 雙腿輕微踩踏，避免大幅度動作
+                            tLegL = 10 + Math.sin(localPhase * 0.6) * 15;
+                            tCalfL = Math.cos(localPhase * 1.0) * 20;
+                            tLegR = -10 + Math.sin(localPhase * 0.8) * 15;
+                            tCalfR = Math.cos(localPhase * 1.2) * 20;
+
+                            targetY = smoothBass * 5; // freestyle 只有極微小的低音反應，沒有明顯跳動
                             break;
                     }
                 }
