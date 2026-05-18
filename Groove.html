@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>神級街舞團 | MJ 經典舞步與 360 度環繞運鏡</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #020305;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; 
+            margin: 0;
+            height: 100dvh; 
+            display: flex;
+            flex-direction: column; 
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0; 
+            z-index: 20; 
+        }
+
+        .header-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 60vw; 
+        }
+
+        .stage-container {
+            flex-grow: 1; 
+            min-height: 0; 
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; 
+            align-items: center;
+            background: radial-gradient(circle at top, #110e1c 0%, #010103 100%);
+            position: relative;
+            overflow: hidden;
+            perspective: 1200px; 
+        }
+
+        #bg-bokeh-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; 
+            pointer-events: none;
+        }
+
+        #particle-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 3; 
+            pointer-events: none;
+        }
+
+        .stage-lights {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.02) 0%, transparent 70%);
+            opacity: 0.5; pointer-events: none;
+            z-index: 5; 
+            transition: background 1s ease-in-out;
+        }
+
+        .crew-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 10; 
+            width: 100%;
+            height: 350px; 
+            margin-top: auto;    
+            margin-bottom: 130px; 
+            transform-origin: bottom center;
+            transform-style: preserve-3d; 
+        }
+
+        .dancer-mover {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            will-change: transform, opacity, z-index;
+            transform-origin: bottom center; 
+            transition: opacity 0.8s ease-in-out; 
+        }
+
+        .shadow {
+            position: absolute;
+            bottom: -5px;
+            width: 70px;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 50%;
+            filter: blur(6px);
+            z-index: 1;
+            will-change: transform, opacity;
+        }
+
+        .dancer-bass { color: #ff0055; filter: drop-shadow(0 0 12px #ff0055); }
+        .dancer-mid { color: #00e5ff; filter: drop-shadow(0 0 8px #00e5ff); }
+        .dancer-treble { color: #b700ff; filter: drop-shadow(0 0 8px #b700ff); }
+
+        .stickman-container { 
+            z-index: 2; 
+            will-change: transform; 
+            transform-origin: bottom center;
+        }
+        
+        .stickman { 
+            width: 120px; height: 250px; overflow: visible; 
+            transform-origin: center center; 
+        }
+        .stickman circle, .stickman line {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        
+        .head, .arm-l, .arm-r, .forearm-l, .forearm-r, .leg-l, .leg-r, .calf-l, .calf-r {
+            transform-origin: 0px 0px;
+            will-change: transform;
+        }
+
+        @keyframes flip-backward {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-360deg); }
+        }
+        @keyframes cartwheel-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes pirouette-spin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(1080deg); } 
+        }
+        @keyframes headspin-anim {
+            0% { transform: rotate(180deg) rotateY(0deg); }
+            100% { transform: rotate(180deg) rotateY(1440deg); } 
+        }
+        @keyframes windmill-anim {
+            0% { transform: rotateX(65deg) rotateZ(0deg); }
+            100% { transform: rotateX(65deg) rotateZ(1080deg); } 
+        }
+
+        #led-canvas {
+            width: 100%;
+            height: 60px; 
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.6);
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 -15px 40px rgba(0, 255, 170, 0.08);
+            flex-shrink: 0;
+        }
+
+        .bottom-controls-wrapper {
+            flex-shrink: 0; 
+            width: 100%;
+            padding: 10px 15px 15px 15px; 
+            background-color: #020305;
+            z-index: 20;
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px; 
+            padding: 8px 12px; 
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center; 
+            gap: 12px;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        #audio-upload {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #00e5ff, #b700ff);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            margin: 0;
+            box-shadow: 0 4px 10px rgba(0, 229, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-btn:hover {
+            transform: scale(1.03);
+            filter: brightness(1.1);
+        }
+
+        .upload-btn.success-state {
+            background: linear-gradient(45deg, #00e5ff, #00ff88);
+            color: #020305;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        audio { 
+            width: 100%; 
+            height: 38px; 
+            border-radius: 30px; 
+            outline: none; 
+            flex-grow: 1; 
+        }
+    </style>
+</head>
+<body>
+
+    <header class="glass-header py-2">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h6 id="app-title" class="m-0 fw-bold tracking-wider text-light header-title" title="Ultimate Crew (360° MJ)">🎧 Ultimate Crew (360° MJ)</h6>
+            <div>
+                <span id="tempo-badge" class="badge bg-secondary text-light fw-bold ms-2">等待音樂...</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="stage-container" id="stage">
+        <canvas id="bg-bokeh-canvas"></canvas>
+        <div class="stage-lights" id="stage-lights"></div>
+        <canvas id="particle-canvas"></canvas>
+        <div class="crew-container" id="crew"></div>
+        <canvas id="led-canvas"></canvas>
+    </section>
+
+    <div class="bottom-controls-wrapper">
+        <div class="container px-0">
+            <div class="row justify-content-center m-0">
+                <div class="col-lg-8 col-12 px-1">
+                    <div class="control-panel">
+                        <label for="audio-upload" class="upload-btn">
+                            🎵 載入音樂
+                        </label>
+                        <input type="file" id="audio-upload" accept="audio/*">
+                        <audio id="audio-player" controls></audio>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const stickmanTemplate = `
+            <svg viewBox="-100 -50 200 320" class="stickman">
+                <line x1="0" y1="0" x2="0" y2="90" class="torso" />
+                <g transform="translate(0, 0)"><g class="head"><circle cx="0" cy="-30" r="22" /></g></g>
+                <g transform="translate(0, 15)"><g class="arm-l"><line x1="0" y1="0" x2="-35" y2="45" /><g transform="translate(-35, 45)"><g class="forearm-l"><line x1="0" y1="0" x2="-25" y2="45" /></g></g></g></g>
+                <g transform="translate(0, 15)"><g class="arm-r"><line x1="0" y1="0" x2="35" y2="45" /><g transform="translate(35, 45)"><g class="forearm-r"><line x1="0" y1="0" x2="25" y2="45" /></g></g></g></g>
+                <g transform="translate(0, 90)"><g class="leg-l"><line x1="0" y1="0" x2="-25" y2="70" /><g transform="translate(-25, 70)"><g class="calf-l"><line x1="0" y1="0" x2="-5" y2="70" /></g></g></g></g>
+                <g transform="translate(0, 90)"><g class="leg-r"><line x1="0" y1="0" x2="25" y2="70" /><g transform="translate(25, 70)"><g class="calf-r"><line x1="0" y1="0" x2="5" y2="70" /></g></g></g></g>
+            </svg>
+        `;
+
+        const dancersConfig = [
+            { id: 'treble1', class: 'dancer-treble', baseScale: 0.85 },
+            { id: 'mid1', class: 'dancer-mid', baseScale: 0.85 },
+            { id: 'bass', class: 'dancer-bass', baseScale: 0.92 }, 
+            { id: 'mid2', class: 'dancer-mid', baseScale: 0.85 },
+            { id: 'treble2', class: 'dancer-treble', baseScale: 0.85 }
+        ];
+
+        const DANCE_STYLES = ['toprock', 'locking', 'popping', 'c_walk', 'moonwalk', 'anti_gravity_lean', 'clapping', 'hands_on_hips', 'salute', 'point_sky', 'splits', 'jumping_splits'];
+        const SLOT_SPACING = 140; 
+        
+        const crewContainer = document.getElementById('crew');
+        const dancers = [];
+
+        dancersConfig.forEach((config, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = config.class;
+            
+            wrapper.style.position = 'relative'; 
+            wrapper.style.width = '0px'; 
+            wrapper.style.display = 'flex';
+            wrapper.style.justifyContent = 'center';
+            wrapper.style.alignItems = 'flex-end';
+
+            wrapper.innerHTML = `
+                <div class="dancer-mover">
+                    <div class="shadow"></div>
+                    <div class="stickman-container">${stickmanTemplate}</div>
+                </div>
+            `;
+            crewContainer.appendChild(wrapper);
+            
+            const distFromCenter = Math.abs(index - 2);
+            const initialZ = 1.0 - (distFromCenter * 0.18);
+            const initialX = (index - 2) * SLOT_SPACING;
+
+            dancers.push({
+                wrapper: wrapper,
+                baseScale: config.baseScale,
+                mover: wrapper.querySelector('.dancer-mover'),
+                stickman: wrapper.querySelector('.stickman-container'),
+                shadow: wrapper.querySelector('.shadow'),
+                dom: {
+                    head: wrapper.querySelector('.head'),
+                    armL: wrapper.querySelector('.arm-l'), forearmL: wrapper.querySelector('.forearm-l'),
+                    armR: wrapper.querySelector('.arm-r'), forearmR: wrapper.querySelector('.forearm-r'),
+                    legL: wrapper.querySelector('.leg-l'), calfL: wrapper.querySelector('.calf-l'),
+                    legR: wrapper.querySelector('.leg-r'), calfR: wrapper.querySelector('.calf-r')
+                },
+                angles: { head: 0, armL: 0, forearmL: 0, armR: 0, forearmR: 0, legL: 0, calfL: 0, legR: 0, calfR: 0 },
+                
+                originalIndex: index,
+                slotIndex: index,     
+                x: initialX, targetX: initialX,
+                y: 0, 
+                z: initialZ, targetZ: initialZ, 
+                
+                bodyTilt: 0, 
+                
+                currentStyle: 'locking',
+                trickCooldown: Math.floor(Math.random() * 300),
+                isTricking: false,
+                trickType: '',
+                trickStartTime: 0
+            });
+        });
+
+        const audioUpload = document.getElementById('audio-upload');
+        const audioPlayer = document.getElementById('audio-player');
+        const stageLights = document.getElementById('stage-lights');
+        const canvas = document.getElementById('led-canvas');
+        const pCanvas = document.getElementById('particle-canvas'); 
+        const bgCanvas = document.getElementById('bg-bokeh-canvas'); 
+        const tempoBadge = document.getElementById('tempo-badge');
+        const appTitle = document.getElementById('app-title');
+        
+        const ctx = canvas.getContext('2d');
+        const pCtx = pCanvas.getContext('2d'); 
+        const bgCtx = bgCanvas.getContext('2d'); 
+
+        let audioContext, analyser, dataArray;
+        let smoothBass = 0, smoothMid = 0, smoothTreble = 0, smoothEnergy = 0, dancePhase = 0;
+        let prevBass = 0; 
+        
+        let globalChoreoTimer = 0;
+        let isSyncMode = false;
+        let isSoloMode = false;
+        let soloIndex = -1;
+
+        let cameraAngleY = 0; 
+        let targetCameraAngleY = 0;
+        let currentStageScale = 1;
+        let currentStageTranslateY = 0;
+        
+        let responsiveScale = 1;
+        let isMusicPlaying = false;
+
+        class BackgroundBokeh {
+            constructor(w, h, hueBase) {
+                this.w = w; this.h = h;
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.5) * 0.2;
+                this.size = Math.random() * 250 + 150;
+                this.baseAlpha = Math.random() * 0.04 + 0.02;
+                this.alpha = this.baseAlpha;
+                this.hue = hueBase + (Math.random() * 20 - 10);
+            }
+            update(hueBase, energy) {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < -this.size) this.x = this.w + this.size;
+                if (this.x > this.w + this.size) this.x = -this.size;
+                if (this.y < -this.size) this.y = this.h + this.size;
+                if (this.y > this.h + this.size) this.y = -this.size;
+                
+                this.hue = hueBase + (Math.random() * 2 - 1);
+                this.alpha = this.baseAlpha + (energy * (isMusicPlaying ? 0.01 : 0.005));
+            }
+            draw(ctx) {
+                ctx.beginPath();
+                let gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                gradient.addColorStop(0, `hsla(${this.hue}, 60%, 80%, ${this.alpha})`); 
+                gradient.addColorStop(0.5, `hsla(${this.hue}, 50%, 70%, ${this.alpha * 0.5})`);
+                gradient.addColorStop(1, `hsla(${this.hue}, 30%, 50%, 0)`);
+                
+                ctx.fillStyle = gradient;
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        class SingleConcertLight {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y; 
+                this.angle = -Math.PI / 2; 
+                this.targetAngle = -Math.PI / 2;
+                this.alpha = 0;
+                this.hue = 180;
+                this.spread = 0.12; 
+            }
+            update(energy, isBeat, hueBase) {
+                this.angle += (this.targetAngle - this.angle) * 0.08;
+                if (isBeat) {
+                    this.alpha = 0.12 + energy * 0.08; 
+                    this.hue = hueBase + (Math.random() * 30 - 15);
+                } else {
+                    this.alpha -= 0.003; 
+                    const minAlpha = energy * 0.03; 
+                    if (this.alpha < minAlpha) this.alpha = minAlpha;
+                }
+            }
+            draw(ctx, length) {
+                if (this.alpha <= 0.005) return;
+                const x2 = this.x + length * Math.cos(this.angle - this.spread);
+                const y2 = this.y + length * Math.sin(this.angle - this.spread);
+                const x3 = this.x + length * Math.cos(this.angle + this.spread);
+                const y3 = this.y + length * Math.sin(this.angle + this.spread);
+                const targetX = this.x + length * Math.cos(this.angle);
+                const targetY = this.y + length * Math.sin(this.angle);
+
+                const grad = ctx.createLinearGradient(this.x, this.y, targetX, targetY);
+                grad.addColorStop(0, `hsla(${this.hue}, 80%, 75%, ${this.alpha})`);
+                grad.addColorStop(0.3, `hsla(${this.hue}, 70%, 65%, ${this.alpha * 0.4})`);
+                grad.addColorStop(1, `hsla(${this.hue}, 60%, 55%, 0)`);
+
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(x2, y2);
+                ctx.lineTo(x3, y3);
+                ctx.closePath();
+                ctx.fillStyle = grad;
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${this.hue}, 100%, 85%, ${this.alpha * 1.5})`;
+                ctx.fill();
+            }
+        }
+
+        class ConcertLightSystem {
+            constructor(w, h) {
+                this.w = w;
+                this.h = h;
+                this.lights = [];
+                const count = 5;
+                for(let i = 0; i < count; i++) {
+                    this.lights.push(new SingleConcertLight(w * (i + 0.5) / count, h + 10));
+                }
+                this.beamLength = Math.max(w, h) * 1.5; 
+                this.lastModeChange = 0;
+            }
+
+            triggerMode(hueBase, mode) {
+                this.lights.forEach((l, i) => {
+                    if (mode === 'parallel') {
+                        l.targetAngle = -Math.PI / 2 + (Math.random() * 0.1 - 0.05);
+                        l.spread = 0.08; 
+                    } else if (mode === 'cross') {
+                        const isLeft = i < this.lights.length / 2;
+                        l.targetAngle = isLeft ? -Math.PI / 3.5 : -Math.PI * 2.5 / 3.5;
+                        l.spread = 0.15;
+                    } else if (mode === 'fan') {
+                        const progress = i / (this.lights.length - 1); 
+                        l.targetAngle = -Math.PI * 0.85 + progress * Math.PI * 0.7;
+                        l.spread = 0.12;
+                    } else {
+                        l.targetAngle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.9;
+                        l.spread = 0.1;
+                    }
+                    l.hue = hueBase + (i * 12 - 24); 
+                });
+            }
+
+            update(energy, isBeat, hueBase) {
+                if (isBeat && performance.now() - this.lastModeChange > 1500) {
+                    const modes = ['parallel', 'cross', 'fan', 'chaos'];
+                    this.triggerMode(hueBase, modes[Math.floor(Math.random() * modes.length)]);
+                    this.lastModeChange = performance.now();
+                }
+                this.lights.forEach(l => l.update(energy, isBeat, hueBase));
+            }
+
+            draw(ctx) {
+                this.lights.forEach(l => l.draw(ctx, this.beamLength));
+            }
+        }
+
+        class UnifiedCeilingLightSystem {
+            constructor(w, h) {
+                this.w = w; 
+                this.h = h;
+                this.lights = [];
+                this.count = 7; 
+                const spacing = w / this.count;
+
+                for (let i = 0; i < this.count; i++) {
+                    this.lights.push({
+                        x: spacing / 2 + i * spacing,
+                        y: 15, 
+                        hue: 180,
+                        classicAlpha: 0,
+                        scannerAlpha: 0,
+                        angle: Math.PI / 2,
+                        targetAngle: Math.PI / 2,
+                        sweepSpeed: 0.02 + Math.random() * 0.03
+                    });
+                }
+
+                this.chaseOffset = 0;
+                this.colorCycle = 0;
+                this.washIntensity = 0;    
+                this.scannerIntensity = 0; 
+            }
+
+            update(smoothEnergy, isBeat, rawTreble, smoothMid, hueBase, isPlaying) {
+                const targetWash = (isPlaying && smoothEnergy < 0.25) ? 1 : 0;
+                this.washIntensity += (targetWash - this.washIntensity) * 0.03;
+
+                const targetScanner = (isPlaying && smoothEnergy > 0.35) ? 1 : 0;
+                this.scannerIntensity += (targetScanner - this.scannerIntensity) * 0.05;
+
+                this.chaseOffset += smoothMid * 0.2;
+                this.colorCycle += smoothEnergy * 4;
+
+                this.lights.forEach((l, i) => {
+                    l.hue = hueBase; 
+
+                    l.classicAlpha -= 0.04;
+                    if (isPlaying) {
+                        if (isBeat) {
+                            l.classicAlpha = 0.6 + smoothEnergy * 0.4;
+                        } else if (rawTreble > 0.65 && Math.random() > 0.75) {
+                            l.classicAlpha = 0.5 + Math.random() * 0.3;
+                        } else if (smoothMid > 0.4) {
+                            let wave = Math.sin(this.chaseOffset + i);
+                            if (wave > 0.85) l.classicAlpha = Math.max(l.classicAlpha, wave * 0.4 * smoothMid);
+                        }
+                    }
+                    if (l.classicAlpha < 0) l.classicAlpha = 0;
+                    if (l.classicAlpha > 1) l.classicAlpha = 1;
+
+                    l.angle += (l.targetAngle - l.angle) * l.sweepSpeed;
+                    if (isPlaying && this.scannerIntensity > 0.01) {
+                        l.scannerAlpha -= 0.03;
+                        if (isBeat) {
+                            l.scannerAlpha = 0.35 + smoothEnergy * 0.2;
+                            l.targetAngle = Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.8;
+                        } else if (rawTreble > 0.6 && Math.random() > 0.8) {
+                            l.scannerAlpha = 0.25 + Math.random() * 0.2;
+                            l.targetAngle = Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.4;
+                        }
+                        if (smoothMid > 0.3) {
+                            l.targetAngle += Math.sin(performance.now() * 0.002 + i) * 0.05;
+                        }
+                    } else {
+                        l.scannerAlpha -= 0.05;
+                    }
+                    if (l.scannerAlpha < 0) l.scannerAlpha = 0;
+                    if (l.scannerAlpha > 1) l.scannerAlpha = 1;
+                });
+            }
+
+            draw(ctx) {
+                const h = this.h;
+
+                if (this.washIntensity > 0.01) {
+                    const spread = 0.55; 
+                    const beamLength = h * 1.5;
+                    this.lights.forEach((l, i) => {
+                        const washHue = (l.hue + i * 15) % 360;
+                        const pulse = 0.6 + Math.sin(performance.now() * 0.001 + i) * 0.4;
+                        const alpha = this.washIntensity * pulse * 0.15; 
+                        
+                        if (alpha > 0.005) {
+                            ctx.beginPath();
+                            let grad = ctx.createLinearGradient(l.x, l.y, l.x, l.y + beamLength);
+                            grad.addColorStop(0, `hsla(${washHue}, 60%, 75%, ${alpha})`);
+                            grad.addColorStop(1, `hsla(${washHue}, 60%, 75%, 0)`);
+                            ctx.fillStyle = grad;
+                            ctx.moveTo(l.x, l.y);
+                            ctx.lineTo(l.x - beamLength * spread, l.y + beamLength);
+                            ctx.lineTo(l.x + beamLength * spread, l.y + beamLength);
+                            ctx.fill();
+                        }
+                    });
+                }
+
+                this.lights.forEach((l) => {
+                    if (l.classicAlpha > 0.01) {
+                        const cAlpha = l.classicAlpha;
+                        
+                        ctx.beginPath();
+                        let grad = ctx.createLinearGradient(l.x, l.y, l.x, l.y + h * 0.6);
+                        grad.addColorStop(0, `hsla(${l.hue}, 80%, 75%, ${cAlpha * 0.25})`);
+                        grad.addColorStop(1, `hsla(${l.hue}, 80%, 75%, 0)`);
+                        ctx.fillStyle = grad;
+                        ctx.moveTo(l.x - 20, l.y);
+                        ctx.lineTo(l.x + 20, l.y);
+                        ctx.lineTo(l.x + 120, l.y + h * 0.6);
+                        ctx.lineTo(l.x - 120, l.y + h * 0.6);
+                        ctx.fill();
+
+                        ctx.beginPath();
+                        let glowRadius = 150 * cAlpha; 
+                        let glowGrad = ctx.createRadialGradient(l.x, l.y, 0, l.x, l.y, glowRadius);
+                        glowGrad.addColorStop(0, `hsla(${l.hue}, 100%, 100%, ${cAlpha})`);      
+                        glowGrad.addColorStop(0.15, `hsla(${l.hue}, 80%, 65%, ${cAlpha * 0.6})`); 
+                        glowGrad.addColorStop(1, `hsla(${l.hue}, 50%, 20%, 0)`);                   
+                        ctx.fillStyle = glowGrad;
+                        ctx.arc(l.x, l.y, glowRadius, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+
+                if (this.scannerIntensity > 0.01) {
+                    const beamLength = h * 1.2;
+                    const spread = 0.15;
+                    const coreSpread = 0.03;
+                    
+                    this.lights.forEach((l, i) => {
+                        const scanHue = (l.hue + (i * 30) + this.colorCycle) % 360;
+                        const finalAlpha = l.scannerAlpha * this.scannerIntensity;
+
+                        if (finalAlpha > 0.01) {
+                            const endX = l.x + beamLength * Math.cos(l.angle);
+                            const endY = l.y + beamLength * Math.sin(l.angle);
+                            const x2 = l.x + beamLength * Math.cos(l.angle - spread);
+                            const y2 = l.y + beamLength * Math.sin(l.angle - spread);
+                            const x3 = l.x + beamLength * Math.cos(l.angle + spread);
+                            const y3 = l.y + beamLength * Math.sin(l.angle + spread);
+
+                            ctx.beginPath();
+                            let grad = ctx.createLinearGradient(l.x, l.y, endX, endY);
+                            grad.addColorStop(0, `hsla(${scanHue}, 90%, 75%, ${finalAlpha * 0.2})`);
+                            grad.addColorStop(0.4, `hsla(${scanHue}, 80%, 65%, ${finalAlpha * 0.08})`);
+                            grad.addColorStop(1, `hsla(${scanHue}, 80%, 50%, 0)`);
+                            ctx.fillStyle = grad;
+                            ctx.moveTo(l.x, l.y);
+                            ctx.lineTo(x2, y2);
+                            ctx.lineTo(x3, y3);
+                            ctx.fill();
+
+                            const cx2 = l.x + beamLength * Math.cos(l.angle - coreSpread);
+                            const cy2 = l.y + beamLength * Math.sin(l.angle - coreSpread);
+                            const cx3 = l.x + beamLength * Math.cos(l.angle + coreSpread);
+                            const cy3 = l.y + beamLength * Math.sin(l.angle + coreSpread);
+                            
+                            ctx.beginPath();
+                            let coreGrad = ctx.createLinearGradient(l.x, l.y, endX, endY);
+                            coreGrad.addColorStop(0, `hsla(${scanHue}, 100%, 95%, ${finalAlpha * 0.35})`);
+                            coreGrad.addColorStop(1, `hsla(${scanHue}, 100%, 80%, 0)`);
+                            ctx.fillStyle = coreGrad;
+                            ctx.moveTo(l.x, l.y);
+                            ctx.lineTo(cx2, cy2);
+                            ctx.lineTo(cx3, cy3);
+                            ctx.fill();
+                        }
+                    });
+                }
+
+                this.lights.forEach((l, i) => {
+                    ctx.fillStyle = '#050505';
+                    ctx.fillRect(l.x - 18, l.y - 12, 36, 16); 
+                    
+                    ctx.fillStyle = `hsla(${l.hue}, 100%, 85%, ${l.classicAlpha * 0.5 + 0.1})`; 
+                    ctx.fillRect(l.x - 12, l.y - 4, 24, 6);   
+
+                    if (this.scannerIntensity > 0.01) {
+                        const scanHue = (l.hue + (i * 30) + this.colorCycle) % 360;
+                        const finalAlpha = l.scannerAlpha * this.scannerIntensity;
+                        const lensX = l.x + 8 * Math.cos(l.angle);
+                        const lensY = l.y + 8 * Math.sin(l.angle);
+                        
+                        ctx.fillStyle = `hsla(${scanHue}, 100%, 85%, ${finalAlpha + 0.2})`;
+                        ctx.beginPath();
+                        ctx.arc(lensX, lensY, 6, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+            }
+        }
+
+        let backgroundOrbs = [];
+        let concertLights = null; 
+        let unifiedCeilingLights = null; 
+        
+        let particles = [];
+        
+        class Particle {
+            constructor(x, y, hue, type, energy = 1) {
+                this.x = x;
+                this.y = y;
+                this.type = type; 
+                this.hue = hue;
+                this.life = 1.0;
+                
+                if (type === 'bass_orb') {
+                    this.vx = (Math.random() - 0.5) * 8 * energy;
+                    this.vy = (Math.random() - 1) * 12 * energy - 2;
+                    this.size = Math.random() * 12 + 6;
+                    this.decay = Math.random() * 0.015 + 0.01;
+                    this.friction = 0.94;
+                    this.gravity = 0.15;
+                } else if (type === 'treble_spark') {
+                    this.vx = (Math.random() - 0.5) * 18 * energy;
+                    this.vy = (Math.random() - 1) * 22 * energy;
+                    this.size = Math.random() * 2 + 1.5;
+                    this.decay = Math.random() * 0.04 + 0.03;
+                    this.friction = 0.88;
+                    this.gravity = 0.4;
+                } else if (type === 'mid_dust') {
+                    this.vx = (Math.random() - 0.5) * 4 * energy;
+                    this.vy = (Math.random() - 0.8) * 4 * energy;
+                    this.size = Math.random() * 4 + 1;
+                    this.decay = Math.random() * 0.008 + 0.004;
+                    this.friction = 0.98;
+                    this.gravity = -0.02; 
+                } else if (type === 'shockwave') {
+                    this.vx = 0; 
+                    this.vy = 0;
+                    this.size = 10;
+                    this.decay = 0.05;
+                    this.friction = 1;
+                    this.gravity = 0;
+                    this.maxSize = energy * 150;
+                }
+            }
+
+            update(energy) {
+                if (this.type !== 'shockwave') {
+                    const swirlX = Math.sin(this.y * 0.02 + performance.now() * 0.002) * energy * 2;
+                    this.x += this.vx + swirlX;
+                    this.y += this.vy;
+                    this.vx *= this.friction;
+                    this.vy *= this.friction;
+                    this.vy += this.gravity;
+                    this.size = Math.max(0, this.size * 0.96); 
+                } else {
+                    this.size += (this.maxSize - this.size) * 0.15;
+                }
+                this.life -= this.decay;
+            }
+
+            draw(ctx) {
+                if (this.life <= 0) return;
+                
+                ctx.beginPath();
+                if (this.type === 'shockwave') {
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.strokeStyle = `hsla(${this.hue}, 100%, 70%, ${this.life * 0.6})`;
+                    ctx.lineWidth = 6 * this.life;
+                    ctx.stroke();
+                } else if (this.type === 'treble_spark') {
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(this.x - this.vx * 1.5, this.y - this.vy * 1.5);
+                    ctx.strokeStyle = `hsla(${this.hue}, 100%, 80%, ${this.life})`;
+                    ctx.lineWidth = this.size;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                } else {
+                    let gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                    gradient.addColorStop(0, `hsla(${this.hue}, 100%, 90%, ${this.life})`);
+                    gradient.addColorStop(0.3, `hsla(${this.hue}, 100%, 65%, ${this.life * 0.8})`);
+                    gradient.addColorStop(1, `hsla(${this.hue}, 100%, 50%, 0)`);
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        function resizeCanvas() {
+            if(!canvas) return;
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            
+            const stage = document.getElementById('stage');
+            if(stage) {
+                const stageWidth = stage.clientWidth || window.innerWidth;
+                const fallbackHeight = window.innerHeight - 150; 
+                const stageHeight = stage.clientHeight > 10 ? stage.clientHeight : fallbackHeight;
+
+                if(pCanvas) {
+                    pCanvas.width = stageWidth;
+                    pCanvas.height = stageHeight;
+                }
+                
+                if(bgCanvas) {
+                    bgCanvas.width = stageWidth;
+                    bgCanvas.height = stageHeight;
+                    
+                    backgroundOrbs = [];
+                    for(let i=0; i<8; i++) backgroundOrbs.push(new BackgroundBokeh(stageWidth, stageHeight, 180));
+                    
+                    concertLights = new ConcertLightSystem(stageWidth, stageHeight);
+                    unifiedCeilingLights = new UnifiedCeilingLightSystem(stageWidth, stageHeight);
+                }
+
+                const scaleX = stageWidth / 800; 
+                const scaleY = stageHeight / 650; 
+
+                responsiveScale = Math.min(scaleX, scaleY);
+                responsiveScale = Math.max(0.2, Math.min(responsiveScale, 1.5));
+
+                if (crewContainer) {
+                    currentStageScale = responsiveScale; 
+                    crewContainer.style.transform = `scale(${currentStageScale}) translateY(${currentStageTranslateY}px) rotateY(${cameraAngleY}deg)`;
+                }
+            }
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        document.addEventListener('DOMContentLoaded', resizeCanvas);
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            setTimeout(resizeCanvas, 100); 
+            setTimeout(resizeCanvas, 500); 
+        });
+        resizeCanvas(); 
+
+        audioUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const uploadBtn = document.querySelector('.upload-btn');
+            uploadBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: text-bottom;"><polyline points="20 6 9 17 4 12"></polyline></svg>讀取成功';
+            uploadBtn.classList.add('success-state');
+            
+            setTimeout(() => {
+                uploadBtn.innerHTML = '🎵 更換音樂';
+                uploadBtn.classList.remove('success-state');
+            }, 2000);
+            
+            const cleanFileName = file.name.replace(/\.[^/.]+$/, "");
+            appTitle.innerText = `🎧 ${cleanFileName}`;
+            appTitle.title = cleanFileName;
+            
+            audioPlayer.src = URL.createObjectURL(file);
+            audioPlayer.play();
+            isMusicPlaying = true; 
+            if (!audioContext) initWebAudio();
+        });
+
+        audioPlayer.addEventListener('play', () => { isMusicPlaying = true; });
+        audioPlayer.addEventListener('pause', () => { isMusicPlaying = false; });
+
+        function initWebAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 512;
+            analyser.smoothingTimeConstant = 0.6;
+            const source = audioContext.createMediaElementSource(audioPlayer);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+        }
+
+        renderFrame();
+
+        function updateJoint(dancer, joint, targetAngle, speed) {
+            dancer.angles[joint] += (targetAngle - dancer.angles[joint]) * speed;
+            dancer.dom[joint].style.transform = `rotate(${dancer.angles[joint]}deg)`;
+        }
+
+        function triggerTrick(dancer, type) {
+            dancer.isTricking = true;
+            dancer.trickType = type;
+            dancer.trickStartTime = performance.now();
+            const svg = dancer.stickman.querySelector('.stickman');
+
+            // 【進一步放慢特技動畫時間】確保每個特技招式不會做太快
+            const speedFactor = Math.max(1.0, 1.3 - (typeof smoothEnergy !== 'undefined' ? smoothEnergy * 0.2 : 0.1)); 
+            let duration = 800 * speedFactor;
+
+            if (type === 'backflip') {
+                svg.style.animation = `flip-backward ${0.8 * speedFactor}s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`;
+            } else if (type === 'cartwheel') {
+                duration = 900 * speedFactor;
+                svg.style.animation = `cartwheel-spin ${0.9 * speedFactor}s linear forwards`;
+            } else if (type === 'spin') {
+                duration = 1500 * speedFactor;
+                svg.style.animation = `pirouette-spin ${1.5 * speedFactor}s ease-in-out forwards`;
+            } else if (type === 'headspin') {
+                duration = 2500 * speedFactor;
+                svg.style.animation = `headspin-anim ${2.5 * speedFactor}s ease-in-out forwards`;
+            } else if (type === 'windmill') {
+                duration = 2000 * speedFactor;
+                svg.style.animation = `windmill-anim ${2.0 * speedFactor}s ease-in-out forwards`;
+            }
+
+            setTimeout(() => {
+                svg.style.animation = '';
+                dancer.isTricking = false;
+            }, duration);
+        }
+
+        const FORMS = ['V', 'InvertedV', 'W', 'Line', 'Vertical', 'Cross', 'Slash', 'Backslash'];
+
+        function renderFrame() {
+            requestAnimationFrame(renderFrame);
+            
+            let rawBass = 0, rawMid = 0, rawTreble = 0, rawEnergy = 0;
+
+            if (analyser && isMusicPlaying) {
+                analyser.getByteFrequencyData(dataArray);
+                rawBass = ((dataArray[2] + dataArray[4] + dataArray[6]) / 3) / 255;
+                rawMid = ((dataArray[15] + dataArray[20] + dataArray[25]) / 3) / 255;
+                rawTreble = ((dataArray[50] + dataArray[60] + dataArray[70]) / 3) / 255;
+                rawEnergy = (rawBass + rawMid + rawTreble) / 3;
+
+                smoothBass += (rawBass - smoothBass) * 0.2;
+                smoothMid += (rawMid - smoothMid) * 0.3;
+                smoothTreble += (rawTreble - smoothTreble) * 0.3;
+                smoothEnergy += (rawEnergy - smoothEnergy) * 0.1; 
+
+                // 【大幅降低節奏推進速度】強調依賴音樂低音來驅動，避免純隨時間快轉
+                const tempoMultiplier = 0.005 + (smoothEnergy * 0.06) + (smoothBass * 0.04); 
+                dancePhase += tempoMultiplier;
+            } else {
+                smoothBass += (0 - smoothBass) * 0.1;
+                smoothMid += (0 - smoothMid) * 0.1;
+                smoothTreble += (0 - smoothTreble) * 0.1;
+                smoothEnergy += (0 - smoothEnergy) * 0.1;
+                dancePhase += 0.005; // 沒音樂時非常緩慢的待機動作
+            }
+
+            if (isMusicPlaying && globalChoreoTimer % 30 === 0) {
+                if (smoothEnergy < 0.2) {
+                    tempoBadge.innerText = '🎵 Chill / 慢板';
+                    tempoBadge.className = 'badge bg-secondary text-light fw-bold ms-2';
+                } else if (smoothEnergy < 0.4) {
+                    tempoBadge.innerText = '🔥 Groove / 中板';
+                    tempoBadge.className = 'badge bg-primary text-light fw-bold ms-2';
+                } else {
+                    tempoBadge.innerText = '⚡ Hype / 快節奏';
+                    tempoBadge.className = 'badge bg-danger text-light fw-bold ms-2';
+                }
+            }
+
+            let hueBase = 180; 
+            if (isSyncMode) hueBase = 10; 
+            if (isSoloMode) hueBase = 280; 
+
+            stageLights.style.opacity = isMusicPlaying ? smoothBass * 0.95 + 0.1 : 0.2;
+            const stageHue = isMusicPlaying ? (hueBase + smoothEnergy * 100) % 360 : hueBase;
+            stageLights.style.background = `radial-gradient(circle at center, hsla(${stageHue}, 100%, 65%, ${smoothBass * 0.3}) 0%, transparent 70%)`;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            pCtx.globalCompositeOperation = 'lighter'; 
+
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            bgCtx.globalCompositeOperation = 'lighter'; 
+
+            backgroundOrbs.forEach(orb => {
+                orb.update(hueBase, smoothEnergy);
+                orb.draw(bgCtx);
+            });
+
+            let isBeat = false;
+            if (smoothBass > 0.82 && prevBass <= 0.82) isBeat = true;
+
+            if (concertLights) {
+                if (isMusicPlaying) {
+                    concertLights.update(smoothEnergy, isBeat, hueBase);
+                } else {
+                    concertLights.update(0, false, hueBase); 
+                }
+                concertLights.draw(bgCtx);
+            }
+
+            if (unifiedCeilingLights) {
+                unifiedCeilingLights.update(smoothEnergy, isBeat, rawTreble, smoothMid, hueBase, isMusicPlaying);
+                unifiedCeilingLights.draw(bgCtx);
+            }
+
+            if (isMusicPlaying) {
+                if (smoothEnergy > 0.15 && Math.random() < smoothEnergy * 0.5) {
+                    particles.push(new Particle(
+                        Math.random() * pCanvas.width, 
+                        pCanvas.height - 20, 
+                        hueBase + (Math.random() * 40 - 20),
+                        'mid_dust',
+                        smoothEnergy
+                    ));
+                }
+
+                if (rawTreble > 0.6 && Math.random() > 0.5) {
+                    let sparkCount = Math.floor(rawTreble * 5);
+                    for(let i = 0; i < sparkCount; i++) {
+                        particles.push(new Particle(
+                            Math.random() * pCanvas.width, 
+                            pCanvas.height - 30, 
+                            hueBase + 60, 
+                            'treble_spark',
+                            rawTreble
+                        ));
+                    }
+                }
+
+                if (isBeat) {
+                    particles.push(new Particle(
+                        (Math.random() * 0.6 + 0.2) * pCanvas.width, 
+                        pCanvas.height - 40, 
+                        hueBase,
+                        'shockwave',
+                        smoothBass
+                    ));
+
+                    const burstCount = Math.floor(smoothBass * 35); 
+                    for(let i = 0; i < burstCount; i++) {
+                        particles.push(new Particle(
+                            (Math.random() * 0.8 + 0.1) * pCanvas.width, 
+                            pCanvas.height - 10, 
+                            hueBase + (Math.random() * 60 - 30),
+                            'bass_orb',
+                            smoothBass * 1.5 
+                        ));
+                    }
+                }
+            }
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.update(smoothEnergy);
+                p.draw(pCtx);
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+            
+            prevBass = smoothBass; 
+
+            const bars = 90;
+            const barWidth = (canvas.width / bars) - 2;
+            let startX = 0;
+            
+            if (analyser && isMusicPlaying) {
+                for(let i = 0; i < bars; i++) {
+                    const ledsCount = Math.floor(dataArray[i] / 16); 
+                    for(let j = 0; j < ledsCount; j++) {
+                        ctx.fillStyle = `hsla(${hueBase + i*1.5 - j*5}, 100%, 60%, 0.8)`;
+                        ctx.fillRect(startX, canvas.height - (j * 8) - 6, barWidth, 5);
+                    }
+                    startX += barWidth + 2;
+                }
+            }
+
+            if (isMusicPlaying) {
+                globalChoreoTimer++;
+            }
+            
+            if (isMusicPlaying && globalChoreoTimer > 350 + Math.random() * 200) {
+                globalChoreoTimer = 0;
+                
+                const modeRand = Math.random();
+                isSyncMode = false;
+                isSoloMode = false;
+                soloIndex = -1;
+
+                if (smoothEnergy > 0.35 && Math.random() > 0.7) {
+                    targetCameraAngleY += (Math.random() > 0.5 ? 360 : -360); 
+                } else if (Math.random() > 0.8) {
+                    targetCameraAngleY = (Math.random() > 0.5 ? 1 : -1) * (15 + Math.random() * 10);
+                } else {
+                    targetCameraAngleY = 0; 
+                }
+
+                let newSlots = [0, 1, 2, 3, 4];
+                if (Math.random() > 0.4) {
+                    newSlots.sort(() => Math.random() - 0.5); 
+                }
+
+                if (modeRand > 0.7) {
+                    isSoloMode = true;
+                    soloIndex = Math.floor(Math.random() * 5); 
+                    
+                    const oldSlot2DancerIndex = newSlots.indexOf(2);
+                    newSlots[oldSlot2DancerIndex] = newSlots[soloIndex];
+                    newSlots[soloIndex] = 2;
+
+                    dancers.forEach((d, i) => {
+                        d.slotIndex = newSlots[i];
+                        if (i === soloIndex) {
+                            d.currentStyle = DANCE_STYLES[Math.floor(Math.random() * DANCE_STYLES.length)];
+                            d.targetX = (d.slotIndex - 2) * SLOT_SPACING; 
+                            d.targetZ = 1.2; 
+                        } else {
+                            d.currentStyle = 'bounce'; 
+                            d.targetX = (d.slotIndex - 2) * SLOT_SPACING + (d.slotIndex > 2 ? 40 : -40); 
+                            d.targetZ = 0.5; 
+                        }
+                    });
+
+                } else if (modeRand > 0.4) {
+                    isSyncMode = true;
+                    const syncStyle = DANCE_STYLES[Math.floor(Math.random() * DANCE_STYLES.length)];
+                    const form = FORMS[Math.floor(Math.random() * FORMS.length)];
+                    const shiftX = (Math.random() - 0.5) * 60; 
+
+                    dancers.forEach((d, i) => {
+                        let p = newSlots[i]; 
+                        d.currentStyle = syncStyle;
+                        
+                        if (form === 'V') {
+                            d.targetX = (p - 2) * SLOT_SPACING + shiftX;
+                            d.targetZ = 1.0 - Math.abs(p - 2) * 0.18;
+                        } 
+                        else if (form === 'InvertedV') {
+                            d.targetX = (p - 2) * SLOT_SPACING + shiftX;
+                            d.targetZ = 0.6 + Math.abs(p - 2) * 0.18;
+                        } 
+                        else if (form === 'W') {
+                            d.targetX = (p - 2) * SLOT_SPACING + shiftX;
+                            const wZ = [1.1, 0.5, 1.1, 0.5, 1.1];
+                            d.targetZ = wZ[p];
+                        } 
+                        else if (form === 'Line') {
+                            d.targetX = (p - 2) * SLOT_SPACING + shiftX;
+                            d.targetZ = 0.85;
+                        } 
+                        else if (form === 'Vertical') {
+                            d.targetX = shiftX; 
+                            d.targetZ = 1.2 - p * 0.22; 
+                        } 
+                        else if (form === 'Cross') {
+                            let targetSlot = 2;
+                            let tz = 0.85;
+                            if (p === 0) { targetSlot = 0.6; tz = 0.85; }
+                            if (p === 4) { targetSlot = 3.4; tz = 0.85; }
+                            if (p === 1) { targetSlot = 2; tz = 1.25; }
+                            if (p === 3) { targetSlot = 2; tz = 0.45; }
+                            
+                            d.targetX = (targetSlot - 2) * SLOT_SPACING + shiftX;
+                            d.targetZ = tz;
+                        }
+                        else if (form === 'Slash') {
+                            d.targetX = (p - 2) * SLOT_SPACING + shiftX;
+                            d.targetZ = 1.2 - p * 0.18;
+                        }
+                        else if (form === 'Backslash') {
+                            d.targetX = (p - 2) * SLOT_SPACING + shiftX;
+                            d.targetZ = 0.4 + p * 0.18;
+                        }
+                    });
+                } else {
+                    dancers.forEach((d, i) => {
+                        d.slotIndex = newSlots[i];
+                        d.currentStyle = DANCE_STYLES[Math.floor(Math.random() * DANCE_STYLES.length)];
+                        d.targetX = (d.slotIndex - 2) * SLOT_SPACING + (Math.random() - 0.5) * 30;
+                        const dist = Math.abs(d.slotIndex - 2);
+                        d.targetZ = 1.0 - (dist * 0.15) + (Math.random() * 0.1 - 0.05); 
+                    });
+                }
+            }
+
+            dancers.forEach((dancer, index) => {
+                let targetBodyTilt = 0; 
+
+                if (isSoloMode) {
+                    dancer.mover.style.opacity = index === soloIndex ? '1' : '0.25';
+                } else {
+                    dancer.mover.style.opacity = '1';
+                }
+
+                dancer.wrapper.style.zIndex = Math.round(dancer.z * 100);
+                dancer.mover.style.zIndex = Math.round(dancer.z * 100);
+
+                const localPhase = isSyncMode ? dancePhase : dancePhase + (index * 1.5); 
+                const isWalking = Math.abs(dancer.targetX - dancer.x) > 20;
+
+                dancer.x += (dancer.targetX - dancer.x) * 0.05;
+
+                if (isWalking) {
+                    const walkDirection = Math.sign(dancer.targetX - dancer.x);
+                    const tempZ = dancer.targetZ + (walkDirection * 0.2);
+                    dancer.z += (tempZ - dancer.z) * 0.1;
+                } else {
+                    dancer.z += (dancer.targetZ - dancer.z) * 0.05;
+                }
+
+                dancer.mover.style.transform = `translateX(${dancer.x}px)`;
+
+                if (dancer.trickCooldown > 0) dancer.trickCooldown--;
+                const isHeavyBass = smoothBass > 0.88;
+                
+                if (isMusicPlaying && isHeavyBass && dancer.trickCooldown === 0 && !dancer.isTricking && !isSyncMode && !isWalking && smoothEnergy > 0.25) {
+                    if (isSoloMode && index !== soloIndex) return;
+
+                    const rand = Math.random();
+                    if (rand > 0.985) { 
+                        triggerTrick(dancer, 'headspin'); 
+                        dancer.trickCooldown = 500; 
+                    } else if (rand > 0.97) { 
+                        triggerTrick(dancer, 'windmill'); 
+                        dancer.trickCooldown = 450;
+                    } else if (rand > 0.95) { 
+                        triggerTrick(dancer, 'spin'); 
+                        dancer.trickCooldown = 350;
+                    } else if (rand > 0.93) { 
+                        triggerTrick(dancer, 'backflip'); 
+                        dancer.trickCooldown = 400; 
+                    } else if (rand > 0.91) { 
+                        triggerTrick(dancer, 'cartwheel'); 
+                        dancer.trickCooldown = 350;
+                    } else if (rand > 0.75) {
+                        dancer.trickCooldown = 80; 
+                    }
+                }
+
+                let tHead=0, tArmL=0, tForearmL=0, tArmR=0, tForearmR=0;
+                let tLegL=0, tCalfL=0, tLegR=0, tCalfR=0;
+                let targetY = 0;
+                
+                // 【顯著降低關節的補間速度】讓動作移動時有阻尼感，消除抽搐與瞬移現象
+                let currentJointSpeed = isMusicPlaying ? (0.03 + (smoothEnergy * 0.08) + (smoothBass * 0.05)) : 0.02;
+
+                const beatStep = Math.floor(localPhase * 2) % 4;
+                const cycle = Math.sin(localPhase);
+                const fastCycle = Math.sin(localPhase * 2);
+                const isFreeze = isHeavyBass && !dancer.isTricking && !isWalking;
+
+                if (dancer.isTricking) {
+                    currentJointSpeed = 0.2; // 特技時關節變化也再慢一點
+                    const elapsed = performance.now() - dancer.trickStartTime;
+                    
+                    const speedFactor = Math.max(1.0, 1.3 - smoothEnergy * 0.2);
+                    let duration = 800 * speedFactor;
+                    if(dancer.trickType === 'cartwheel') duration = 900 * speedFactor;
+                    if(dancer.trickType === 'spin') duration = 1500 * speedFactor;
+                    if(dancer.trickType === 'headspin') duration = 2500 * speedFactor;
+                    if(dancer.trickType === 'windmill') duration = 2000 * speedFactor;
+
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    if (dancer.trickType === 'backflip') {
+                        targetY = -180 * Math.sin(progress * Math.PI); 
+                        tHead = 40; tLegL = 110; tCalfL = -140; tLegR = 110; tCalfR = -140;
+                        tArmL = 160; tForearmL = 0; tArmR = 160; tForearmR = 0;
+                    } else if (dancer.trickType === 'cartwheel') {
+                        targetY = -150 * Math.sin(progress * Math.PI); 
+                        tHead = 0; tLegL = 50; tCalfL = -10; tLegR = -50; tCalfR = 10;
+                        tArmL = 140; tForearmL = -10; tArmR = -140; tForearmR = 10;
+                    } else if (dancer.trickType === 'spin') {
+                        targetY = 0; 
+                        tHead = 0; tLegL = 0; tCalfL = 0; 
+                        tLegR = 70; tCalfR = -60; 
+                        tArmL = 100; tForearmL = 0; tArmR = -100; tForearmR = 0; 
+                    } else if (dancer.trickType === 'headspin') {
+                        targetY = -15; 
+                        tHead = 0; 
+                        tLegL = 60; tCalfL = -10; tLegR = -60; tCalfR = 10; 
+                        tArmL = 160; tForearmL = -20; tArmR = -160; tForearmR = 20; 
+                    } else if (dancer.trickType === 'windmill') {
+                        targetY = 40; 
+                        tHead = -20; 
+                        tLegL = 70; tCalfL = -20; tLegR = -70; tCalfR = 20; 
+                        tArmL = -150; tForearmL = 0; tArmR = 150; tForearmR = 0; 
+                    }
+
+                } else if (isFreeze) {
+                    currentJointSpeed = 0.4; 
+                    targetY = 40 + (smoothBass * 20); 
+                    
+                    dancer.mover.style.opacity = '1';
+
+                    if (dancer.slotIndex === 2) {
+                        tHead = 20; 
+                        tLegL = 80; tCalfL = -100; tLegR = -80; tCalfR = 100;
+                        tArmL = 140; tForearmL = -30; tArmR = -140; tForearmR = 30;
+                    } else if (dancer.slotIndex === 1 || dancer.slotIndex === 3) {
+                        tHead = dancer.slotIndex === 1 ? -20 : 20; 
+                        tLegL = 90; tCalfL = -140; tLegR = -20; tCalfR = 20;
+                        tArmL = dancer.slotIndex === 1 ? -160 : 160; 
+                        tForearmL = 0; 
+                        tArmR = dancer.slotIndex === 1 ? -20 : 20; 
+                        tForearmR = 0;
+                    } else {
+                        tHead = -30;
+                        tLegL = 20; tCalfL = -20; tLegR = -20; tCalfR = 20;
+                        tArmL = -180; tForearmL = -40; tArmR = 180; tForearmR = 40;
+                        targetY = 10 + (smoothBass * 10); 
+                    }
+                } else {
+                    targetY = smoothBass * 25; // 利用 smoothBass 來產生天然的 Bounce 感
+                    const effectiveStyle = isWalking ? 'walk' : ((isSoloMode && index !== soloIndex) ? 'bounce' : dancer.currentStyle);
+
+                    switch(effectiveStyle) {
+                        case 'splits':
+                            tHead = cycle * 10;
+                            tLegL = 90; tCalfL = 0;
+                            tLegR = -90; tCalfR = 0;
+                            tArmL = 100; tForearmL = 0;
+                            tArmR = -100; tForearmR = 0;
+                            targetY = 85 + smoothBass * 10; 
+                            break;
+
+                        case 'jumping_splits':
+                            let jumpPulse = Math.sin(localPhase * 1.5);
+                            if (jumpPulse > 0) { 
+                                targetY = -55 * Math.pow(jumpPulse, 0.5); 
+                                tLegL = 90; tCalfL = 0;
+                                tLegR = -90; tCalfR = 0;
+                                tArmL = -150; tForearmL = -20;
+                                tArmR = 150; tForearmR = 20;
+                                tHead = -20;
+                            } else { 
+                                targetY = 30 + smoothBass * 10;
+                                tLegL = 30; tCalfL = -60;
+                                tLegR = -30; tCalfR = 60;
+                                tArmL = 45; tForearmL = -90;
+                                tArmR = -45; tForearmR = 90;
+                                tHead = 20;
+                            }
+                            break;
+
+                        case 'hands_on_hips':
+                            tHead = cycle * 10;
+                            tLegL = 10 + smoothBass * 20; tCalfL = -(smoothBass * 30);
+                            tLegR = -10 - smoothBass * 20; tCalfR = smoothBass * 30;
+                            tArmL = 25; tForearmL = -105;
+                            tArmR = -25; tForearmR = 105;
+                            targetY = smoothBass * 20;
+                            break;
+
+                        case 'salute':
+                            tHead = -10 + fastCycle * 5; 
+                            tLegL = -15; tCalfL = 0;
+                            tLegR = 15; tCalfR = 0;
+                            tArmL = 25; tForearmL = -105; 
+                            tArmR = -105 + (smoothBass * -15); tForearmR = -120; 
+                            targetY = smoothBass * 5;
+                            break;
+
+                        case 'point_sky':
+                            tHead = 20 + fastCycle * 5; 
+                            targetBodyTilt = -12; 
+                            tLegL = -15; tCalfL = 0; 
+                            tLegR = -35; tCalfR = 40; 
+                            tArmL = 25; tForearmL = -105; 
+                            tArmR = -135 + (smoothTreble * -20); tForearmR = 0; 
+                            targetY = smoothBass * 15;
+                            break;
+
+                        case 'walk':
+                            tHead = fastCycle * 10;
+                            tLegL = fastCycle * 40; tCalfL = fastCycle > 0 ? -30 : 0;
+                            tLegR = -fastCycle * 40; tCalfR = fastCycle < 0 ? -30 : 0;
+                            tArmL = -fastCycle * 40; tForearmL = -20;
+                            tArmR = fastCycle * 40; tForearmR = 20;
+                            break;
+
+                        case 'bounce':
+                            tHead = cycle * 15;
+                            tLegL = 10 + smoothBass * 30; tCalfL = -(smoothBass * 40);
+                            tLegR = -10 - smoothBass * 30; tCalfR = smoothBass * 40;
+                            tArmL = -20; tForearmL = -20; tArmR = 20; tForearmR = 20;
+                            break;
+
+                        case 'toprock':
+                            tHead = cycle * 15;
+                            tLegL = cycle > 0 ? 35 : -15; tCalfL = cycle > 0 ? -40 : 10;
+                            tLegR = cycle < 0 ? 35 : -15; tCalfR = cycle < 0 ? -40 : 10;
+                            const armSwing = cycle * (50 + smoothMid * 50);
+                            tArmL = armSwing - 20; tForearmL = -60;
+                            tArmR = armSwing + 20; tForearmR = 60;
+                            break;
+
+                        case 'locking': 
+                            tHead = beatStep % 2 === 0 ? 20 : -10;
+                            tLegL = 30; tCalfL = -20;
+                            tLegR = -30; tCalfR = 20;
+
+                            if (beatStep === 0) {
+                                tArmL = -110; tForearmL = -30; tArmR = -80; tForearmR = -20;
+                            } else if (beatStep === 1) {
+                                tArmL = -30; tForearmL = -120; tArmR = 30; tForearmR = 120;
+                            } else if (beatStep === 2) {
+                                tArmL = 80; tForearmL = 20; tArmR = 100; tForearmR = 20;
+                            } else {
+                                tArmL = 40; tForearmL = -30; tArmR = -40; tForearmR = 30;
+                                targetY += 20; 
+                            }
+                            break;
+
+                        case 'popping':
+                            tHead = Math.sin(localPhase * 0.5) * 20;
+                            tLegL = 15; tCalfL = -20; tLegR = -15; tCalfR = 20;
+
+                            const popTwitch = smoothTreble > 0.6 ? (Math.random()-0.5)*30 : 0;
+                            tArmL = -80 + Math.sin(localPhase)*40 + popTwitch;
+                            tForearmL = Math.cos(localPhase)*60;
+                            tArmR = 80 + Math.sin(localPhase + Math.PI)*40 + popTwitch;
+                            tForearmR = Math.cos(localPhase + Math.PI)*60;
+                            break;
+
+                        case 'c_walk':
+                            tHead = fastCycle * 15;
+                            if (beatStep % 2 === 0) {
+                                tLegL = 40; tCalfL = 0; tLegR = 20; tCalfR = 40;
+                            } else {
+                                tLegL = -20; tCalfL = -40; tLegR = -40; tCalfR = 0;
+                            }
+                            tArmL = 20 + fastCycle * 30; tForearmL = -20;
+                            tArmR = -20 + fastCycle * 30; tForearmR = 20;
+                            break;
+
+                        case 'moonwalk':
+                            tHead = 15;
+                            let mwPhase = (localPhase * 1.5) % (Math.PI * 2);
+                            let mwSlide = Math.sin(mwPhase);
+                            
+                            if (mwSlide > 0) {
+                                tLegL = -mwSlide * 35; tCalfL = 0;
+                                tLegR = mwSlide * 45;  tCalfR = -60;
+                            } else {
+                                tLegL = -mwSlide * 45; tCalfL = -60;
+                                tLegR = mwSlide * 35;  tCalfR = 0;
+                            }
+                            
+                            targetY = 15 + Math.abs(mwSlide) * 8; 
+                            
+                            tArmL = 20 + Math.cos(mwPhase) * 20; tForearmL = -30;
+                            tArmR = -20 - Math.cos(mwPhase) * 20; tForearmR = 30;
+                            break;
+
+                        case 'anti_gravity_lean':
+                            targetBodyTilt = 45; 
+                            tHead = 15; 
+                            
+                            tLegL = 0; tCalfL = 0; 
+                            tLegR = 0; tCalfR = 0;
+                            
+                            tArmL = -30; tForearmL = -70;  
+                            tArmR = 30; tForearmR = 70; 
+                            
+                            targetY = 0;
+                            break;
+
+                        case 'clapping':
+                            const clapCycle = Math.abs(Math.sin(localPhase * 4)); 
+                            const clapPulse = Math.pow(clapCycle, 2); 
+                            
+                            tHead = clapCycle * 15;
+                            tArmL = -130; 
+                            tArmR = 130; 
+                            tForearmL = clapPulse * 55; 
+                            tForearmR = clapPulse * -55; 
+                            targetY = smoothMid * 20;
+                            tLegL = 20 + smoothBass * 30; 
+                            tCalfL = -(smoothBass * 30);
+                            tLegR = -20 - smoothBass * 30; 
+                            tCalfR = smoothBass * 30;
+                            break;
+                    }
+                }
+
+                dancer.y += (targetY - dancer.y) * (dancer.isTricking ? 0.3 : 0.4);
+
+                const depthYOffset = (1 - dancer.z) * -220; 
+                const finalRenderY = dancer.y + depthYOffset;
+                const finalScale = dancer.baseScale * dancer.z;
+                
+                dancer.bodyTilt += (targetBodyTilt - dancer.bodyTilt) * 0.1;
+                dancer.stickman.style.transform = `translateY(${finalRenderY}px) scale(${finalScale}) rotate(${dancer.bodyTilt}deg)`;
+                
+                const shadowScale = Math.max(0.1, 1 - (dancer.y / -100)) * dancer.z; 
+                dancer.shadow.style.transform = `translateY(${depthYOffset}px) scale(${shadowScale})`;
+                dancer.shadow.style.opacity = Math.max(0.1, shadowScale * 0.8);
+
+                updateJoint(dancer, 'head', tHead, currentJointSpeed);
+                updateJoint(dancer, 'armL', tArmL, currentJointSpeed);
+                updateJoint(dancer, 'forearmL', tForearmL, currentJointSpeed);
+                updateJoint(dancer, 'armR', tArmR, currentJointSpeed);
+                updateJoint(dancer, 'forearmR', tForearmR, currentJointSpeed);
+                updateJoint(dancer, 'legL', tLegL, currentJointSpeed);
+                updateJoint(dancer, 'calfL', tCalfL, currentJointSpeed);
+                updateJoint(dancer, 'legR', tLegR, currentJointSpeed);
+                updateJoint(dancer, 'calfR', tCalfR, currentJointSpeed);
+            });
+
+            const cameraSpeed = 0.015 + (smoothEnergy * 0.01);
+            cameraAngleY += (targetCameraAngleY - cameraAngleY) * cameraSpeed;
+
+            const targetScale = (isSoloMode ? 1.1 : 1) * responsiveScale;
+            const targetTranslateY = (isSoloMode ? 20 : 0) * responsiveScale;
+            
+            currentStageScale += (targetScale - currentStageScale) * 0.05;
+            currentStageTranslateY += (targetTranslateY - currentStageTranslateY) * 0.05;
+
+            crewContainer.style.transform = `scale(${currentStageScale}) translateY(${currentStageTranslateY}px) rotateY(${cameraAngleY}deg)`;
+        }
+    </script>
+</body>
+</html>
