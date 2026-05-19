@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>夜櫻之境 - 江戶古町完美排版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================
+           基礎設定
+           ========================================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html {
+            width: 100%; height: 100%; overflow: hidden;
+            font-family: 'Noto Serif TC', serif;
+            background-color: #020617; color: #f8fafc;
+        }
+        .hidden { opacity: 0 !important; visibility: hidden !important; }
+        .visible { opacity: 1 !important; visibility: visible !important; }
+
+        /* =========================================
+           🌸 櫻花與花筏系統 (精準落水修正版)
+           ========================================= */
+        #sakura-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 999;
+        }
+        .petal {
+            position: absolute;
+            width: clamp(10px, 1.5vw, 15px); height: clamp(10px, 1.5vw, 15px);
+            background: linear-gradient(135deg, #fbcfe8, #f472b6);
+            border-radius: 15px 0px 15px 0px; 
+            box-shadow: 0 0 10px rgba(244, 114, 182, 0.4);
+            top: 0; 
+        }
+
+        /* 階段一：落到水面 */
+        @keyframes fall-to-water {
+            0% { transform: translate(0vw, -5vh) rotate(0deg) scale(var(--scale)); opacity: 0; }
+            10% { opacity: var(--opacity); }
+            100% { transform: translate(0vw, var(--water-level)) rotate(360deg) scale(var(--scale)); opacity: var(--opacity); }
+        }
+
+        /* 階段二：水面漂流 */
+        @keyframes flow-on-water {
+            0% { transform: translate(0vw, var(--water-level)) rotate(360deg) scale(var(--scale)); opacity: var(--opacity); }
+            70% { opacity: var(--opacity); }
+            100% { transform: translate(-20vw, var(--water-level)) rotate(720deg) scale(var(--scale)); opacity: 0; }
+        }
+
+        /* =========================================
+           開頭畫面
+           ========================================= */
+        #landing-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100; transition: opacity 1.5s ease, visibility 1.5s;
+            cursor: pointer;
+        }
+        .hero-card {
+            position: relative; z-index: 10;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
+            width: 90%; max-width: 600px;
+            padding: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 5vw, 5rem);
+            text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+        .hero-card:hover { transform: translateY(-5px); }
+        .subtitle {
+            font-size: clamp(0.7rem, 2vw, 0.9rem); letter-spacing: 4px; 
+            color: #d8b4e2; margin-bottom: 1rem; text-transform: uppercase;
+        }
+        .hero-card h1 {
+            font-size: clamp(2.5rem, 6vw, 3.5rem); font-weight: 700; margin-bottom: 1.5rem;
+            letter-spacing: 2px; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        .hero-card p {
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem); line-height: 1.8; color: #cbd5e1;
+            margin-bottom: clamp(1.5rem, 4vw, 2.5rem); font-weight: 300;
+        }
+        .cta-button {
+            background: linear-gradient(135deg, #d4af37, #f3e5ab); color: #1e1b4b;
+            border: none; padding: clamp(0.8rem, 2vw, 1rem) clamp(2rem, 5vw, 3rem); 
+            font-size: clamp(1rem, 2.5vw, 1.1rem); font-weight: 700; border-radius: 30px; 
+            cursor: pointer; font-family: inherit; letter-spacing: 2px; 
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            background: linear-gradient(135deg, #f3e5ab, #d4af37);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6); transform: scale(1.05);
+        }
+
+        /* =========================================
+           精緻街景
+           ========================================= */
+        :root { 
+            --shoji-light: #ffaa00; 
+            --wood-dark: #120d0a; 
+            --wood-frame: #0a0604; 
+            
+            /* 貓咪位置變數設定 */
+            --cat-roof-left: 9vw;
+            /* 修正：跟隨房屋真實的 clamp 高度，並減去 8px 讓貓咪貼合屋頂邊緣 */
+            --cat-roof-bottom: calc(22% + clamp(110px, 22vh, 180px) - 8px); 
+            --cat-street-left: 15vw;
+            --cat-street-bottom: 12%;
+        }
+        
+        #main-scene {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; visibility: hidden;
+            transition: opacity 2s ease; 
+            display: flex; flex-direction: column; justify-content: flex-end; z-index: 10;
+        }
+
+        .sky {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, #020617 0%, #0c1424 100%); z-index: 1;
+        }
+        .moon {
+            position: absolute; top: 10%; right: 15%; 
+            width: clamp(40px, 10vw, 80px); height: clamp(40px, 10vw, 80px);
+            background: #ffeeb3; border-radius: 50%;
+            box-shadow: 0 0 clamp(20px, 5vw, 50px) rgba(255, 238, 179, 0.3);
+            /* 使月亮可點擊 */
+            cursor: pointer;
+            pointer-events: auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .moon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 clamp(30px, 6vw, 60px) rgba(255, 238, 179, 0.5);
+        }
+        
+        /* =========================================
+           🌸 月亮點擊：日式直書精美文字特效
+           ========================================= */
+        .moon-text-effect {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* 加入日式明體字型堆疊，若無則降級為 Noto Serif */
+            font-family: 'Noto Serif TC', 'Yu Mincho', 'Sawarabi Mincho', serif;
+            font-size: clamp(6rem, 18vw, 12rem);
+            font-weight: 300;
+            letter-spacing: 1rem;
+            
+            /* 日本傳統風格：直書 */
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            
+            pointer-events: none; 
+            z-index: 1000; 
+            
+            /* 精美外觀：粉金漸層色與層次霓虹光暈 */
+            background: linear-gradient(to right, #ffffff 0%, #fbcfe8 40%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            
+            /* 多重光影營造神祕華麗感 */
+            filter: drop-shadow(0 0 30px rgba(244, 114, 182, 0.9)) drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+            
+            opacity: 0;
+            animation: fade-in-out-text 4.5s ease-in-out forwards;
+        }
+
+        @keyframes fade-in-out-text {
+            0% { opacity: 0; transform: translate(-50%, -40%) scale(0.9); filter: blur(10px) drop-shadow(0 0 15px rgba(244, 114, 182, 0)); }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0px) drop-shadow(0 0 30px rgba(244, 114, 182, 0.9)); }
+            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0px) drop-shadow(0 0 30px rgba(244, 114, 182, 0.9)); }
+            100% { opacity: 0; transform: translate(-50%, -60%) scale(1.05); filter: blur(15px) drop-shadow(0 0 15px rgba(244, 114, 182, 0)); }
+        }
+        
+        .tree {
+            position: absolute; bottom: 22%; right: clamp(2%, 8%, 10%); 
+            width: clamp(150px, 35vw, 300px); height: clamp(200px, 45vh, 400px);
+            background: #02040a; opacity: 0.8; z-index: 8;
+            clip-path: polygon(50% 0%, 40% 20%, 45% 40%, 30% 60%, 40% 70%, 20% 90%, 50% 100%, 80% 90%, 60% 70%, 70% 60%, 55% 40%, 60% 20%);
+        }
+
+        .town {
+            position: absolute; bottom: 22%; left: 0; width: 100%;
+            display: flex; align-items: flex-end; padding: 0 5%; z-index: 10;
+        }
+
+        .edo-machiya {
+            position: relative; 
+            width: clamp(60px, 15vw, 160px); 
+            height: clamp(110px, 22vh, 180px); 
+            margin-right: clamp(-5px, -1.5vw, -10px); 
+            display: flex; flex-direction: column;
+        }
+
+        .roof-main {
+            width: 110%; height: clamp(20px, 4vh, 40px);
+            margin-left: -5%; background: #06080d;
+            clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
+            background-image: repeating-linear-gradient(to right, transparent, transparent 8px, #030408 8px, #030408 10px);
+            border-bottom: 2px solid var(--wood-frame); z-index: 3;
+        }
+
+        .floor-second {
+            width: 90%; height: 35%; margin: 0 auto;
+            background: var(--wood-dark); border: 2px solid var(--wood-frame);
+            border-bottom: none; display: flex; justify-content: center; align-items: center;
+        }
+        .mushi-window {
+            width: 50%; height: 60%;
+            background-color: rgba(255, 170, 0, 0.4);
+            box-shadow: 0 0 15px rgba(255, 170, 0, 0.2);
+            background-image: repeating-linear-gradient(to right, var(--wood-frame) 0px, var(--wood-frame) 3px, transparent 3px, transparent 6px);
+            border: 2px solid var(--wood-frame);
+        }
+
+        .roof-eaves {
+            width: 115%; height: clamp(10px, 2vh, 18px);
+            margin-left: -7.5%; background: #090a12;
+            clip-path: polygon(5% 0%, 95% 0%, 100% 100%, 0% 100%);
+            background-image: repeating-linear-gradient(to right, transparent, transparent 6px, #030408 6px, #030408 8px);
+            z-index: 2;
+        }
+
+        .floor-ground {
+            width: 96%; flex-grow: 1; margin: 0 auto;
+            background: var(--wood-dark); border: 2px solid var(--wood-frame);
+            display: flex; flex-direction: column; justify-content: flex-end;
+            position: relative;
+        }
+
+        .koushi-grid {
+            width: 100%; height: 80%; background-color: var(--shoji-light);
+            box-shadow: 0 0 clamp(10px, 2vw, 25px) rgba(255, 170, 0, 0.6);
+            background-image: 
+                repeating-linear-gradient(to right, var(--wood-frame) 0px, var(--wood-frame) 4px, transparent 4px, transparent 8px),
+                repeating-linear-gradient(to bottom, transparent 0px, transparent 40px, var(--wood-frame) 40px, var(--wood-frame) 43px);
+            border-top: 3px solid var(--wood-frame);
+        }
+
+        .noren {
+            position: absolute; top: 0; left: 10%; width: 40%; height: 45%;
+            background: #1e3a5f; border-bottom: 1px solid rgba(0,0,0,0.5);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 52% 100%, 52% 20%, 48% 20%, 48% 100%, 0 100%);
+        }
+        .noren-red { background: #5f1e24; }
+        .noren-green { background: #2f402e; }
+
+        .refined-lantern {
+            position: absolute; width: clamp(18px, 3.5vw, 26px); height: clamp(26px, 5vh, 38px);
+            background: radial-gradient(circle at 50% 40%, #ffffff 0%, #ffbb22 60%, #e65c00 100%);
+            border-radius: 40% 40% 40% 40% / 50% 50% 50% 50%;
+            box-shadow: 0 0 25px rgba(255, 140, 0, 0.75), inset 0 0 8px rgba(0,0,0,0.2);
+            display: flex; justify-content: center; align-items: center;
+            transform-origin: top center; animation: lantern-sway 4s ease-in-out infinite alternate; z-index: 25;
+        }
+        .refined-lantern::before {
+            content: ''; position: absolute; top: -3px; left: 20%; right: 20%; height: 4px;
+            background: #0f0a06; border-radius: 2px 2px 0 0; border-bottom: 1px solid #ffaa00;
+        }
+        .refined-lantern::after {
+            content: ''; position: absolute; bottom: -3px; left: 22%; right: 22%; height: 4px;
+            background: #0f0a06; border-radius: 0 0 1px 1px;
+        }
+        .lantern-ribs {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: inherit; pointer-events: none;
+            background: repeating-linear-gradient(to bottom, transparent, transparent 5px, rgba(40, 20, 0, 0.2) 5px, rgba(40, 20, 0, 0.2) 6px),
+                        linear-gradient(to right, transparent 45%, rgba(0,0,0,0.06) 50%, transparent 55%);
+        }
+        .lantern-tassel {
+            position: absolute; bottom: -16px; left: 50%; width: 2px; height: 14px;
+            background: #b91c1c; transform: translateX(-50%); pointer-events: none;
+        }
+        .lantern-tassel::after {
+            content: ''; position: absolute; bottom: -3px; left: -1.5px; width: 5px; height: 5px;
+            background: #b91c1c; border-radius: 50%;
+        }
+        .lantern-text {
+            font-size: clamp(7px, 1.2vw, 10px); font-weight: 700; color: rgba(20, 5, 0, 0.85);
+            writing-mode: vertical-rl; text-orientation: upright; font-family: 'Noto Serif TC', serif; letter-spacing: -2px;
+            transform: scale(0.85); pointer-events: none; text-shadow: 0 0 2px rgba(255,255,255,0.3);
+        }
+        @keyframes lantern-sway { 0% { transform: rotate(-3.5deg); } 100% { transform: rotate(3.5deg); } }
+
+        .street {
+            position: absolute; bottom: 10%; left: 0; width: 100%; height: 12%;
+            background: #0a0f1d; border-top: clamp(2px, 0.5vw, 4px) solid #1e293b; 
+            z-index: 15; box-shadow: 0 -20px 50px rgba(0,0,0,0.8);
+        }
+        .walker {
+            position: absolute; bottom: 12%; left: -100px; z-index: 20;
+            transform-origin: bottom center; transform: scale(clamp(0.5, 1.2vw, 1)); 
+            animation: walk-animation 30s linear infinite; cursor: pointer;
+        }
+        .umbrella { width: 70px; height: 35px; background: #7f1d1d; border-radius: 40px 40px 0 0; margin-bottom: -5px; }
+        .human { width: 18px; height: 50px; background: #020617; margin-left: 26px; border-radius: 10px 10px 0 0; }
+        @keyframes walk-animation { from { left: -100px; } to { left: 110%; } }
+        .vanish-active { animation: ninja-poof 0.3s ease-in forwards !important; }
+        @keyframes ninja-poof {
+            0% { opacity: 1; filter: blur(0px); }
+            50% { opacity: 0.5; filter: blur(4px); }
+            100% { opacity: 0; transform: scale(0) translateY(50px); filter: blur(10px); }
+        }
+        .smoke-particle {
+            position: absolute; background: radial-gradient(circle, rgba(203, 213, 225, 0.8) 0%, transparent 60%);
+            border-radius: 50%; pointer-events: none; z-index: 30; filter: blur(2px);
+            animation: smoke-expand 0.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+        @keyframes smoke-expand { 0% { transform: scale(0.2); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+
+        /* =========================================
+           🌊 水域、倒影與漣漪系統 (確認保留)
+           ========================================= */
+        .river {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 10%;
+            background: #02050f; z-index: 25; overflow: hidden;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 15px 25px rgba(0,0,0,0.8);
+        }
+
+        .tree-reflection {
+            position: absolute; top: 0; right: clamp(2%, 8%, 10%); 
+            width: clamp(150px, 35vw, 300px); height: clamp(200px, 45vh, 400px);
+            background: linear-gradient(to top, #01030a 0%, #0d0409 100%);
+            transform-origin: top; transform: scaleY(-1); 
+            clip-path: polygon(50% 0%, 40% 20%, 45% 40%, 30% 60%, 40% 70%, 20% 90%, 50% 100%, 80% 90%, 60% 70%, 70% 60%, 55% 40%, 60% 20%);
+            filter: blur(8px); opacity: 0.4;
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 25%);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 25%);
+        }
+
+        .river-glow {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background:
+                radial-gradient(ellipse 40% 80% at 15% 0%, rgba(255, 170, 0, 0.15) 0%, transparent 100%), 
+                radial-gradient(ellipse 30% 80% at 50% 0%, rgba(220, 38, 38, 0.1) 0%, transparent 100%), 
+                radial-gradient(ellipse 40% 80% at 85% 0%, rgba(255, 170, 0, 0.15) 0%, transparent 100%);
+            filter: blur(4px); mix-blend-mode: screen;
+            animation: water-shimmer 5s ease-in-out infinite alternate;
+        }
+
+        .river-reflect {
+            position: absolute; top: 0; left: 0; width: 200%; height: 100%;
+            background: 
+                repeating-linear-gradient(180deg, transparent, transparent 2px, rgba(255,255,255,0.02) 3px, transparent 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(255, 255, 255, 0.02) 40px, transparent 50px);
+            animation: water-flow 25s linear infinite;
+        }
+
+        .water-ripple {
+            position: absolute;
+            width: 20px; height: 8px; 
+            margin-left: -10px; margin-top: -4px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%; pointer-events: none; z-index: 26;
+            animation: ripple-expand 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+        @keyframes ripple-expand {
+            0% { transform: scale(0.2); opacity: 0.8; border-width: 1px; }
+            100% { transform: scale(3.5); opacity: 0; border-width: 0px; }
+        }
+
+        @keyframes water-flow { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes water-shimmer { 0% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        .firefly {
+            position: absolute; border-radius: 50%; background: #ccff00;
+            box-shadow: 0 0 clamp(4px, 1vw, 10px) #ccff00;
+            opacity: 0; animation: firefly-float linear forwards; pointer-events: none; z-index: 30;
+        }
+        @keyframes firefly-float {
+            0% { transform: translate(0, 0); opacity: 0; }
+            30% { opacity: 0.8; }
+            70% { opacity: 0.8; }
+            100% { transform: translate(clamp(-30px, -5vw, 30px), -50px); opacity: 0; }
+        }
+
+        /* =========================================
+           🐈 精緻黑貓系統 (屋頂休息與走路循環版)
+           ========================================= */
+        .black-cat {
+            position: absolute;
+            z-index: 35; /* 確保在街道和房屋之上 */
+            width: 48px; 
+            height: 38px;
+            cursor: pointer;
+            pointer-events: auto; 
+            transform-origin: bottom center;
+        }
+
+        /* --- 狀態 1：屋頂睡覺 --- */
+        .black-cat.state-roof {
+            left: var(--cat-roof-left);
+            bottom: var(--cat-roof-bottom);
+        }
+        .black-cat.state-roof .cat-motion-container {
+            animation: none; 
+            transform: scaleX(-1) scaleY(0.65) translateY(8px); 
+        }
+        .black-cat.state-roof .cat-leg { opacity: 0; } 
+        .black-cat.state-roof .cat-tail {
+            animation: cat-sleep-tail 4s ease-in-out infinite alternate;
+        }
+        
+        /* 替貓咪身體加上極微弱的月光背光 */
+        .black-cat.state-roof .cat-body,
+        .black-cat.state-roof .cat-head {
+            box-shadow: 0 -1px 2px rgba(255, 238, 179, 0.25); 
+        }
+
+        /* 貓咪隨機眨眼動畫 */
+        .black-cat.state-roof .cat-eye {
+            height: 3px; 
+            background-color: #ccff00;
+            margin-top: 1px;
+            box-shadow: 0 0 4px rgba(204, 255, 0, 0.8);
+            animation: cat-blink 5s infinite;
+        }
+
+        @keyframes cat-sleep-tail {
+            0% { transform: rotate(-70deg); }
+            100% { transform: rotate(-75deg); }
+        }
+        
+        @keyframes cat-blink {
+            0%, 20%, 24%, 60%, 64%, 68%, 100% {
+                height: 3px; 
+                margin-top: 1px; 
+                background-color: #ccff00;
+                box-shadow: 0 0 4px rgba(204, 255, 0, 0.8);
+            }
+            22% { 
+                height: 0px; 
+                margin-top: 2.5px;
+                background-color: #555;
+                box-shadow: none;
+            }
+            62%, 66% { 
+                height: 0px; 
+                margin-top: 2.5px;
+                background-color: #555;
+                box-shadow: none;
+            }
+        }
+
+        /* --- 狀態 2：跳下屋頂 --- */
+        .black-cat.state-jump-down {
+            animation: jump-down-arc 0.7s ease-in forwards;
+        }
+        .black-cat.state-jump-down .cat-motion-container {
+            animation: cat-jump-motion 0.7s ease-out forwards; 
+        }
+        @keyframes jump-down-arc {
+            0% { left: var(--cat-roof-left); bottom: var(--cat-roof-bottom); }
+            40% { left: calc(var(--cat-roof-left) + 4vw); bottom: calc(var(--cat-roof-bottom) + 3vh); }
+            100% { left: var(--cat-street-left); bottom: var(--cat-street-bottom); }
+        }
+
+        /* --- 狀態 3：路上行走 --- */
+        .black-cat.state-walking {
+            bottom: var(--cat-street-bottom);
+            animation: walk-to-end 18s linear forwards;
+        }
+        @keyframes walk-to-end {
+            0% { left: var(--cat-street-left); }
+            100% { left: 120%; }
+        }
+
+        .cat-motion-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            transform: scaleX(-1); 
+            animation: cat-run-gait-body 0.6s ease-in-out infinite alternate; 
+        }
+
+        .black-cat.jumping .cat-motion-container {
+            animation: cat-jump-motion 0.8s ease-out forwards;
+        }
+
+        @keyframes cat-run-gait-body {
+            0% { transform: scaleX(-1) translateY(0) rotate(5deg); }
+            100% { transform: scaleX(-1) translateY(-4px) rotate(-3deg); }
+        }
+
+        .cat-part { position: absolute; background-color: #000000; }
+        .cat-head {
+            top: -1px; left: -1px; width: 17px; height: 17px;
+            border-radius: 50%; z-index: 3; transform: rotate(-10deg);
+        }
+        .cat-head::before, .cat-head::after {
+            content: ''; position: absolute; top: -6px; width: 0; height: 0;
+            border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 7px solid #000000;
+        }
+        .cat-head::before { left: 0px; transform: rotate(-20deg); }
+        .cat-head::after { right: 0px; transform: rotate(20deg); }
+        .cat-eyes {
+            position: absolute; top: 6px; left: 3px; width: 11px; height: 5px;
+            display: flex; justify-content: space-between;
+        }
+        .cat-eye {
+            width: 4px; height: 4px; background-color: #ccff00; 
+            border-radius: 50%; box-shadow: 0 0 2px #ccff00;
+        }
+        .cat-body {
+            bottom: 7px; left: 6px; width: 30px; height: 18px;
+            border-radius: 12px 14px 4px 6px; z-index: 1;
+        }
+        .cat-tail {
+            bottom: 12px; right: -12px; width: 18px; height: 5px;
+            background-color: #000000; border-radius: 4px; transform-origin: left center;
+            animation: cat-run-tail 0.3s ease-in-out infinite alternate;
+        }
+        @keyframes cat-run-tail {
+            0% { transform: rotate(15deg); }
+            100% { transform: rotate(-10deg); }
+        }
+        .cat-leg {
+            position: absolute; bottom: 0px; width: 5px; height: 10px;
+            background-color: #000000; border-radius: 3px;
+            transform-origin: top center; z-index: 0;
+        }
+        .leg-fr { left: 11px; animation: cat-run-leg-swing 0.6s ease-in-out infinite alternate; }
+        .leg-fl { left: 15px; background-color: #0d0d0d; animation: cat-run-leg-swing 0.6s ease-in-out infinite alternate-reverse; }
+        .leg-br { right: 10px; animation: cat-run-leg-swing 0.6s ease-in-out infinite alternate-reverse; }
+        .leg-bl { right: 14px; background-color: #0d0d0d; animation: cat-run-leg-swing 0.6s ease-in-out infinite alternate; }
+
+        @keyframes cat-run-leg-swing {
+            0% { transform: rotate(35deg) translateY(-1px); }
+            100% { transform: rotate(-35deg) translateY(1px); }
+        }
+
+        @keyframes cat-jump-motion {
+            0% { transform: scaleX(-1) translateY(0) rotate(5deg); } 
+            15% { transform: scaleX(-1) translateY(3px) rotate(10deg); } 
+            30% { transform: scaleX(-1) translateY(-15px) rotate(-20deg); } 
+            50% { transform: scaleX(-1) translateY(-20px) rotate(-10deg); } 
+            70% { transform: scaleX(-1) translateY(-10px) rotate(15deg); } 
+            85% { transform: scaleX(-1) translateY(2px) rotate(10deg); } 
+            100% { transform: scaleX(-1) translateY(0) rotate(5deg); } 
+        }
+        .black-cat.jumping .cat-tail { animation: cat-jump-tail 0.8s ease-out forwards; }
+        @keyframes cat-jump-tail {
+            0% { transform: rotate(15deg); }
+            30% { transform: rotate(40deg); }
+            50% { transform: rotate(-10deg); }
+            70% { transform: rotate(20deg); }
+            100% { transform: rotate(15deg); }
+        }
+        .black-cat.jumping .cat-leg { animation: cat-jump-legs 0.8s ease-out forwards; }
+        @keyframes cat-jump-legs {
+            0% { transform: rotate(0); }
+            15% { transform: rotate(30deg); }
+            30% { transform: rotate(-60deg) scaleY(0.6); } 
+            50% { transform: rotate(-70deg) scaleY(0.5); }
+            70% { transform: rotate(-30deg) scaleY(0.9); }
+            85% { transform: rotate(30deg); }
+            100% { transform: rotate(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-audio" loop><source src="night-ambience.mp3" type="audio/mpeg"></audio>
+    <audio id="poof-audio"><source src="ninja-poof.mp3" type="audio/mpeg"></audio>
+
+    <div id="sakura-container"></div>
+
+    <section id="landing-screen" onclick="startExperience()">
+        <div class="hero-card">
+            <div class="subtitle">Kyoto Yozakura</div>
+            <h1>夜櫻之境</h1>
+            <p>沉浸於流動的日式美學。我們將傳統文化與現代數位工藝完美交織，為您的品牌打造獨一無二的靜謐體驗。</p>
+            <button class="cta-button">開始探索</button>
+        </div>
+    </section>
+
+    <main id="main-scene">
+        <div class="sky">
+            <div class="moon" onclick="showMoonText(event)"></div>
+        </div>
+        <div class="tree"></div>
+        <div class="town">
+            <div class="edo-machiya">
+                <div class="roof-main"></div><div class="floor-second"><div class="mushi-window"></div></div><div class="roof-eaves"></div>
+                <div class="floor-ground"><div class="refined-lantern" style="top: -12px; right: 12px; animation-delay: -0.5s;"><div class="lantern-ribs"></div><div class="lantern-text">櫻</div><div class="lantern-tassel"></div></div><div class="noren"></div><div class="koushi-grid"></div></div>
+            </div>
+            <div class="edo-machiya" style="height: clamp(140px, 28vh, 220px); z-index: -1; filter: brightness(0.6);">
+                <div class="roof-main"></div><div class="floor-second"><div class="mushi-window"></div></div><div class="roof-eaves"></div>
+                <div class="floor-ground"><div class="refined-lantern" style="top: -10px; left: 20%; animation-delay: -1.2s; scale: 0.8;"><div class="lantern-ribs"></div><div class="lantern-text">夜</div><div class="lantern-tassel"></div></div><div class="koushi-grid"></div></div>
+            </div>
+            <div class="edo-machiya">
+                <div class="roof-main"></div><div class="floor-second"><div class="mushi-window"></div></div><div class="roof-eaves"></div>
+                <div class="floor-ground"><div class="refined-lantern" style="top: -12px; left: 15%; animation-delay: -2.3s;"><div class="lantern-ribs"></div><div class="lantern-text">祭</div><div class="lantern-tassel"></div></div><div class="noren noren-red" style="left: 50%;"></div><div class="koushi-grid"></div></div>
+            </div>
+            <div class="edo-machiya" style="height: clamp(130px, 25vh, 200px); z-index: -1; filter: brightness(0.7);">
+                <div class="roof-main"></div><div class="floor-second"><div class="mushi-window"></div></div><div class="roof-eaves"></div><div class="floor-ground"><div class="koushi-grid"></div></div>
+            </div>
+            <div class="edo-machiya">
+                <div class="roof-main"></div><div class="floor-second"><div class="mushi-window"></div></div><div class="roof-eaves"></div>
+                <div class="floor-ground"><div class="refined-lantern" style="top: -12px; left: 12px; animation-delay: -0.8s;"><div class="lantern-ribs"></div><div class="lantern-text">古</div><div class="lantern-tassel"></div></div><div class="refined-lantern" style="top: -12px; right: 12px; animation-delay: -1.7s;"><div class="lantern-ribs"></div><div class="lantern-text">町</div><div class="lantern-tassel"></div></div><div class="noren noren-green" style="left: 40%;"></div><div class="koushi-grid"></div></div>
+            </div>
+            <div class="edo-machiya">
+                <div class="roof-main"></div><div class="floor-second"><div class="mushi-window"></div></div><div class="roof-eaves"></div><div class="floor-ground"><div class="koushi-grid"></div></div>
+            </div>
+        </div>
+        
+        <div class="street">
+            <div class="walker" onclick="ninjaVanish(event)"><div class="umbrella"></div><div class="human"></div></div>
+        </div>
+        
+        <div class="black-cat state-roof" id="blackCat" onclick="catInteract(event)">
+            <div class="cat-motion-container">
+                <div class="cat-part cat-head">
+                    <div class="cat-eyes">
+                        <div class="cat-eye"></div>
+                        <div class="cat-eye"></div>
+                    </div>
+                </div>
+                <div class="cat-part cat-body"></div>
+                <div class="cat-part cat-leg leg-fr"></div>
+                <div class="cat-part cat-leg leg-fl"></div>
+                <div class="cat-part cat-leg leg-br"></div>
+                <div class="cat-part cat-leg leg-bl"></div>
+                <div class="cat-part cat-tail"></div>
+            </div>
+        </div>
+
+        <div class="river" id="main-river">
+            <div class="tree-reflection"></div>
+            <div class="river-glow"></div>
+            <div class="river-reflect"></div>
+        </div>
+    </main>
+
+    <script>
+        const container = document.getElementById('sakura-container');
+        const riverContainer = document.getElementById('main-river');
+
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('petal');
+            
+            const startX = Math.random() * 100;
+            petal.style.left = `${startX}vw`;
+            
+            petal.style.setProperty('--scale', Math.random() * 0.6 + 0.4);
+            petal.style.setProperty('--opacity', Math.random() * 0.5 + 0.3);
+
+            const waterLevelVh = 92 + Math.random() * 6; 
+            petal.style.setProperty('--water-level', `${waterLevelVh}vh`);
+            
+            const fallDuration = Math.random() * 3 + 4; 
+            const flowDuration = Math.random() * 4 + 5; 
+
+            petal.style.animation = `fall-to-water ${fallDuration}s linear forwards`;
+            container.appendChild(petal);
+
+            setTimeout(() => {
+                const rippleYPercent = ((waterLevelVh - 90) / 10) * 100;
+                createWaterRipple(startX, rippleYPercent);
+                
+                petal.style.animation = `flow-on-water ${flowDuration}s linear forwards`;
+                
+                setTimeout(() => { petal.remove(); }, flowDuration * 1000);
+
+            }, fallDuration * 1000);
+        }
+
+        function createWaterRipple(xPositionVw, yPositionPercent) {
+            const ripple = document.createElement('div');
+            ripple.classList.add('water-ripple');
+            
+            ripple.style.left = `${xPositionVw}vw`;
+            ripple.style.top = `${yPositionPercent}%`;
+            
+            riverContainer.appendChild(ripple);
+            
+            setTimeout(() => { ripple.remove(); }, 1500);
+        }
+
+        setInterval(createPetal, 300);
+        for(let i = 0; i < 15; i++) { setTimeout(createPetal, Math.random() * 2000); }
+
+        function createFirefly() {
+            const firefly = document.createElement('div');
+            firefly.classList.add('firefly');
+            firefly.style.left = `${Math.random() * 100}vw`;
+            firefly.style.bottom = `${Math.random() * 30 + 10}vh`; 
+            const size = Math.random() * 2 + 2;
+            firefly.style.width = `${size}px`;
+            firefly.style.height = `${size}px`;
+            const duration = Math.random() * 4 + 3;
+            firefly.style.animationDuration = `${duration}s`;
+            document.getElementById('main-scene').appendChild(firefly);
+            setTimeout(() => { firefly.remove(); }, duration * 1000);
+        }
+        setInterval(createFirefly, 800);
+
+        function startExperience() {
+            const landing = document.getElementById('landing-screen');
+            const scene = document.getElementById('main-scene');
+            
+            const bgAudio = document.getElementById('bg-audio');
+            bgAudio.volume = 0.4; 
+            bgAudio.play().catch(() => console.log("等待載入真實音檔...")); 
+
+            landing.classList.add('hidden');
+            scene.classList.add('visible');
+            
+            scene.style.transform = "scale(1.1)";
+            setTimeout(() => {
+                scene.style.transition = "transform 10s ease-out";
+                scene.style.transform = "scale(1)";
+            }, 100);
+        }
+
+        function ninjaVanish(event) {
+            event.stopPropagation(); 
+            const walker = event.currentTarget;
+            if(walker.classList.contains('vanish-active')) return;
+
+            const poofAudio = document.getElementById('poof-audio');
+            poofAudio.currentTime = 0; poofAudio.volume = 0.8;
+            poofAudio.play().catch(() => {});
+
+            const rect = walker.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            for(let i = 0; i < 5; i++) {
+                const smoke = document.createElement('div');
+                smoke.classList.add('smoke-particle');
+                const size = Math.random() * 40 + 40; 
+                smoke.style.width = `${size}px`; smoke.style.height = `${size}px`;
+                smoke.style.left = `${centerX + (Math.random() - 0.5) * 60 - size/2}px`;
+                smoke.style.top = `${centerY + (Math.random() - 0.5) * 60 - size/2}px`;
+                document.body.appendChild(smoke);
+                setTimeout(() => smoke.remove(), 500);
+            }
+
+            walker.classList.add('vanish-active');
+            setTimeout(() => {
+                walker.style.display = 'none';
+                setTimeout(() => {
+                    walker.classList.remove('vanish-active');
+                    walker.style.display = 'block';
+                    walker.style.animation = 'none';
+                    walker.offsetHeight; 
+                    walker.style.animation = null; 
+                }, 5000);
+            }, 300);
+        }
+
+        function catInteract(event) {
+            event.stopPropagation(); 
+            const cat = event.currentTarget;
+
+            if (cat.classList.contains('state-roof')) {
+                cat.classList.remove('state-roof');
+                cat.classList.add('state-jump-down');
+
+                cat.addEventListener('animationend', function handleJumpDown(e) {
+                    if (e.animationName === 'jump-down-arc') {
+                        cat.classList.remove('state-jump-down');
+                        cat.classList.add('state-walking');
+                        cat.removeEventListener('animationend', handleJumpDown);
+                    }
+                });
+            } 
+            else if (cat.classList.contains('state-walking') && !cat.classList.contains('jumping')) {
+                cat.classList.add('jumping');
+                const motionContainer = cat.querySelector('.cat-motion-container');
+                
+                motionContainer.addEventListener('animationend', function handler(e) {
+                    if (e.animationName === 'cat-jump-motion') {
+                        cat.classList.remove('jumping');
+                        motionContainer.removeEventListener('animationend', handler);
+                    }
+                });
+            }
+        }
+
+        document.getElementById('blackCat').addEventListener('animationend', function(e) {
+            if (e.animationName === 'walk-to-end') {
+                this.classList.remove('state-walking');
+                this.classList.remove('jumping');
+                this.classList.add('state-roof'); 
+            }
+        });
+
+        function showMoonText(event) {
+            if (event) event.stopPropagation(); 
+
+            if (document.getElementById('active-moon-text')) return;
+
+            const textDiv = document.createElement('div');
+            textDiv.id = 'active-moon-text';
+            textDiv.classList.add('moon-text-effect');
+            
+            // 將 "夜櫻" 分開包裝以便控制直書排版
+            textDiv.innerHTML = '<span>夜</span><span>櫻</span>';
+            
+            document.body.appendChild(textDiv);
+
+            textDiv.addEventListener('animationend', () => {
+                textDiv.remove();
+            });
+        }
+    </script>
+</body>
+</html>
