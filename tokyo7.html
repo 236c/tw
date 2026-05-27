@@ -833,7 +833,7 @@
                                 <div class="flex-grow-1 min-w-0">
                                     <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px; margin-bottom: 4px; background-color: rgba(26,82,118,0.1); color: #1A5276; border-left-color: #1A5276;">24H 營業</span> <span class="badge bg-light text-muted border fw-normal mb-1 ms-1" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 8 分</span>
                                     <h6 class="fw-bold mb-0 text-truncate">西友超市 (Seiyu Asakusa Rox)</h6>
-                                    <small class="text-muted d-block text-wrap mt-1" style="font-size: 0.85rem; line-height: 1.4;">位於 ROX 商場 B1。最大優勢是 24 小時營業，無論多晚結束行程都能補給宵夜與零食。</small>
+                                    <small class="text-muted d-block text-wrap mt-1" style="font-size: 0.85rem; line-height: 1.4;">位於 ROX 商場 B1。最大優勢是 24 小時營業，無論多晚結束行程都能補給宵誘與零食。</small>
                                 </div>
                                 <a href="https://maps.google.com/?q=西友超市淺草ROX" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
@@ -1096,13 +1096,25 @@
                         function(position) {
                             const lat = position.coords.latitude;
                             const lng = position.coords.longitude;
+                            const coordString = `${lat},${lng}`; // 組合出「緯度,經度」字串
                             
                             // 恢復按鈕原本的樣子
                             myLocationBtn.innerHTML = originalHtml;
                             
-                            // 開啟 Google Maps 搜尋經緯度
-                            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-                            window.open(mapUrl, '_blank');
+                            // 使用 Clipboard API 自動複製座標到剪貼簿 (HTTPS 環境下才能運作)
+                            navigator.clipboard.writeText(coordString).then(() => {
+                                // 複製成功，跳出提示讓使用者知道，點擊確定後再跳轉
+                                alert(`📍 座標已自動複製：\n${coordString}\n\n你可以直接切換到 LINE 或 Messenger 貼上傳給朋友囉！\n\n按下「確定」將為你開啟地圖。`);
+                                
+                                // 使用官方標準 Search URL，精準定位大頭針
+                                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+                                window.open(mapUrl, '_blank');
+                            }).catch(err => {
+                                // 萬一因系統限制導致自動複製失敗的備用方案
+                                alert(`📍 取得座標：\n${coordString}\n(自動複製失敗，請手動複製記下)\n\n按下「確定」將為你開啟地圖。`);
+                                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+                                window.open(mapUrl, '_blank');
+                            });
                         },
                         // 取得座標失敗
                         function(error) {
