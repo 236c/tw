@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         :root {
             --bg-paper: #FBF9F5;      /* 鳥之子色（溫潤米白紙張感） */
@@ -250,6 +252,49 @@
             min-width: 0 !important;
         }
 
+        /* ===== 浮動工具按鈕 (GPS & 截圖) ===== */
+        .floating-tools {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1050;
+        }
+
+        .tool-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .tool-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        .tool-btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-location {
+            background-color: var(--accent-green);
+        }
+
+        .btn-screenshot {
+            background-color: var(--accent-gold);
+        }
+
         /* ===== 手機版全面二次優化 ===== */
         @media (max-width: 991px) {
             body {
@@ -357,6 +402,19 @@
                 font-size: 0.9rem !important;
                 letter-spacing: 1px;
             }
+
+            /* 手機版調整浮動按鈕位置，避免被底部選單擋住 */
+            .floating-tools {
+                bottom: 90px;
+                right: 15px;
+                gap: 10px;
+            }
+            
+            .tool-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
@@ -379,7 +437,7 @@
             <a class="nav-link" href="#resources"><i class="fa-regular fa-bookmark"></i> <span>資源</span></a>
         </nav>
 
-        <main class="main-content">
+        <main class="main-content" id="capture-area">
             
             <section id="cover" style="position: relative; min-height: 100vh; display: flex; align-items: center; border-bottom: none;">
                 <div class="container text-center">
@@ -411,7 +469,7 @@
                             </div>
                             <div class="col-lg-5 text-center">
                                 <div class="polaroid-box mb-3">
-                                    <img src="https://images.unsplash.com/photo-1590447158019-883d8d5f8bc7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Hotel Vibe" class="img-fluid" style="height: 180px; object-fit: cover; width: 100%;">
+                                    <img src="https://images.unsplash.com/photo-1590447158019-883d8d5f8bc7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Hotel Vibe" class="img-fluid" style="height: 180px; object-fit: cover; width: 100%;" crossorigin="anonymous">
                                 </div>
                                 <div class="row g-2">
                                     <div class="col-6">
@@ -513,69 +571,93 @@
                             <a href="https://youtu.be/AVNPQHsvAFg?si=sCnxX7iInATA2kA9" target="_blank" class="action-btn btn-yt py-1 px-3"><i class="fab fa-youtube"></i> 影片</a>
                         </div>
                         <div class="row g-3">
-                            <div class="col-6 col-md-3">
+                            <div class="col-12 col-md-6 col-lg-3">
                                 <div class="handbook-card text-center p-3 d-flex flex-column h-100">
                                     <h6 class="fw-bold mb-3 border-bottom pb-2" style="border-color: #E6DEC9;">🌅 上午</h6>
                                     <div class="mb-3">
-                                        <span class="fw-bold d-block text-truncate">忠犬八公</span>
-                                        <div class="mt-1"><span class="badge bg-light text-muted border fw-normal" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 距飯店：電車 35 分</span></div>
-                                        <a href="https://maps.google.com/?q=Shibuya+Crossing" target="_blank" class="action-btn btn-map w-100 mt-2 py-1"><i class="fas fa-map-marker-alt"></i> 地圖</a>
-                                        <small class="text-muted d-block mt-2 lh-sm text-start">澀谷最經典的相約地標，出站即達。順便瞧瞧旁邊全世界最繁忙的十字路口。</small>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <div class="d-flex align-items-center min-w-0 text-start">
+                                                <span class="fw-bold text-truncate">忠犬八公</span>
+                                                <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 距飯店：電車 35 分</span>
+                                            </div>
+                                            <a href="https://maps.google.com/?q=Shibuya+Crossing" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
+                                        </div>
+                                        <small class="text-muted d-block mt-1 lh-sm text-start">澀谷最經典的相約地標，出站即達。順便瞧瞧旁邊全世界最繁忙的十字路口。</small>
                                     </div>
                                     <div class="mt-auto border-top pt-2" style="border-color: #F2EDE4;">
-                                        <span class="fw-bold d-block text-truncate" style="color: var(--accent-gold);">I'm donut ?</span>
-                                        <div class="mt-1"><span class="badge bg-light text-muted border fw-normal" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span></div>
+                                        <div class="d-flex align-items-center mb-1 mt-1 text-start">
+                                            <span class="fw-bold text-truncate" style="color: var(--accent-gold);">I'm donut ?</span>
+                                            <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
+                                        </div>
                                         <small class="text-muted d-block mt-1 lh-sm text-start">主打空氣感爆棚的生甜甜圈，口感濕潤蓬鬆，極受歡迎。</small>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-6 col-md-3">
+                            <div class="col-12 col-md-6 col-lg-3">
                                 <div class="handbook-card text-center p-3 d-flex flex-column h-100">
                                     <h6 class="fw-bold mb-3 border-bottom pb-2" style="border-color: #E6DEC9;">☀️ 中午</h6>
                                     <div class="mb-3">
-                                        <span class="fw-bold d-block text-truncate">澀谷 PARCO</span>
-                                        <div class="mt-1"><span class="badge bg-light text-muted border fw-normal" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span></div>
-                                        <a href="https://maps.google.com/?q=澀谷PARCO&ll=35.6620484,139.6987767" target="_blank" class="action-btn btn-map w-100 mt-2 py-1"><i class="fas fa-map-marker-alt"></i> 地圖</a>
-                                        <small class="text-muted d-block mt-2 lh-sm text-start">6樓是動漫聖地（Nintendo、寶可夢中心），頂樓還有景觀高空露台。</small>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <div class="d-flex align-items-center min-w-0 text-start">
+                                                <span class="fw-bold text-truncate">澀谷 PARCO</span>
+                                                <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
+                                            </div>
+                                            <a href="https://maps.google.com/?q=澀谷PARCO&ll=35.6620484,139.6987767" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
+                                        </div>
+                                        <small class="text-muted d-block mt-1 lh-sm text-start">6樓是動漫聖地（Nintendo、寶可夢中心），頂樓還有景觀高空露台。</small>
                                     </div>
                                     <div class="mt-auto border-top pt-2" style="border-color: #F2EDE4;">
-                                        <span class="fw-bold d-block text-truncate" style="color: var(--accent-gold);">Hamburg</span>
-                                        <div class="mt-1"><span class="badge bg-light text-muted border fw-normal" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span></div>
+                                        <div class="d-flex align-items-center mb-1 mt-1 text-start">
+                                            <span class="fw-bold text-truncate" style="color: var(--accent-gold);">Hamburg</span>
+                                            <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
+                                        </div>
                                         <small class="text-muted d-block mt-1 lh-sm text-start">香氣濃郁的多汁漢堡排，搭配主廚特調雙醬，白飯殺手。</small>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-6 col-md-3">
+                            <div class="col-12 col-md-6 col-lg-3">
                                 <div class="handbook-card text-center p-3 d-flex flex-column h-100">
                                     <h6 class="fw-bold mb-3 border-bottom pb-2" style="border-color: #E6DEC9;">☕ 下午</h6>
                                     <div class="mb-3">
-                                        <span class="fw-bold d-block text-truncate">宮下公園散策</span>
-                                        <div class="mt-1"><span class="badge bg-light text-muted border fw-normal" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span></div>
-                                        <a href="https://maps.google.com/?q=MIYASHITA+PARK" target="_blank" class="action-btn btn-map w-100 mt-2 py-1"><i class="fas fa-map-marker-alt"></i> 地圖</a>
-                                        <small class="text-muted d-block mt-2 lh-sm text-start">結合複合式商場與頂樓公園的潮流綠洲，適合散步、喝星巴克看電車交錯。</small>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <div class="d-flex align-items-center min-w-0 text-start">
+                                                <span class="fw-bold text-truncate">宮下公園散策</span>
+                                                <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
+                                            </div>
+                                            <a href="https://maps.google.com/?q=MIYASHITA+PARK" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
+                                        </div>
+                                        <small class="text-muted d-block mt-1 lh-sm text-start">結合複合式商場與頂樓公園的潮流綠洲，適合散步、喝星巴克看電車交錯。</small>
                                     </div>
                                     <div class="mt-auto border-top pt-2" style="border-color: #F2EDE4;">
-                                        <span class="fw-bold d-block text-truncate" style="color: var(--accent-gold);">Sakura Stage</span>
-                                        <div class="mt-1"><span class="badge bg-light text-muted border fw-normal" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span></div>
+                                        <div class="d-flex align-items-center mb-1 mt-1 text-start">
+                                            <span class="fw-bold text-truncate" style="color: var(--accent-gold);">Sakura Stage</span>
+                                            <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
+                                        </div>
                                         <small class="text-muted d-block mt-1 lh-sm text-start">澀谷最新地標複合大樓，體驗數位美妝科技與最新潮流品牌。</small>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-6 col-md-3">
+                            <div class="col-12 col-md-6 col-lg-3">
                                 <div class="handbook-card text-center p-3 d-flex flex-column h-100">
                                     <h6 class="fw-bold mb-3 border-bottom pb-2" style="border-color: #E6DEC9;">🌙 晚上</h6>
                                     <div class="mb-3">
-                                        <span class="fw-bold d-block text-truncate" style="color: var(--accent-green);">SHIBUYA SKY</span>
-                                        <div class="mt-1"><span class="badge bg-light text-muted border fw-normal" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span></div>
-                                        <a href="https://maps.google.com/?q=SHIBUYA+SKY" target="_blank" class="action-btn btn-map w-100 mt-2 py-1"><i class="fas fa-map-marker-alt"></i></a>
-                                        <small class="text-muted d-block mt-2 lh-sm text-start">360度無死角俯瞰東京夜景，將東京鐵塔與晴空塔雙地標同時盡收眼底。</small>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <div class="d-flex align-items-center min-w-0 text-start">
+                                                <span class="fw-bold text-truncate" style="color: var(--accent-green);">SHIBUYA SKY</span>
+                                                <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
+                                            </div>
+                                            <a href="https://maps.google.com/?q=SHIBUYA+SKY" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
+                                        </div>
+                                        <small class="text-muted d-block mt-1 lh-sm text-start">360度無死角俯瞰東京夜景，將東京鐵塔與晴空塔雙地標同時盡收眼底。</small>
                                     </div>
                                     <div class="mt-auto border-top pt-2" style="border-color: #F2EDE4;">
-                                        <span class="fw-bold d-block text-truncate" style="color: var(--accent-green);">澀谷橫丁</span>
-                                        <div class="mt-1"><span class="badge bg-light text-muted border fw-normal" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span></div>
+                                        <div class="d-flex align-items-center mb-1 mt-1 text-start">
+                                            <span class="fw-bold text-truncate" style="color: var(--accent-green);">澀谷橫丁</span>
+                                            <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
+                                        </div>
                                         <small class="text-muted d-block mt-1 lh-sm text-start">位於宮下公園1樓，聚集全日本地方特色美食，適合體驗熱鬧的日式居酒屋夜生活。</small>
                                     </div>
                                 </div>
@@ -976,11 +1058,88 @@
             </section>
 
         </main>
+        
+        <div class="floating-tools" id="floatingTools">
+            <button class="tool-btn btn-location" onclick="getLocation()" title="顯示我的位置">
+                <i class="fa-solid fa-location-crosshairs"></i>
+            </button>
+            <button class="tool-btn btn-screenshot" onclick="takeScreenshot()" title="截圖分享">
+                <i class="fa-solid fa-camera"></i>
+            </button>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+        // ===== GPS 取得目前位置 =====
+        function getLocation() {
+            const locBtnIcon = document.querySelector('.btn-location i');
+            
+            if (navigator.geolocation) {
+                // 點擊時讓圖示旋轉，表示正在抓取位置
+                locBtnIcon.className = 'fa-solid fa-spinner fa-spin';
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        // 取得成功，恢復圖示
+                        locBtnIcon.className = 'fa-solid fa-location-crosshairs';
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        // 組合 Google Maps URL 並另開分頁
+                        const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+                        window.open(mapUrl, '_blank');
+                    },
+                    (error) => {
+                        // 取得失敗，恢復圖示並提示
+                        locBtnIcon.className = 'fa-solid fa-location-crosshairs';
+                        console.error('Error getting location', error);
+                        alert('無法取得位置，請確認您的裝置與瀏覽器是否已開啟定位權限。');
+                    },
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            } else {
+                alert('您的瀏覽器不支援地理位置功能。');
+            }
+        }
+
+        // ===== 網頁截圖分享 =====
+        function takeScreenshot() {
+            const tools = document.getElementById('floatingTools');
+            const captureBtnIcon = document.querySelector('.btn-screenshot i');
+            
+            // 點擊時顯示載入中
+            captureBtnIcon.className = 'fa-solid fa-spinner fa-spin';
+            // 截圖前暫時隱藏工具按鈕，避免按鈕被截圖進去
+            tools.style.opacity = '0'; 
+            
+            // 使用 html2canvas 將 #capture-area 轉為圖片
+            // 若想截圖完整網頁包含側邊欄，可將 document.getElementById('capture-area') 改為 document.body
+            html2canvas(document.body, {
+                useCORS: true, // 允許跨域圖片(如unsplash)
+                scale: window.devicePixelRatio || 2, // 提高圖片解析度
+                backgroundColor: '#FBF9F5', // 設定背景色
+            }).then(canvas => {
+                // 恢復按鈕顯示
+                tools.style.opacity = '1';
+                captureBtnIcon.className = 'fa-solid fa-camera';
+                
+                // 建立虛擬 <a> 標籤來觸發下載
+                const link = document.createElement('a');
+                link.download = 'Tokyo-Scrapbook-' + new Date().getTime() + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                // 發生錯誤也記得恢復按鈕
+                tools.style.opacity = '1';
+                captureBtnIcon.className = 'fa-solid fa-camera';
+                console.error('Screenshot failed:', err);
+                alert('截圖失敗，請稍後再試。');
+            });
+        }
+
+
+        // ===== 原本的導航列連動與滑動功能 =====
         document.addEventListener('DOMContentLoaded', () => {
             const navLinks = document.querySelectorAll('.nav-link');
             const sections = document.querySelectorAll('section');
