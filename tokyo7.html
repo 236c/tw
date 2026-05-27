@@ -1103,7 +1103,7 @@
             }
         }
 
-        // ===== 網頁截圖分享 =====
+// ===== 網頁截圖分享 (手機版優化) =====
         function takeScreenshot() {
             const tools = document.getElementById('floatingTools');
             const captureBtnIcon = document.querySelector('.btn-screenshot i');
@@ -1113,28 +1113,56 @@
             // 截圖前暫時隱藏工具按鈕，避免按鈕被截圖進去
             tools.style.opacity = '0'; 
             
-            // 使用 html2canvas 將 #capture-area 轉為圖片
-            // 若想截圖完整網頁包含側邊欄，可將 document.getElementById('capture-area') 改為 document.body
+            // 針對手機版稍微降低解析度，避免記憶體不足導致沒反應
+            const isMobile = window.innerWidth <= 991;
+            const captureScale = isMobile ? 1 : (window.devicePixelRatio || 2); 
+
             html2canvas(document.body, {
-                useCORS: true, // 允許跨域圖片(如unsplash)
-                scale: window.devicePixelRatio || 2, // 提高圖片解析度
-                backgroundColor: '#FBF9F5', // 設定背景色
+                useCORS: true, 
+                scale: captureScale, 
+                backgroundColor: '#FBF9F5'
             }).then(canvas => {
                 // 恢復按鈕顯示
                 tools.style.opacity = '1';
                 captureBtnIcon.className = 'fa-solid fa-camera';
                 
-                // 建立虛擬 <a> 標籤來觸發下載
-                const link = document.createElement('a');
-                link.download = 'Tokyo-Scrapbook-' + new Date().getTime() + '.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+                // 【關鍵修正】使用 toBlob 替代 toDataURL，解決大圖崩潰問題
+                canvas.toBlob(function(blob) {
+                    if (!blob) {
+                        alert('產生圖片失敗，可能是網頁過長導致記憶體不足。');
+                        return;
+                    }
+
+                    // 1. 優先嘗試：呼叫手機內建的原生分享選單 (可直接傳 LINE 或存圖片)
+                    if (navigator.share && navigator.canShare) {
+                        const file = new File([blob], 'Tokyo-Scrapbook.png', { type: 'image/png' });
+                        if (navigator.canShare({ files: [file] })) {
+                            navigator.share({
+                                title: '東京漫遊手札',
+                                files: [file]
+                            }).catch(err => console.log('分享已取消或失敗:', err));
+                            return; // 成功呼叫分享選單後結束
+                        }
+                    }
+
+                    // 2. 備用方案：如果是在電腦上或不支援原生分享，則使用 ObjectURL 下載
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = 'Tokyo-Scrapbook-' + new Date().getTime() + '.png';
+                    link.href = url;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url); // 釋放記憶體
+                    
+                }, 'image/png');
+                
             }).catch(err => {
-                // 發生錯誤也記得恢復按鈕
+                // 發生錯誤時恢復按鈕
                 tools.style.opacity = '1';
                 captureBtnIcon.className = 'fa-solid fa-camera';
                 console.error('Screenshot failed:', err);
-                alert('截圖失敗，請稍後再試。');
+                alert('截圖失敗，請重新整理後再試。');
             });
         }
 
