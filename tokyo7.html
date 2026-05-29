@@ -10,13 +10,13 @@
     
     <style>
         :root {
-            --bg-paper: #FBF9F5;      /* 鳥之子色（溫潤米白紙張感） */
-            --text-sumi: #2C2A29;     /* 墨色（深灰黑） */
-            --text-muted: #6E6862;    /* 枯茶色（有溫度的灰色） */
-            --accent-green: #4A594E;  /* 千歲綠（和風知性綠） */
-            --accent-gold: #BC9F76;   /* 金茶色（復古金色） */
+            --bg-paper: #FBF9F5;
+            --text-sumi: #2C2A29;
+            --text-muted: #6E6862;
+            --accent-green: #4A594E;
+            --accent-gold: #BC9F76;
             --card-bg: #FFFFFF;
-            --grid-color: rgba(188, 159, 118, 0.06); /* 手帳方格線顏色 */
+            --grid-color: rgba(188, 159, 118, 0.06);
         }
 
         body {
@@ -38,7 +38,6 @@
             color: var(--accent-green);
         }
 
-        /* ===== 手帳背景紋理 ===== */
         .notebook-texture {
             background-image: 
                 linear-gradient(var(--grid-color) 1px, transparent 1px),
@@ -54,7 +53,6 @@
             overflow-x: hidden;
         }
 
-        /* ===== 日式側邊導航 ===== */
         .sidebar {
             width: 260px;
             background-color: #FFFDF9;
@@ -118,7 +116,6 @@
             font-size: 1.2rem;
         }
 
-        /* ===== 內容區域 ===== */
         .main-content {
             margin-left: 260px;
             flex-grow: 1;
@@ -150,7 +147,6 @@
             background: repeating-linear-gradient(45deg, var(--accent-gold), var(--accent-gold) 4px, transparent 4px, transparent 8px);
         }
 
-        /* ===== 手札風卡片設計 ===== */
         .handbook-card {
             background: var(--card-bg);
             border-radius: 4px;
@@ -167,7 +163,6 @@
             box-shadow: 4px 8px 20px rgba(44,42,41,0.07);
         }
 
-        /* 紙膠帶/標籤裝飾 */
         .badge-tag {
             background-color: rgba(188, 159, 118, 0.15);
             color: #8A6D3B;
@@ -189,7 +184,6 @@
             letter-spacing: 1px;
         }
 
-        /* 拍立得照片風格 */
         .polaroid-box {
             background: #fff;
             padding: 12px 12px 24px 12px;
@@ -202,7 +196,6 @@
             transform: rotate(0deg) scale(1.02);
         }
 
-        /* 手札風格按鈕 */
         .action-btn {
             background-color: #FFFDF9;
             color: var(--text-sumi);
@@ -250,7 +243,6 @@
             min-width: 0 !important;
         }
 
-        /* ===== 行程時間專屬漸層與邊框 ===== */
         .time-bg-morning {
             background: linear-gradient(135deg, rgba(255, 246, 233, 0.9) 0%, #FFFFFF 100%) !important;
             border-left: 4px solid #E3A45C !important; 
@@ -268,11 +260,8 @@
             border-left: 4px solid #6B849C !important; 
         }
 
-        /* ===== 手機版全面二次優化 ===== */
         @media (max-width: 991px) {
-            body {
-                font-size: 16px; 
-            }
+            body { font-size: 16px; }
 
             .sidebar {
                 width: 100%;
@@ -291,9 +280,7 @@
                 background-color: #FFFDF9;
             }
             
-            .sidebar-logo {
-                display: none;
-            }
+            .sidebar-logo { display: none; }
 
             .nav-link {
                 flex-direction: column;
@@ -318,27 +305,21 @@
                 font-weight: 700;
             }
             
-            .nav-link.active::before {
-                display: none;
-            }
+            .nav-link.active::before { display: none; }
 
             .main-content {
                 margin-left: 0;
                 padding-bottom: 90px; 
             }
 
-            section {
-                padding: 45px 18px; 
-            }
+            section { padding: 45px 18px; }
 
             .section-title {
                 font-size: 1.75rem;
                 margin-bottom: 28px;
             }
 
-            .handbook-card {
-                padding: 22px; 
-            }
+            .handbook-card { padding: 22px; }
 
             .handbook-card p.small, 
             .handbook-card small.text-muted, 
@@ -356,9 +337,7 @@
                 letter-spacing: 0.02em !important;
             }
             
-            .handbook-card span {
-                font-size: 1rem !important;
-            }
+            .handbook-card span { font-size: 1rem !important; }
             
             .badge-tag {
                 font-size: 0.85rem !important;
@@ -434,7 +413,7 @@
                                 </div>
                                 <div class="row g-2">
                                     <div class="col-6">
-                                        <a href="https://www.google.com/maps?q=35.7088,139.7942" target="_blank" class="action-btn btn-map w-100"><i class="fas fa-map-marker-alt"></i> 地圖</a>
+                                        <a href="https://www.google.com/maps/search/?api=1&query=APA+Hotel+淺草駅前" target="_blank" class="action-btn btn-map w-100"><i class="fas fa-map-marker-alt"></i> 地圖</a>
                                     </div>
                                     <div class="col-6">
                                         <a href="https://www.apahotel.com/hotel/syutoken/tokyo/asakusa-ekimae/" target="_blank" class="action-btn w-100"><i class="fas fa-globe text-muted"></i> 官網</a>
@@ -484,7 +463,7 @@
                                 <div class="handbook-card time-bg-morning d-flex flex-column h-100">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h6 class="fw-bold mb-0 text-truncate">🌅 早上｜築地場外市場 <span class="badge bg-light text-muted border fw-normal ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 20 分</span></h6>
-                                        <a href="https://www.google.com/maps?q=35.6655,139.7707" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt"></i></a>
+                                        <a href="https://www.google.com/maps/search/?api=1&query=築地場外市場" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt"></i></a>
                                     </div>
                                     <p class="small text-muted mb-3 lh-sm text-start">探索人氣爆棚的東京廚房。品嚐現噴槍炙燒的海鮮串燒、濃郁多汁的生蠔、香甜厚實的玉子燒，以及職人手作海鮮丼，早晨空腹前來是最完美的致敬。</p>
                                     <a href="https://youtu.be/Oa4BGCZWdMk?si=ZfHKe-2r0tK7Dk__" target="_blank" class="action-btn btn-yt w-100 mt-auto py-1"><i class="fab fa-youtube"></i> 影片</a>
@@ -495,7 +474,7 @@
                                 <div class="handbook-card time-bg-noon d-flex flex-column h-100">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h6 class="fw-bold mb-0 text-truncate">☀️ 中午｜銀座商圈 <span class="badge bg-light text-muted border fw-normal ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 15 分</span></h6>
-                                        <a href="https://www.google.com/maps?q=35.6712,139.7665" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt"></i></a>
+                                        <a href="https://www.google.com/maps/search/?api=1&query=銀座商圈" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt"></i></a>
                                     </div>
                                     <p class="small text-muted mb-3 lh-sm text-start">慢步於極致高雅的奢華街頭。除了探訪頂級旗艦店，還能造訪高質感文具聖地「伊東屋 ITOYA」、巨型 UNIQLO、木村家紅豆麵包，深度沉浸於大人系的精緻美學。</p>
                                     <a href="https://youtu.be/fKxfW2nC2tg?si=x6aIVRsMwyZXjELs" target="_blank" class="action-btn btn-yt w-100 mt-auto py-1"><i class="fab fa-youtube"></i> 影片</a>
@@ -509,7 +488,7 @@
                                     <div class="mb-3">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <span class="fw-bold text-truncate" style="color: var(--accent-green);"><i class="fa-regular fa-image me-2" style="color: var(--accent-gold);"></i>Aqua City <span class="badge bg-light text-muted border fw-normal ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 40 分</span></span>
-                                            <a href="https://www.google.com/maps?q=35.6276,139.7712" target="_blank" class="action-btn btn-map py-1 px-2 ms-2"><i class="fas fa-map-marker-alt"></i></a>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=Aqua+City+台場" target="_blank" class="action-btn btn-map py-1 px-2 ms-2"><i class="fas fa-map-marker-alt"></i></a>
                                         </div>
                                         <p class="text-muted small mb-0 mt-1 lh-sm text-start">坐擁觀賞彩虹大橋與自由女神的最佳視角，東京灣的璀璨夜景在這裡一覽無遺。</p>
                                     </div>
@@ -517,7 +496,7 @@
                                     <div class="mb-2 mt-auto border-top pt-2" style="border-color: rgba(255,255,255,0.5) !important;">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <span class="fw-bold text-truncate" style="color: var(--accent-green);"><i class="fa-solid fa-robot me-2" style="color: var(--accent-gold);"></i>DiverCity <span class="badge bg-light text-muted border fw-normal ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 40 分</span></span>
-                                            <a href="https://www.google.com/maps?q=35.6251,139.7752" target="_blank" class="action-btn btn-map py-1 px-2 ms-2"><i class="fas fa-map-marker-alt"></i></a>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=DiverCity+台場" target="_blank" class="action-btn btn-map py-1 px-2 ms-2"><i class="fas fa-map-marker-alt"></i></a>
                                         </div>
                                         <p class="text-muted small mb-0 mt-1 lh-sm text-start">朝聖廣場上極具震撼力的 1:1 等身大獨角獸鋼彈，並享受一站式的潮流購物與美食體驗。</p>
                                     </div>
@@ -541,7 +520,7 @@
                                                 <span class="fw-bold text-truncate">忠犬八公</span>
                                                 <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
                                             </div>
-                                            <a href="https://www.google.com/maps?q=35.6591,139.7006" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=忠犬八公像+澀谷" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
                                         </div>
                                         <small class="text-muted d-block mt-1 lh-sm text-start">澀谷最經典的相約地標，出站即達。順便瞧瞧旁邊全世界最繁忙的十字路口。</small>
                                     </div>
@@ -564,7 +543,7 @@
                                                 <span class="fw-bold text-truncate">澀谷 PARCO</span>
                                                 <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
                                             </div>
-                                            <a href="https://www.google.com/maps?q=35.6620,139.6987" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=澀谷+PARCO" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
                                         </div>
                                         <small class="text-muted d-block mt-1 lh-sm text-start">6樓是動漫聖地（Nintendo、寶可夢中心），頂樓還有景觀高空露台。</small>
                                     </div>
@@ -587,7 +566,7 @@
                                                 <span class="fw-bold text-truncate">宮下公園散策</span>
                                                 <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
                                             </div>
-                                            <a href="https://www.google.com/maps?q=35.6622,139.7018" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=宮下公園" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
                                         </div>
                                         <small class="text-muted d-block mt-1 lh-sm text-start">結合複合式商場與頂樓公園的潮流綠洲，適合散步、喝星巴克看電車交錯。</small>
                                     </div>
@@ -610,7 +589,7 @@
                                                 <span class="fw-bold text-truncate" style="color: var(--accent-green);">SHIBUYA SKY</span>
                                                 <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
                                             </div>
-                                            <a href="https://www.google.com/maps?q=35.6584,139.7022" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=SHIBUYA+SKY" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
                                         </div>
                                         <small class="text-muted d-block mt-1 lh-sm text-start">360度無死角俯瞰東京夜景，將東京鐵塔與晴空塔雙地標同時盡收眼底。</small>
                                     </div>
@@ -640,7 +619,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🏬</span>淺草ROX</h6>
                                     <p class="text-muted small mb-0 mt-1">淺草在地大型複合式商場，服飾、藥妝及美食應有盡有。</p>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7126,139.7923" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=淺草ROX" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
                             </div>
                         </div>
 
@@ -652,7 +631,7 @@
                                     <p class="text-muted small mb-0 mt-1">日本最古老商店街，近90家小店。</p>
                                 </div>
                                 <div class="d-flex flex-column gap-2 ms-2 mt-auto w-auto">
-                                    <a href="https://www.google.com/maps?q=35.7118,139.7964" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt m-0"></i> 地圖</a>
+                                    <a href="https://www.google.com/maps/search/?api=1&query=淺草+仲見世通" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt m-0"></i> 地圖</a>
                                     <a href="https://www.asakusa-nakamise.jp/store/index.html" target="_blank" class="action-btn py-1 px-2"><i class="fa-solid fa-circle-info text-muted"></i> 店鋪資訊</a>
                                 </div>
                             </div>
@@ -665,7 +644,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🐧</span>唐吉訶德 淺草店</h6>
                                     <p class="text-muted small mb-0 mt-1">ドン・キホーテ 浅草店 / 24小時營業的驚安殿堂，伴手禮與雜貨補給首選。</p>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.6712,139.76655" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=唐吉訶德+淺草店" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
                             </div>
                         </div>
                         
@@ -676,11 +655,10 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">⛩️</span>傳法院通</h6>
                                     <p class="text-muted small mb-0 mt-1">江戶老街，隱藏必吃懷舊小吃。</p>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7130,139.7946" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=淺草+傳法院通" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
                             </div>
                         </div>
 
-                        <!-- 加入桐生堂 -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3" style="border-left: 3px solid var(--accent-gold);">
                                 <div class="flex-grow-1 min-w-0">
@@ -688,7 +666,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🧵</span>桐生堂 (Kumihimo Kiryudo)</h6>
                                     <p class="text-muted small mb-0 mt-1">傳承百年的傳統組紐工藝，專賣手工編織的手環、相機背帶與精緻和風雜貨。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/Kumihimo+Kiryudo" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=桐生堂+淺草" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
                             </div>
                         </div>
 
@@ -699,7 +677,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">👘</span>MEGA Tansuya Asakusa</h6>
                                     <p class="text-muted small mb-0 mt-1">大型和服專賣店，提供豐富的中古及新品和服選擇。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/MEGA+Tansuya+Asakusa" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=MEGA+Tansuya+Asakusa" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
                             </div>
                         </div>
 
@@ -710,7 +688,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🎎</span>Antiques Kimono Lily</h6>
                                     <p class="text-muted small mb-0 mt-1">精緻的復古和服選物店，適合尋找獨特花色與風格的收藏者。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/Antiques+Kimono+Lily+Asakusa" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Antiques+Kimono+Lily+Asakusa" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
                             </div>
                         </div>
 
@@ -721,7 +699,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🌸</span>淺草愛和服 3號店</h6>
                                     <p class="text-muted small mb-0 mt-1">淺草知名和服體驗店家，提供專業的和服租借與穿著服務。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/浅草愛和服+3號店" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=淺草愛和服+3號店" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
                             </div>
                         </div>
                         
@@ -732,7 +710,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🐟</span>阿美橫町</h6>
                                     <p class="text-muted small mb-0 mt-1">傳統庶民商店街，全長500公尺。</p>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7099,139.7745" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=上野+阿美橫町" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
                             </div>
                         </div>
                         
@@ -744,8 +722,8 @@
                                     <p class="text-muted small mb-0 mt-1">池袋總店 / 秋葉原分店</p>
                                 </div>
                                 <div class="d-flex flex-column gap-2 ms-3 w-auto">
-                                    <a href="https://www.google.com/maps?q=35.7314,139.7153" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt"></i> 池袋</a>
-                                    <a href="https://www.google.com/maps?q=35.7001,139.7709" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt"></i> 秋葉</a>
+                                    <a href="https://www.google.com/maps/search/?api=1&query=Animate+池袋本店" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt"></i> 池袋</a>
+                                    <a href="https://www.google.com/maps/search/?api=1&query=Animate+秋葉原" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt"></i> 秋葉</a>
                                 </div>
                             </div>
                         </div>
@@ -757,7 +735,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🚉</span>東京站一番街</h6>
                                     <p class="text-muted small mb-0 mt-1">熱鬧的地下購物區，設有東京動漫人物街、拉麵街與精緻餐廳。</p>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.6812,139.7671" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=東京站一番街" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
                             </div>
                         </div>
 
@@ -768,7 +746,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🏛️</span>日本橋三越本店</h6>
                                     <p class="text-muted small mb-0 mt-1">日本歷史最悠久的百貨公司，建築本身即是重要文化財，展現極致日式品味。</p>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.6843,139.7735" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=日本橋三越本店" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
                             </div>
                         </div>
                         
@@ -781,7 +759,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🗼</span>淺草文化觀光中心</h6>
                                     <p class="text-muted small mb-0 mt-1">8樓設有免費展望台與景觀咖啡廳。</p>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7107,139.7965" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=淺草文化觀光中心" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i><span class="d-md-none ms-2">地圖</span></a>
                             </div>
                         </div>
 
@@ -792,7 +770,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🎰</span>ガシャポンのデパート</h6>
                                     <p class="text-muted small mb-0 mt-1">淺草花屋敷店 / 人氣大型扭蛋專專賣店。</p>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7151,139.7946" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=ガシャポンのデパート+淺草花屋敷店" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i><span class="d-md-none ms-2">地圖</span></a>
                             </div>
                         </div>
                         
@@ -803,7 +781,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🔪</span>合羽橋道具街</h6>
                                     <p class="text-muted small mb-0 mt-1">餐飲器具與食品模型天堂。</p>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7153,139.7887" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=合羽橋道具街" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i><span class="d-md-none ms-2">地圖</span></a>
                             </div>
                         </div>
 
@@ -815,7 +793,7 @@
                                     <p class="text-muted small mb-0 mt-1">全球第二間、日本首間最高規格 Jordan 品牌旗艦店！設有 Workshop 客製化與 Lounge 歷史收藏展示區。</p>
                                 </div>
                                 <div class="d-flex flex-column gap-2 ms-2 mt-auto w-auto">
-                                    <a href="https://www.google.com/maps?q=35.6631,139.7029" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt m-0"></i> 地圖</a>
+                                    <a href="https://www.google.com/maps/search/?api=1&query=Jordan+World+of+Flight+Shibuya" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt m-0"></i> 地圖</a>
                                     <a href="https://www.nike.com/jp/en/retail/s/shibuya-x-jordan" target="_blank" class="action-btn py-1 px-2"><i class="fa-solid fa-circle-info text-muted"></i> 官網</a>
                                 </div>
                             </div>
@@ -828,7 +806,7 @@
                                     <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">👟</span>GALLERY・2</h6>
                                     <p class="text-muted small mb-0 mt-1">大型運動用品專專賣店（五樓設有全棟最豐富的籃球/NBA裝備專區）。</p>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.6606,139.6974" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=GALLERY+2+澀谷" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i><span class="d-md-none ms-2">地圖</span></a>
                             </div>
                         </div>
                     </div>
@@ -840,7 +818,6 @@
                     <h2 class="section-title">🍱 嚴選美食與在地超市 🛒</h2>
                     
                     <div class="row g-3 mb-4">
-                        <!-- 1. 步行 2 分 -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
@@ -848,14 +825,13 @@
                                 </div>
                                 <div class="flex-grow-1 min-w-0">
                                     <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px; margin-bottom: 4px;">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-1 ms-1" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 2 分</span>
-                                    <h6 class="fw-bold mb-0 text-truncate">駒形前川 (或伊東屋)</h6>
-                                    <small class="text-muted d-block text-truncate mt-1">日式鐵板燒與在地料理</small>
+                                    <h6 class="fw-bold mb-0 text-truncate">Komagata-cho Itoya</h6>
+                                    <small class="text-muted d-block text-truncate mt-1">駒形町 伊東屋</small>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7076,139.7972" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Komagata-cho+Itoya" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
 
-                        <!-- 2. 步行 4 分 -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
@@ -866,11 +842,10 @@
                                     <h6 class="fw-bold mb-0 text-truncate">麥當勞 淺草店</h6>
                                     <small class="text-muted d-block text-truncate mt-1">マクドナルド 浅草店</small>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7121,139.7947" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=麥當勞+淺草店" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
 
-                        <!-- 3. 步行 5 分 -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
@@ -881,11 +856,10 @@
                                     <h6 class="fw-bold mb-0 text-truncate">HAT COFFEE</h6>
                                     <small class="text-muted d-block text-truncate mt-1">超人氣 3D 立體拉花咖啡</small>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7058,139.7915" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=HAT+COFFEE+淺草" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
 
-                        <!-- 4. 步行 7 分 -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
@@ -896,14 +870,13 @@
                                     <h6 class="fw-bold mb-0 text-truncate">Ramen Hayashida</h6>
                                     <small class="text-muted d-block text-truncate mt-1">らぁ麺はやし田浅草店</small>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7112,139.7933" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=らぁ麺はやし田+淺草店" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
                     </div>
 
                     <h5 class="fw-bold mb-3" style="color: var(--accent-gold); font-size: 1.15rem;"><span class="me-2">🛒</span>夜間補給與生鮮超市</h5>
                     <div class="row g-3">
-                        <!-- 5. 步行 8 分 -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
@@ -914,11 +887,10 @@
                                     <h6 class="fw-bold mb-0 text-truncate">OZEKI 淺草雷門店</h6>
                                     <small class="text-muted d-block text-wrap mt-1" style="font-size: 0.85rem; line-height: 1.4;">位置極近雷門，生鮮水果品質在當地評價極高。回飯店前順路採買當季草莓或精緻熟食的最佳選擇。</small>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7104,139.7951" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=OZEKI+淺草雷門店" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
 
-                        <!-- 6. 步行 8 分 -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #EBF5FB; border: 1px solid #A9CCE3;">
@@ -929,11 +901,10 @@
                                     <h6 class="fw-bold mb-0 text-truncate">西友超市 (Seiyu Asakusa Rox)</h6>
                                     <small class="text-muted d-block text-wrap mt-1" style="font-size: 0.85rem; line-height: 1.4;">位於 ROX 商場 B1。最大優勢是 24 小時營業，無論多晚結束行程都能補給宵夜與零食。</small>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7126,139.7923" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=西友+淺草ROX食品館" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
 
-                        <!-- 7. 步行 15 分 -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
@@ -944,11 +915,10 @@
                                     <h6 class="fw-bold mb-0 text-truncate">OK Store 淺草店</h6>
                                     <small class="text-muted d-block text-wrap mt-1" style="font-size: 0.85rem; line-height: 1.4;">以驚人親民價格著稱的當地庶民超市。若有大量伴手禮、零食或飲料的採購需求，這裡性價比最高。</small>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7161,139.7978" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=OK+Store+淺草店" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
 
-                        <!-- 8. 步行 20 分 -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
@@ -959,7 +929,7 @@
                                     <h6 class="fw-bold mb-0 text-truncate">Life 超市 (淺草店)</h6>
                                     <small class="text-muted d-block text-wrap mt-1" style="font-size: 0.85rem; line-height: 1.4;">規模龐大、商品種類最齊全。從精緻日本生鮮蔬果、藥妝到各類日用品應有盡有，逛起來寬敞整潔。</small>
                                 </div>
-                                <a href="https://www.google.com/maps?q=35.7188,139.7963" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Life超市+淺草店" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
                     </div>
@@ -1029,7 +999,7 @@
                 </div>
             </section>
 
-            <section id="resources" style="padding-bottom: 60px;">
+			<section id="resources" style="padding-bottom: 60px;">
                 <div class="container">
                     <h2 class="section-title">參考資源</h2>
                     <div class="row g-3">
@@ -1037,7 +1007,7 @@
                             <a href="https://www.chictrip.com.tw/" target="_blank" class="text-decoration-none">
                                 <div class="handbook-card text-center p-4 bg-white" style="border: 1px dashed var(--accent-gold);">
                                     <span class="badge-tag mb-2" style="background-color:rgba(188, 159, 118, 0.15); color:#8A6D3B; border-left-color:var(--accent-gold); font-size: 0.8rem; padding: 3px 10px;">行程規劃</span>
-                                    <i class="fa-regular fa-calendar-days fs-2 mb-2 d-block" style="color: var(--accent-gold);"></i>
+                                    <div class="mb-2 d-block" style="font-size: 2.8rem; line-height: 1.2;">🗺️</div>
                                     <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">去趣 chicTrip</h5>
                                 </div>
                             </a>
@@ -1046,7 +1016,7 @@
                             <a href="https://bobbytravel.tw/tokyo-disneyland/" target="_blank" class="text-decoration-none">
                                 <div class="handbook-card text-center p-4 bg-white" style="border: 1px dashed var(--accent-green);">
                                     <span class="badge-tag mb-2" style="background-color:rgba(74,89,78,0.15); color:var(--accent-green); border-left-color:var(--accent-green); font-size: 0.8rem; padding: 3px 10px;">樂園攻略</span>
-                                    <i class="fa-solid fa-wand-magic-sparkles fs-2 mb-2 d-block" style="color: var(--accent-green);"></i>
+                                    <div class="mb-2 d-block" style="font-size: 2.8rem; line-height: 1.2;">🎡</div>
                                     <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">波比看世界</h5>
                                 </div>
                             </a>
@@ -1055,7 +1025,7 @@
                             <a href="https://www.tokyodisneyresort.jp/tc/index.html" target="_blank" class="text-decoration-none">
                                 <div class="handbook-card text-center p-4 bg-white" style="border: 1px dashed var(--accent-green);">
                                     <span class="badge-tag mb-2" style="background-color:rgba(74,89,78,0.15); color:var(--accent-green); border-left-color:var(--accent-green); font-size: 0.8rem; padding: 3px 10px;">夢幻國度</span>
-                                    <i class="fa-brands fa-fort-awesome fs-2 mb-2 d-block" style="color: var(--accent-green);"></i>
+                                    <div class="mb-2 d-block" style="font-size: 2.8rem; line-height: 1.2;">🏰</div>
                                     <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">東京迪士尼官網</h5>
                                 </div>
                             </a>
@@ -1064,7 +1034,7 @@
                             <a href="https://www.gltjp.com/zh-hant/article/item/20183/" target="_blank" class="text-decoration-none">
                                 <div class="handbook-card text-center p-4 bg-white" style="border: 1px dashed var(--accent-gold);">
                                     <span class="badge-tag mb-2" style="background-color:rgba(188, 159, 118, 0.15); color:#8A6D3B; border-left-color:var(--accent-gold); font-size: 0.8rem; padding: 3px 10px;">指南</span>
-                                    <i class="fa-regular fa-compass fs-2 mb-2 d-block" style="color: var(--accent-gold);"></i>
+                                    <div class="mb-2 d-block" style="font-size: 2.8rem; line-height: 1.2;">🧭</div>
                                     <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">好運日本行</h5>
                                 </div>
                             </a>
@@ -1073,7 +1043,7 @@
                             <a href="https://kimiyo.tw/" target="_blank" class="text-decoration-none">
                                 <div class="handbook-card text-center p-4 bg-white" style="border: 1px dashed var(--accent-green);">
                                     <span class="badge-tag mb-2" style="background-color:rgba(74,89,78,0.15); color:var(--accent-green); border-left-color:var(--accent-green); font-size: 0.8rem; padding: 3px 10px;">網誌</span>
-                                    <i class="fa-regular fa-paper-plane fs-2 mb-2 d-block" style="color: var(--accent-green);"></i>
+                                    <div class="mb-2 d-block" style="font-size: 2.8rem; line-height: 1.2;">🐈</div>
                                     <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">喵爸喵媽</h5>
                                 </div>
                             </a>
@@ -1134,7 +1104,6 @@
                 anchor.addEventListener('click', function (e) {
                     const targetId = this.getAttribute('href');
                     
-                    // 排除「我的位置」這類的非錨點連結
                     if(targetId === '#') return;
 
                     e.preventDefault();
@@ -1187,9 +1156,7 @@
 
             sections.forEach(section => observer.observe(section));
 
-            // ===== 取得 GPS 位置並開啟 Google Map 功能 =====
             const myLocationBtn = document.getElementById('myLocationBtn');
-            // 初始化 Bootstrap Modal
             const locationModal = new bootstrap.Modal(document.getElementById('locationModal'));
 
             if (myLocationBtn) {
@@ -1201,11 +1168,9 @@
                         return;
                     }
 
-                    // 按鈕視覺回饋
                     const originalHtml = this.innerHTML;
                     this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>定位中...</span>';
                     
-                    // UI 元素準備
                     const coordDisplay = document.getElementById('coordDisplay');
                     const copyCoordBtn = document.getElementById('copyCoordBtn');
                     const navUrlDisplay = document.getElementById('navUrlDisplay');
@@ -1221,24 +1186,19 @@
                     openMapBtn.href = '#';
                     openMapBtn.classList.add('disabled');
 
-                    // 先把 Modal 叫出來讓使用者知道有在運作
                     locationModal.show();
 
-                    // 成功取得座標的處理
                     const successCallback = function(position) {
                         const lat = position.coords.latitude;
                         const lng = position.coords.longitude;
                         const coordString = `${lat}, ${lng}`; 
                         
-                        // 建立導航網址 (給朋友用，直接規劃路線到這個座標)
+                        // 關於使用者當前即時定位的分享，保留使用經緯度以確保能準確傳送當前 GPS (因為沒有明確景點名稱)
                         const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-                        
-                        // 建立純顯示大頭針的地圖網址 (單純查看位置)
-                        const mapUrl = `https://maps.google.com/`;
+                        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
                         
                         myLocationBtn.innerHTML = originalHtml;
                         
-                        // 顯示資料與按鈕
                         coordDisplay.innerText = coordString;
                         navUrlDisplay.value = navUrl;
                         
@@ -1251,7 +1211,6 @@
                         openMapBtn.href = mapUrl;
                         openMapBtn.classList.remove('disabled');
 
-                        // 綁定複製座標功能
                         copyCoordBtn.onclick = function(e) {
                             e.preventDefault();
                             navigator.clipboard.writeText(coordString).then(() => {
@@ -1262,9 +1221,8 @@
                             });
                         };
 
-                        // 綁定複製導航網址功能
                         copyNavUrlBtn.onclick = function(e) {
-                            e.preventDefault(); // 防止按鈕預設行為
+                            e.preventDefault();
                             navigator.clipboard.writeText(navUrl).then(() => {
                                 copyNavUrlBtn.innerHTML = '<i class="fa-solid fa-check text-success"></i>';
                                 setTimeout(() => { copyNavUrlBtn.innerHTML = '<i class="fa-regular fa-copy"></i>'; }, 2000);
@@ -1274,7 +1232,6 @@
                         };
                     };
 
-                    // 失敗的處理
                     const errorCallback = function(error) {
                         myLocationBtn.innerHTML = originalHtml;
                         
@@ -1292,11 +1249,9 @@
                         openMapBtn.innerHTML = '<i class="fas fa-map"></i> 開啟一般地圖';
                     };
 
-                    // 階段一：高精確度定位 (GPS)
                     navigator.geolocation.getCurrentPosition(
                         successCallback,
                         function(error) {
-                            // 階段二：若超時，降級使用一般網路/WiFi定位重試
                             if (error.code === error.TIMEOUT) {
                                 navigator.geolocation.getCurrentPosition(
                                     successCallback,
