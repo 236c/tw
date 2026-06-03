@@ -6,43 +6,48 @@
     <title>東京專屬旅遊手札 | Tokyo Scrapbook</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-paper: #FBF9F5;
-            --text-sumi: #2C2A29;
-            --text-muted: #6E6862;
-            --accent-green: #4A594E;
-            --accent-gold: #BC9F76;
+            /* 日式和色調色盤 */
+            --bg-washi: #F9F8F4;      /* 胡粉色 (和紙底色) */
+            --text-sumi: #2C2A29;     /* 墨色 */
+            --text-muted: #827E77;    /* 利休鼠 (優雅灰褐) */
+            --accent-primary: #1B2A41;/* 紺青色 (深邃靛藍) */
+            --accent-gold: #B49A5E;   /* 伽羅色 (沉穩香檳金) */
+            --accent-red: #9B3326;    /* 蘇芳色 (印泥朱紅) */
             --card-bg: #FFFFFF;
-            --grid-color: rgba(188, 159, 118, 0.06);
+            --border-light: #EAE6DF;  /* 柔和邊框 */
+            --grid-color: rgba(27, 42, 65, 0.03); /* 極淡網格 */
         }
 
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: var(--bg-paper);
+            background-color: var(--bg-washi);
             color: var(--text-sumi);
             margin: 0;
             padding: 0;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            font-size: 17px;
-            line-height: 1.7;
-            letter-spacing: 0.04em;
+            font-size: 16px;
+            line-height: 1.8;
+            letter-spacing: 0.06em;
         }
 
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Noto Serif TC', serif;
             font-weight: 700;
-            color: var(--accent-green);
+            color: var(--accent-primary);
+            letter-spacing: 0.08em;
         }
 
+        /* 仿和紙與微網格紋理 */
         .notebook-texture {
             background-image: 
                 linear-gradient(var(--grid-color) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-size: 30px 30px;
         }
 
         .app-container {
@@ -53,67 +58,91 @@
             overflow-x: hidden;
         }
 
+        /* 側邊欄 - 極簡和風 */
         .sidebar {
             width: 260px;
-            background-color: #FFFDF9;
+            background-color: #FFFFFF;
             position: fixed;
             height: 100vh;
             display: flex;
             flex-direction: column;
             padding: 40px 20px;
-            border-right: 2px dashed #E6DEC9;
+            border-right: 1px solid var(--border-light);
             z-index: 100;
         }
 
         .sidebar-logo {
             text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 1px dashed var(--accent-gold);
-            padding-bottom: 20px;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            position: relative;
         }
 
-        .sidebar-logo i {
-            font-size: 2rem;
-            color: var(--accent-gold);
-            margin-bottom: 10px;
+        .sidebar-logo::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 1px;
+            background-color: var(--accent-gold);
+        }
+
+        /* 印章風格 Logo */
+        .hanko-seal-logo {
+            width: 45px;
+            height: 45px;
+            border: 2px solid var(--accent-red);
+            color: var(--accent-red);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            letter-spacing: 0;
         }
         
         .sidebar-logo h4 {
-            font-size: 1.3rem;
-            letter-spacing: 3px;
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            font-weight: 500;
         }
 
         .nav-link {
             color: var(--text-muted);
-            font-size: 1.1rem;
+            font-size: 1rem;
             padding: 12px 20px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            transition: all 0.3s ease;
+            border-radius: 0;
+            margin-bottom: 4px;
+            transition: all 0.4s ease;
             display: flex;
             align-items: center;
-            font-weight: 500;
+            font-weight: 400;
             text-decoration: none;
             position: relative;
+            border-left: 2px solid transparent;
         }
 
         .nav-link i {
             width: 30px;
-            font-size: 1.1rem;
+            font-size: 1rem;
+            opacity: 0.8;
         }
 
-        .nav-link:hover, .nav-link.active {
-            background-color: rgba(74, 89, 78, 0.08);
-            color: var(--accent-green);
-            font-weight: 700;
+        .nav-link:hover {
+            color: var(--accent-primary);
+            background-color: rgba(234, 230, 223, 0.3);
         }
 
-        .nav-link.active::before {
-            content: '•';
-            position: absolute;
-            left: 8px;
-            color: var(--accent-gold);
-            font-size: 1.2rem;
+        .nav-link.active {
+            background-color: rgba(234, 230, 223, 0.4);
+            color: var(--accent-primary);
+            font-weight: 500;
+            border-left: 2px solid var(--accent-red);
         }
 
         .main-content {
@@ -124,235 +153,242 @@
         }
 
         section {
-            padding: 90px 60px;
-            border-bottom: 1px dashed #E6DEC9;
+            padding: 100px 60px;
+            border-bottom: 1px solid var(--border-light);
         }
 
+        /* 標題設計 - 居中對稱，帶有傳統紅線點綴 */
         .section-title {
-            font-size: 2.2rem;
-            margin-bottom: 40px;
+            font-size: 2rem;
+            margin-bottom: 50px;
             position: relative;
-            display: inline-block;
-            color: var(--accent-green);
-            letter-spacing: 2px;
+            text-align: center;
+            color: var(--accent-primary);
+            font-weight: 500;
         }
 
         .section-title::after {
             content: '';
             position: absolute;
-            left: 0;
-            bottom: -6px;
-            width: 100%;
-            height: 3px;
-            background: repeating-linear-gradient(45deg, var(--accent-gold), var(--accent-gold) 4px, transparent 4px, transparent 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -15px;
+            width: 40px;
+            height: 2px;
+            background: var(--accent-red);
         }
 
+        /* 卡片設計 - 俐落、微邊框、去圓角 */
         .handbook-card {
             background: var(--card-bg);
-            border-radius: 4px;
-            padding: 28px;
-            box-shadow: 2px 4px 15px rgba(44,42,41,0.04);
+            border-radius: 2px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
             height: 100%;
-            border: 1px solid #E6DEC9;
+            border: 1px solid var(--border-light);
             position: relative;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
         }
 
         .handbook-card:hover {
             transform: translateY(-2px);
-            box-shadow: 4px 8px 20px rgba(44,42,41,0.07);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+            border-color: rgba(180, 154, 94, 0.4); /* Hover 時透出淡淡伽羅金 */
         }
 
+        /* 標籤 - 框線鏤空風格 */
         .badge-tag {
-            background-color: rgba(188, 159, 118, 0.15);
-            color: #8A6D3B;
-            padding: 4px 14px;
-            border-radius: 2px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            background-color: transparent;
+            color: var(--text-muted);
+            padding: 2px 10px;
+            border-radius: 0;
+            font-size: 0.85rem;
+            font-weight: 400;
             margin-bottom: 15px;
             display: inline-block;
-            border-left: 3px solid var(--accent-gold);
-            letter-spacing: 1px;
+            border: 1px solid var(--border-light);
+            letter-spacing: 2px;
         }
+        
+        /* 特定標籤顏色覆蓋 */
+        .badge-tag.gold { border-color: var(--accent-gold); color: var(--accent-gold); }
+        .badge-tag.red { border-color: var(--accent-red); color: var(--accent-red); }
+        .badge-tag.indigo { border-color: var(--accent-primary); color: var(--accent-primary); }
 
         .badge-route {
-            background-color: var(--accent-green) !important;
-            border-radius: 2px;
-            padding: 6px 12px;
-            font-weight: 500;
-            letter-spacing: 1px;
+            background-color: var(--text-sumi) !important;
+            border-radius: 0;
+            padding: 4px 10px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            font-family: 'Noto Serif TC', serif;
         }
 
         .polaroid-box {
             background: #fff;
-            padding: 12px 12px 24px 12px;
-            box-shadow: 2px 4px 12px rgba(0,0,0,0.06);
-            border: 1px solid #EFEAE2;
-            transform: rotate(-1deg);
-            transition: transform 0.3s;
+            padding: 10px 10px 30px 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            border: 1px solid var(--border-light);
+            transition: transform 0.4s;
         }
         .polaroid-box:hover {
-            transform: rotate(0deg) scale(1.02);
+            transform: scale(1.02);
         }
 
+        /* 按鈕 - 細緻的方框 */
         .action-btn {
-            background-color: #FFFDF9;
-            color: var(--text-sumi);
-            border: 1px solid #D9CEB2;
-            border-radius: 4px;
-            padding: 8px 16px;
-            font-size: 0.95rem;
-            font-weight: 500;
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-light);
+            border-radius: 2px;
+            padding: 6px 14px;
+            font-size: 0.9rem;
+            font-weight: 400;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
         }
         .action-btn:hover {
-            background-color: rgba(188, 159, 118, 0.1);
+            background-color: var(--bg-washi);
             border-color: var(--accent-gold);
-            color: var(--accent-green);
+            color: var(--accent-gold);
         }
         
-        .btn-map i { color: #C94A29; }
-        .btn-yt { 
-            color: #A62B2B; 
-            background-color: #FFF5F5; 
-            border-color: #E8A7A7; 
-        }
-        .btn-yt:hover {
-            background-color: #FFE3E3;
-            border-color: #A62B2B;
-            color: #A62B2B;
-        }
-        .btn-flight {
-            color: #1A5276;
-            background-color: #EBF5FB;
-            border-color: #A9CCE3;
-        }
-        .btn-flight:hover {
-            background-color: #D4E6F1;
-            border-color: #1A5276;
-            color: #1A5276;
-        }
+        .btn-map:hover { border-color: var(--accent-red); color: var(--accent-red); }
+        .btn-yt:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+        .btn-flight:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
 
         .min-w-0 {
             min-width: 0 !important;
         }
 
+        /* 時間區塊背景 - 去除漸層，改用典雅純色與極簡側邊線 */
         .time-bg-morning {
-            background: linear-gradient(135deg, rgba(255, 246, 233, 0.9) 0%, #FFFFFF 100%) !important;
-            border-left: 4px solid #E3A45C !important; 
+            background: #FDFCF9 !important;
+            border-left: 2px solid #D9A441 !important; 
         }
         .time-bg-noon {
-            background: linear-gradient(135deg, rgba(248, 247, 235, 0.9) 0%, #FFFFFF 100%) !important;
-            border-left: 4px solid #C4B27C !important; 
+            background: #FDFCF9 !important;
+            border-left: 2px solid #7B8D78 !important; /* 抹茶綠系 */
         }
         .time-bg-afternoon {
-            background: linear-gradient(135deg, rgba(255, 239, 232, 0.9) 0%, #FFFFFF 100%) !important;
-            border-left: 4px solid #D68D74 !important; 
+            background: #FDFCF9 !important;
+            border-left: 2px solid #B07B65 !important; /* 赤茶色 */
         }
         .time-bg-night {
-            background: linear-gradient(135deg, rgba(236, 241, 246, 0.9) 0%, #FFFFFF 100%) !important;
-            border-left: 4px solid #6B849C !important; 
+            background: #FDFCF9 !important;
+            border-left: 2px solid #3F4B5A !important; /* 鐵灰色 */
         }
 
+        /* 首頁 Cover 特殊樣式 */
+        #cover h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem); 
+            letter-spacing: 0.15em; 
+            color: var(--text-sumi); 
+            font-weight: 500;
+            position: relative;
+            display: inline-block;
+        }
+
+        /* 手機版樣式優化 */
         @media (max-width: 991px) {
-            body { font-size: 16px; }
+            body { font-size: 15px; }
 
             .sidebar {
                 width: 100%;
-                height: 75px; 
+                height: 65px; 
                 flex-direction: row;
                 justify-content: flex-start;
                 align-items: center;
                 bottom: 0;
                 top: auto;
-                padding: 0 5px;
+                padding: 0;
                 z-index: 1000;
-                box-shadow: 0 -3px 15px rgba(44,42,41,0.1);
+                box-shadow: 0 -2px 15px rgba(0,0,0,0.03);
                 overflow-x: auto;
                 border-right: none;
-                border-top: 1px solid #E6DEC9;
-                background-color: #FFFDF9;
+                border-top: 1px solid var(--border-light);
             }
             
             .sidebar-logo { display: none; }
 
             .nav-link {
                 flex-direction: column;
-                padding: 8px 0;
+                padding: 10px 0 6px 0;
                 margin: 0;
-                font-size: 0.9rem; 
-                border-radius: 0;
-                color: var(--text-muted) !important;
+                font-size: 0.75rem; 
+                border-left: none;
+                border-bottom: 2px solid transparent;
                 min-width: 70px; 
                 text-align: center;
+                letter-spacing: 1px;
             }
 
             .nav-link i {
-                font-size: 1.25rem;
-                margin-bottom: 3px;
-                width: auto;
+                font-size: 1.1rem;
+                margin-bottom: 4px;
             }
 
             .nav-link.active {
                 background-color: transparent !important;
-                color: var(--accent-green) !important;
-                font-weight: 700;
+                color: var(--accent-primary) !important;
+                font-weight: 500;
+                border-left: none;
+                border-bottom: 2px solid var(--accent-red);
             }
-            
-            .nav-link.active::before { display: none; }
 
             .main-content {
                 margin-left: 0;
-                padding-bottom: 90px; 
+                padding-bottom: 70px; 
             }
 
-            section { padding: 45px 18px; }
+            section { padding: 40px 20px; }
 
             .section-title {
-                font-size: 1.75rem;
-                margin-bottom: 28px;
+                font-size: 1.6rem;
+                margin-bottom: 35px;
             }
 
-            .handbook-card { padding: 22px; }
+            .handbook-card { padding: 20px !important; }
 
-            .handbook-card p.small, 
-            .handbook-card small.text-muted, 
-            .handbook-card .text-light.text-opacity-75 {
-                font-size: 0.92rem !important; 
-                line-height: 1.6 !important;    
-                margin-top: 6px !important;
-                margin-bottom: 6px !important;
-                letter-spacing: 0.03em !important;
+            #shopping .handbook-card, 
+            #food .handbook-card {
+                flex-direction: column !important;
+                align-items: flex-start !important;
             }
 
-            .handbook-card h6,
-            .handbook-card .fw-bold.d-block {
-                font-size: 1.05rem !important; 
-                letter-spacing: 0.02em !important;
+            #shopping .handbook-card .flex-grow-1,
+            #food .handbook-card .flex-grow-1 {
+                width: 100%;
+                margin-bottom: 12px;
+            }
+
+            #food .handbook-card .rounded-circle {
+                border-radius: 2px !important; 
+                width: 40px !important;
+                height: 40px !important;
+                margin-bottom: 10px !important;
+                background-color: var(--bg-washi) !important;
+            }
+
+            #shopping .handbook-card .action-btn, 
+            #food .handbook-card .action-btn,
+            #shopping .handbook-card .w-auto {
+                width: 100% !important;
+                margin-left: 0 !important;
+                margin-top: auto !important;
             }
             
-            .handbook-card span { font-size: 1rem !important; }
-            
-            .badge-tag {
-                font-size: 0.85rem !important;
-                padding: 3px 10px;
+            #shopping .handbook-card .d-flex.flex-column.gap-2 {
+                flex-direction: row !important;
+                gap: 8px !important;
+                width: 100%;
             }
-
-            .polaroid-box {
-                transform: none !important;
-                margin-bottom: 15px;
-            }
-
-            .action-btn {
-                padding: 8px 14px;
-                font-size: 0.9rem !important;
-                letter-spacing: 1px;
+            #shopping .handbook-card .d-flex.flex-column.gap-2 .action-btn {
+                flex: 1;
             }
         }
     </style>
@@ -363,9 +399,9 @@
         
         <nav id="handbook-nav" class="sidebar">
             <div class="sidebar-logo d-none d-lg-block">
-                <i class="fa-regular fa-compass"></i>
-                <h4 class="mb-0">東京漫遊手札</h4>
-                <small class="text-muted" style="font-size: 0.75rem; letter-spacing: 1px;">TRAVEL SKETCH</small>
+                <div class="hanko-seal-logo">手<br>札</div>
+                <h4 class="mb-0 text-sumi">東京漫遊</h4>
+                <small class="text-muted" style="font-size: 0.75rem; letter-spacing: 2px;">TOKYO KIKO</small>
             </div>
             <a class="nav-link active" href="#cover"><i class="fas fa-home"></i> <span>首頁</span></a>
             <a class="nav-link" href="#hotel"><i class="fa-regular fa-building"></i> <span>住宿</span></a>
@@ -374,18 +410,18 @@
             <a class="nav-link" href="#food"><i class="fa-solid fa-bowl-food"></i> <span>美食</span></a>
             <a class="nav-link" href="#flight"><i class="fa-solid fa-plane"></i> <span>飛行</span></a>
             <a class="nav-link" href="#resources"><i class="fa-regular fa-bookmark"></i> <span>資源</span></a>
-            <a class="nav-link" href="#" id="myLocationBtn"><i class="fa-solid fa-location-crosshairs"></i> <span>我的位置</span></a>
+            <a class="nav-link" href="#" id="myLocationBtn"><i class="fa-solid fa-location-crosshairs"></i> <span>定位</span></a>
         </nav>
 
         <main class="main-content">
             
             <section id="cover" style="position: relative; min-height: 100vh; display: flex; align-items: center; border-bottom: none;">
                 <div class="container text-center">
-                    <p class="small text-muted mb-2" style="letter-spacing: 4px; font-weight: 500;">- MEMORIES OF JOURNEY -</p>
-                    <h1 style="font-size: clamp(2.2rem, 6vw, 4.2rem); letter-spacing: 4px; color: var(--accent-green); font-weight: 700;">東京漫遊手札</h1>
-                    <div style="width: 60px; height: 1px; background-color: var(--accent-gold); margin: 25px auto;"></div>
-                    <p class="lead mt-2 fw-bold text-muted" style="font-size: clamp(1.1rem, 4vw, 1.3rem); letter-spacing: 2px;">淺草 · 銀座 · 台場 · 澀谷 · 上野</p>
-                    <p class="small text-muted mt-5" style="font-family: 'Noto Serif TC', serif; font-style: italic;">2026 Tokyo Exclusive Itinerary</p>
+                    <p class="small mb-3" style="letter-spacing: 6px; font-weight: 400; color: var(--accent-red); font-family: 'Noto Serif TC', serif;">【 旅 の 記 憶 】</p>
+                    <h1>東京漫遊手札</h1>
+                    <div style="width: 1px; height: 60px; background-color: var(--accent-gold); margin: 30px auto;"></div>
+                    <p class="lead mt-2 text-muted" style="font-family: 'Noto Serif TC', serif; font-size: clamp(1.1rem, 4vw, 1.3rem); letter-spacing: 4px;">淺草 · 銀座 · 台場 · 澀谷 · 上野</p>
+                    <p class="small text-muted mt-5" style="letter-spacing: 2px;">二零二六 · 專屬行程</p>
                 </div>
             </section>
 
@@ -393,22 +429,24 @@
                 <div class="container">
                     <h2 class="section-title">住宿基地</h2>
                     <div class="handbook-card">
-                        <div class="row align-items-center g-4">
+                        <div class="row align-items-center g-5">
                             <div class="col-lg-7">
-                                <span class="badge-tag">淺草核心區</span>
-                                <h3 class="fw-bold mb-2" style="color: var(--accent-green); font-size: clamp(1.3rem, 4vw, 1.75rem);">APA Hotel〈淺草駅前〉</h3>
-                                <p class="text-muted small mb-3" style="letter-spacing: 1px;">No.285 アパホテル</p>
+                                <span class="badge-tag gold">淺草核心區</span>
+                                <h3 class="mb-3" style="font-size: clamp(1.4rem, 4vw, 1.8rem);">APA Hotel〈淺草駅前〉</h3>
+                                <p class="text-muted small mb-4" style="letter-spacing: 2px; font-family: 'Noto Serif TC', serif;">No.285 アパホテル</p>
                                 
-                                <p class="fw-bold mb-2" style="font-size: 1.05rem; color: var(--accent-gold);"><i class="fas fa-train me-2"></i>交通機能</p>
+                                <p class="mb-3" style="font-size: 1.05rem; color: var(--accent-primary); font-family: 'Noto Serif TC', serif;">
+                                    <i class="fas fa-train me-2 text-muted"></i>交通機能
+                                </p>
                                 <ul class="list-unstyled small text-muted lh-lg" style="font-size: 0.95rem;">
-                                    <li class="mb-1">• <strong>都營淺草線</strong>「淺草站」(A1出口) 步行 1 分</li>
-                                    <li class="mb-1">• <strong>東京地鐵銀座線</strong>「淺草站」(A3出口) 步行 3 分</li>
-                                    <li class="mb-1">• <strong>東武晴空塔線</strong>「淺草站」(正門) 步行 6 分</li>
-                                    <li class="mb-1">• <strong>都營大江戶線</strong>「藏前站」(A6出口) 步行 6 分</li>
+                                    <li class="mb-2">▫️ <strong>都營淺草線</strong>「淺草站」(A1出口) 步行 1 分</li>
+                                    <li class="mb-2">▫️ <strong>東京地鐵銀座線</strong>「淺草站」(A3出口) 步行 3 分</li>
+                                    <li class="mb-2">▫️ <strong>東武晴空塔線</strong>「淺草站」(正門) 步行 6 分</li>
+                                    <li class="mb-2">▫️ <strong>都營大江戶線</strong>「藏前站」(A6出口) 步行 6 分</li>
                                 </ul>
                             </div>
                             <div class="col-lg-5 text-center">
-                                <div class="polaroid-box mb-3">
+                                <div class="polaroid-box mb-4">
                                     <img src="https://images.unsplash.com/photo-1590447158019-883d8d5f8bc7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Hotel Vibe" class="img-fluid" style="height: 180px; object-fit: cover; width: 100%;">
                                 </div>
                                 <div class="row g-2">
@@ -416,10 +454,10 @@
                                         <a href="https://www.google.com/maps/search/?api=1&query=APA+Hotel+淺草駅前" target="_blank" class="action-btn btn-map w-100"><i class="fas fa-map-marker-alt"></i> 地圖</a>
                                     </div>
                                     <div class="col-6">
-                                        <a href="https://www.apahotel.com/hotel/syutoken/tokyo/asakusa-ekimae/" target="_blank" class="action-btn w-100"><i class="fas fa-globe text-muted"></i> 官網</a>
+                                        <a href="https://www.apahotel.com/hotel/syutoken/tokyo/asakusa-ekimae/" target="_blank" class="action-btn w-100"><i class="fas fa-globe"></i> 官網</a>
                                     </div>
                                     <div class="col-12">
-                                        <a href="https://www.agoda.com/zh-tw/apa-hotel-asakusa-kuramae/hotel/tokyo-jp.html" target="_blank" class="btn text-white w-100 mt-1" style="background-color: var(--accent-green); font-weight: 500; font-size: 0.95rem; border-radius: 4px; letter-spacing: 1px; padding: 8px 12px;">Agoda 訂房</a>
+                                        <a href="https://www.agoda.com/zh-tw/apa-hotel-asakusa-kuramae/hotel/tokyo-jp.html" target="_blank" class="action-btn w-100 mt-1" style="background-color: var(--text-sumi); color: #fff; border: none;">Agoda 訂房</a>
                                     </div>
                                 </div>
                             </div>
@@ -433,23 +471,23 @@
                     <h2 class="section-title">精選路線</h2>
                     
                     <div class="mb-5">
-                        <h4 class="fw-bold mb-3 fs-5"><span class="badge badge-route me-2">路線 1</span> 下町風情與水上夜宴</h4>
+                        <h4 class="mb-4 fs-5"><span class="badge badge-route me-3 text-white">其之壹</span> 下町風情與水上夜宴</h4>
                         <div class="handbook-card p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3 flex-wrap gap-2" style="border-color: #E6DEC9 !important;">
-                                <h5 class="fw-bold mb-0" style="color: var(--text-sumi); font-size: 1.15rem;">淺草老街 & 釣新屋形船</h5>
-                                <a href="https://youtu.be/4UA9zOhjoVk?si=QS82am-O_5cNOeZH" target="_blank" class="action-btn btn-yt py-1 px-3"><i class="fab fa-youtube"></i> 影片</a>
+                            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3 flex-wrap gap-2" style="border-color: var(--border-light) !important;">
+                                <h5 class="mb-0" style="font-size: 1.15rem;">淺草老街 & 釣新屋形船</h5>
+                                <a href="https://youtu.be/4UA9zOhjoVk?si=QS82am-O_5cNOeZH" target="_blank" class="action-btn btn-yt py-1 px-3"><i class="fab fa-youtube"></i> 映像</a>
                             </div>
-                            <div class="d-flex mb-3 p-3 rounded time-bg-morning">
-                                <i class="fa-regular fa-sun mt-1 me-3 fs-4" style="color: #E3A45C !important;"></i>
+                            <div class="d-flex mb-3 p-3 time-bg-morning" style="border-radius: 2px;">
+                                <i class="fa-regular fa-sun mt-1 me-3 fs-5" style="color: #D9A441;"></i>
                                 <div>
-                                    <h6 class="fw-bold mb-1" style="color: var(--accent-green);">白天｜淺草老街散策 <span class="badge bg-light text-muted border fw-normal ms-2" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行約 10 分</span></h6>
+                                    <h6 class="mb-1">白晝｜淺草老街散策 <span class="badge bg-white text-muted border fw-normal ms-2 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 步行 10 分</span></h6>
                                     <p class="text-muted small mb-0">穿梭於充滿江戶風情的雷門與淺草寺周邊，感受下町傳統文化與街邊小吃。</p>
                                 </div>
                             </div>
-                            <div class="d-flex p-3 rounded time-bg-night">
-                                <i class="fa-regular fa-moon mt-1 me-3 fs-4" style="color: #6B849C !important;"></i>
+                            <div class="d-flex p-3 time-bg-night" style="border-radius: 2px;">
+                                <i class="fa-regular fa-moon mt-1 me-3 fs-5" style="color: #3F4B5A;"></i>
                                 <div>
-                                    <h6 class="fw-bold mb-1" style="color: var(--accent-green);">夜晚｜釣新屋形船 <span class="badge bg-light text-muted border fw-normal ms-2" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行約 5 分</span></h6>
+                                    <h6 class="mb-1">夜闌｜釣新屋形船 <span class="badge bg-white text-muted border fw-normal ms-2 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 步行 5 分</span></h6>
                                     <p class="text-muted small mb-0">在水上享受道地日式料理與東京絕美夜景，體驗極致浪漫的水上宴席。</p>
                                 </div>
                             </div>
@@ -457,48 +495,48 @@
                     </div>
 
                     <div class="mb-5">
-                        <h4 class="fw-bold mb-3 fs-5"><span class="badge badge-route me-2">路線 2</span> 東京都會百變魅力</h4>
+                        <h4 class="mb-4 fs-5"><span class="badge badge-route me-3 text-white">其之貳</span> 東京都會百變魅力</h4>
                         <div class="row g-3">
                             <div class="col-12 col-md-4">
                                 <div class="handbook-card time-bg-morning d-flex flex-column h-100">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h6 class="fw-bold mb-0 text-truncate">🌅 早上｜築地場外市場 <span class="badge bg-light text-muted border fw-normal ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 20 分</span></h6>
+                                        <h6 class="mb-0 text-truncate">晨間｜築地場外市場 <span class="badge bg-white text-muted border fw-normal ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 20 分</span></h6>
                                         <a href="https://www.google.com/maps/search/?api=1&query=築地場外市場" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt"></i></a>
                                     </div>
-                                    <p class="small text-muted mb-3 lh-sm text-start">探索人氣爆棚的東京廚房。品嚐現噴槍炙燒的海鮮串燒、濃郁多汁的生蠔、香甜厚實的玉子燒，以及職人手作海鮮丼，早晨空腹前來是最完美的致敬。</p>
-                                    <a href="https://youtu.be/Oa4BGCZWdMk?si=ZfHKe-2r0tK7Dk__" target="_blank" class="action-btn btn-yt w-100 mt-auto py-1"><i class="fab fa-youtube"></i> 影片</a>
+                                    <p class="small text-muted mb-3 lh-sm text-start">探索人氣爆棚的東京廚房。品嚐現噴槍炙燒的海鮮串燒、濃郁多汁的生蠔、香甜厚實的玉子燒，以及職人手作海鮮丼。</p>
+                                    <a href="https://youtu.be/Oa4BGCZWdMk?si=ZfHKe-2r0tK7Dk__" target="_blank" class="action-btn btn-yt w-100 mt-auto py-1"><i class="fab fa-youtube"></i> 映像</a>
                                 </div>
                             </div>
                             
                             <div class="col-12 col-md-4">
                                 <div class="handbook-card time-bg-noon d-flex flex-column h-100">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h6 class="fw-bold mb-0 text-truncate">☀️ 中午｜銀座商圈 <span class="badge bg-light text-muted border fw-normal ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 15 分</span></h6>
+                                        <h6 class="mb-0 text-truncate">日中｜銀座商圈 <span class="badge bg-white text-muted border fw-normal ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 15 分</span></h6>
                                         <a href="https://www.google.com/maps/search/?api=1&query=銀座商圈" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt"></i></a>
                                     </div>
-                                    <p class="small text-muted mb-3 lh-sm text-start">慢步於極致高雅的奢華街頭。除了探訪頂級旗艦店，還能造訪高質感文具聖地「伊東屋 ITOYA」、巨型 UNIQLO、木村家紅豆麵包，深度沉浸於大人系的精緻美學。</p>
-                                    <a href="https://youtu.be/fKxfW2nC2tg?si=x6aIVRsMwyZXjELs" target="_blank" class="action-btn btn-yt w-100 mt-auto py-1"><i class="fab fa-youtube"></i> 影片</a>
+                                    <p class="small text-muted mb-3 lh-sm text-start">慢步於極致高雅的奢華街頭。除了探訪頂級旗艦店，還能造訪高質感文具聖地「伊東屋 ITOYA」，深度沉浸於精緻美學。</p>
+                                    <a href="https://youtu.be/fKxfW2nC2tg?si=x6aIVRsMwyZXjELs" target="_blank" class="action-btn btn-yt w-100 mt-auto py-1"><i class="fab fa-youtube"></i> 映像</a>
                                 </div>
                             </div>
                             
                             <div class="col-12 col-md-4">
                                 <div class="handbook-card time-bg-night d-flex flex-column h-100">
-                                    <h6 class="fw-bold mb-3 border-bottom pb-2 text-truncate" style="border-color: rgba(255,255,255,0.5) !important;">🌙 傍晚｜台場海濱</h6>
+                                    <h6 class="mb-3 border-bottom pb-2 text-truncate" style="border-color: var(--border-light) !important;">黃昏｜台場海濱</h6>
                                     
                                     <div class="mb-3">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fw-bold text-truncate" style="color: var(--accent-green);"><i class="fa-regular fa-image me-2" style="color: var(--accent-gold);"></i>Aqua City <span class="badge bg-light text-muted border fw-normal ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 40 分</span></span>
+                                            <span class="text-truncate" style="color: var(--accent-primary); font-weight: 500;">Aqua City <span class="badge bg-white text-muted border fw-normal ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 40 分</span></span>
                                             <a href="https://www.google.com/maps/search/?api=1&query=Aqua+City+台場" target="_blank" class="action-btn btn-map py-1 px-2 ms-2"><i class="fas fa-map-marker-alt"></i></a>
                                         </div>
-                                        <p class="text-muted small mb-0 mt-1 lh-sm text-start">坐擁觀賞彩虹大橋與自由女神的最佳視角，東京灣的璀璨夜景在這裡一覽無遺。</p>
+                                        <p class="text-muted small mb-0 mt-1 lh-sm text-start">坐擁觀賞彩虹大橋與自由女神的最佳視角。</p>
                                     </div>
                                     
-                                    <div class="mb-2 mt-auto border-top pt-2" style="border-color: rgba(255,255,255,0.5) !important;">
+                                    <div class="mb-2 mt-auto border-top pt-3" style="border-color: var(--border-light) !important;">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fw-bold text-truncate" style="color: var(--accent-green);"><i class="fa-solid fa-robot me-2" style="color: var(--accent-gold);"></i>DiverCity <span class="badge bg-light text-muted border fw-normal ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 40 分</span></span>
+                                            <span class="text-truncate" style="color: var(--accent-primary); font-weight: 500;">DiverCity</span>
                                             <a href="https://www.google.com/maps/search/?api=1&query=DiverCity+台場" target="_blank" class="action-btn btn-map py-1 px-2 ms-2"><i class="fas fa-map-marker-alt"></i></a>
                                         </div>
-                                        <p class="text-muted small mb-0 mt-1 lh-sm text-start">朝聖廣場上極具震撼力的 1:1 等身大獨角獸鋼彈，並享受一站式的潮流購物與美食體驗。</p>
+                                        <p class="text-muted small mb-0 mt-1 lh-sm text-start">朝聖 1:1 獨角獸鋼彈，享受潮流購物。</p>
                                     </div>
                                 </div>
                             </div>
@@ -506,99 +544,75 @@
                     </div>
 
                     <div>
-                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                            <h4 class="fw-bold mb-0 fs-5"><span class="badge badge-route me-2">路線 3</span> 澀谷次文化與都會潮流</h4>
-                            <a href="https://youtu.be/AVNPQHsvAFg?si=sCnxX7iInATA2kA9" target="_blank" class="action-btn btn-yt py-1 px-3"><i class="fab fa-youtube"></i> 影片</a>
+                        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                            <h4 class="mb-0 fs-5"><span class="badge badge-route me-3 text-white">其之參</span> 澀谷次文化與都會潮流</h4>
+                            <a href="https://youtu.be/AVNPQHsvAFg?si=sCnxX7iInATA2kA9" target="_blank" class="action-btn btn-yt py-1 px-3"><i class="fab fa-youtube"></i> 映像</a>
                         </div>
                         <div class="row g-3">
-                            <div class="col-12 col-md-6 col-lg-3">
+                            <div class="col-6 col-lg-3">
                                 <div class="handbook-card time-bg-morning text-center p-3 d-flex flex-column h-100">
-                                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="border-color: rgba(255,255,255,0.5);">🌅 上午</h6>
-                                    <div class="mb-3">
+                                    <h6 class="mb-3 border-bottom pb-2" style="border-color: var(--border-light);">午前</h6>
+                                    <div class="mb-3 text-start">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <div class="d-flex align-items-center min-w-0 text-start">
-                                                <span class="fw-bold text-truncate">忠犬八公</span>
-                                                <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
-                                            </div>
-                                            <a href="https://www.google.com/maps/search/?api=1&query=忠犬八公像+澀谷" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
+                                            <span class="font-weight-500 text-truncate">忠犬八公</span>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=忠犬八公像+澀谷" target="_blank" class="action-btn btn-map px-2 py-1 ms-2"><i class="fas fa-map-marker-alt m-0"></i></a>
                                         </div>
-                                        <small class="text-muted d-block mt-1 lh-sm text-start">澀谷最經典的相約地標，出站即達。順便瞧瞧旁邊全世界最繁忙的十字路口。</small>
+                                        <small class="text-muted d-block mt-1 lh-sm">澀谷經典地標與十字路口。</small>
                                     </div>
-                                    <div class="mt-auto border-top pt-2" style="border-color: rgba(255,255,255,0.5);">
-                                        <div class="d-flex align-items-center mb-1 mt-1 text-start">
-                                            <span class="fw-bold text-truncate" style="color: var(--accent-gold);">I'm donut ?</span>
-                                            <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1 lh-sm text-start">主打空氣感爆棚的生甜甜圈，口感濕潤蓬鬆，極受歡迎。</small>
+                                    <div class="mt-auto border-top pt-2 text-start" style="border-color: var(--border-light);">
+                                        <span class="font-weight-500 text-truncate" style="color: var(--accent-gold);">I'm donut ?</span>
+                                        <small class="text-muted d-block mt-1 lh-sm">空氣感爆棚的生甜甜圈。</small>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-12 col-md-6 col-lg-3">
+                            <div class="col-6 col-lg-3">
                                 <div class="handbook-card time-bg-noon text-center p-3 d-flex flex-column h-100">
-                                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="border-color: rgba(255,255,255,0.5);">☀️ 中午</h6>
-                                    <div class="mb-3">
+                                    <h6 class="mb-3 border-bottom pb-2" style="border-color: var(--border-light);">日中</h6>
+                                    <div class="mb-3 text-start">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <div class="d-flex align-items-center min-w-0 text-start">
-                                                <span class="fw-bold text-truncate">澀谷 PARCO</span>
-                                                <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
-                                            </div>
-                                            <a href="https://www.google.com/maps/search/?api=1&query=澀谷+PARCO" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
+                                            <span class="font-weight-500 text-truncate">澀谷 PARCO</span>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=澀谷+PARCO" target="_blank" class="action-btn btn-map px-2 py-1 ms-2"><i class="fas fa-map-marker-alt m-0"></i></a>
                                         </div>
-                                        <small class="text-muted d-block mt-1 lh-sm text-start">6樓是動漫聖地（Nintendo、寶可夢中心），頂樓還有景觀高空露台。</small>
+                                        <small class="text-muted d-block mt-1 lh-sm">6樓為動漫迷聖地。</small>
                                     </div>
-                                    <div class="mt-auto border-top pt-2" style="border-color: rgba(255,255,255,0.5);">
-                                        <div class="d-flex align-items-center mb-1 mt-1 text-start">
-                                            <span class="fw-bold text-truncate" style="color: var(--accent-gold);">Hamburg</span>
-                                            <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1 lh-sm text-start">香氣濃郁的多汁漢堡排，搭配主廚特調雙醬，白飯殺手。</small>
+                                    <div class="mt-auto border-top pt-2 text-start" style="border-color: var(--border-light);">
+                                        <span class="font-weight-500 text-truncate" style="color: var(--accent-gold);">Hamburg</span>
+                                        <small class="text-muted d-block mt-1 lh-sm">香氣濃郁的多汁漢堡排。</small>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-12 col-md-6 col-lg-3">
+                            <div class="col-6 col-lg-3">
                                 <div class="handbook-card time-bg-afternoon text-center p-3 d-flex flex-column h-100">
-                                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="border-color: rgba(255,255,255,0.5);">☕ 下午</h6>
-                                    <div class="mb-3">
+                                    <h6 class="mb-3 border-bottom pb-2" style="border-color: var(--border-light);">午後</h6>
+                                    <div class="mb-3 text-start">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <div class="d-flex align-items-center min-w-0 text-start">
-                                                <span class="fw-bold text-truncate">宮下公園散策</span>
-                                                <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
-                                            </div>
-                                            <a href="https://www.google.com/maps/search/?api=1&query=宮下公園" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
+                                            <span class="font-weight-500 text-truncate">宮下公園</span>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=宮下公園" target="_blank" class="action-btn btn-map px-2 py-1 ms-2"><i class="fas fa-map-marker-alt m-0"></i></a>
                                         </div>
-                                        <small class="text-muted d-block mt-1 lh-sm text-start">結合複合式商場與頂樓公園的潮流綠洲，適合散步、喝星巴克看電車交錯。</small>
+                                        <small class="text-muted d-block mt-1 lh-sm">結合商場的潮流綠洲。</small>
                                     </div>
-                                    <div class="mt-auto border-top pt-2" style="border-color: rgba(255,255,255,0.5);">
-                                        <div class="d-flex align-items-center mb-1 mt-1 text-start">
-                                            <span class="fw-bold text-truncate" style="color: var(--accent-gold);">Sakura Stage</span>
-                                            <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1 lh-sm text-start">澀谷最新地標複合大樓，體驗數位美妝科技與最新潮流品牌。</small>
+                                    <div class="mt-auto border-top pt-2 text-start" style="border-color: var(--border-light);">
+                                        <span class="font-weight-500 text-truncate" style="color: var(--accent-gold);">Sakura Stage</span>
+                                        <small class="text-muted d-block mt-1 lh-sm">澀谷最新地標複合大樓。</small>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-12 col-md-6 col-lg-3">
+                            <div class="col-6 col-lg-3">
                                 <div class="handbook-card time-bg-night text-center p-3 d-flex flex-column h-100">
-                                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="border-color: rgba(255,255,255,0.5);">🌙 晚上</h6>
-                                    <div class="mb-3">
+                                    <h6 class="mb-3 border-bottom pb-2" style="border-color: var(--border-light);">夜闌</h6>
+                                    <div class="mb-3 text-start">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <div class="d-flex align-items-center min-w-0 text-start">
-                                                <span class="fw-bold text-truncate" style="color: var(--accent-green);">SHIBUYA SKY</span>
-                                                <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
-                                            </div>
-                                            <a href="https://www.google.com/maps/search/?api=1&query=SHIBUYA+SKY" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
+                                            <span class="font-weight-500 text-truncate" style="color: var(--accent-primary);">SHIBUYA SKY</span>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=SHIBUYA+SKY" target="_blank" class="action-btn btn-map px-2 py-1 ms-2"><i class="fas fa-map-marker-alt m-0"></i></a>
                                         </div>
-                                        <small class="text-muted d-block mt-1 lh-sm text-start">360度無死角俯瞰東京夜景，將東京鐵塔與晴空塔雙地標同時盡收眼底。</small>
+                                        <small class="text-muted d-block mt-1 lh-sm">360度俯瞰東京絕美夜景。</small>
                                     </div>
-                                    <div class="mt-auto border-top pt-2" style="border-color: rgba(255,255,255,0.5);">
-                                        <div class="d-flex align-items-center mb-1 mt-1 text-start">
-                                            <span class="fw-bold text-truncate" style="color: var(--accent-green);">澀谷橫丁</span>
-                                            <span class="badge bg-light text-muted border fw-normal ms-2 flex-shrink-0" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1 lh-sm text-start">位於宮下公園1樓，聚集全日本地方特色美食，適合體驗熱鬧的日式居酒屋夜生活。</small>
+                                    <div class="mt-auto border-top pt-2 text-start" style="border-color: var(--border-light);">
+                                        <span class="font-weight-500 text-truncate" style="color: var(--accent-primary);">澀谷橫丁</span>
+                                        <small class="text-muted d-block mt-1 lh-sm">聚集全日本地方特色美食。</small>
                                     </div>
                                 </div>
                             </div>
@@ -609,30 +623,29 @@
 
             <section id="shopping">
                 <div class="container">
-                    <h2 class="section-title">🛍️ 購物與職人</h2>
+                    <h2 class="section-title">職人與物販</h2>
                     <div class="row g-3">
-                        
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card d-flex align-items-center p-3" style="border-left: 3px solid var(--accent-gold);">
+                            <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 8 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🏬</span>淺草ROX</h6>
+                                    <span class="badge-tag gold mb-2">淺草</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 8 分</span>
+                                    <h6 class="mb-1 text-truncate">淺草ROX</h6>
                                     <p class="text-muted small mb-0 mt-1">淺草在地大型複合式商場，服飾、藥妝及美食應有盡有。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=淺草ROX" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=淺草ROX" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 10 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🏮</span>仲見世通</h6>
+                                    <span class="badge-tag gold mb-2">淺草</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 10 分</span>
+                                    <h6 class="mb-1 text-truncate">仲見世通</h6>
                                     <p class="text-muted small mb-0 mt-1">日本最古老商店街，近90家小店。</p>
                                 </div>
                                 <div class="d-flex flex-column gap-2 ms-2 mt-auto w-auto">
                                     <a href="https://www.google.com/maps/search/?api=1&query=淺草+仲見世通" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt m-0"></i> 地圖</a>
-                                    <a href="https://www.asakusa-nakamise.jp/store/index.html" target="_blank" class="action-btn py-1 px-2"><i class="fa-solid fa-circle-info text-muted"></i> 店鋪資訊</a>
+                                    <a href="https://www.asakusa-nakamise.jp/store/index.html" target="_blank" class="action-btn py-1 px-2"><i class="fa-solid fa-info"></i> 資訊</a>
                                 </div>
                             </div>
                         </div>
@@ -640,41 +653,41 @@
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2" style="background-color: rgba(26,82,118,0.1); color: #1A5276; border-left-color: #1A5276;">淺草 24H</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 1 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🐧</span>唐吉訶德 淺草店</h6>
-                                    <p class="text-muted small mb-0 mt-1">ドン・キホーテ 浅草店 / 24小時營業的驚安殿堂，伴手禮與雜貨補給首選。</p>
+                                    <span class="badge-tag indigo mb-2">淺草 24H</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 1 分</span>
+                                    <h6 class="mb-1 text-truncate">唐吉訶德 淺草店</h6>
+                                    <p class="text-muted small mb-0 mt-1">ドン・キホーテ / 驚安殿堂，伴手禮補給首選。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=唐吉訶德+淺草店" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=唐吉訶德+淺草店" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
                             </div>
                         </div>
                         
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 10 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">⛩️</span>傳法院通</h6>
+                                    <span class="badge-tag gold mb-2">淺草</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 10 分</span>
+                                    <h6 class="mb-1 text-truncate">傳法院通</h6>
                                     <p class="text-muted small mb-0 mt-1">江戶老街，隱藏必吃懷舊小吃。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=淺草+傳法院通" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=淺草+傳法院通" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card d-flex align-items-center p-3" style="border-left: 3px solid var(--accent-gold);">
+                            <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 8 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🧵</span>桐生堂 (Kumihimo Kiryudo)</h6>
-                                    <p class="text-muted small mb-0 mt-1">傳承百年的傳統組紐工藝，專賣手工編織的手環、相機背帶與精緻和風雜貨。</p>
+                                    <span class="badge-tag red mb-2">百年工藝</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 8 分</span>
+                                    <h6 class="mb-1 text-truncate">桐生堂</h6>
+                                    <p class="text-muted small mb-0 mt-1">傳承百年，專賣手工編織手環、相機背帶與和風雜貨。</p>
                                 </div>
                                 <a href="https://www.google.com/maps/search/?api=1&query=桐生堂+淺草" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card d-flex align-items-center p-3" style="border-left: 3px solid var(--accent-gold);">
+                            <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 10 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">👘</span>MEGA Tansuya Asakusa</h6>
+                                    <span class="badge-tag red mb-2">和服選物</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 10 分</span>
+                                    <h6 class="mb-1 text-truncate">MEGA Tansuya</h6>
                                     <p class="text-muted small mb-0 mt-1">大型和服專賣店，提供豐富的中古及新品和服選擇。</p>
                                 </div>
                                 <a href="https://www.google.com/maps/search/?api=1&query=MEGA+Tansuya+Asakusa" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
@@ -682,10 +695,10 @@
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card d-flex align-items-center p-3" style="border-left: 3px solid var(--accent-gold);">
+                            <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 8 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🎎</span>Antiques Kimono Lily</h6>
+                                    <span class="badge-tag red mb-2">復古選物</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 8 分</span>
+                                    <h6 class="mb-1 text-truncate">Kimono Lily</h6>
                                     <p class="text-muted small mb-0 mt-1">精緻的復古和服選物店，適合尋找獨特花色與風格的收藏者。</p>
                                 </div>
                                 <a href="https://www.google.com/maps/search/?api=1&query=Antiques+Kimono+Lily+Asakusa" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
@@ -693,33 +706,33 @@
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card d-flex align-items-center p-3" style="border-left: 3px solid var(--accent-gold);">
+                            <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 5 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🌸</span>淺草愛和服 3號店</h6>
+                                    <span class="badge-tag red mb-2">和服體驗</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 5 分</span>
+                                    <h6 class="mb-1 text-truncate">淺草愛和服 3號店</h6>
                                     <p class="text-muted small mb-0 mt-1">淺草知名和服體驗店家，提供專業的和服租借與穿著服務。</p>
                                 </div>
                                 <a href="https://www.google.com/maps/search/?api=1&query=淺草愛和服+3號店" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
                             </div>
                         </div>
-                        
+
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">上野</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 10 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🐟</span>阿美橫町</h6>
-                                    <p class="text-muted small mb-0 mt-1">傳統庶民商店街，全長500公尺。</p>
+                                    <span class="badge-tag gold mb-2">上野</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 10 分</span>
+                                    <h6 class="mb-1 text-truncate">阿美橫町</h6>
+                                    <p class="text-muted small mb-0 mt-1">傳統庶民商店街，全長500公尺，好逛好買。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=上野+阿美橫町" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=上野+阿美橫町" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
                             </div>
                         </div>
-                        
+
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2" style="background-color:rgba(74,89,78,0.15); color:var(--accent-green); border-left-color:var(--accent-green);">動漫</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 15-35 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">👾</span>Animate</h6>
-                                    <p class="text-muted small mb-0 mt-1">池袋總店 / 秋葉原分店</p>
+                                    <span class="badge-tag indigo mb-2">動漫</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 15-35 分</span>
+                                    <h6 class="mb-1 text-truncate">Animate</h6>
+                                    <p class="text-muted small mb-0 mt-1">池袋總店 / 秋葉原分店，動漫商品齊全。</p>
                                 </div>
                                 <div class="d-flex flex-column gap-2 ms-3 w-auto">
                                     <a href="https://www.google.com/maps/search/?api=1&query=Animate+池袋本店" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt"></i> 池袋</a>
@@ -731,82 +744,82 @@
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">東京車站</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 15 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🚉</span>東京站一番街</h6>
-                                    <p class="text-muted small mb-0 mt-1">熱鬧的地下購物區，設有東京動漫人物街、拉麵街與精緻餐廳。</p>
+                                    <span class="badge-tag gold mb-2">東京車站</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 15 分</span>
+                                    <h6 class="mb-1 text-truncate">東京站一番街</h6>
+                                    <p class="text-muted small mb-0 mt-1">熱鬧的地下購物區，設有動漫人物街與拉麵街。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=東京站一番街" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=東京站一番街" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">日本橋</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 10 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🏛️</span>日本橋三越本店</h6>
-                                    <p class="text-muted small mb-0 mt-1">日本歷史最悠久的百貨公司，建築本身即是重要文化財，展現極致日式品味。</p>
+                                    <span class="badge-tag gold mb-2">日本橋</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 10 分</span>
+                                    <h6 class="mb-1 text-truncate">日本橋三越本店</h6>
+                                    <p class="text-muted small mb-0 mt-1">日本歷史最悠久的百貨，建築本身即是重要文化財。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=日本橋三越本店" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=日本橋三越本店" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt mb-0"></i></a>
                             </div>
                         </div>
-                        
-<div class="col-12 mt-4"><h5 class="fw-bold mb-1" style="color: var(--accent-gold); font-size: 1.15rem;"><span class="me-2">🌟</span>特色推薦</h5></div>
+
+                        <div class="col-12 mt-5"><h5 class="mb-3 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 特色推薦 —</h5></div>
                         
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card d-flex align-items-center p-3" style="border-left: 3px solid var(--accent-gold);">
+                            <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 8 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🗼</span>淺草文化觀光中心</h6>
+                                    <span class="badge-tag gold mb-2">淺草</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 8 分</span>
+                                    <h6 class="mb-1 text-truncate">淺草文化觀光中心</h6>
                                     <p class="text-muted small mb-0 mt-1">8樓設有免費展望台與景觀咖啡廳。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=淺草文化觀光中心" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=淺草文化觀光中心" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card d-flex align-items-center p-3" style="border-left: 3px solid var(--accent-gold);">
+                            <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 12 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🎰</span>ガシャポンのデパート</h6>
+                                    <span class="badge-tag gold mb-2">淺草</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 12 分</span>
+                                    <h6 class="mb-1 text-truncate">ガシャポンのデパート</h6>
                                     <p class="text-muted small mb-0 mt-1">淺草花屋敷店 / 人氣大型扭蛋專專賣店。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=ガシャポンのデパート+淺草花屋敷店" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i><span class="d-md-none ms-2">地圖</span></a>
-                            </div>
-                        </div>
-                        
-                        <div class="col-12 col-md-6">
-                            <div class="handbook-card d-flex align-items-center p-3" style="border-left: 3px solid var(--accent-gold);">
-                                <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 15 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🔪</span>合羽橋道具街</h6>
-                                    <p class="text-muted small mb-0 mt-1">餐飲器具與食品模型天堂。</p>
-                                </div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=合羽橋道具街" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=ガシャポンのデパート+淺草花屋敷店" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card d-flex align-items-center p-3" style="border-left: 3px solid #C94A29;">
+                            <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2" style="background-color:rgba(201, 74, 41, 0.12); color:#C94A29; border-left-color:#C94A29;">澀谷 · 明治通</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">🏀</span>Jordan World of Flight</h6>
-                                    <p class="text-muted small mb-0 mt-1">全球第二間、日本首間最高規格 Jordan 品牌旗艦店！設有 Workshop 客製化與 Lounge 歷史收藏展示區。</p>
+                                    <span class="badge-tag gold mb-2">淺草</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 15 分</span>
+                                    <h6 class="mb-1 text-truncate">合羽橋道具街</h6>
+                                    <p class="text-muted small mb-0 mt-1">餐飲器具與食品模型天堂。</p>
+                                </div>
+                                <a href="https://www.google.com/maps/search/?api=1&query=合羽橋道具街" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="handbook-card d-flex align-items-center p-3">
+                                <div class="flex-grow-1 min-w-0">
+                                    <span class="badge-tag red mb-2">澀谷</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 35 分</span>
+                                    <h6 class="mb-1 text-truncate">Jordan World of Flight</h6>
+                                    <p class="text-muted small mb-0 mt-1">全球第二間、日本首間最高規格 Jordan 品牌旗艦店！</p>
                                 </div>
                                 <div class="d-flex flex-column gap-2 ms-2 mt-auto w-auto">
                                     <a href="https://www.google.com/maps/search/?api=1&query=Jordan+World+of+Flight+Shibuya" target="_blank" class="action-btn btn-map py-1 px-2"><i class="fas fa-map-marker-alt m-0"></i> 地圖</a>
-                                    <a href="https://www.nike.com/jp/en/retail/s/shibuya-x-jordan" target="_blank" class="action-btn py-1 px-2"><i class="fa-solid fa-circle-info text-muted"></i> 官網</a>
+                                    <a href="https://www.nike.com/jp/en/retail/s/shibuya-x-jordan" target="_blank" class="action-btn py-1 px-2"><i class="fa-solid fa-globe"></i> 官網</a>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card d-flex align-items-center p-3" style="border-left: 3px solid var(--accent-green);">
+                            <div class="handbook-card d-flex align-items-center p-3">
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-2" style="background-color:rgba(74,89,78,0.15); color:var(--accent-green); border-left-color:var(--accent-green);">澀谷</span> <span class="badge bg-light text-muted border fw-normal mb-2 ms-1" style="font-size: 0.75rem; letter-spacing: 0;"><i class="fa-solid fa-train"></i> 電車 35 分</span>
-                                    <h6 class="fw-bold mb-1 text-truncate"><span class="me-2">👟</span>GALLERY・2</h6>
-                                    <p class="text-muted small mb-0 mt-1">大型運動用品專專賣店（五樓設有全棟最豐富的籃球/NBA裝備專區）。</p>
+                                    <span class="badge-tag indigo mb-2">澀谷</span> <span class="badge bg-transparent text-muted border fw-normal mb-2 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 35 分</span>
+                                    <h6 class="mb-1 text-truncate">GALLERY・2</h6>
+                                    <p class="text-muted small mb-0 mt-1">大型運動用品專專賣店（五樓設有最豐富的籃球裝備專區）。</p>
                                 </div>
-                                <a href="https://www.google.com/maps/search/?api=1&query=GALLERY+2+澀谷" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i><span class="d-md-none ms-2">地圖</span></a>
+                                <a href="https://www.google.com/maps/search/?api=1&query=GALLERY+2+澀谷" target="_blank" class="action-btn btn-map ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
                     </div>
@@ -815,18 +828,18 @@
 
             <section id="food">
                 <div class="container">
-                    <h2 class="section-title">🍱 嚴選美食與在地超市 🛒</h2>
+                    <h2 class="section-title">味覺與尋鮮</h2>
                     
-                    <div class="row g-3 mb-4">
+                    <div class="row g-3 mb-5">
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
-                                    <span style="font-size: 1.5rem;">🥩</span>
+                                <div class="d-flex align-items-center justify-content-center me-4" style="width: 45px; height: 45px; flex-shrink: 0; background-color: var(--bg-washi); border: 1px solid var(--border-light); font-size: 1.2rem;">
+                                    肉
                                 </div>
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px; margin-bottom: 4px;">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-1 ms-1" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 2 分</span>
-                                    <h6 class="fw-bold mb-0 text-truncate">Komagata-cho Itoya</h6>
-                                    <small class="text-muted d-block text-truncate mt-1">駒形町 伊東屋</small>
+                                    <span class="badge-tag mb-1" style="font-size: 0.7rem; padding: 2px 6px; margin-bottom: 4px;">淺草</span> <span class="badge bg-transparent text-muted border fw-normal mb-1 ms-1 rounded-0" style="font-size: 0.7rem;"><i class="fa-solid fa-person-walking"></i> 3 分</span>
+                                    <h6 class="mb-0 text-truncate">駒形町 伊東屋</h6>
+                                    <small class="text-muted d-block text-truncate mt-1">Komagata-cho Itoya</small>
                                 </div>
                                 <a href="https://www.google.com/maps/search/?api=1&query=Komagata-cho+Itoya" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
@@ -834,13 +847,13 @@
 
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
-                                    <span style="font-size: 1.5rem;">🍔</span>
+                                <div class="d-flex align-items-center justify-content-center me-4" style="width: 45px; height: 45px; flex-shrink: 0; background-color: var(--bg-washi); border: 1px solid var(--border-light); font-size: 1.2rem;">
+                                    堡
                                 </div>
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px; margin-bottom: 4px;">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-1 ms-1" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 4 分</span>
-                                    <h6 class="fw-bold mb-0 text-truncate">麥當勞 淺草店</h6>
-                                    <small class="text-muted d-block text-truncate mt-1">マクドナルド 浅草店</small>
+                                    <span class="badge-tag mb-1" style="font-size: 0.7rem; padding: 2px 6px; margin-bottom: 4px;">淺草</span> <span class="badge bg-transparent text-muted border fw-normal mb-1 ms-1 rounded-0" style="font-size: 0.7rem;"><i class="fa-solid fa-person-walking"></i> 8 分</span>
+                                    <h6 class="mb-0 text-truncate">麥當勞 淺草店</h6>
+                                    <small class="text-muted d-block text-truncate mt-1">マクドナルド</small>
                                 </div>
                                 <a href="https://www.google.com/maps/search/?api=1&query=麥當勞+淺草店" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
@@ -848,44 +861,41 @@
 
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
-                                    <span style="font-size: 1.5rem;">☕</span>
+                                <div class="d-flex align-items-center justify-content-center me-4" style="width: 45px; height: 45px; flex-shrink: 0; background-color: var(--bg-washi); border: 1px solid var(--border-light); font-size: 1.2rem;">
+                                    茶
                                 </div>
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px; margin-bottom: 4px;">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-1 ms-1" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 5 分</span>
-                                    <h6 class="fw-bold mb-0 text-truncate">HAT COFFEE</h6>
-                                    <small class="text-muted d-block text-truncate mt-1">超人氣 3D 立體拉花咖啡</small>
+                                    <span class="badge-tag mb-1" style="font-size: 0.7rem; padding: 2px 6px; margin-bottom: 4px;">淺草</span> <span class="badge bg-transparent text-muted border fw-normal mb-1 ms-1 rounded-0" style="font-size: 0.7rem;"><i class="fa-solid fa-person-walking"></i> 6 分</span>
+                                    <h6 class="mb-0 text-truncate">HAT COFFEE</h6>
+                                    <small class="text-muted d-block text-truncate mt-1">超人氣立體拉花咖啡</small>
                                 </div>
                                 <a href="https://www.google.com/maps/search/?api=1&query=HAT+COFFEE+淺草" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
-
+                        
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
-                                    <span style="font-size: 1.5rem;">🍜</span>
+                                <div class="d-flex align-items-center justify-content-center me-4" style="width: 45px; height: 45px; flex-shrink: 0; background-color: var(--bg-washi); border: 1px solid var(--border-light); font-size: 1.2rem;">
+                                    麵
                                 </div>
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px; margin-bottom: 4px;">淺草</span> <span class="badge bg-light text-muted border fw-normal mb-1 ms-1" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 7 分</span>
-                                    <h6 class="fw-bold mb-0 text-truncate">Ramen Hayashida</h6>
-                                    <small class="text-muted d-block text-truncate mt-1">らぁ麺はやし田浅草店</small>
+                                    <span class="badge-tag mb-1" style="font-size: 0.7rem; padding: 2px 6px; margin-bottom: 4px;">淺草</span> <span class="badge bg-transparent text-muted border fw-normal mb-1 ms-1 rounded-0" style="font-size: 0.7rem;"><i class="fa-solid fa-person-walking"></i> 8 分</span>
+                                    <h6 class="mb-0 text-truncate">Ramen Hayashida</h6>
+                                    <small class="text-muted d-block text-truncate mt-1">らぁ麺はやし田</small>
                                 </div>
                                 <a href="https://www.google.com/maps/search/?api=1&query=らぁ麺はやし田+淺草店" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
                         </div>
                     </div>
 
-                    <h5 class="fw-bold mb-3" style="color: var(--accent-gold); font-size: 1.15rem;"><span class="me-2">🛒</span>夜間補給與生鮮超市</h5>
+                    <h5 class="mb-4 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 鮮市與補給 —</h5>
                     <div class="row g-3">
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
-                                    <span style="font-size: 1.5rem;">🍎</span>
-                                </div>
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px; margin-bottom: 4px;">雷門旁</span> <span class="badge bg-light text-muted border fw-normal mb-1 ms-1" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 8 分</span>
-                                    <h6 class="fw-bold mb-0 text-truncate">OZEKI 淺草雷門店</h6>
-                                    <small class="text-muted d-block text-wrap mt-1" style="font-size: 0.85rem; line-height: 1.4;">位置極近雷門，生鮮水果品質在當地評價極高。回飯店前順路採買當季草莓或精緻熟食的最佳選擇。</small>
+                                    <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px;">雷門旁</span> <span class="badge bg-transparent text-muted border fw-normal mb-1 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 6 分</span>
+                                    <h6 class="mb-0 text-truncate mt-2">OZEKI 淺草雷門店</h6>
+                                    <small class="text-muted d-block text-wrap mt-2" style="font-size: 0.85rem; line-height: 1.6;">極近雷門，生鮮水果品質在當地評價高。回飯店前順路採買當季草莓首選。</small>
                                 </div>
                                 <a href="https://www.google.com/maps/search/?api=1&query=OZEKI+淺草雷門店" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
@@ -893,13 +903,10 @@
 
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #EBF5FB; border: 1px solid #A9CCE3;">
-                                    <span style="font-size: 1.5rem;">🏪</span>
-                                </div>
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px; margin-bottom: 4px; background-color: rgba(26,82,118,0.1); color: #1A5276; border-left-color: #1A5276;">24H 營業</span> <span class="badge bg-light text-muted border fw-normal mb-1 ms-1" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 8 分</span>
-                                    <h6 class="fw-bold mb-0 text-truncate">西友超市 (Seiyu Asakusa Rox)</h6>
-                                    <small class="text-muted d-block text-wrap mt-1" style="font-size: 0.85rem; line-height: 1.4;">位於 ROX 商場 B1。最大優勢是 24 小時營業，無論多晚結束行程都能補給宵夜與零食。</small>
+                                    <span class="badge-tag indigo mb-1" style="font-size: 0.75rem; padding: 2px 8px;">24H 營業</span> <span class="badge bg-transparent text-muted border fw-normal mb-1 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 10 分</span>
+                                    <h6 class="mb-0 text-truncate mt-2">西友超市 (ROX)</h6>
+                                    <small class="text-muted d-block text-wrap mt-2" style="font-size: 0.85rem; line-height: 1.6;">位於 ROX 商場 B1，24 小時營業，無論多晚都能補給宵夜與零食。</small>
                                 </div>
                                 <a href="https://www.google.com/maps/search/?api=1&query=西友+淺草ROX食品館" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
@@ -907,13 +914,10 @@
 
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
-                                    <span style="font-size: 1.5rem;">🏷️</span>
-                                </div>
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px; margin-bottom: 4px;">小資極薦</span> <span class="badge bg-light text-muted border fw-normal mb-1 ms-1" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 15 分</span>
-                                    <h6 class="fw-bold mb-0 text-truncate">OK Store 淺草店</h6>
-                                    <small class="text-muted d-block text-wrap mt-1" style="font-size: 0.85rem; line-height: 1.4;">以驚人親民價格著稱的當地庶民超市。若有大量伴手禮、零食或飲料的採購需求，這裡性價比最高。</small>
+                                    <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px;">小資極薦</span> <span class="badge bg-transparent text-muted border fw-normal mb-1 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 12 分</span>
+                                    <h6 class="mb-0 text-truncate mt-2">OK Store 淺草店</h6>
+                                    <small class="text-muted d-block text-wrap mt-2" style="font-size: 0.85rem; line-height: 1.6;">以親民價格著稱的庶民超市。大量伴手禮、零食採購需求性價比最高。</small>
                                 </div>
                                 <a href="https://www.google.com/maps/search/?api=1&query=OK+Store+淺草店" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
@@ -921,13 +925,10 @@
 
                         <div class="col-12 col-md-6">
                             <div class="handbook-card d-flex align-items-center p-3">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0; background-color: #F5EFE6; border: 1px solid #E6DEC9;">
-                                    <span style="font-size: 1.5rem;">🛍️</span>
-                                </div>
                                 <div class="flex-grow-1 min-w-0">
-                                    <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px; margin-bottom: 4px;">大型連鎖</span> <span class="badge bg-light text-muted border fw-normal mb-1 ms-1" style="font-size: 0.7rem; letter-spacing: 0;"><i class="fa-solid fa-person-walking"></i> 步行 20 分</span>
-                                    <h6 class="fw-bold mb-0 text-truncate">Life 超市 (淺草店)</h6>
-                                    <small class="text-muted d-block text-wrap mt-1" style="font-size: 0.85rem; line-height: 1.4;">規模龐大、商品種類最齊全。從精緻日本生鮮蔬果、藥妝到各類日用品應有盡有，逛起來寬敞整潔。</small>
+                                    <span class="badge-tag mb-1" style="font-size: 0.75rem; padding: 2px 8px;">大型連鎖</span> <span class="badge bg-transparent text-muted border fw-normal mb-1 ms-1 rounded-0" style="font-size: 0.75rem;"><i class="fa-solid fa-person-walking"></i> 15 分</span>
+                                    <h6 class="mb-0 text-truncate mt-2">Life 超市 (淺草店)</h6>
+                                    <small class="text-muted d-block text-wrap mt-2" style="font-size: 0.85rem; line-height: 1.6;">規模龐大種類齊全。從精緻日本生鮮蔬果、藥妝到各類日用品應有盡有。</small>
                                 </div>
                                 <a href="https://www.google.com/maps/search/?api=1&query=Life超市+淺草店" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 mt-auto"><i class="fas fa-map-marker-alt"></i></a>
                             </div>
@@ -941,56 +942,54 @@
                     <h2 class="section-title">啟程與歸途</h2>
                     <div class="row g-4">
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card d-flex flex-column justify-content-between">
+                            <div class="handbook-card d-flex flex-column justify-content-between p-5">
                                 <div>
-                                    <span class="badge-tag" style="background-color: rgba(74, 89, 78, 0.15); color: var(--accent-green); border-left-color: var(--accent-green);">去程航班</span>
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h3 class="fw-bold mb-0 fs-4" style="color: var(--text-sumi); font-size: 1.3rem;">國泰航空 CX450</h3>
-                                        <span class="badge bg-secondary py-1 px-2" style="font-size: 0.8rem; background-color: var(--accent-gold) !important;">777-300</span>
+                                    <span class="badge-tag indigo">往路</span>
+                                    <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+                                        <h3 class="mb-0 fs-4" style="color: var(--text-sumi);">國泰航空 CX450</h3>
+                                        <span class="badge bg-transparent border text-muted rounded-0" style="font-size: 0.8rem; border-color: var(--border-light) !important;">777-300</span>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between my-4 px-2 text-center">
                                         <div>
-                                            <span class="fs-5 fw-bold d-block">TPE</span>
-                                            <small class="text-muted">台北桃園</small>
+                                            <span class="fs-5 fw-bold d-block font-serif">TPE</span>
+                                            <small class="text-muted">臺北桃園</small>
                                         </div>
-                                        <div class="flex-grow-1 mx-3 position-relative d-flex align-items-center justify-content-center">
+                                        <div class="flex-grow-1 mx-4 position-relative d-flex align-items-center justify-content-center">
                                             <div style="position: absolute; width: 100%; height: 1px; border-top: 1px dashed var(--accent-gold); top: 50%;"></div>
-                                            <i class="fa-solid fa-plane text-muted style-plane" style="transform: rotate(45deg); background: var(--card-bg); padding: 0 8px; z-index: 1; color: var(--accent-gold) !important;"></i>
                                         </div>
                                         <div>
-                                            <span class="fs-5 fw-bold d-block">NRT</span>
+                                            <span class="fs-5 fw-bold d-block font-serif">NRT</span>
                                             <small class="text-muted">東京成田</small>
                                         </div>
                                     </div>
-                                    <p class="small text-muted mb-4"><i class="fa-regular fa-file-lines me-2"></i>記錄包含詳細的桃園快閃貴賓室心得、波音 777-300 經典區域型商務艙體驗及機上餐食分享。</p>
+                                    <p class="small text-muted mb-4 lh-lg">記錄包含詳細的桃園快閃貴賓室心得、波音 777-300 經典區域型商務艙體驗及機上餐食分享。</p>
                                 </div>
                                 <a href="https://nonstopflying.tw/251010cx450/" target="_blank" class="action-btn btn-flight w-100 mt-2"><i class="fa-solid fa-book-open"></i> 閱讀飛行記錄</a>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card d-flex flex-column justify-content-between">
+                            <div class="handbook-card d-flex flex-column justify-content-between p-5">
                                 <div>
-                                    <span class="badge-tag" style="background-color: rgba(188, 159, 118, 0.15); color: #8A6D3B; border-left-color: var(--accent-gold);">回程航班</span>
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h3 class="fw-bold mb-0 fs-4" style="color: var(--text-sumi); font-size: 1.3rem;">國泰航空 CX451</h3>
-                                        <span class="badge bg-secondary py-1 px-2" style="font-size: 0.8rem; background-color: var(--accent-green) !important;">777-300</span>
+                                    <span class="badge-tag red">復路</span>
+                                    <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+                                        <h3 class="mb-0 fs-4" style="color: var(--text-sumi);">國泰航空 CX451</h3>
+                                        <span class="badge bg-transparent border text-muted rounded-0" style="font-size: 0.8rem; border-color: var(--border-light) !important;">777-300</span>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between my-4 px-2 text-center">
                                         <div>
-                                            <span class="fs-5 fw-bold d-block">NRT</span>
+                                            <span class="fs-5 fw-bold d-block font-serif">NRT</span>
                                             <small class="text-muted">東京成田</small>
                                         </div>
-                                        <div class="flex-grow-1 mx-3 position-relative d-flex align-items-center justify-content-center">
-                                            <div style="position: absolute; width: 100%; height: 1px; border-top: 1px dashed var(--accent-green); top: 50%;"></div>
-                                            <i class="fa-solid fa-plane text-muted style-plane" style="transform: rotate(45deg); background: var(--card-bg); padding: 0 8px; z-index: 1; color: var(--accent-green) !important;"></i>
+                                        <div class="flex-grow-1 mx-4 position-relative d-flex align-items-center justify-content-center">
+                                            <div style="position: absolute; width: 100%; height: 1px; border-top: 1px dashed var(--accent-red); top: 50%;"></div>
                                         </div>
                                         <div>
-                                            <span class="fs-5 fw-bold d-block">TPE</span>
-                                            <small class="text-muted">台北桃園</small>
+                                            <span class="fs-5 fw-bold d-block font-serif">TPE</span>
+                                            <small class="text-muted">臺北桃園</small>
                                         </div>
                                     </div>
-                                    <p class="small text-muted mb-4"><i class="fa-regular fa-file-lines me-2"></i>開箱成田機場日航 Sakura Lounge 貴賓室，完整收錄東京回程的 777-300 飛行服務細節。</p>
+                                    <p class="small text-muted mb-4 lh-lg">開箱成田機場日航 Sakura Lounge 貴賓室，完整收錄東京回程的 777-300 飛行服務細節。</p>
                                 </div>
                                 <a href="https://nonstopflying.tw/251013cx451/" target="_blank" class="action-btn btn-flight w-100 mt-2"><i class="fa-solid fa-book-open"></i> 閱讀飛行記錄</a>
                             </div>
@@ -999,54 +998,98 @@
                 </div>
             </section>
 
-			<section id="resources" style="padding-bottom: 60px;">
+			<section id="resources" style="padding-bottom: 80px;">
                 <div class="container">
-                    <h2 class="section-title">參考資源</h2>
-                    <div class="row g-3">
-                        <div class="col-12 col-md-6 col-lg-3">
+                    <h2 class="section-title">參考資源與夏祭</h2>
+                    <div class="row g-3 mb-5">
+                        <div class="col-6 col-md-6 col-lg-3">
                             <a href="https://www.chictrip.com.tw/" target="_blank" class="text-decoration-none">
-                                <div class="handbook-card text-center p-4 bg-white" style="border: 1px dashed var(--accent-gold);">
-                                    <span class="badge-tag mb-2" style="background-color:rgba(188, 159, 118, 0.15); color:#8A6D3B; border-left-color:var(--accent-gold); font-size: 0.8rem; padding: 3px 10px;">行程規劃</span>
-                                    <div class="mb-2 d-block" style="font-size: 2.8rem; line-height: 1.2;">🗺️</div>
-                                    <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">去趣 chicTrip</h5>
+                                <div class="handbook-card text-center p-4 bg-white">
+                                    <div class="mb-3 d-block" style="font-size: 1.8rem; color: var(--accent-gold);"><i class="fa-solid fa-map-location-dot"></i></div>
+                                    <h5 class="text-dark mb-0" style="font-size: 1rem;">去趣 chicTrip</h5>
+                                    <small class="text-muted mt-2 d-block">行程規劃</small>
                                 </div>
                             </a>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-3">
+                        <div class="col-6 col-md-6 col-lg-3">
                             <a href="https://bobbytravel.tw/tokyo-disneyland/" target="_blank" class="text-decoration-none">
-                                <div class="handbook-card text-center p-4 bg-white" style="border: 1px dashed var(--accent-green);">
-                                    <span class="badge-tag mb-2" style="background-color:rgba(74,89,78,0.15); color:var(--accent-green); border-left-color:var(--accent-green); font-size: 0.8rem; padding: 3px 10px;">樂園攻略</span>
-                                    <div class="mb-2 d-block" style="font-size: 2.8rem; line-height: 1.2;">🎡</div>
-                                    <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">波比看世界</h5>
+                                <div class="handbook-card text-center p-4 bg-white">
+                                    <div class="mb-3 d-block" style="font-size: 1.8rem; color: var(--accent-primary);"><i class="fa-brands fa-fort-awesome"></i></div>
+                                    <h5 class="text-dark mb-0" style="font-size: 1rem;">波比看世界</h5>
+                                    <small class="text-muted mt-2 d-block">樂園攻略</small>
                                 </div>
                             </a>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-3">
+                        <div class="col-6 col-md-6 col-lg-3">
                             <a href="https://www.tokyodisneyresort.jp/tc/index.html" target="_blank" class="text-decoration-none">
-                                <div class="handbook-card text-center p-4 bg-white" style="border: 1px dashed var(--accent-green);">
-                                    <span class="badge-tag mb-2" style="background-color:rgba(74,89,78,0.15); color:var(--accent-green); border-left-color:var(--accent-green); font-size: 0.8rem; padding: 3px 10px;">夢幻國度</span>
-                                    <div class="mb-2 d-block" style="font-size: 2.8rem; line-height: 1.2;">🏰</div>
-                                    <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">東京迪士尼官網</h5>
+                                <div class="handbook-card text-center p-4 bg-white">
+                                    <div class="mb-3 d-block" style="font-size: 1.8rem; color: var(--accent-primary);"><i class="fa-solid fa-ticket"></i></div>
+                                    <h5 class="text-dark mb-0" style="font-size: 1rem;">東京迪士尼</h5>
+                                    <small class="text-muted mt-2 d-block">官方網站</small>
                                 </div>
                             </a>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-3">
+                        <div class="col-6 col-md-6 col-lg-3">
                             <a href="https://www.gltjp.com/zh-hant/article/item/20183/" target="_blank" class="text-decoration-none">
-                                <div class="handbook-card text-center p-4 bg-white" style="border: 1px dashed var(--accent-gold);">
-                                    <span class="badge-tag mb-2" style="background-color:rgba(188, 159, 118, 0.15); color:#8A6D3B; border-left-color:var(--accent-gold); font-size: 0.8rem; padding: 3px 10px;">指南</span>
-                                    <div class="mb-2 d-block" style="font-size: 2.8rem; line-height: 1.2;">🧭</div>
-                                    <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">好運日本行</h5>
+                                <div class="handbook-card text-center p-4 bg-white">
+                                    <div class="mb-3 d-block" style="font-size: 1.8rem; color: var(--accent-red);"><i class="fa-solid fa-compass"></i></div>
+                                    <h5 class="text-dark mb-0" style="font-size: 1rem;">好運日本行</h5>
+                                    <small class="text-muted mt-2 d-block">深度指南</small>
                                 </div>
                             </a>
                         </div>
-                        <div class="col-12 col-md-6 col-lg-3">
+                        <div class="col-6 col-md-6 col-lg-3">
                             <a href="https://kimiyo.tw/" target="_blank" class="text-decoration-none">
-                                <div class="handbook-card text-center p-4 bg-white" style="border: 1px dashed var(--accent-green);">
-                                    <span class="badge-tag mb-2" style="background-color:rgba(74,89,78,0.15); color:var(--accent-green); border-left-color:var(--accent-green); font-size: 0.8rem; padding: 3px 10px;">網誌</span>
-                                    <div class="mb-2 d-block" style="font-size: 2.8rem; line-height: 1.2;">🐈</div>
-                                    <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">喵爸喵媽</h5>
+                                <div class="handbook-card text-center p-4 bg-white">
+                                    <div class="mb-3 d-block" style="font-size: 1.8rem; color: var(--accent-primary);"><i class="fa-solid fa-cat"></i></div>
+                                    <h5 class="text-dark mb-0" style="font-size: 1rem;">喵爸喵媽</h5>
+                                    <small class="text-muted mt-2 d-block">網誌</small>
                                 </div>
                             </a>
+                        </div>
+                    </div>
+
+                    <h5 class="mb-4 mt-5 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 夏祭與花火 —</h5>
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-lg-6">
+                            <div class="handbook-card p-5 h-100 d-flex flex-column" style="border-top: 3px solid var(--accent-red);">
+                                <span class="badge-tag red mb-3">盆踊大會</span>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h3 class="mb-0 fs-4" style="color: var(--text-sumi);">築地本願寺納涼盆踊</h3>
+                                </div>
+                                <p class="text-muted small mb-4" style="letter-spacing: 1px;"><i class="fa-regular fa-calendar me-2"></i> 2026年7月29日(水)～8月1日(土)</p>
+                                <p class="text-muted small mb-4 flex-grow-1" style="line-height: 1.8;">
+                                    號稱「日本一の食と盆踊り」。除了有經典的大江戶助六太鼓奉納演奏與傳統盆踊體驗，現場更集結了築地周邊眾多的人氣名店擺攤。在莊嚴的寺院背景下，品嚐美味小吃並感受濃厚的江戶夏日風情。
+                                </p>
+                                <div class="row g-2 mt-auto">
+                                    <div class="col-6">
+                                        <a href="https://www.google.com/maps/search/?api=1&query=銀座商圈8" target="_blank" class="action-btn btn-map w-100"><i class="fas fa-map-marker-alt"></i> 地圖</a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="https://tsukijihongwanji.jp/news/11529/" target="_blank" class="action-btn w-100"><i class="fas fa-globe"></i> 官網</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <div class="handbook-card p-5 h-100 d-flex flex-column" style="border-top: 3px solid var(--accent-gold);">
+                                <span class="badge-tag gold mb-3">花火盛典</span>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h3 class="mb-0 fs-4" style="color: var(--text-sumi);">東京都 8月1日 花火大會</h3>
+                                </div>
+                                <p class="text-muted small mb-4" style="letter-spacing: 1px;"><i class="fa-regular fa-calendar me-2"></i> 2026年8月1日(土)</p>
+                                <ul class="list-unstyled small text-muted mb-4 flex-grow-1" style="line-height: 1.8;">
+                                    <li class="mb-3"><strong><i class="fa-solid fa-fan me-2" style="color: var(--accent-gold);"></i>第67回 いたばし花火大会</strong><br>預計發射約1萬5千發，擁有都內最大的「尺五寸玉」煙火，極具震撼力。</li>
+                                    <li class="mb-3"><strong><i class="fa-solid fa-fan me-2" style="color: var(--accent-gold);"></i>第51回 江戸川区花火大会</strong><br>預計發射約1萬4千發，以7大不同主題的精緻演出點綴江戶川夜空。</li>
+                                    <li class="mb-3"><strong><i class="fa-solid fa-fan me-2" style="color: var(--accent-gold);"></i>八王子花火大会</strong><br>於富士森公園舉辦，發射約4千發，為西東京夏夜的一大亮點。</li>
+                                </ul>
+                                <div class="row g-2 mt-auto">
+                                    <div class="col-12">
+                                        <a href="https://hanabi.walkerplus.com/calendar/0801/ar0313/" target="_blank" class="action-btn w-100"><i class="fa-solid fa-info-circle"></i> 查看完整花火資訊</a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1054,34 +1097,34 @@
 
             <div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-sm">
-                    <div class="modal-content" style="border: 1px solid #E6DEC9; border-radius: 8px; background-color: var(--bg-paper);">
+                    <div class="modal-content" style="border: 1px solid var(--border-light); border-radius: 2px; background-color: var(--card-bg);">
                         <div class="modal-header border-bottom-0 pb-0">
-                            <h6 class="modal-title fw-bold" id="locationModalLabel" style="color: var(--accent-green);">
-                                <i class="fa-solid fa-location-dot me-2 text-danger"></i>目前位置
+                            <h6 class="modal-title fw-bold" id="locationModalLabel" style="color: var(--accent-primary); letter-spacing: 2px;">
+                                現在地
                             </h6>
                             <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body text-center pt-2 pb-4">
                             
-                            <p class="small text-muted mb-2 fw-bold text-start ps-1"><i class="fa-solid fa-crosshairs me-1 text-muted"></i> 經緯度座標</p>
-                            <div class="p-2 mb-3 bg-white rounded shadow-sm d-flex justify-content-between align-items-center" style="border: 1px dashed var(--accent-gold);">
-                                <span id="coordDisplay" class="fw-bold text-sumi" style="font-size: 0.95rem; letter-spacing: 1px;">讀取中...</span>
+                            <p class="small text-muted mb-2 fw-bold text-start ps-1">經緯度座標</p>
+                            <div class="p-2 mb-3 bg-white d-flex justify-content-between align-items-center" style="border: 1px solid var(--border-light);">
+                                <span id="coordDisplay" class="text-sumi" style="font-size: 0.95rem;">讀取中...</span>
                                 <button id="copyCoordBtn" class="btn btn-sm btn-light border-0 text-muted" title="複製座標">
                                     <i class="fa-regular fa-copy"></i>
                                 </button>
                             </div>
 
-                            <p class="small text-muted mb-2 fw-bold text-start ps-1 mt-3"><i class="fa-solid fa-car me-1 text-muted"></i> 導航分享網址</p>
-                            <div class="p-2 mb-3 bg-white rounded shadow-sm d-flex justify-content-between align-items-center gap-2" style="border: 1px dashed var(--accent-green);">
+                            <p class="small text-muted mb-2 fw-bold text-start ps-1 mt-3">分享網址</p>
+                            <div class="p-2 mb-4 bg-white d-flex justify-content-between align-items-center gap-2" style="border: 1px solid var(--border-light);">
                                 <input type="text" id="navUrlDisplay" class="form-control form-control-sm border-0 bg-transparent text-muted shadow-none px-1" value="讀取中..." readonly style="font-size: 0.85rem; cursor: default;">
                                 <button id="copyNavUrlBtn" class="btn btn-sm btn-light border-0 text-muted flex-shrink-0" title="複製導航網址">
                                     <i class="fa-regular fa-copy"></i>
                                 </button>
                             </div>
 
-                            <div class="d-grid mt-4">
-                                <a id="openMapBtn" href="#" target="_blank" class="action-btn btn-map w-100" style="background-color: #fff;">
-                                    <i class="fas fa-map-marker-alt"></i> 開啟地圖查看位置
+                            <div class="d-grid mt-2">
+                                <a id="openMapBtn" href="#" target="_blank" class="action-btn w-100">
+                                    <i class="fas fa-map-marker-alt"></i> 開啟地圖查看
                                 </a>
                             </div>
                         </div>
@@ -1193,7 +1236,6 @@
                         const lng = position.coords.longitude;
                         const coordString = `${lat}, ${lng}`; 
                         
-                        // 關於使用者當前即時定位的分享，保留使用經緯度以確保能準確傳送當前 GPS (因為沒有明確景點名稱)
                         const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
                         const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
                         
@@ -1259,7 +1301,7 @@
                                     {
                                         enableHighAccuracy: false,
                                         timeout: 15000,
-                                        maximumAge: 300000 
+                                        maximumAge: 0 
                                     }
                                 );
                             } else {
@@ -1269,7 +1311,7 @@
                         {
                             enableHighAccuracy: true,
                             timeout: 8000, 
-                            maximumAge: 60000 
+                            maximumAge: 0 
                         }
                     );
                 });
