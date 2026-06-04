@@ -293,6 +293,18 @@
             display: inline-block;
         }
 
+        /* --- 新增：東京時間藝術動畫 CSS --- */
+        @keyframes breathe {
+            0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(180, 154, 94, 0.6); }
+            50% { opacity: 0.3; text-shadow: none; }
+        }
+        .breathing-colon {
+            animation: breathe 2.5s infinite ease-in-out;
+            display: inline-block;
+            transform: translateY(-2px);
+        }
+        /* --- 新增結束 --- */
+
         /* 手機版樣式優化 */
         @media (max-width: 991px) {
             body { font-size: 15px; }
@@ -420,8 +432,20 @@
                     <h1>東京漫遊手札</h1>
                     <div style="width: 1px; height: 60px; background-color: var(--accent-gold); margin: 30px auto;"></div>
                     <p class="lead mt-2 text-muted" style="font-family: 'Noto Serif TC', serif; font-size: clamp(1.1rem, 4vw, 1.3rem); letter-spacing: 4px;">淺草 · 銀座 · 台場 · 澀谷 · 上野</p>
-                    <p class="small text-muted mt-5" style="letter-spacing: 2px;">二零二六 · 專屬行程</p>
-                </div>
+                    <p class="small text-muted mt-5 mb-2" style="letter-spacing: 2px;">二零二六 · 專屬行程</p>
+                    
+                    <div class="mt-5 mx-auto" style="max-width: 220px; font-family: 'Noto Serif TC', serif; position: relative; padding: 18px 0; border-top: 1px solid rgba(180, 154, 94, 0.4); border-bottom: 1px solid rgba(180, 154, 94, 0.4);">
+                        <div style="position: absolute; left: -3px; top: 50%; transform: translateY(-50%); width: 4px; height: 4px; border-radius: 50%; background-color: var(--accent-red);"></div>
+                        <div style="position: absolute; right: -3px; top: 50%; transform: translateY(-50%); width: 4px; height: 4px; border-radius: 50%; background-color: var(--accent-red);"></div>
+                        
+                        <small style="letter-spacing: 5px; font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 6px; margin-right: -5px;">東京現時刻</small>
+                        <div style="font-size: 2rem; font-weight: 400; color: var(--accent-primary); display: flex; justify-content: center; align-items: center; gap: 6px; letter-spacing: 2px;">
+                            <span id="tk-hour">--</span>
+                            <span class="breathing-colon" style="color: var(--accent-gold); font-size: 1.6rem; margin: 0 4px;">:</span>
+                            <span id="tk-minute">--</span>
+                        </div>
+                    </div>
+                    </div>
             </section>
 
             <section id="hotel">
@@ -1061,7 +1085,6 @@
                                 </div>
                             </a>
                         </div>
-                        <!-- 新增：Let's ENJOY TOKYO -->
                         <div class="col-6 col-md-6 col-lg-3">
                             <a href="https://www.enjoytokyo.jp/" target="_blank" class="text-decoration-none">
                                 <div class="handbook-card text-center p-4 bg-white">
@@ -1396,6 +1419,42 @@
                         }
                     );
                 });
+
+                // --- 藝術感東京時間功能 ---
+                function updateTokyoTime() {
+                    const hourEl = document.getElementById('tk-hour');
+                    const minEl = document.getElementById('tk-minute');
+                    if (!hourEl || !minEl) return;
+
+                    const now = new Date();
+                    // 設定時區為亞洲/東京，並只取時與分
+                    const options = { 
+                        timeZone: 'Asia/Tokyo',
+                        hour12: false,
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    };
+                    
+                    // 使用 Intl.DateTimeFormat 解析各部位
+                    const formatter = new Intl.DateTimeFormat('en-US', options);
+                    const parts = formatter.formatToParts(now);
+                    
+                    let hours = '';
+                    let minutes = '';
+                    
+                    parts.forEach(part => {
+                        if (part.type === 'hour') hours = part.value;
+                        if (part.type === 'minute') minutes = part.value;
+                    });
+
+                    // 確保為兩位數
+                    hourEl.innerText = hours.padStart(2, '0');
+                    minEl.innerText = minutes.padStart(2, '0');
+                }
+
+                // 初始化並每秒更新一次（確保分鐘跳轉準確）
+                updateTokyoTime();
+                setInterval(updateTokyoTime, 1000);
             }
         });
     </script>
