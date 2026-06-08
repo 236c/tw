@@ -481,6 +481,94 @@
                 margin-top: 0 !important;
             }
         }
+		
+/* 🎆 花火・奢華夜宴 (高級商業風) */
+        .fireworks-card {
+            background: linear-gradient(145deg, #161A24 0%, #0B0D14 100%) !important; /* 日本傳統色：留紺 (深邃夜空) */
+            border: 1px solid #2A3143 !important;
+            border-top: 3px solid #D4AF37 !important; /* 金箔色 */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+            position: relative;
+            overflow: hidden;
+        }
+        .fireworks-card::after {
+            /* 模擬花火金粉散落的極簡質感 */
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(#D4AF37 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.08;
+            z-index: 0;
+        }
+        .fireworks-card > * { position: relative; z-index: 1; }
+        .fireworks-card .badge-tag {
+            border-color: rgba(212, 175, 55, 0.6);
+            color: #D4AF37;
+            font-weight: 500;
+            background: transparent;
+        }
+        .fireworks-card h6 {
+            color: #F9F6EE; /* 珍珠白 */
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .fireworks-card .text-muted { color: #8F96A8 !important; }
+        .fireworks-card .action-btn {
+            border-color: rgba(212, 175, 55, 0.3);
+            color: #D4AF37;
+            background: rgba(212, 175, 55, 0.05);
+        }
+        .fireworks-card .action-btn:hover {
+            border-color: #D4AF37;
+            color: #161A24;
+            background: #D4AF37;
+        }
+
+        /* 🏮 祭典・高級和風 (雅緻商業風) */
+        .matsuri-card {
+            background: linear-gradient(135deg, #FCFAF5 0%, #F4EFE6 100%) !important; /* 象牙白和紙色 */
+            border: 1px solid #EAE3D5 !important;
+            border-top: 3px solid #9B3326 !important; /* 日本傳統色：蘇芳/深緋 */
+            box-shadow: 0 8px 24px rgba(155, 51, 38, 0.06) !important;
+            position: relative;
+            overflow: hidden;
+        }
+        .matsuri-card::before {
+            /* 雅緻的水引/和風暈染感裝飾 */
+            content: '';
+            position: absolute;
+            right: -30px;
+            top: -30px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(155,51,38,0.06) 0%, rgba(155,51,38,0) 70%);
+            z-index: 0;
+        }
+        .matsuri-card > * { position: relative; z-index: 1; }
+        .matsuri-card .badge-tag {
+            border-color: #9B3326;
+            color: #9B3326;
+            background-color: transparent;
+            font-weight: 500;
+        }
+        .matsuri-card h6 {
+            color: #2C2A29;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .matsuri-card .action-btn {
+            border-color: #D4C9B4;
+            color: #827E77;
+        }
+        .matsuri-card .action-btn:hover {
+            border-color: #9B3326;
+            color: #9B3326;
+            background-color: rgba(155,51,38,0.04);
+        }		
     </style>
 </head>
 <body>
@@ -598,17 +686,41 @@
                         <div class="row align-items-center g-5">
                             <div class="col-lg-7">
                                 <span class="badge-tag gold">淺草核心區</span>
-                                <h3 class="mb-3" style="font-size: clamp(1.4rem, 4vw, 1.8rem);">APA Hotel〈淺草駅前〉</h3>
+                                <h3 class="mb-3" style="font-size: clamp(1.2rem, 3.5vw, 1.5rem);">APA Hotel〈淺草駅前〉</h3>
                                 <p class="text-muted small mb-4" style="letter-spacing: 2px; font-family: 'Noto Serif TC', serif;">No.285 アパホテル</p>
                                 
-                                <p class="mb-3" style="font-size: 1.05rem; color: var(--accent-primary); font-family: 'Noto Serif TC', serif;">
+								<p class="mb-3" style="font-size: 1.05rem; color: var(--accent-primary); font-family: 'Noto Serif TC', serif;">
                                     <i class="fas fa-train me-2 text-muted"></i>交通機能
                                 </p>
-                                <ul class="list-unstyled small text-muted lh-lg" style="font-size: 0.95rem;">
-                                    <li class="mb-2">▫️ <strong>都營淺草線</strong>「淺草站」(A1出口) 步行 1 分</li>
-                                    <li class="mb-2">▫️ <strong>東京地鐵銀座線</strong>「淺草站」(A3出口) 步行 3 分</li>
-                                    <li class="mb-2">▫️ <strong>東武晴空塔線</strong>「淺草站」(正門) 步行 6 分</li>
-                                    <li class="mb-2">▫️ <strong>都營大江戶線</strong>「藏前站」(A6出口) 步行 6 分</li>
+                                <ul class="list-unstyled small text-muted" style="font-size: 0.95rem;">
+                                    <li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;">
+                                        <div class="text-truncate pe-2">
+                                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#E85263; margin-right:6px;"></span>
+                                            <strong style="color: var(--text-sumi);">淺草線</strong> 淺草站 (A1)
+                                        </div>
+                                        <span class="text-nowrap" style="font-size: 0.85rem;"><i class="fa-solid fa-person-walking me-1"></i>1 分</span>
+                                    </li>
+                                    <li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;">
+                                        <div class="text-truncate pe-2">
+                                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#FF9500; margin-right:6px;"></span>
+                                            <strong style="color: var(--text-sumi);">銀座線</strong> 淺草站 (A3)
+                                        </div>
+                                        <span class="text-nowrap" style="font-size: 0.85rem;"><i class="fa-solid fa-person-walking me-1"></i>3 分</span>
+                                    </li>
+                                    <li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;">
+                                        <div class="text-truncate pe-2">
+                                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#0073C2; margin-right:6px;"></span>
+                                            <strong style="color: var(--text-sumi);">東武線</strong> 淺草站 (正門)
+                                        </div>
+                                        <span class="text-nowrap" style="font-size: 0.85rem;"><i class="fa-solid fa-person-walking me-1"></i>6 分</span>
+                                    </li>
+                                    <li class="d-flex justify-content-between align-items-center mb-1">
+                                        <div class="text-truncate pe-2">
+                                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#B6007A; margin-right:6px;"></span>
+                                            <strong style="color: var(--text-sumi);">大江戶線</strong> 藏前站 (A6)
+                                        </div>
+                                        <span class="text-nowrap" style="font-size: 0.85rem;"><i class="fa-solid fa-person-walking me-1"></i>6 分</span>
+                                    </li>
                                 </ul>
                             </div>
                             <div class="col-lg-5 text-center">
@@ -721,7 +833,7 @@
                             <a href="https://youtu.be/AVNPQHsvAFg?si=sCnxX7iInATA2kA9" target="_blank" class="action-btn btn-yt py-1 px-3"><i class="fab fa-youtube"></i> 映像</a>
                         </div>
                         <div class="row g-3">
-                            <div class="col-6 col-lg-3">
+                            <div class="col-12 col-lg-3">
                                 <div class="handbook-card time-bg-morning text-center p-3 d-flex flex-column h-100">
                                     <h6 class="mb-3 border-bottom pb-2" style="border-color: var(--border-light);">午前</h6>
                                     <div class="mb-3 text-start">
@@ -737,7 +849,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-6 col-lg-3">
+                            <div class="col-12 col-lg-3">
                                 <div class="handbook-card time-bg-noon text-center p-3 d-flex flex-column h-100">
                                     <h6 class="mb-3 border-bottom pb-2" style="border-color: var(--border-light);">日中</h6>
                                     <div class="mb-3 text-start">
@@ -753,7 +865,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-6 col-lg-3">
+                            <div class="col-12 col-lg-3">
                                 <div class="handbook-card time-bg-afternoon text-center p-3 d-flex flex-column h-100">
                                     <h6 class="mb-3 border-bottom pb-2" style="border-color: var(--border-light);">午後</h6>
                                     <div class="mb-3 text-start">
@@ -769,7 +881,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-6 col-lg-3">
+                            <div class="col-12 col-lg-3">
                                 <div class="handbook-card time-bg-night text-center p-3 d-flex flex-column h-100">
                                     <h6 class="mb-3 border-bottom pb-2" style="border-color: var(--border-light);">夜闌</h6>
                                     <div class="mb-3 text-start">
@@ -1329,17 +1441,18 @@
                         </div>
                     </div>
 
-					<h5 class="mb-4 mt-5 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 夏祭與花火 —</h5>
+<h5 class="mb-4 mt-5 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 夏祭與花火 —</h5>
                     <div class="row g-2 g-md-3 mb-4">
+                        
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card p-4 h-100 d-flex flex-column" style="background-color: #FCF8F8; border-top: 2px solid var(--accent-red);">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="badge-tag red mb-0">盆踊大會</span>
-                                    <small class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-calendar me-1"></i> 7/29 - 8/1</small>
+                            <div class="handbook-card p-4 h-100 d-flex flex-column matsuri-card">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <span class="badge-tag mb-0">納涼盆踊</span>
+                                    <small class="text-muted" style="font-size: 0.75rem; font-family: 'Noto Serif TC', serif;"><i class="fa-regular fa-calendar me-1"></i> 7/29 - 8/1</small>
                                 </div>
-                                <h6 class="mb-2" style="color: var(--text-sumi); font-size: 1.1rem; font-weight: 700;">築地本願寺納涼盆踊</h6>
-                                <p class="text-muted small mb-3 flex-grow-1">
-                                    號稱「日本一の食と盆踊り」。在莊嚴的寺院背景下，品嚐人氣名店小吃，感受最道地的江戶夏日風情。
+                                <h6 class="mb-3 fs-5">築地本願寺納涼盆踊</h6>
+                                <p class="text-muted small mb-4 flex-grow-1 lh-lg">
+                                    號稱「日本一の食と盆踊り」。在莊嚴的寺院建築下，品嚐頂級名店的限定雅緻小食，沉浸於最道地的江戶夏夜風情。
                                 </p>
                                 <div class="d-flex gap-2 mt-auto">
                                     <a href="https://www.google.com/maps/search/?api=1&query=銀座商圈8" target="_blank" class="action-btn flex-grow-1"><i class="fas fa-map-marker-alt"></i> 地圖</a>
@@ -1349,18 +1462,19 @@
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <div class="handbook-card p-4 h-100 d-flex flex-column" style="background-color: #FDFBF4; border-top: 2px solid var(--accent-gold);">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="badge-tag gold mb-0">花火盛典</span>
-                                    <small class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-calendar me-1"></i> 8月1日(土)</small>
+                            <div class="handbook-card p-4 h-100 d-flex flex-column fireworks-card">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <span class="badge-tag mb-0">花火盛典</span>
+                                    <small class="text-muted" style="font-size: 0.75rem; font-family: 'Noto Serif TC', serif;"><i class="fa-regular fa-calendar me-1"></i> 8月1日 (土)</small>
                                 </div>
-                                <h6 class="mb-2" style="color: var(--text-sumi); font-size: 1.1rem; font-weight: 700;">東京都 8.1 花火大會</h6>
-                                <p class="text-muted small mb-3 flex-grow-1">
-                                    夏夜最高潮！包含「板橋」、「江戶川」與「八王子」等大型花火大會同日綻放，以萬發煙火震撼點綴江戶夜空。
+                                <h6 class="mb-3 fs-5">東京都 8.1 花火大會</h6>
+                                <p class="text-muted small mb-4 flex-grow-1 lh-lg">
+                                    夏夜最高潮。板橋、江戶川與八王子等大型花火大會同日綻放，以萬發璀璨金火震撼點綴江戶的深邃夜空。
                                 </p>
                                 <a href="https://hanabi.walkerplus.com/calendar/0801/ar0313/" target="_blank" class="action-btn w-100 mt-auto"><i class="fa-solid fa-info-circle"></i> 完整花火資訊</a>
                             </div>
                         </div>
+
                     </div>
 
                     <h5 class="mb-4 mt-5 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 啟程與歸途 —</h5>
