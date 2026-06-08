@@ -264,22 +264,10 @@
         .min-w-0 { min-width: 0 !important; }
 
         /* 時間區塊背景 */
-        .time-bg-morning { 
-            background-color: #FCF8F0 !important; 
-            border-left: 3px solid #D9A441 !important; 
-        }
-        .time-bg-noon { 
-            background-color: #F4F6F4 !important; 
-            border-left: 3px solid #7B8D78 !important; 
-        }
-        .time-bg-afternoon { 
-            background-color: #F9F4F3 !important; 
-            border-left: 3px solid #B07B65 !important; 
-        }
-        .time-bg-night { 
-            background-color: #F3F4F5 !important; 
-            border-left: 3px solid #3F4B5A !important; 
-        }
+        .time-bg-morning { background-color: #FCF8F0 !important; border-left: 3px solid #D9A441 !important; }
+        .time-bg-noon { background-color: #F4F6F4 !important; border-left: 3px solid #7B8D78 !important; }
+        .time-bg-afternoon { background-color: #F9F4F3 !important; border-left: 3px solid #B07B65 !important; }
+        .time-bg-night { background-color: #F3F4F5 !important; border-left: 3px solid #3F4B5A !important; }
 
         #cover h1 {
             font-size: clamp(2.5rem, 6vw, 4.5rem); 
@@ -301,7 +289,7 @@
         }
 
         /* 🚅 新幹線進出場動畫設定 */
-		@keyframes shinkansen-transit {
+        @keyframes shinkansen-transit {
             0% { 
                 transform: translateX(-120vw); 
                 animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); 
@@ -323,28 +311,112 @@
             animation: shinkansen-transit 20s infinite;
             will-change: transform;
             display: inline-block;
-            cursor: pointer; /* 👈 新增：加上游標提示可點擊 */
-            transition: filter 0.2s; /* 讓 hover 效果更滑順 */
+            cursor: pointer;
+            transition: filter 0.2s;
         }
         
-        .shinkansen-anim:hover {
-            filter: brightness(1.05); /* 👈 新增：滑鼠移上去時微微發亮提示可互動 */
-        }
+        .shinkansen-anim:hover { filter: brightness(1.05); }
 
-        /* 👇 新增：點擊後立即強制開走的動畫設定 */
+        /* 點擊後立即強制開走的動畫設定 */
         @keyframes shinkansen-fast-depart {
             0% { transform: translateX(0); }
             100% { transform: translateX(120vw); }
         }
 
         .shinkansen-depart-now {
-            /* 覆蓋原本的 20 秒動畫，強制用 1.2 秒加速離開 */
             animation: shinkansen-fast-depart 1.2s forwards cubic-bezier(0.5, 0, 0.75, 0) !important;
         }
 
+        /* 🎆 花火・奢華夜宴 (高級商業風) */
+        .fireworks-card {
+            background: linear-gradient(145deg, #161A24 0%, #0B0D14 100%) !important;
+            border: 1px solid #2A3143 !important;
+            border-top: 3px solid #D4AF37 !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+            position: relative;
+            overflow: hidden;
+        }
+        .fireworks-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(#D4AF37 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.08;
+            z-index: 0;
+        }
+        .fireworks-card > * { position: relative; z-index: 1; }
+        .fireworks-card .badge-tag {
+            border-color: rgba(212, 175, 55, 0.6);
+            color: #D4AF37;
+            font-weight: 500;
+            background: transparent;
+        }
+        .fireworks-card h6 {
+            color: #F9F6EE;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .fireworks-card .text-muted { color: #8F96A8 !important; }
+        .fireworks-card .action-btn {
+            border-color: rgba(212, 175, 55, 0.3);
+            color: #D4AF37;
+            background: rgba(212, 175, 55, 0.05);
+        }
+        .fireworks-card .action-btn:hover {
+            border-color: #D4AF37;
+            color: #161A24;
+            background: #D4AF37;
+        }
+
+        /* 🏮 祭典・高級和風 (雅緻商業風) */
+        .matsuri-card {
+            background: linear-gradient(135deg, #FCFAF5 0%, #F4EFE6 100%) !important;
+            border: 1px solid #EAE3D5 !important;
+            border-top: 3px solid #9B3326 !important;
+            box-shadow: 0 8px 24px rgba(155, 51, 38, 0.06) !important;
+            position: relative;
+            overflow: hidden;
+        }
+        .matsuri-card::before {
+            content: '';
+            position: absolute;
+            right: -30px;
+            top: -30px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(155,51,38,0.06) 0%, rgba(155,51,38,0) 70%);
+            z-index: 0;
+        }
+        .matsuri-card > * { position: relative; z-index: 1; }
+        .matsuri-card .badge-tag {
+            border-color: #9B3326;
+            color: #9B3326;
+            background-color: transparent;
+            font-weight: 500;
+        }
+        .matsuri-card h6 {
+            color: #2C2A29;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .matsuri-card .action-btn {
+            border-color: #D4C9B4;
+            color: #827E77;
+        }
+        .matsuri-card .action-btn:hover {
+            border-color: #9B3326;
+            color: #9B3326;
+            background-color: rgba(155,51,38,0.04);
+        }		
+
         /* 手機版樣式優化 */
         @media (max-width: 991px) {
-            body { font-size: 14.5px; }
+            /* 讓手機版整體字體放大，提升閱讀清晰度 */
+            body { font-size: 16px; }
 
             .sidebar {
                 width: 100%;
@@ -481,94 +553,6 @@
                 margin-top: 0 !important;
             }
         }
-		
-/* 🎆 花火・奢華夜宴 (高級商業風) */
-        .fireworks-card {
-            background: linear-gradient(145deg, #161A24 0%, #0B0D14 100%) !important; /* 日本傳統色：留紺 (深邃夜空) */
-            border: 1px solid #2A3143 !important;
-            border-top: 3px solid #D4AF37 !important; /* 金箔色 */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
-            position: relative;
-            overflow: hidden;
-        }
-        .fireworks-card::after {
-            /* 模擬花火金粉散落的極簡質感 */
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(#D4AF37 1px, transparent 1px);
-            background-size: 24px 24px;
-            opacity: 0.08;
-            z-index: 0;
-        }
-        .fireworks-card > * { position: relative; z-index: 1; }
-        .fireworks-card .badge-tag {
-            border-color: rgba(212, 175, 55, 0.6);
-            color: #D4AF37;
-            font-weight: 500;
-            background: transparent;
-        }
-        .fireworks-card h6 {
-            color: #F9F6EE; /* 珍珠白 */
-            font-family: 'Noto Serif TC', serif;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        .fireworks-card .text-muted { color: #8F96A8 !important; }
-        .fireworks-card .action-btn {
-            border-color: rgba(212, 175, 55, 0.3);
-            color: #D4AF37;
-            background: rgba(212, 175, 55, 0.05);
-        }
-        .fireworks-card .action-btn:hover {
-            border-color: #D4AF37;
-            color: #161A24;
-            background: #D4AF37;
-        }
-
-        /* 🏮 祭典・高級和風 (雅緻商業風) */
-        .matsuri-card {
-            background: linear-gradient(135deg, #FCFAF5 0%, #F4EFE6 100%) !important; /* 象牙白和紙色 */
-            border: 1px solid #EAE3D5 !important;
-            border-top: 3px solid #9B3326 !important; /* 日本傳統色：蘇芳/深緋 */
-            box-shadow: 0 8px 24px rgba(155, 51, 38, 0.06) !important;
-            position: relative;
-            overflow: hidden;
-        }
-        .matsuri-card::before {
-            /* 雅緻的水引/和風暈染感裝飾 */
-            content: '';
-            position: absolute;
-            right: -30px;
-            top: -30px;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(155,51,38,0.06) 0%, rgba(155,51,38,0) 70%);
-            z-index: 0;
-        }
-        .matsuri-card > * { position: relative; z-index: 1; }
-        .matsuri-card .badge-tag {
-            border-color: #9B3326;
-            color: #9B3326;
-            background-color: transparent;
-            font-weight: 500;
-        }
-        .matsuri-card h6 {
-            color: #2C2A29;
-            font-family: 'Noto Serif TC', serif;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        .matsuri-card .action-btn {
-            border-color: #D4C9B4;
-            color: #827E77;
-        }
-        .matsuri-card .action-btn:hover {
-            border-color: #9B3326;
-            color: #9B3326;
-            background-color: rgba(155,51,38,0.04);
-        }		
     </style>
 </head>
 <body>
@@ -599,7 +583,7 @@
                     <p class="lead mt-2 text-muted" style="font-family: 'Noto Serif TC', serif; font-size: clamp(1.1rem, 4vw, 1.3rem); letter-spacing: 8px;">浮世之悠 · 漫步江戶</p>
                     
 				    <div class="mt-5 mb-2 d-flex justify-content-center" style="width: 100%;">
-                        <div class="shinkansen-anim">
+                        <div class="shinkansen-anim" title="點擊讓列車出發！">
                             <svg width="210" height="60" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
                                 <defs>
                                     <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -685,41 +669,42 @@
                     <div class="handbook-card">
                         <div class="row align-items-center g-5">
                             <div class="col-lg-7">
-                                <span class="badge-tag gold">淺草核心區</span>
-                                <h3 class="mb-3" style="font-size: clamp(1.2rem, 3.5vw, 1.5rem);">APA Hotel〈淺草駅前〉</h3>
+                                <span class="badge-tag gold mb-0">淺草核心區</span>
+                                <h3 class="mb-3 mt-2" style="font-size: clamp(1.35rem, 4vw, 1.6rem); font-weight: 700; color: var(--text-sumi);">APA Hotel〈淺草駅前〉</h3>
                                 <p class="text-muted small mb-4" style="letter-spacing: 2px; font-family: 'Noto Serif TC', serif;">No.285 アパホテル</p>
                                 
-								<p class="mb-3" style="font-size: 1.05rem; color: var(--accent-primary); font-family: 'Noto Serif TC', serif;">
-                                    <i class="fas fa-train me-2 text-muted"></i>交通機能
+                                <p class="mb-3" style="font-size: 1.1rem; font-weight: 700; color: var(--accent-primary); font-family: 'Noto Serif TC', serif;">
+                                    <i class="fas fa-train me-2"></i>交通機能
                                 </p>
-                                <ul class="list-unstyled small text-muted" style="font-size: 0.95rem;">
-                                    <li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;">
+                                
+                                <ul class="list-unstyled" style="font-size: 1.05rem; color: var(--text-sumi);">
+                                    <li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom" style="border-color: rgba(0,0,0,0.08) !important;">
                                         <div class="text-truncate pe-2">
-                                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#E85263; margin-right:6px;"></span>
-                                            <strong style="color: var(--text-sumi);">淺草線</strong> 淺草站 (A1)
+                                            <span style="display:inline-block; width:9px; height:9px; border-radius:50%; background-color:#E85263; margin-right:8px; transform: translateY(-1px);"></span>
+                                            <strong style="color: #000;">淺草線</strong> 淺草站 (A1)
                                         </div>
-                                        <span class="text-nowrap" style="font-size: 0.85rem;"><i class="fa-solid fa-person-walking me-1"></i>1 分</span>
+                                        <span class="text-nowrap fw-medium" style="font-size: 0.95rem; color: var(--text-sumi);"><i class="fa-solid fa-person-walking me-1"></i>1 分</span>
                                     </li>
-                                    <li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;">
+                                    <li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom" style="border-color: rgba(0,0,0,0.08) !important;">
                                         <div class="text-truncate pe-2">
-                                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#FF9500; margin-right:6px;"></span>
-                                            <strong style="color: var(--text-sumi);">銀座線</strong> 淺草站 (A3)
+                                            <span style="display:inline-block; width:9px; height:9px; border-radius:50%; background-color:#FF9500; margin-right:8px; transform: translateY(-1px);"></span>
+                                            <strong style="color: #000;">銀座線</strong> 淺草站 (A3)
                                         </div>
-                                        <span class="text-nowrap" style="font-size: 0.85rem;"><i class="fa-solid fa-person-walking me-1"></i>3 分</span>
+                                        <span class="text-nowrap fw-medium" style="font-size: 0.95rem; color: var(--text-sumi);"><i class="fa-solid fa-person-walking me-1"></i>3 分</span>
                                     </li>
-                                    <li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;">
+                                    <li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom" style="border-color: rgba(0,0,0,0.08) !important;">
                                         <div class="text-truncate pe-2">
-                                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#0073C2; margin-right:6px;"></span>
-                                            <strong style="color: var(--text-sumi);">東武線</strong> 淺草站 (正門)
+                                            <span style="display:inline-block; width:9px; height:9px; border-radius:50%; background-color:#0073C2; margin-right:8px; transform: translateY(-1px);"></span>
+                                            <strong style="color: #000;">東武線</strong> 淺草站 (正門)
                                         </div>
-                                        <span class="text-nowrap" style="font-size: 0.85rem;"><i class="fa-solid fa-person-walking me-1"></i>6 分</span>
+                                        <span class="text-nowrap fw-medium" style="font-size: 0.95rem; color: var(--text-sumi);"><i class="fa-solid fa-person-walking me-1"></i>6 分</span>
                                     </li>
                                     <li class="d-flex justify-content-between align-items-center mb-1">
                                         <div class="text-truncate pe-2">
-                                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#B6007A; margin-right:6px;"></span>
-                                            <strong style="color: var(--text-sumi);">大江戶線</strong> 藏前站 (A6)
+                                            <span style="display:inline-block; width:9px; height:9px; border-radius:50%; background-color:#B6007A; margin-right:8px; transform: translateY(-1px);"></span>
+                                            <strong style="color: #000;">大江戶線</strong> 藏前站 (A6)
                                         </div>
-                                        <span class="text-nowrap" style="font-size: 0.85rem;"><i class="fa-solid fa-person-walking me-1"></i>6 分</span>
+                                        <span class="text-nowrap fw-medium" style="font-size: 0.95rem; color: var(--text-sumi);"><i class="fa-solid fa-person-walking me-1"></i>6 分</span>
                                     </li>
                                 </ul>
                             </div>
@@ -1363,7 +1348,7 @@
                 </div>
             </section>
 
-			<section id="resources" style="padding-bottom: 80px;">
+            <section id="resources" style="padding-bottom: 80px;">
                 <div class="container">
                     <h2 class="section-title">參考資源與夏祭</h2>
                     <div class="row g-3 mb-5">
@@ -1441,7 +1426,7 @@
                         </div>
                     </div>
 
-<h5 class="mb-4 mt-5 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 夏祭與花火 —</h5>
+                    <h5 class="mb-4 mt-5 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 夏祭與花火 —</h5>
                     <div class="row g-2 g-md-3 mb-4">
                         
                         <div class="col-12 col-md-6">
@@ -1586,6 +1571,7 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- 導航與滾動監聽 ---
             const navLinks = document.querySelectorAll('.nav-link');
             const sections = document.querySelectorAll('section');
             const navContainer = document.getElementById('handbook-nav');
@@ -1644,6 +1630,7 @@
             }, observerOptions);
             sections.forEach(section => observer.observe(section));
 
+            // --- 地理定位 Modal 與 東京時間更新 ---
             const myLocationBtn = document.getElementById('myLocationBtn');
             const locationModal = new bootstrap.Modal(document.getElementById('locationModal'));
 
@@ -1773,7 +1760,7 @@
                 setInterval(updateTokyoTime, 1000);
             }
             
-            // 🚅 新幹線點擊彩蛋：立即開走功能
+            // --- 🚅 新幹線點擊彩蛋：立即開走功能 ---
             const shinkansen = document.querySelector('.shinkansen-anim');
             if (shinkansen) {
                 shinkansen.addEventListener('click', function() {
