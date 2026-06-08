@@ -263,21 +263,21 @@
 
         .min-w-0 { min-width: 0 !important; }
 
-/* 時間區塊背景 - 使用不透明的實色 (Solid Color)，保持卡片色彩均勻且不會透出底部背景 */
+        /* 時間區塊背景 */
         .time-bg-morning { 
-            background-color: #FCF8F0 !important; /* 晨光金微淡實色 */
+            background-color: #FCF8F0 !important; 
             border-left: 3px solid #D9A441 !important; 
         }
         .time-bg-noon { 
-            background-color: #F4F6F4 !important; /* 抹茶綠微淡實色 */
+            background-color: #F4F6F4 !important; 
             border-left: 3px solid #7B8D78 !important; 
         }
         .time-bg-afternoon { 
-            background-color: #F9F4F3 !important; /* 赤茶色微淡實色 */
+            background-color: #F9F4F3 !important; 
             border-left: 3px solid #B07B65 !important; 
         }
         .time-bg-night { 
-            background-color: #F3F4F5 !important; /* 鐵灰色微淡實色 */
+            background-color: #F3F4F5 !important; 
             border-left: 3px solid #3F4B5A !important; 
         }
 
@@ -300,9 +300,49 @@
             transform: translateY(-2px);
         }
 
-        #cat-eyes { transition: transform 0.1s ease; }
+        /* 🚅 新幹線進出場動畫設定 */
+		@keyframes shinkansen-transit {
+            0% { 
+                transform: translateX(-120vw); 
+                animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); 
+            }
+            15% { 
+                transform: translateX(0); 
+                animation-timing-function: linear; 
+            }
+            85% { 
+                transform: translateX(0); 
+                animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0); 
+            }
+            100% { 
+                transform: translateX(120vw); 
+            }
+        }
 
-        /* 手機版樣式優化 (包含雙排網格排版調整) */
+        .shinkansen-anim {
+            animation: shinkansen-transit 20s infinite;
+            will-change: transform;
+            display: inline-block;
+            cursor: pointer; /* 👈 新增：加上游標提示可點擊 */
+            transition: filter 0.2s; /* 讓 hover 效果更滑順 */
+        }
+        
+        .shinkansen-anim:hover {
+            filter: brightness(1.05); /* 👈 新增：滑鼠移上去時微微發亮提示可互動 */
+        }
+
+        /* 👇 新增：點擊後立即強制開走的動畫設定 */
+        @keyframes shinkansen-fast-depart {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(120vw); }
+        }
+
+        .shinkansen-depart-now {
+            /* 覆蓋原本的 20 秒動畫，強制用 1.2 秒加速離開 */
+            animation: shinkansen-fast-depart 1.2s forwards cubic-bezier(0.5, 0, 0.75, 0) !important;
+        }
+
+        /* 手機版樣式優化 */
         @media (max-width: 991px) {
             body { font-size: 14.5px; }
 
@@ -354,14 +394,13 @@
                 padding-bottom: 70px; 
             }
 
-            section { padding: 40px 15px; } /* 縮小螢幕左右間距 */
+            section { padding: 40px 15px; } 
 
             .section-title {
                 font-size: 1.5rem;
                 margin-bottom: 30px;
             }
 
-            /* 🌟 針對雙排網格的卡片優化 */
             .handbook-card { padding: 14px !important; }
 
             #shopping .handbook-card, 
@@ -374,46 +413,42 @@
             #shopping .handbook-card .flex-grow-1,
             #food .handbook-card .flex-grow-1 {
                 width: 100%;
-                margin-bottom: auto; /* 將按鈕推到底部 */
+                margin-bottom: auto; 
             }
 
-            /* 美食區的圓形 Icon 縮小，適應雙排寬度 */
             #food .handbook-card .d-flex.align-items-center.justify-content-center.me-4 {
                 width: 32px !important;
                 height: 32px !important;
                 font-size: 0.9rem !important;
                 margin-bottom: 10px !important;
                 margin-right: 0 !important; 
-                border-radius: 4px !important; /* 原本是圓形，改為微方角更俐落 */
+                border-radius: 4px !important; 
                 background-color: transparent !important;
                 border-color: var(--accent-gold) !important;
                 color: var(--accent-gold);
             }
 
-            /* 確保標題不斷行但超出會變刪節號 */
             #shopping h6, #food h6 {
                 font-size: 0.9rem;
                 margin-bottom: 6px !important;
                 white-space: normal;
                 display: -webkit-box;
-                -webkit-line-clamp: 2; /* 最多兩行 */
+                -webkit-line-clamp: 2; 
                 -webkit-box-orient: vertical;
                 overflow: hidden;
             }
 
-            /* 敘述文字統一縮小並限制行數 */
             #shopping p.small, #food p.small, #shopping small, #food small {
                 font-size: 0.75rem !important;
                 line-height: 1.4;
                 display: -webkit-box;
-                -webkit-line-clamp: 2; /* 敘述最多兩行 */
+                -webkit-line-clamp: 2; 
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 margin-bottom: 10px !important;
                 margin-top: 4px !important;
             }
 
-            /* 標籤微調 */
             .badge-tag {
                 padding: 2px 6px;
                 font-size: 0.65rem;
@@ -425,18 +460,16 @@
                 margin-bottom: 6px !important;
             }
 
-            /* 滿版置底按鈕 */
             #shopping .handbook-card .action-btn, 
             #food .handbook-card .action-btn,
             #shopping .handbook-card .w-auto {
                 width: 100% !important;
                 margin-left: 0 !important;
-                margin-top: auto !important; /* 確保按鈕永遠在最下方 */
+                margin-top: auto !important; 
                 padding: 5px 0 !important;
                 font-size: 0.8rem;
             }
             
-            /* 針對有多個按鈕的區塊轉為水平並排 */
             #shopping .handbook-card .d-flex.flex-column.gap-2 {
                 flex-direction: row !important;
                 gap: 6px !important;
@@ -471,67 +504,77 @@
 
         <main class="main-content">
             
-            <section id="cover" style="position: relative; min-height: 100vh; display: flex; align-items: center; border-bottom: none;">
-                <div class="container text-center">
+            <section id="cover" style="position: relative; min-height: 100vh; display: flex; align-items: center; border-bottom: none; overflow: hidden;">
+                <div class="container text-center position-relative">
                     <p class="small mb-3" style="letter-spacing: 6px; font-weight: 400; color: var(--accent-red); font-family: 'Noto Serif TC', serif;">【 旅 の 記 憶 】</p>
                     <h1>東京漫遊手札</h1>
-                    <div style="width: 1px; height: 60px; background-color: var(--accent-gold); margin: 30px auto;"></div>
                     <p class="lead mt-2 text-muted" style="font-family: 'Noto Serif TC', serif; font-size: clamp(1.1rem, 4vw, 1.3rem); letter-spacing: 8px;">浮世之悠 · 漫步江戶</p>
                     
-					<div class="mt-5 mb-2 d-flex justify-content-center">
-                        <svg width="100" height="50" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
-                            <ellipse cx="80" cy="84" rx="65" ry="5" fill="rgba(0,0,0,0.05)" />
+				    <div class="mt-5 mb-2 d-flex justify-content-center" style="width: 100%;">
+                        <div class="shinkansen-anim">
+                            <svg width="210" height="60" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
+                                <defs>
+                                    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#ffffff"/>
+                                        <stop offset="40%" stop-color="#fcfcfc"/>
+                                        <stop offset="85%" stop-color="#e8e8e8"/>
+                                        <stop offset="100%" stop-color="#cccccc"/>
+                                    </linearGradient>
+                                    
+                                    <linearGradient id="winGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#1a2530"/>
+                                        <stop offset="100%" stop-color="#050a10"/>
+                                    </linearGradient>
 
-                            <path d="M 105 65 C 135 65, 135 80, 146 72" fill="none" stroke="var(--text-sumi)" stroke-width="8" stroke-linecap="round" />
+                                    <filter id="shadow" x="-10%" y="-10%" width="120%" height="150%">
+                                        <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000" flood-opacity="0.08"/>
+                                    </filter>
+                                </defs>
 
-                            <rect x="105" y="74" width="14" height="9" rx="4.5" fill="#1e1c1b" />
-                            <line x1="109.5" y1="77.5" x2="109.5" y2="81" stroke="#000" stroke-width="1.2" stroke-linecap="round"/>
-                            <line x1="114.5" y1="77.5" x2="114.5" y2="81" stroke="#000" stroke-width="1.2" stroke-linecap="round"/>
+                                <ellipse cx="180" cy="110" rx="180" ry="8" fill="rgba(0,0,0,0.05)" />
 
-                            <rect x="30" y="46" width="85" height="32" rx="16" fill="var(--text-sumi)" />
-                            <circle cx="50" cy="55" r="22" fill="var(--text-sumi)" />
+                                <g filter="url(#shadow)">
+                                    <path d="M -20 30 
+                                            L 200 30 
+                                            C 280 30, 330 35, 360 55 
+                                            C 385 70, 390 85, 380 92 
+                                            C 375 95, 365 96, 340 96 
+                                            L -20 96 Z" 
+                                        fill="url(#bodyGrad)" />
 
-                            <ellipse cx="90" cy="63" rx="18" ry="15" fill="var(--text-sumi)" />
-                            <path d="M 74 54 Q 80 72 96 73" fill="none" stroke="#151413" stroke-width="1.5" stroke-linecap="round" />
+                                    <path d="M -20 88 L 365 88 C 362 92, 355 96, 340 96 L -20 96 Z" fill="#2c3035" />
 
-                            <rect x="28" y="73" width="18" height="10" rx="5" fill="var(--text-sumi)" />
-                            <rect x="52" y="73" width="18" height="10" rx="5" fill="var(--text-sumi)" />
-                            <rect x="85" y="73" width="18" height="10" rx="5" fill="var(--text-sumi)" />
+                                    <path d="M -20 74 L 320 74 C 345 74, 365 77, 378 86 C 375 87, 370 88, 365 88 L -20 88 Z" fill="#003366" />
+                                    <path d="M -20 67 L 310 67 C 330 67, 345 69, 360 76 L 357 78 C 343 71, 328 69, 310 69 L -20 69 Z" fill="#003366" />
 
-                            <line x1="34" y1="77" x2="34" y2="81.5" stroke="#111" stroke-width="1.5" stroke-linecap="round"/>
-                            <line x1="40" y1="77" x2="40" y2="81.5" stroke="#111" stroke-width="1.5" stroke-linecap="round"/>
-                            <line x1="58" y1="77" x2="58" y2="81.5" stroke="#111" stroke-width="1.5" stroke-linecap="round"/>
-                            <line x1="64" y1="77" x2="64" y2="81.5" stroke="#111" stroke-width="1.5" stroke-linecap="round"/>
-                            <line x1="91" y1="77" x2="91" y2="81.5" stroke="#111" stroke-width="1.5" stroke-linecap="round"/>
-                            <line x1="97" y1="77" x2="97" y2="81.5" stroke="#111" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M 245 42 C 280 44, 315 50, 335 60 L 325 64 C 305 54, 275 49, 240 48 Z" fill="url(#winGrad)" />
 
-                            <path d="M 25 35 Q 20 2 42 18 Z" fill="var(--text-sumi)" stroke="var(--text-sumi)" stroke-width="2" stroke-linejoin="round"/>
-                            <path d="M 28 32 Q 24 10 39 20 Z" fill="#E8B4B8" /> 
-                            
-                            <path d="M 75 35 Q 80 2 58 18 Z" fill="var(--text-sumi)" stroke="var(--text-sumi)" stroke-width="2" stroke-linejoin="round"/>
-                            <path d="M 72 32 Q 76 10 61 20 Z" fill="#E8B4B8" />
+                                    <path d="M -20 48 L 190 48 C 205 48, 215 49, 220 52 C 215 55, 205 56, 190 56 L -20 56 Z" fill="#1e2124" />
 
-                            <ellipse cx="50" cy="42" rx="32" ry="26" fill="var(--text-sumi)" />
+                                    <rect x="0" y="49.5" width="20" height="5" rx="1.5" fill="url(#winGrad)"/>
+                                    <rect x="30" y="49.5" width="20" height="5" rx="1.5" fill="url(#winGrad)"/>
+                                    <rect x="60" y="49.5" width="20" height="5" rx="1.5" fill="url(#winGrad)"/>
+                                    <rect x="90" y="49.5" width="20" height="5" rx="1.5" fill="url(#winGrad)"/>
+                                    <rect x="120" y="49.5" width="20" height="5" rx="1.5" fill="url(#winGrad)"/>
+                                    <rect x="150" y="49.5" width="20" height="5" rx="1.5" fill="url(#winGrad)"/>
+                                    <rect x="180" y="49.5" width="12" height="5" rx="1.5" fill="url(#winGrad)"/>
 
-                            <ellipse cx="32" cy="50" rx="5" ry="2.5" fill="#F4A2A2" opacity="0.7" />
-                            <ellipse cx="68" cy="50" rx="5" ry="2.5" fill="#F4A2A2" opacity="0.7" />
+                                    <path d="M 75 30 L 75 88" stroke="#cecece" stroke-width="0.8" opacity="0.6"/>
+                                    <path d="M 110 30 L 110 88" stroke="#cecece" stroke-width="0.8" opacity="0.6"/>
 
-                            <g id="cat-eyes" style="transform-origin: 50px 42px;">
-                                <circle cx="36" cy="43" r="7.5" fill="#FFF" />
-                                <circle cx="37" cy="43" r="4.5" fill="var(--accent-primary)" />
-                                <circle cx="35" cy="41" r="1.5" fill="#FFF" /> <circle cx="64" cy="43" r="7.5" fill="#FFF" />
-                                <circle cx="63" cy="43" r="4.5" fill="var(--accent-primary)" />
-                                <circle cx="61" cy="41" r="1.5" fill="#FFF" /> </g>
+                                    <path d="M -20 31 L 200 31 C 280 31, 328 36, 355 55" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
 
-                            <polygon points="48,48 52,48 50,51" fill="#F4A2A2" />
+                                    <ellipse cx="380" cy="89" rx="4" ry="2" fill="#ffffff" filter="drop-shadow(0 0 3px #fff)"/>
+                                    <ellipse cx="380" cy="89" rx="2" ry="1" fill="#ffeb99" />
+                                </g>
 
-                            <path d="M 46 51 Q 48 54 50 51 Q 52 54 54 51" fill="none" stroke="#888" stroke-width="1.2" stroke-linecap="round" />
-                            
-                            <path d="M 33 60 Q 50 67 67 60" fill="none" stroke="var(--accent-red)" stroke-width="4" stroke-linecap="round" />
-                            <circle cx="50" cy="64" r="4.5" fill="var(--accent-gold)" />
-                            <line x1="50" y1="66" x2="50" y2="68.5" stroke="#9B7B3E" stroke-width="1" />
-                            <circle cx="50" cy="66" r="1" fill="#9B7B3E" />
-                        </svg>
+                                <g stroke="var(--accent-primary, #003366)" stroke-linecap="round" opacity="0.4">
+                                    <line x1="-30" y1="40" x2="-5" y2="40" stroke-width="2" />
+                                    <line x1="-15" y1="63" x2="15" y2="63" stroke-width="1.5" />
+                                    <line x1="-40" y1="80" x2="-10" y2="80" stroke-width="2.5" />
+                                </g>
+                            </svg>
+                        </div>
                     </div>
                     
                     <div class="mt-4 mx-auto" style="max-width: 220px; font-family: 'Noto Serif TC', serif; position: relative; padding: 18px 0; border-top: 1px solid rgba(180, 154, 94, 0.4); border-bottom: 1px solid rgba(180, 154, 94, 0.4);">
@@ -689,14 +732,7 @@
                                             </div>
                                             <a href="https://www.google.com/maps/search/?api=1&query=忠犬八公像+澀谷" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
                                         </div>
-                                        <small class="text-muted d-block mt-1 lh-sm">澀谷經典地標與十字路口。</small>
-                                    </div>
-                                    <div class="mt-auto border-top pt-2 text-start" style="border-color: var(--border-light);">
-                                        <div class="d-flex align-items-center mb-1">
-                                            <span class="font-weight-500 text-truncate" style="color: var(--accent-gold);">I'm donut ?</span>
-                                            <span class="badge bg-white text-muted border fw-normal ms-2 rounded-0 flex-shrink-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 35 分</span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1 lh-sm">空氣感爆棚的生甜甜圈。</small>
+                                        <small class="text-muted d-block mt-2 lh-base">澀谷最具代表性的會面地標，緊鄰著世界知名的全向十字路口，感受東京無與倫比的都會脈動與人潮交織的視覺震撼。</small>
                                     </div>
                                 </div>
                             </div>
@@ -712,14 +748,7 @@
                                             </div>
                                             <a href="https://www.google.com/maps/search/?api=1&query=澀谷+PARCO" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
                                         </div>
-                                        <small class="text-muted d-block mt-1 lh-sm">6樓為動漫迷聖地。</small>
-                                    </div>
-                                    <div class="mt-auto border-top pt-2 text-start" style="border-color: var(--border-light);">
-                                        <div class="d-flex align-items-center mb-1">
-                                            <span class="font-weight-500 text-truncate" style="color: var(--accent-gold);">Hamburg</span>
-                                            <span class="badge bg-white text-muted border fw-normal ms-2 rounded-0 flex-shrink-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 35 分</span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1 lh-sm">香氣濃郁的多汁漢堡排。</small>
+                                        <small class="text-muted d-block mt-2 lh-base">匯聚前衛時尚與次文化的指標性商場。6樓更是令動漫與遊戲迷瘋狂的朝聖地（包含任天堂、寶可夢中心等官方旗艦店）。</small>
                                     </div>
                                 </div>
                             </div>
@@ -735,14 +764,7 @@
                                             </div>
                                             <a href="https://www.google.com/maps/search/?api=1&query=宮下公園" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
                                         </div>
-                                        <small class="text-muted d-block mt-1 lh-sm">結合商場的潮流綠洲。</small>
-                                    </div>
-                                    <div class="mt-auto border-top pt-2 text-start" style="border-color: var(--border-light);">
-                                        <div class="d-flex align-items-center mb-1">
-                                            <span class="font-weight-500 text-truncate" style="color: var(--accent-gold);">Sakura Stage</span>
-                                            <span class="badge bg-white text-muted border fw-normal ms-2 rounded-0 flex-shrink-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 35 分</span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1 lh-sm">澀谷最新地標複合大樓。</small>
+                                        <small class="text-muted d-block mt-2 lh-base">完美結合立體公園、潮流商場與質感飯店的新世代都市綠洲。頂樓可享受都會中的戶外微風與愜意陽光。</small>
                                     </div>
                                 </div>
                             </div>
@@ -758,14 +780,7 @@
                                             </div>
                                             <a href="https://www.google.com/maps/search/?api=1&query=SHIBUYA+SKY" target="_blank" class="action-btn btn-map px-2 py-1 ms-2 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
                                         </div>
-                                        <small class="text-muted d-block mt-1 lh-sm">360度俯瞰東京絕美夜景。</small>
-                                    </div>
-                                    <div class="mt-auto border-top pt-2 text-start" style="border-color: var(--border-light);">
-                                        <div class="d-flex align-items-center mb-1">
-                                            <span class="font-weight-500 text-truncate" style="color: var(--accent-primary);">澀谷橫丁</span>
-                                            <span class="badge bg-white text-muted border fw-normal ms-2 rounded-0 flex-shrink-0" style="font-size: 0.75rem;"><i class="fa-solid fa-train"></i> 35 分</span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1 lh-sm">聚集全日本地方特色美食。</small>
+                                        <small class="text-muted d-block mt-2 lh-base">位於澀谷最高點的露天展望台。傍晚可賞絕美日落與富士山剪影，入夜後則能無死角盡收東京璀璨的百萬夜景。</small>
                                     </div>
                                 </div>
                             </div>
@@ -1316,7 +1331,6 @@
 
 					<h5 class="mb-4 mt-5 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 夏祭與花火 —</h5>
                     <div class="row g-2 g-md-3 mb-4">
-                        <!-- 盆踊大會 (搭配蘇芳色主題，使用極淡的櫻粉色背景) -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card p-4 h-100 d-flex flex-column" style="background-color: #FCF8F8; border-top: 2px solid var(--accent-red);">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -1334,7 +1348,6 @@
                             </div>
                         </div>
 
-                        <!-- 花火大會 (搭配伽羅色主題，使用極淡的月白金色背景) -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card p-4 h-100 d-flex flex-column" style="background-color: #FDFBF4; border-top: 2px solid var(--accent-gold);">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -1352,7 +1365,6 @@
 
                     <h5 class="mb-4 mt-5 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 啟程與歸途 —</h5>
                     <div class="row g-2 g-md-3">
-                        <!-- 去程 (搭配紺青色主題，使用極淡的白藍色背景) -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card p-4 d-flex flex-column justify-content-between" style="background-color: #F4F7FB;">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -1383,7 +1395,6 @@
                             </div>
                         </div>
 
-                        <!-- 回程 (搭配蘇芳色主題，使用極淡的櫻粉色背景) -->
                         <div class="col-12 col-md-6">
                             <div class="handbook-card p-4 d-flex flex-column justify-content-between" style="background-color: #FCF8F8;">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -1465,14 +1476,13 @@
             const sections = document.querySelectorAll('section');
             const navContainer = document.getElementById('handbook-nav');
 
-			// 🌟 推薦一：【四季風物詩】 (清新、透明感、步移景異)
             const sectionColors = {
                 'cover': 'var(--bg-washi)', 
-                'hotel': '#E6EAEF',         // 【冬雪】白藍：像乾淨的飯店床單與清晨冷空氣
-                'route': '#E7EBE4',         // 【初春】白綠：像代代木公園的新綠，充滿探索活力
-                'shopping': '#F2E8E9',      // 【春櫻】櫻色：像新宿、銀座的落櫻，帶出購物的愉悅感
-                'food': '#F3ECE2',          // 【秋實】白茶：像剛烤好的糰子或溫暖的木吧台
-                'resources': '#E8E6E9'      // 【梅雨】灰梅：帶有一絲紫調的灰，適合沉澱下來閱讀資訊
+                'hotel': '#E6EAEF',         
+                'route': '#E7EBE4',         
+                'shopping': '#F2E8E9',      
+                'food': '#F3ECE2',          
+                'resources': '#E8E6E9'      
             };
 
             navLinks.forEach(anchor => {
@@ -1512,7 +1522,6 @@
                             }
                         }
 
-                        // 🌟 觸發背景漸變
                         if (sectionColors[activeId]) {
                             document.body.style.backgroundColor = sectionColors[activeId];
                         }
@@ -1649,24 +1658,25 @@
                 updateTokyoTime();
                 setInterval(updateTokyoTime, 1000);
             }
-
-            const catEyes = document.getElementById('cat-eyes');
-            if (catEyes) {
-                function blink() {
-                    catEyes.style.transform = 'scaleY(0.1)';
+            
+            // 🚅 新幹線點擊彩蛋：立即開走功能
+            const shinkansen = document.querySelector('.shinkansen-anim');
+            if (shinkansen) {
+                shinkansen.addEventListener('click', function() {
+                    // 如果已經在開走狀態，就不重複觸發
+                    if (this.classList.contains('shinkansen-depart-now')) return;
+                    
+                    // 加上立即開走的 class
+                    this.classList.add('shinkansen-depart-now');
+                    
+                    // 等待駛離動畫結束後 (1.2秒)，移除 class 並無縫重置原本的循環動畫
                     setTimeout(() => {
-                        catEyes.style.transform = 'scaleY(1)';
-                    }, 150); 
-                }
-
-                function startRandomBlinking() {
-                    blink();
-                    const nextBlinkDelay = Math.random() * 5000 + 2000;
-                    setTimeout(startRandomBlinking, nextBlinkDelay);
-                }
-
-                setTimeout(startRandomBlinking, 2000);
-            }
+                        this.classList.remove('shinkansen-depart-now');
+                        // 重新觸發重繪 (reflow) 讓原本的 CSS animation 從頭開始算
+                        void this.offsetWidth;
+                    }, 1200);
+                });
+            }		
         });
     </script>
 </body>
