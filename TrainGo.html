@@ -23,50 +23,52 @@
             background-color: #000;
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             touch-action: none;
+            display: flex;
+            flex-direction: column;
         }
 
         canvas {
             display: block;
+            flex: 1; 
             width: 100%;
             height: 100%;
             z-index: 5;
+            min-height: 0; 
+            will-change: transform; 
         }
 
         #dashboard {
-            position: absolute;
-            bottom: 3vh;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 94%;
-            max-width: 1080px;
+            width: 100%;
             background: var(--metal-gradient);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-top: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0; 
             display: flex;
+            flex-direction: row;
+            flex-wrap: wrap; 
             justify-content: space-between;
             align-items: center;
-            padding: 2.2vh 3.5vw;
+            padding: 16px 32px;
+            gap: 16px;
             box-sizing: border-box;
             box-shadow: 
                 inset 0 1px 1px rgba(255,255,255,0.15), 
                 inset 0 -3px 10px rgba(0,0,0,0.95),
-                0 25px 60px rgba(0, 0, 0, 0.95),
-                0 0 30px rgba(0, 229, 255, 0.03);
+                0 -10px 30px rgba(0, 0, 0, 0.5);
             color: #fff;
             z-index: 10;
-            max-height: 26vh; 
             user-select: none;
             -webkit-user-select: none;
+            flex-shrink: 0; 
+            max-height: 25vh; 
         }
 
         #dashboard::after {
             content: '';
             position: absolute;
             top: 4px; right: 4px; bottom: 4px; left: 4px;
-            border-radius: 16px;
             background-image: 
                 linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), 
                 linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
@@ -77,13 +79,15 @@
         .gauge-cluster {
             display: flex;
             align-items: center;
-            gap: 24px;
-            flex: 1.2;
+            gap: 20px;
+            flex: 1;
+            min-width: 280px;
+            max-width: 450px; 
         }
 
         .segmented-gauge {
-            width: 92px;
-            height: 92px;
+            width: 84px;
+            height: 84px;
             position: relative;
             background: #04070f;
             border-radius: 50%;
@@ -94,6 +98,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .gauge-svg {
@@ -118,7 +123,7 @@
             color: #475569;
             font-weight: 800;
             letter-spacing: 1.5px;
-            top: 22px;
+            top: 20px;
         }
 
         .dash-metrics {
@@ -142,13 +147,13 @@
         }
 
         .dash-value {
-            font-size: clamp(36px, 4.8vw, 52px);
+            font-size: 42px;
             font-weight: 700;
             font-family: 'Courier New', Courier, monospace;
             color: var(--primary-color);
             text-shadow: var(--panel-glow);
             background: #02050b;
-            padding: 4px 18px;
+            padding: 4px 14px;
             border-radius: 6px;
             box-shadow: 
                 inset 0 4px 8px rgba(0,0,0,0.95),
@@ -183,7 +188,11 @@
         .dash-control-center {
             display: flex;
             align-items: center;
-            gap: 30px;
+            justify-content: space-between;
+            gap: 20px;
+            flex: 1.2;
+            min-width: 320px;
+            max-width: 600px;
         }
 
         .station-panel {
@@ -191,11 +200,12 @@
             flex-direction: column;
             gap: 4px;
             background: #02050b;
-            padding: 8px 16px;
+            padding: 8px 14px;
             border-radius: 6px;
             border: 1px solid rgba(255,255,255,0.03);
             box-shadow: inset 0 3px 6px rgba(0,0,0,0.8);
-            min-width: 130px;
+            min-width: 120px;
+            flex: 1;
         }
         .station-title {
             font-size: 9px;
@@ -205,7 +215,7 @@
         }
         .station-dist-num {
             font-family: 'Courier New', monospace;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: #ffcc00;
             text-shadow: 0 0 10px rgba(255,204,0,0.3);
@@ -221,13 +231,14 @@
         #status-panel {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
             font-size: 10px;
             color: #475569;
             font-weight: 800;
-            padding-right: 20px;
+            padding-right: 15px;
             border-right: 1px solid rgba(255,255,255,0.08);
             letter-spacing: 1px;
+            flex-shrink: 0;
         }
         .status-item { display: flex; align-items: center; }
         .status-led {
@@ -244,16 +255,16 @@
         .status-yellow { background-color: #ffcc00; box-shadow: 0 0 10px #ffcc00, 0 0 4px #ffcc00; }
         .status-door { background-color: #00e5ff; box-shadow: 0 0 10px #00e5ff, 0 0 4px #00e5ff; }
 
-        .button-matrix { display: flex; gap: 14px; }
+        .button-matrix { display: flex; gap: 10px; flex-shrink: 0; }
 
         .realistic-button {
             background: var(--btn-gradient);
             border: 1px solid rgba(255,255,255,0.08);
             border-top: 1px solid rgba(255,255,255,0.18);
             color: #e2e8f0;
-            padding: 12px 26px;
+            padding: 10px 20px;
             border-radius: var(--border-radius);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             letter-spacing: 1px;
             cursor: pointer;
@@ -264,24 +275,26 @@
                 0 1px 1px rgba(0,0,0,0.5);
             touch-action: manipulation;
         }
-        .realistic-button:hover {
-            color: #ffffff;
-            border-top: 1px solid rgba(255,255,255,0.3);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 10px rgba(0,0,0,0.6);
-        }
-        .realistic-button:active {
-            transform: translateY(1.5px);
-            box-shadow: inset 0 3px 5px rgba(0,0,0,0.8);
-            background: linear-gradient(180deg, #161b2d 0%, #111522 100%);
-        }
 
-        #transition-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(255, 255, 255, 0);
-            pointer-events: none;
-            z-index: 20;
-            transition: background-color 0.8s ease-in-out;
+        @media (max-width: 768px) {
+            #dashboard {
+                padding: 12px 20px;
+                gap: 8px;
+                max-height: none; 
+            }
+            .gauge-cluster {
+                justify-content: center;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                padding-bottom: 8px;
+                margin-bottom: 2px;
+                flex: 1 0 100%; 
+                max-width: 100%;
+            }
+            .dash-control-center {
+                flex: 1 0 100%; 
+                max-width: 100%;
+                gap: 8px;
+            }
         }
     </style>
 </head>
@@ -345,193 +358,102 @@
 
         let isMovingUp = false;
         let isMovingDown = false;
-
         let weatherParticles = [];
 
-        // --- 音效系統控制變數 (Web Audio API) ---
-        let audioCtx = null;
-        let runNoiseNode = null;     // 行駛粉紅噪音
-        let runGainNode = null;      // 行駛音量控制
-        let trackOscNode = null;     // 鐵軌撞擊振盪器
-        let trackGainNode = null;    // 鐵軌音量控制
-        let lastTrackClackTime = 0;  // 上次鐵軌撞擊時間
+        let lastTime = performance.now();
 
-        // 初始化音訊環境
+        let audioCtx = null;
+        let runGainNode = null;      
+        let lastTrackClackTime = 0;  
+
         function initAudio() {
-            if (audioCtx) return; // 避免重複初始化
-            
-            // 建立音訊主控台
+            if (audioCtx) return; 
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             audioCtx = new AudioContext();
 
-            // 1. 建立列車行駛時的「風切低頻噪音」
             const bufferSize = 2 * audioCtx.sampleRate;
             const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const output = noiseBuffer.getChannelData(0);
-            
-            // 用粉紅/白噪音算法填充緩衝區
-            for (let i = 0; i < bufferSize; i++) {
-                output[i] = Math.random() * 2 - 1;
-            }
+            for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
 
             const noiseSource = audioCtx.createBufferSource();
-            noiseSource.buffer = noiseBuffer;
-            noiseSource.loop = true;
+            noiseSource.buffer = noiseBuffer; noiseSource.loop = true;
 
-            // 建立低通濾波器，讓噪音聽起來像車廂內悶悶的風切與馬達聲
             const filter = audioCtx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(150, audioCtx.currentTime); 
+            filter.type = 'lowpass'; filter.frequency.setValueAtTime(150, audioCtx.currentTime); 
 
-            runGainNode = audioCtx.createGain();
-            runGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-
-            noiseSource.connect(filter);
-            filter.connect(runGainNode);
-            runGainNode.connect(audioCtx.destination);
+            runGainNode = audioCtx.createGain(); runGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            noiseSource.connect(filter); filter.connect(runGainNode); runGainNode.connect(audioCtx.destination);
             noiseSource.start();
-
-            // 2. 建立鐵軌接縫撞擊聲節奏器 (Click-Clack)
-            trackGainNode = audioCtx.createGain();
-            trackGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-            trackGainNode.connect(audioCtx.destination);
         }
 
-        // 播放新幹線經典「雙音調警笛」喇叭
         function playHornSound() {
             if (!audioCtx) initAudio();
             if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-
             const now = audioCtx.currentTime;
-            
-            // 新幹線經典警笛由兩個主要頻率混合而成 (400Hz 與 480Hz)
-            const osc1 = audioCtx.createOscillator();
-            const osc2 = audioCtx.createOscillator();
+            const osc1 = audioCtx.createOscillator(); const osc2 = audioCtx.createOscillator();
             const hornGain = audioCtx.createGain();
-
-            osc1.type = 'triangle'; // 三角波，聲音比正弦波厚實又不會像方波刺耳
-            osc1.frequency.setValueAtTime(400, now);
-            
-            osc2.type = 'triangle';
-            osc2.frequency.setValueAtTime(480, now);
-
-            // 警笛淡入淡出包絡線 (防爆音、擬真動態)
+            osc1.type = 'triangle'; osc1.frequency.setValueAtTime(400, now);
+            osc2.type = 'triangle'; osc2.frequency.setValueAtTime(480, now);
             hornGain.gain.setValueAtTime(0, now);
-            hornGain.gain.linearRampToValueAtTime(0.25, now + 0.1); // 快速淡入
-            hornGain.gain.setValueAtTime(0.25, now + 0.6);         // 持續時間
-            hornGain.gain.linearRampToValueAtTime(0, now + 1.1);   // 緩慢尾音淡出
-
-            osc1.connect(hornGain);
-            osc2.connect(hornGain);
-            hornGain.connect(audioCtx.destination);
-
-            osc1.start(now);
-            osc2.start(now);
-            osc1.stop(now + 1.2);
-            osc2.stop(now + 1.2);
+            hornGain.gain.linearRampToValueAtTime(0.25, now + 0.1);
+            hornGain.gain.setValueAtTime(0.25, now + 0.6);
+            hornGain.gain.linearRampToValueAtTime(0, now + 1.1);
+            osc1.connect(hornGain); osc2.connect(hornGain); hornGain.connect(audioCtx.destination);
+            osc1.start(now); osc2.start(now); osc1.stop(now + 1.2); osc2.stop(now + 1.2);
         }
 
-        // 動態調整行駛音效
         function updateTrainSounds() {
             if (!audioCtx || !runGainNode) return;
-
             const now = audioCtx.currentTime;
-            const currentSpeedPercent = speed / 320; // 0.0 ~ 1.0
-
-            // 1. 動態調整風切聲與馬達轟鳴音量 (隨速度增長)
-            const targetNoiseVolume = currentSpeedPercent * 0.15;
-            runGainNode.gain.setTargetAtTime(targetNoiseVolume, now, 0.1);
-
-            // 2. 模擬鐵軌撞擊節奏 (鐵軌節縫Click-Clack)
+            const currentSpeedPercent = speed / 320; 
+            runGainNode.gain.setTargetAtTime(currentSpeedPercent * 0.15, now, 0.1);
             if (speed > 10) {
-                // 速度越快，撞擊間隔越短
-                const clackInterval = 1500 / speed; // 秒數間隔
+                const clackInterval = 1500 / speed; 
                 if (now - lastTrackClackTime > clackInterval) {
-                    playTrackClack();
-                    lastTrackClackTime = now;
+                    playTrackClack(); lastTrackClackTime = now;
                 }
             }
         }
 
-        // 製造一聲鐵軌撞擊聲
         function playTrackClack() {
             const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            const filter = audioCtx.createBiquadFilter();
-
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(60, now); // 低沉的撞擊重低音
-
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(100, now);
-
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); const filter = audioCtx.createBiquadFilter();
+            osc.type = 'sine'; osc.frequency.setValueAtTime(60, now);
+            filter.type = 'lowpass'; filter.frequency.setValueAtTime(100, now);
             const speedVol = (speed / 320) * 0.25;
-            gain.gain.setValueAtTime(speedVol, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08); // 啪嗒一聲快速消失
-
-            osc.connect(filter);
-            filter.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            osc.start(now);
-            osc.stop(now + 0.1);
-
-            // 模擬鐵軌撞擊必定是連續兩聲 (前輪跟後輪過縫隙：喀嗒、喀嗒)
+            gain.gain.setValueAtTime(speedVol, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+            osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(now); osc.stop(now + 0.1);
             setTimeout(() => {
                 if (!audioCtx || speed < 10) return;
                 const now2 = audioCtx.currentTime;
-                const osc2 = audioCtx.createOscillator();
-                const gain2 = audioCtx.createGain();
-                const filter2 = audioCtx.createBiquadFilter();
-
-                osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(55, now2);
-                filter2.type = 'lowpass';
-                filter2.frequency.setValueAtTime(90, now2);
-
-                gain2.gain.setValueAtTime(speedVol * 0.7, now2); // 第二聲稍微弱一點
-                gain2.gain.exponentialRampToValueAtTime(0.001, now2 + 0.07);
-
-                osc2.connect(filter2);
-                filter2.connect(gain2);
-                gain2.connect(audioCtx.destination);
-                osc2.start(now2);
-                osc2.stop(now2 + 0.09);
+                const osc2 = audioCtx.createOscillator(); const gain2 = audioCtx.createGain(); const filter2 = audioCtx.createBiquadFilter();
+                osc2.type = 'sine'; osc2.frequency.setValueAtTime(55, now2);
+                filter2.type = 'lowpass'; filter2.frequency.setValueAtTime(90, now2);
+                gain2.gain.setValueAtTime(speedVol * 0.7, now2); gain2.gain.exponentialRampToValueAtTime(0.001, now2 + 0.07);
+                osc2.connect(filter2); filter2.connect(gain2); gain2.connect(audioCtx.destination);
+                osc2.start(now2); osc2.stop(now2 + 0.09);
             }, 120);
         }
 
-        // --- 車站資料庫 ---
         const stationPool = [
             { name: "東京 (TOKYO)" }, { name: "品川 (SHINAGAWA)" }, { name: "新横浜 (SHIN-YOKOHAMA)" },
             { name: "名古屋 (NAGOYA)" }, { name: "京都 (KYOTO)" }, { name: "新大阪 (SHIN-OSAKA)" },
             { name: "博多 (HAKATA)" }, { name: "新青森 (SHIN-AOMORI)" }
         ];
         let currentStationName = "東京 (TOKYO)";
+        let totalStationDistance = 3000; let distanceToStation = totalStationDistance; 
+        let isArrived = false; let doorOpen = false; let isClosingDoors = false; 
+        let doorWidthPercent = 0; let stationMessage = ""; let messageTimer = 0;
+        let isMissionFailed = false; let failureResetTimer = 0;
 
-        // --- 到站系統與車門控制變數 ---
-        let totalStationDistance = 3000; 
-        let distanceToStation = totalStationDistance; 
-        let isArrived = false;
-        let doorOpen = false;
-        let isClosingDoors = false; 
-        let doorWidthPercent = 0; 
-        let stationMessage = "";
-        let messageTimer = 0;
-
-        // 任務失敗重置控制變數
-        let isMissionFailed = false;
-        let failureResetTimer = 0;
-
-        // --- 天氣資料結構庫 ---
         const weatherPool = [
             { type: 'sunny', label: "晴天 (☀️ SUNNY)", mountainColor: 'rgba(0,0,0,0.06)' },
             { type: 'cloudy', label: "陰天 (☁️ CLOUDY)", mountainColor: 'rgba(0,0,0,0.14)' },
             { type: 'rain', label: "雨天 (🌧️ RAIN)", mountainColor: 'rgba(0,0,0,0.18)' },
             { type: 'snow', label: "下雪 (❄️ SNOW)", mountainColor: 'rgba(0,0,0,0.22)' }
         ];
-        
-        // --- 五大風格風景場景庫 ---
         const scenePool = [
             { id: 'mountain', label: "山景 ⛰️", skyTop: '#87CEEB', skyBottom: '#E0F6FF' },
             { id: 'ocean', label: "海景 🌊", skyTop: '#0a3d62', skyBottom: '#3c6382' },
@@ -542,206 +464,158 @@
 
         let currentWeather = weatherPool[Math.floor(Math.random() * weatherPool.length)]; 
         let currentScene = scenePool[Math.floor(Math.random() * scenePool.length)]; 
-
-        // === 平滑切換控制變數 ===
-        let nextScene = null;
-        let nextWeather = null;
-        let transitionAlpha = 0;       
-        let isTransitioning = false;   
-        let hasTriggeredTransition = false; 
-
-        // === 隨機天空物件系統結構 ===
+        let nextScene = null; let nextWeather = null;
+        let transitionAlpha = 0; let isTransitioning = false; let hasTriggeredTransition = false; 
         let skyObjects = [];
 
         function initSkyObjects() {
             skyObjects = [];
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 5; i++) { 
                 skyObjects.push({
                     type: 'cloud',
-                    x: Math.random() * window.innerWidth,
-                    y: Math.random() * (window.innerHeight * 0.25) + 30,
+                    x: Math.random() * width,
+                    y: Math.random() * (height * 0.23) + 30,
                     size: Math.random() * 40 + 40,
                     baseSpeed: Math.random() * 0.2 + 0.1,
                     layer: Math.random() > 0.5 ? 1 : 2 
                 });
             }
-            if (Math.random() > 0.3) {
-                skyObjects.push(generatePlane());
-            }
-            if (Math.random() > 0.4) {
-                generateBirdFlock();
-            }
+            if (Math.random() > 0.3) skyObjects.push(generatePlane());
+            generateBirdFlock();
         }
 
         function generatePlane() {
             return {
-                type: 'plane',
-                x: -100 - Math.random() * 300,
-                y: Math.random() * (window.innerHeight * 0.15) + 20,
-                size: Math.random() * 15 + 15,
-                baseSpeed: Math.random() * 0.8 + 0.6,
-                contrail: [] 
+                type: 'plane', x: -150 - Math.random() * 200, y: Math.random() * (height * 0.15) + 20,
+                size: Math.random() * 15 + 15, baseSpeed: Math.random() * 0.8 + 0.5, contrail: [] 
             };
         }
 
         function generateBirdFlock() {
-            let startX = window.innerWidth + Math.random() * 200;
-            let startY = Math.random() * (window.innerHeight * 0.2) + 50;
-            let size = Math.floor(Math.random() * 4) + 3; 
+            let startX = width + 50 + Math.random() * 150;
+            let startY = Math.random() * (height * 0.18) + 40;
+            let size = Math.floor(Math.random() * 3) + 2; 
             for(let i=0; i<size; i++) {
                 skyObjects.push({
                     type: 'bird',
-                    x: startX + (i * 20) * (Math.random() * 0.5 + 0.8),
-                    y: startY + (Math.sin(i) * 15),
-                    size: Math.random() * 5 + 6,
-                    baseSpeed: -(Math.random() * 1.5 + 2.0), 
+                    x: startX + (i * 22),
+                    y: startY + (Math.sin(i) * 12),
+                    size: Math.random() * 4 + 6,
+                    baseSpeed: -(Math.random() * 1.0 + 1.2), 
                     wingWing: Math.random() * Math.PI
                 });
             }
         }
 
-        function updateAndDrawSkyObjects(globalAlphaValue) {
+        function updateAndDrawSkyObjects(globalAlphaValue, timeRatio) {
             ctx.save();
             ctx.globalAlpha = globalAlphaValue;
-            const horizonY = height * 0.65;
 
             let activeWeatherType = (transitionAlpha > 0.5 && nextWeather) ? nextWeather.type : currentWeather.type;
             if (activeWeatherType === 'sunny') {
-                ctx.save();
-                let sunX = width * 0.75;
-                let sunY = height * 0.18;
+                let sunX = width * 0.75; let sunY = height * 0.18;
                 let sunGlow = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 65);
                 sunGlow.addColorStop(0, 'rgba(255, 253, 230, 1)');
                 sunGlow.addColorStop(0.2, 'rgba(255, 200, 80, 0.8)');
                 sunGlow.addColorStop(1, 'rgba(255, 120, 0, 0)');
-                ctx.fillStyle = sunGlow;
-                ctx.beginPath(); ctx.arc(sunX, sunY, 65, 0, Math.PI * 2); ctx.fill();
-                ctx.restore();
+                ctx.fillStyle = sunGlow; ctx.beginPath(); ctx.arc(sunX, sunY, 65, 0, Math.PI * 2); ctx.fill();
             }
 
             for (let i = skyObjects.length - 1; i >= 0; i--) {
                 let obj = skyObjects[i];
-
                 let speedFactor = 0;
                 if (obj.type === 'cloud') speedFactor = obj.layer === 1 ? 0.04 : 0.08; 
                 if (obj.type === 'plane') speedFactor = 0.12; 
-                if (obj.type === 'bird') speedFactor = 0.28; 
+                if (obj.type === 'bird') speedFactor = 0.25;
 
-                obj.x += obj.baseSpeed - (speed * speedFactor);
+                obj.x += (obj.baseSpeed - (speed * speedFactor)) * timeRatio;
 
-                if (obj.type === 'cloud' && obj.x < -obj.size * 2) { obj.x = width + obj.size; obj.y = Math.random() * (height * 0.25) + 30; }
-                if (obj.type === 'plane' && obj.x > width + 200) { skyObjects.splice(i, 1); continue; }
+                if (obj.type === 'cloud' && obj.x < -obj.size * 2) { 
+                    obj.x = width + obj.size; obj.y = Math.random() * (height * 0.25) + 30; 
+                }
+                if (obj.type === 'plane' && obj.x > width + 250) { skyObjects.splice(i, 1); continue; }
                 if (obj.type === 'bird' && obj.x < -100) { skyObjects.splice(i, 1); continue; }
 
                 if (obj.type === 'cloud') {
                     ctx.fillStyle = activeWeatherType === 'sunny' ? 'rgba(255, 255, 255, 0.85)' : 'rgba(200, 207, 214, 0.6)';
                     ctx.beginPath();
                     ctx.arc(obj.x, obj.y, obj.size * 0.4, 0, Math.PI * 2);
-                    ctx.arc(obj.x + obj.size * 0.3, obj.y - obj.size * 0.1, obj.size * 0.5, 0, Math.PI * 2);
+                    ctx.arc(obj.x + obj.size * 0.25, obj.y - obj.size * 0.2, obj.size * 0.5, 0, Math.PI * 2);
+                    ctx.arc(obj.x + obj.size * 0.55, obj.y - obj.size * 0.1, obj.size * 0.4, 0, Math.PI * 2);
+                    ctx.arc(obj.x + obj.size * 0.3, obj.y + obj.size * 0.1, obj.size * 0.4, 0, Math.PI * 2);
                     ctx.arc(obj.x + obj.size * 0.6, obj.y, obj.size * 0.35, 0, Math.PI * 2);
-                    ctx.fillRect(obj.x, obj.y - obj.size * 0.1, obj.size * 0.6, obj.size * 0.4);
                     ctx.fill();
                 } 
                 else if (obj.type === 'plane') {
-                    if (speed > 5 && Math.random() > 0.4) {
-                        obj.contrail.push({x: obj.x, y: obj.y + 2});
-                    }
-                    if (obj.contrail.length > 40) obj.contrail.shift();
-
+                    if (speed > 5 && Math.random() > 0.4) obj.contrail.push({x: obj.x, y: obj.y + 2});
+                    if (obj.contrail.length > 30) obj.contrail.shift();
                     if (obj.contrail.length > 1) {
-                        ctx.strokeStyle = 'rgba(255,255,255,0.35)';
-                        ctx.lineWidth = 1.5;
-                        ctx.beginPath();
-                        ctx.moveTo(obj.contrail[0].x, obj.contrail[0].y);
-                        for(let c=1; c<obj.contrail.length; c++) {
-                            ctx.lineTo(obj.contrail[c].x, obj.contrail[c].y);
-                        }
+                        ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 1.2;
+                        ctx.beginPath(); ctx.moveTo(obj.contrail[0].x, obj.contrail[0].y);
+                        for(let e=1; e<obj.contrail.length; e++) ctx.lineTo(obj.contrail[e].x, obj.contrail[e].y);
                         ctx.stroke();
                     }
-
-                    ctx.fillStyle = '#f8fafc';
-                    ctx.save();
-                    ctx.translate(obj.x, obj.y);
+                    ctx.fillStyle = '#f8fafc'; ctx.save(); ctx.translate(obj.x, obj.y);
                     ctx.fillRect(0, 0, obj.size, obj.size * 0.18);
                     ctx.beginPath();
                     ctx.moveTo(obj.size * 0.4, obj.size * 0.09);
-                    ctx.lineTo(obj.size * 0.2, -obj.size * 0.4);
-                    ctx.lineTo(obj.size * 0.35, -obj.size * 0.4);
+                    ctx.lineTo(obj.size * 0.2, -obj.size * 0.35);
+                    ctx.lineTo(obj.size * 0.35, -obj.size * 0.35);
                     ctx.lineTo(obj.size * 0.55, obj.size * 0.09);
                     ctx.fill();
-                    ctx.beginPath();
-                    ctx.moveTo(0, obj.size * 0.09);
-                    ctx.lineTo(-obj.size * 0.08, -obj.size * 0.2);
-                    ctx.lineTo(obj.size * 0.05, -obj.size * 0.2);
-                    ctx.lineTo(obj.size * 0.1, obj.size * 0.09);
-                    ctx.fill();
                     ctx.restore();
-                } 
+                }
                 else if (obj.type === 'bird') {
-                    obj.wingWing += 0.22;
+                    obj.wingWing += 0.2 * timeRatio;
                     let wingY = Math.sin(obj.wingWing) * obj.size;
-
                     ctx.strokeStyle = activeWeatherType === 'sunny' ? '#475569' : '#1e293b';
-                    ctx.lineWidth = 1.8;
+                    ctx.lineWidth = 1.5;
                     ctx.beginPath();
                     ctx.moveTo(obj.x - obj.size, obj.y + wingY);
-                    ctx.quadraticCurveTo(obj.x - obj.size*0.4, obj.y - obj.size * 0.2, obj.x, obj.y);
-                    ctx.quadraticCurveTo(obj.x + obj.size*0.4, obj.y - obj.size * 0.2, obj.x + obj.size, obj.y + wingY);
+                    ctx.quadraticCurveTo(obj.x - obj.size * 0.4, obj.y - obj.size * 0.2, obj.x, obj.y);
+                    ctx.quadraticCurveTo(obj.x + obj.size * 0.4, obj.y - obj.size * 0.2, obj.x + obj.size, obj.y + wingY);
                     ctx.stroke();
                 }
             }
-
-            if (skyObjects.filter(o => o.type === 'plane').length === 0 && Math.random() < 0.001) {
-                skyObjects.push(generatePlane());
-            }
-            if (skyObjects.filter(o => o.type === 'bird').length === 0 && Math.random() < 0.003) {
-                generateBirdFlock();
-            }
-
             ctx.restore();
         }
 
-        // 旅客生成
         let passengers = [];
         function initPassengers() {
             passengers = [];
-            for (let i = 0; i < 25; i++) {
+            for (let i = 0; i < 20; i++) {
                 passengers.push({
-                    relX: Math.random() * 1100 - 1120, 
-                    type: Math.floor(Math.random() * 3), 
-                    color: ['#1e3a8a', '#b45309', '#047857', '#4338ca', '#65a30d'][Math.floor(Math.random() * 5)],
-                    height: Math.random() * 5 + 16,
-                    swayOffset: Math.random() * 100
+                    relX: Math.random() * 1100 - 1120, type: Math.floor(Math.random() * 3), 
+                    color: ['#1e3a8a', '#b45309', '#047857'][Math.floor(Math.random() * 3)],
+                    height: Math.random() * 5 + 16, swayOffset: Math.random() * 100
                 });
             }
         }
 
         function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-            initWeatherParticles(); 
-            initPassengers();
-            initSkyObjects(); 
+            const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+            width = canvas.clientWidth;
+            height = canvas.clientHeight;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.scale(dpr, dpr); 
+            initWeatherParticles(); initPassengers(); initSkyObjects(); 
         }
         window.addEventListener('resize', resize);
         window.addEventListener('contextmenu', (e) => e.preventDefault());
 
         function initWeatherParticles() {
             weatherParticles = [];
-            for (let i = 0; i < 150; i++) {
+            const count = width < 600 ? 70 : 130; 
+            for (let i = 0; i < count; i++) {
                 weatherParticles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    size: Math.random() * 2 + 1,
-                    speedY: Math.random() * 5 + 6, 
-                    speedX: Math.random() * 1 - 0.5
+                    x: Math.random() * width, y: Math.random() * height,
+                    size: Math.random() * 1.5 + 1, speedY: Math.random() * 5 + 6, speedX: Math.random() * 1 - 0.5
                 });
             }
         }
 
-        function drawWeather() {
+        function drawWeather(timeRatio) {
             let currentType = (transitionAlpha > 0.5 && nextWeather) ? nextWeather.type : currentWeather.type;
             if (currentType === 'sunny' || currentType === 'cloudy') return; 
 
@@ -753,20 +627,18 @@
                 let dynamicSpeedX = p.speedX - (speed * 0.09); 
                 let dynamicSpeedY = (currentType === 'rain') ? p.speedY : p.speedY * 0.35; 
 
-                p.x += dynamicSpeedX; p.y += dynamicSpeedY;
+                p.x += dynamicSpeedX * timeRatio; p.y += dynamicSpeedY * timeRatio;
 
                 if (p.y > height) { p.y = 0; p.x = Math.random() * width; }
-                if (p.x < 0) { p.x = width; p.y = Math.random() * height; }
+                if (p.x < 0) { e.x = width; p.y = Math.random() * height; }
 
                 if (currentType === 'rain') {
-                    ctx.strokeStyle = `rgba(174, 219, 255, ${0.45 * pAlpha})`;
-                    ctx.lineWidth = 1.2;
+                    ctx.strokeStyle = `rgba(174, 219, 255, ${0.4 * pAlpha})`; ctx.lineWidth = 1.0;
                     ctx.beginPath(); ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(p.x + dynamicSpeedX * 1.3, p.y + dynamicSpeedY * 1.3);
-                    ctx.stroke();
+                    ctx.lineTo(p.x + dynamicSpeedX * 1.2, p.y + dynamicSpeedY * 1.2); ctx.stroke();
                 } else if (currentType === 'snow') {
-                    ctx.fillStyle = `rgba(255, 255, 255, ${0.8 * pAlpha})`;
-                    ctx.beginPath(); ctx.arc(p.x, p.y, p.size * 1.1, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = `rgba(255, 255, 255, ${0.75 * pAlpha})`;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
                 }
             }
             ctx.restore();
@@ -775,8 +647,7 @@
         function getSkyGradient(scene, weather) {
             let skyGrad = ctx.createLinearGradient(0, 0, 0, height);
             if (weather.type === 'sunny') {
-                skyGrad.addColorStop(0, scene.skyTop);
-                skyGrad.addColorStop(1, scene.skyBottom);
+                skyGrad.addColorStop(0, scene.skyTop); skyGrad.addColorStop(1, scene.skyBottom);
             } else if (weather.type === 'cloudy') {
                 skyGrad.addColorStop(0, '#57606f'); skyGrad.addColorStop(1, '#a5b1c2');
             } else if (weather.type === 'rain') {
@@ -790,113 +661,68 @@
         function drawSceneDetails(scene, weather, horizonY) {
             if (scene.id === 'mountain') {
                 const offset = (distance * 0.1) % width;
-                ctx.fillStyle = weather.mountainColor;
-                ctx.beginPath();
-                ctx.moveTo(0 - offset, horizonY); ctx.lineTo(width * 0.3 - offset, height * 0.35);
-                ctx.lineTo(width * 0.7 - offset, horizonY); ctx.lineTo(width * 1.1 - offset, height * 0.28);
+                ctx.fillStyle = weather.mountainColor; ctx.beginPath();
+                ctx.moveTo(0 - offset, horizonY); ctx.lineTo(width * 0.3 - offset, horizonY - height * 0.3);
+                ctx.lineTo(width * 0.7 - offset, horizonY); ctx.lineTo(width * 1.1 - offset, horizonY - height * 0.35);
                 ctx.lineTo(width * 1.6 - offset, horizonY); ctx.lineTo(width * 2, horizonY); ctx.lineTo(0, horizonY); ctx.fill();
             } 
             else if (scene.id === 'ocean') {
-                let oceanGrad = ctx.createLinearGradient(0, height * 0.45, 0, horizonY);
+                let oceanGrad = ctx.createLinearGradient(0, horizonY - height * 0.25, 0, horizonY);
                 oceanGrad.addColorStop(0, '#1b4f72'); oceanGrad.addColorStop(1, '#5dade2');
-                ctx.fillStyle = oceanGrad;
-                ctx.fillRect(0, height * 0.45, width, horizonY - height * 0.45);
-                
-                ctx.fillStyle = 'rgba(255,255,255,0.15)';
-                for (let i = 0; i < width; i += 80) {
-                    let waveW = 40 + Math.sin(Date.now()/200 + i)*15;
-                    ctx.fillRect(i + (distance % 80), height * 0.52 + Math.sin(i)*5, waveW, 2);
-                }
+                ctx.fillStyle = oceanGrad; ctx.fillRect(0, horizonY - height * 0.25, width, height * 0.25);
             } 
             else if (scene.id === 'forest') {
-                const offset = (distance * 0.4) % 120;
-                ctx.fillStyle = '#1e824c';
+                const offset = (distance * 0.4) % 120; ctx.fillStyle = '#1e824c';
                 for (let x = -120; x < width + 120; x += 60) {
-                    let drawX = x - offset;
-                    ctx.beginPath();
+                    let drawX = x - offset; ctx.beginPath();
                     ctx.moveTo(drawX, horizonY); ctx.lineTo(drawX + 30, horizonY - 110); ctx.lineTo(drawX + 60, horizonY);
                     ctx.closePath(); ctx.fill();
                 }
             } 
             else if (scene.id === 'city') {
-                const offset = (distance * 0.3) % 480;
-                ctx.fillStyle = '#2c3e50';
+                const offset = (distance * 0.3) % 480; ctx.fillStyle = '#2c3e50';
                 for (let i = -1; i < (width / 240) + 2; i++) {
                     let drawX = i * 240 - offset;
                     ctx.fillRect(drawX + 10, horizonY - 160, 60, 160);
                     ctx.fillRect(drawX + 80, horizonY - 220, 75, 220);
-                    ctx.fillRect(drawX + 165, horizonY - 130, 55, 130);
-                    
-                    ctx.fillStyle = weather.type !== 'sunny' ? 'rgba(241, 196, 15, 0.75)' : 'rgba(241, 196, 15, 0.45)';
-                    for (let wy = horizonY - 200; wy < horizonY - 20; wy += 35) {
-                        if (Math.sin(wy + i) > 0) ctx.fillRect(drawX + 100, wy, 10, 10);
-                        if (Math.cos(wy - i) > 0) ctx.fillRect(drawX + 130, wy, 10, 10);
-                    }
-                    ctx.fillStyle = '#2c3e50';
                 }
             } 
             else if (scene.id === 'country') {
                 const offset = (distance * 0.25) % 360;
                 ctx.fillStyle = '#27ae60'; ctx.fillRect(0, horizonY - 15, width, 15);
-                
-                ctx.fillStyle = '#e67e22'; 
-                for (let i = -1; i < (width / 360) + 2; i++) {
-                    let drawX = i * 360 - offset;
-                    ctx.beginPath();
-                    ctx.moveTo(drawX + 40, horizonY - 15); ctx.lineTo(drawX + 65, horizonY - 45); ctx.lineTo(drawX + 90, horizonY - 15);
-                    ctx.closePath(); ctx.fill();
-                    ctx.fillStyle = '#f39c12'; ctx.fillRect(drawX + 45, horizonY - 15, 40, 15);
-                    
-                    ctx.fillStyle = '#7f8c8d'; ctx.fillRect(drawX + 180, horizonY - 70, 12, 70); 
-                    ctx.save(); ctx.translate(drawX + 186, horizonY - 70);
-                    ctx.rotate(Date.now() / 800); 
-                    ctx.fillStyle = '#f1f2f6'; ctx.fillRect(-4, -35, 8, 70); ctx.fillRect(-35, -4, 70, 8);
-                    ctx.restore();
-                    ctx.fillStyle = '#e67e22';
-                }
             }
         }
 
-        function drawBackground() {
+        function drawBackground(timeRatio) {
             ctx.save();
-            const horizonY = height * 0.65;
+            const horizonY = height - 30; 
 
             ctx.fillStyle = getSkyGradient(currentScene, currentWeather);
             ctx.fillRect(0, 0, width, height);
             drawSceneDetails(currentScene, currentWeather, horizonY);
-            updateAndDrawSkyObjects(1 - transitionAlpha); 
+            updateAndDrawSkyObjects(1 - transitionAlpha, timeRatio); 
 
             if (isTransitioning && nextScene && nextWeather) {
-                ctx.save();
-                ctx.globalAlpha = transitionAlpha;
-                ctx.fillStyle = getSkyGradient(nextScene, nextWeather);
-                ctx.fillRect(0, 0, width, height);
-                drawSceneDetails(nextScene, nextWeather, horizonY);
-                ctx.restore();
-                
-                updateAndDrawSkyObjects(transitionAlpha);
+                ctx.save(); ctx.globalAlpha = transitionAlpha;
+                ctx.fillStyle = getSkyGradient(nextScene, nextWeather); ctx.fillRect(0, 0, width, height);
+                drawSceneDetails(nextScene, nextWeather, horizonY); ctx.restore();
+                updateAndDrawSkyObjects(transitionAlpha, timeRatio);
             }
-
             ctx.restore();
 
-            // 鐵軌
-            ctx.fillStyle = '#1a202c'; ctx.fillRect(0, horizonY, width, height * 0.1);
-            const trackOffset = (distance * 2) % 40;
-            ctx.fillStyle = '#718096';
+            ctx.fillStyle = '#1a202c'; ctx.fillRect(0, horizonY, width, 30);
+            const trackOffset = (distance * 2) % 40; ctx.fillStyle = '#718096';
             for (let i = -1; i < width / 40 + 1; i++) {
-                ctx.fillRect(i * 40 - trackOffset, height * 0.68, 14, 6);
+                ctx.fillRect(i * 40 - trackOffset, horizonY + 8, 14, 6);
             }
         }
 
         function drawPlatform() {
             ctx.save();
-            const scale = Math.max(0.6, width / 1200);
-            const trainStartX = width * 0.18;
+            const horizonY = height - 30; const scale = Math.max(0.4, width / 1200); 
+            const trainStartX = width * 0.15; 
             const baseLength = 480 * scale; const headLength = 180 * scale;
-            const trainY = height * 0.65;
-            const platformTopY = trainY - 4 * scale; 
-            const perfectStopCanvasX = trainStartX + baseLength + headLength; 
-
+            const platformTopY = horizonY - 4 * scale; const perfectStopCanvasX = trainStartX + baseLength + headLength; 
             const stopLineX = perfectStopCanvasX + (distanceToStation * 8);
             const platformX = stopLineX - 1150; const platformWidth = width * 3;
 
@@ -907,174 +733,98 @@
             passengers.forEach(p => {
                 const pX = stopLineX + p.relX;
                 if (pX > platformX && pX < platformX + platformWidth) {
-                    const sway = Math.sin(Date.now() / 250 + p.swayOffset) * 0.4;
                     ctx.save(); ctx.translate(pX, platformTopY);
-                    if (p.type === 0) {
-                        ctx.fillStyle = '#2c3e50'; ctx.fillRect(-2.5, -p.height, 5, p.height);
-                        ctx.fillStyle = '#ffffff'; ctx.fillRect(-2.5, -p.height - 4, 5, 2.5);
-                        ctx.fillStyle = '#ffdbb5'; ctx.beginPath(); ctx.arc(0, -p.height - 1.5, 2, 0, Math.PI*2); ctx.fill();
-                        ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 1.5;
-                        ctx.beginPath(); ctx.moveTo(2.5, -p.height + 4); ctx.lineTo(6, -p.height + sway); ctx.stroke();
-                    } else if (p.type === 1) {
-                        ctx.fillStyle = '#34495e'; ctx.fillRect(-3, -p.height, 6, p.height);
-                        ctx.fillStyle = '#ffdbb5'; ctx.beginPath(); ctx.arc(0, -p.height - 2, 2.5, 0, Math.PI*2); ctx.fill();
-                        ctx.fillStyle = '#7f8c8d'; ctx.fillRect(4, -9, 4.5, 9);
-                        ctx.strokeStyle = '#34495e'; ctx.strokeRect(5, -11, 2.5, 2);
-                    } else {
-                        ctx.fillStyle = p.color; ctx.fillRect(-2.5, -p.height, 5, p.height);
-                        ctx.fillStyle = '#ffdbb5'; ctx.beginPath(); ctx.arc(0, -p.height - 2, 2.5, 0, Math.PI*2); ctx.fill();
-                    }
+                    ctx.fillStyle = p.color; ctx.fillRect(-2.5, -p.height, 5, p.height);
+                    ctx.fillStyle = '#ffdbb5'; ctx.beginPath(); ctx.arc(0, -p.height - 2, 2.5, 0, Math.PI*2); ctx.fill();
                     ctx.restore();
                 }
             });
 
-            const signX = stopLineX - 120;
-            ctx.fillStyle = '#95a5a6'; ctx.fillRect(signX, platformTopY - 65, 5, 65);
+            const signX = stopLineX - 120; ctx.fillStyle = '#95a5a6'; ctx.fillRect(signX, platformTopY - 65, 5, 65);
             ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#2c3e50'; ctx.lineWidth = 1.5;
-            ctx.fillRect(signX - 50, platformTopY - 95, 106, 32); ctx.strokeRect(signX - 50, platformTopY - 95, 106, 32);
-            ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 11px sans-serif';
-            ctx.fillText(currentStationName.split(" ")[0], signX - 25, platformTopY - 76);
-
-            ctx.fillStyle = 'rgba(241, 196, 15, 0.15)';
-            ctx.fillRect(perfectStopCanvasX - 80, platformTopY, 160, 25); 
-
+            let container = signX - 50; ctx.fillRect(container, platformTopY - 95, 106, 32); ctx.strokeRect(container, platformTopY - 95, 106, 32);
+            ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 11px sans-serif'; ctx.fillText(currentStationName.split(" ")[0], signX - 25, platformTopY - 76);
             ctx.fillStyle = '#e74c3c'; ctx.fillRect(stopLineX - 3, platformTopY, 6, 25);
-            ctx.font = 'bold 11px sans-serif'; ctx.fillText("▲ 停止位置 (STOP LINE)", stopLineX - 55, platformTopY - 8);
             ctx.restore();
         }
 
         function drawShinkansen() {
-            const trainY = height * 0.65;
-            const scale = Math.max(0.6, width / 1200);
-            
-            const baseLength = 480 * scale; 
-            const headLength = 180 * scale; 
-            const trainHeight = 85 * scale;
+            const horizonY = height - 30; const scale = Math.max(0.4, width / 1200); 
+            const baseLength = 480 * scale; const headLength = 180 * scale; const trainHeight = 85 * scale;
             const bounce = speed > 0 ? Math.sin(Date.now() / 40) * 1.5 : 0;
-            
-            const firstCarStartX = width * 0.18; 
-            const secondCarStartX = firstCarStartX - baseLength - 12 * scale; 
-
+            const firstCarStartX = width * 0.15; const secondCarStartX = firstCarStartX - baseLength - 12 * scale; 
             const lightSourceX = firstCarStartX + baseLength + headLength - 5 * scale;
-            const lightSourceY = trainY - trainHeight * 0.25 + bounce;
+            const lightSourceY = horizonY - trainHeight * 0.25 + bounce;
 
             if (isHeadlightOn) {
                 ctx.save();
                 let lightBeamGrad = ctx.createLinearGradient(lightSourceX, lightSourceY, width, lightSourceY);
-                lightBeamGrad.addColorStop(0, 'rgba(255, 255, 230, 0.5)');
-                lightBeamGrad.addColorStop(0.3, 'rgba(255, 255, 240, 0.15)');
+                lightBeamGrad.addColorStop(0, 'rgba(255, 255, 230, 0.45)');
+                lightBeamGrad.addColorStop(0.3, 'rgba(255, 255, 240, 0.12)');
                 lightBeamGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-                ctx.fillStyle = lightBeamGrad;
-                ctx.beginPath(); ctx.moveTo(lightSourceX, lightSourceY - 3);
-                ctx.lineTo(width, lightSourceY - height * 0.22); ctx.lineTo(width, lightSourceY + height * 0.3);
-                ctx.closePath(); ctx.fill();
-                ctx.restore();
+                ctx.fillStyle = lightBeamGrad; ctx.beginPath(); ctx.moveTo(lightSourceX, lightSourceY - 3);
+                ctx.lineTo(width, lightSourceY - height * 0.4); ctx.lineTo(width, lightSourceY + height * 0.4);
+                ctx.closePath(); ctx.fill(); ctx.restore();
             }
 
-            // 【第二節車廂】
-            ctx.save();
-            ctx.translate(secondCarStartX, trainY - trainHeight + bounce);
+            ctx.save(); ctx.translate(secondCarStartX, horizonY - trainHeight + bounce);
             let bodyGrad2 = ctx.createLinearGradient(0, 0, 0, trainHeight);
-            bodyGrad2.addColorStop(0, '#ffffff'); bodyGrad2.addColorStop(0.15, '#f8fafc');
-            bodyGrad2.addColorStop(0.75, '#e2e8f0'); bodyGrad2.addColorStop(1, '#94a3b8');
+            bodyGrad2.addColorStop(0, '#ffffff'); bodyGrad2.addColorStop(1, '#94a3b8');
             ctx.fillStyle = bodyGrad2; ctx.fillRect(0, 0, baseLength, trainHeight);
             ctx.fillStyle = '#334155'; ctx.fillRect(0, trainHeight - 7 * scale, baseLength, 7 * scale);
             ctx.fillStyle = '#0033cc'; ctx.fillRect(0, trainHeight * 0.44, baseLength, trainHeight * 0.12);
-            
-            for (let i = 25 * scale; i < baseLength - 70 * scale; i += 65 * scale) {
-                ctx.fillStyle = '#475569'; ctx.fillRect(i - 1, trainHeight * 0.19, 44 * scale, 22 * scale);
-                let winGrad = ctx.createLinearGradient(i, trainHeight * 0.2, i, trainHeight * 0.38);
-                winGrad.addColorStop(0, '#1e293b'); winGrad.addColorStop(1, '#0f172a');
-                ctx.fillStyle = winGrad; ctx.fillRect(i, trainHeight * 0.2, 42 * scale, 20 * scale);
-            }
-            drawPhysicalDoor(baseLength - 45 * scale, trainHeight, scale);
-            ctx.restore();
+            drawPhysicalDoor(baseLength - 45 * scale, trainHeight, scale); ctx.restore();
 
-            // 【中央防風褶棚】
-            ctx.save();
-            ctx.translate(secondCarStartX + baseLength, trainY - trainHeight + bounce);
-            let gangwayGrad = ctx.createLinearGradient(0, 0, 12 * scale, 0);
-            gangwayGrad.addColorStop(0, '#0f172a'); gangwayGrad.addColorStop(0.5, '#475569'); gangwayGrad.addColorStop(1, '#0f172a');
-            ctx.fillStyle = gangwayGrad; ctx.fillRect(0, trainHeight * 0.06, 12 * scale, trainHeight * 0.88);
-            ctx.restore();
+            ctx.save(); ctx.translate(secondCarStartX + baseLength, horizonY - trainHeight + bounce);
+            ctx.fillStyle = '#475569'; ctx.fillRect(0, trainHeight * 0.06, 12 * scale, trainHeight * 0.88); ctx.restore();
 
-            // 【第一節車廂】
-            ctx.save();
-            ctx.translate(firstCarStartX, trainY - trainHeight + bounce);
+            ctx.save(); ctx.translate(firstCarStartX, horizonY - trainHeight + bounce);
             let bodyGrad1 = ctx.createLinearGradient(0, 0, 0, trainHeight);
-            bodyGrad1.addColorStop(0, '#ffffff'); bodyGrad1.addColorStop(0.2, '#f8fafc');
-            bodyGrad1.addColorStop(0.7, '#e2e8f0'); bodyGrad1.addColorStop(1, '#94a3b8');
-            ctx.fillStyle = bodyGrad1;
-            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(baseLength, 0);
+            bodyGrad1.addColorStop(0, '#ffffff'); bodyGrad1.addColorStop(1, '#94a3b8');
+            ctx.fillStyle = bodyGrad1; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(baseLength, 0);
             ctx.quadraticCurveTo(baseLength + headLength * 0.75, -1 * scale, baseLength + headLength * 0.95, trainHeight * 0.62);
             ctx.quadraticCurveTo(baseLength + headLength, trainHeight * 0.76, baseLength + headLength, trainHeight);
             ctx.lineTo(0, trainHeight); ctx.closePath(); ctx.fill();
 
             ctx.fillStyle = '#334155'; ctx.fillRect(0, trainHeight - 7 * scale, baseLength + headLength * 0.7, 7 * scale);
-            ctx.fillStyle = '#0033cc'; ctx.beginPath();
-            ctx.moveTo(0, trainHeight * 0.44); ctx.lineTo(baseLength, trainHeight * 0.44);
+            ctx.fillStyle = '#0033cc'; ctx.beginPath(); ctx.moveTo(0, trainHeight * 0.44); ctx.lineTo(baseLength, trainHeight * 0.44);
             ctx.quadraticCurveTo(baseLength + headLength * 0.72, trainHeight * 0.44, baseLength + headLength * 0.92, trainHeight * 0.68);
             ctx.lineTo(baseLength + headLength * 0.85, trainHeight * 0.78);
             ctx.quadraticCurveTo(baseLength + headLength * 0.68, trainHeight * 0.56, baseLength, trainHeight * 0.56);
             ctx.lineTo(0, trainHeight * 0.56); ctx.fill();
 
             let cockpitGrad = ctx.createLinearGradient(baseLength - 20 * scale, trainHeight * 0.08, baseLength + 85 * scale, trainHeight * 0.35);
-            cockpitGrad.addColorStop(0, '#0f172a'); cockpitGrad.addColorStop(0.5, '#1e293b'); cockpitGrad.addColorStop(1, '#020617');
-            ctx.fillStyle = cockpitGrad; ctx.beginPath();
-            ctx.moveTo(baseLength - 20 * scale, trainHeight * 0.08); ctx.lineTo(baseLength + 50 * scale, trainHeight * 0.08);
+            cockpitGrad.addColorStop(0, '#0f172a'); cockpitGrad.addColorStop(1, '#020617');
+            ctx.fillStyle = cockpitGrad; ctx.beginPath(); ctx.moveTo(baseLength - 20 * scale, trainHeight * 0.08); ctx.lineTo(baseLength + 50 * scale, trainHeight * 0.08);
             ctx.quadraticCurveTo(baseLength + 90 * scale, trainHeight * 0.10, baseLength + 112 * scale, trainHeight * 0.35);
             ctx.lineTo(baseLength + 68 * scale, trainHeight * 0.35); ctx.closePath(); ctx.fill();
-            
-            for (let i = 65 * scale; i < baseLength - 40 * scale; i += 65 * scale) {
-                ctx.fillStyle = '#475569'; ctx.fillRect(i - 1, trainHeight * 0.19, 44 * scale, 22 * scale);
-                ctx.fillStyle = '#1e293b'; ctx.fillRect(i, trainHeight * 0.2, 42 * scale, 20 * scale);
-            }
             drawPhysicalDoor(15 * scale, trainHeight, scale);
 
             if (isHeadlightOn) {
                 ctx.shadowColor = '#ffffcc'; ctx.shadowBlur = 10; ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.arc(baseLength + headLength - 15 * scale, trainHeight * 0.72, 4.5 * scale, 0, Math.PI * 2);
-                ctx.arc(baseLength + headLength - 25 * scale, trainHeight * 0.75, 3.5 * scale, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(baseLength + headLength - 15 * scale, trainHeight * 0.72, 4.5 * scale, 0, Math.PI * 2); ctx.fill();
                 ctx.shadowBlur = 0; 
             }
-            ctx.restore();
-            drawHornWaves(lightSourceX, lightSourceY);
+            ctx.restore(); drawHornWaves(lightSourceX, lightSourceY);
         }
 
         function drawPhysicalDoor(doorX, trainHeight, scale) {
-            const doorWidth = 32 * scale; const doorHeight = 58 * scale;
-            const doorY = trainHeight - doorHeight - 7 * scale;
-
-            ctx.save();
-            ctx.fillStyle = '#111625'; ctx.fillRect(doorX, doorY, doorWidth, doorHeight);
-            ctx.fillStyle = '#1e293b'; ctx.fillRect(doorX + doorWidth/2 - 1, doorY + 10, 2, doorHeight - 15);
-
+            const doorWidth = 32 * scale; const doorHeight = 58 * scale; const doorY = trainHeight - doorHeight - 7 * scale;
+            ctx.save(); ctx.fillStyle = '#111625'; ctx.fillRect(doorX, doorY, doorWidth, doorHeight);
             const doorMoveOffset = (doorWidth / 2) * doorWidthPercent;
             let doorMetalGrad = ctx.createLinearGradient(doorX, doorY, doorX + doorWidth, doorY);
-            doorMetalGrad.addColorStop(0, '#cbd5e1'); doorMetalGrad.addColorStop(0.5, '#f1f5f9'); doorMetalGrad.addColorStop(1, '#94a3b8');
-            ctx.fillStyle = doorMetalGrad;
+            doorMetalGrad.addColorStop(0, '#cbd5e1'); doorMetalGrad.addColorStop(1, '#94a3b8'); ctx.fillStyle = doorMetalGrad;
 
-            ctx.save();
-            ctx.beginPath(); ctx.rect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight); ctx.clip();
-            ctx.fillRect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight);
-            ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1; ctx.strokeRect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight);
-            ctx.fillStyle = '#0f172a'; ctx.fillRect(doorX - doorMoveOffset + doorWidth/4 - 4, doorY + 10, 6, 18);
-            ctx.restore();
+            ctx.save(); ctx.beginPath(); ctx.rect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight); ctx.clip();
+            ctx.fillRect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight); ctx.restore();
 
-            ctx.save();
-            ctx.beginPath(); ctx.rect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight); ctx.clip();
-            ctx.fillRect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight);
-            ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1; ctx.strokeRect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight);
-            ctx.fillStyle = '#0f172a'; ctx.fillRect(doorX + doorWidth / 2 + doorMoveOffset + 4, doorY + 10, 6, 18);
-            ctx.restore();
-
-            ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.5; ctx.strokeRect(doorX, doorY, doorWidth, doorHeight);
+            ctx.save(); ctx.beginPath(); ctx.rect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight); ctx.clip();
+            ctx.fillRect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight); ctx.restore();
             ctx.restore();
         }
 
         function triggerHorn() {
-            hornWaves.push({ radius: 10, alpha: 1.0, maxRadius: 135 });
-            playHornSound(); // 觸發音效
+            hornWaves.push({ radius: 10, alpha: 1.0, maxRadius: 135 }); playHornSound(); 
         }
 
         function drawHornWaves(startX, startY) {
@@ -1089,209 +839,164 @@
         }
 
         function prepareNextStationScene() {
-            let availableStations = stationPool.filter(s => s.name !== currentStationName);
-            
             nextScene = scenePool[Math.floor(Math.random() * scenePool.length)];
             nextWeather = weatherPool[Math.floor(Math.random() * weatherPool.length)];
-            
-            isTransitioning = true;
-            transitionAlpha = 0; 
+            isTransitioning = true; transitionAlpha = 0; 
         }
 
         function commitNextStation() {
             let availableStations = stationPool.filter(s => s.name !== currentStationName);
-            let nextSelected = availableStations[Math.floor(Math.random() * availableStations.length)];
-            currentStationName = nextSelected.name;
-            
-            totalStationDistance = Math.floor(Math.random() * 2501) + 2500;
-            distanceToStation = totalStationDistance;
+            currentStationName = availableStations[Math.floor(Math.random() * availableStations.length)].name;
+            totalStationDistance = Math.floor(Math.random() * 2501) + 2500; distanceToStation = totalStationDistance;
             document.getElementById('station-name-display').innerText = currentStationName;
-
-            if (nextScene && nextWeather) {
-                currentScene = nextScene;
-                currentWeather = nextWeather;
-            }
-            isTransitioning = false;
-            hasTriggeredTransition = false;
-            transitionAlpha = 0;
-
-            initWeatherParticles(); 
-            initSkyObjects(); 
+            if (nextScene && nextWeather) { currentScene = nextScene; currentWeather = nextWeather; }
+            isTransitioning = false; hasTriggeredTransition = false; transitionAlpha = 0;
+            initWeatherParticles(); initSkyObjects(); 
         }
 
-        function gameLoop() {
+        function gameLoop(timestamp) {
+            let dt = timestamp - lastTime;
+            if (dt > 100) dt = 16.66; 
+            lastTime = timestamp;
+
+            const timeRatio = dt / 16.66; 
+
+            if (skyObjects.filter(o => o.type === 'plane').length === 0 && Math.random() < 0.001 * timeRatio) {
+                skyObjects.push(generatePlane());
+            }
+            if (skyObjects.filter(o => o.type === 'bird').length === 0 && Math.random() < 0.002 * timeRatio) {
+                generateBirdFlock();
+            }
+
             if (isMissionFailed) {
-                failureResetTimer--;
-                targetSpeed = 0;
-                speed = 0; 
+                failureResetTimer -= 1 * timeRatio;
+                targetSpeed = 0; speed = 0; 
                 if (failureResetTimer <= 0) {
-                    isMissionFailed = false;
-                    distanceToStation = 10; 
-                    isArrived = false;
-                    doorOpen = false;
-                    isClosingDoors = false;
-                    doorWidthPercent = 0; 
-                    stationMessage = "重新挑戰！請上下滑動精準停靠 0m 處";
-                    messageTimer = 180;
+                    isMissionFailed = false; distanceToStation = 10; 
+                    isArrived = false; doorOpen = false; isClosingDoors = false; doorWidthPercent = 0; 
+                    stationMessage = "重新挑戰！請上下滑動精準停靠 0m 處"; messageTimer = 180;
                 }
             }
 
-            if (isMovingUp && doorOpen && !isClosingDoors && !isMissionFailed) {
-                isClosingDoors = true; 
-            }
+            if (isMovingUp && doorOpen && !isClosingDoors && !isMissionFailed) isClosingDoors = true; 
 
             if (isClosingDoors) {
-                targetSpeed = 0; speed = 0;
-                doorWidthPercent -= 0.05; 
+                targetSpeed = 0; speed = 0; doorWidthPercent -= 0.05 * timeRatio; 
                 if (doorWidthPercent <= 0) {
                     doorWidthPercent = 0; doorOpen = false; isClosingDoors = false; isArrived = false;
                     commitNextStation(); 
-                    stationMessage = `出發！前方進入【${currentScene.label}】，氣候：${currentWeather.label}`; 
-                    messageTimer = 160;
+                    stationMessage = `出發！前方進入【${currentScene.label}】，氣候：${currentWeather.label}`; messageTimer = 160;
                 }
             } else {
-                if (isMovingUp && !isMissionFailed && !doorOpen) {
-                    targetSpeed = Math.min(320, targetSpeed + 2.5);
-                }
+                if (isMovingUp && !isMissionFailed && !doorOpen) targetSpeed = Math.min(320, targetSpeed + 2.5 * timeRatio);
                 if (isArrived && speed === 0 && !isMissionFailed) {
-                    if (doorWidthPercent < 1.0) doorWidthPercent += 0.04; 
-                    else doorWidthPercent = 1.0;
+                    doorWidthPercent = Math.min(1.0, doorWidthPercent + 0.04 * timeRatio);
                 }
             }
 
-            if (isMovingDown && !isMissionFailed) targetSpeed = Math.max(0, targetSpeed - 3);
+            if (isMovingDown && !isMissionFailed) targetSpeed = Math.max(0, targetSpeed - 3 * timeRatio);
 
             if (!isMissionFailed) {
-                speed += (targetSpeed - speed) * 0.03;
+                speed += (targetSpeed - speed) * (0.03 * timeRatio);
                 if (Math.abs(speed) < 0.1) speed = 0;
-                distance += speed * 0.5;
+                distance += speed * 0.5 * timeRatio;
             }
 
-            // 更新火車引擎/風切/接縫撞擊聲
             updateTrainSounds();
             
             if (!isArrived && !isMissionFailed) {
-                distanceToStation -= (speed / 360); 
+                distanceToStation -= (speed / 360) * timeRatio; 
 
                 if (distanceToStation <= 500 && distanceToStation > 0 && !hasTriggeredTransition) {
-                    prepareNextStationScene();
-                    hasTriggeredTransition = true;
+                    prepareNextStationScene(); hasTriggeredTransition = true;
                 }
 
                 if (isTransitioning) {
-                    if (distanceToStation > 50) {
-                        transitionAlpha = 1 - ((distanceToStation - 50) / 450);
-                    } else {
-                        transitionAlpha = 1;
-                    }
+                    transitionAlpha = (distanceToStation > 50) ? 1 - ((distanceToStation - 50) / 450) : 1;
                 }
                 
                 if (speed === 0 && distanceToStation <= 20) { 
                     if (Math.abs(distanceToStation) <= 10) {
                         isArrived = true; doorOpen = true;
                         let error = Math.round(distanceToStation);
-                        if (error === 0) stationMessage = "完美停靠！誤差 0m，車門已開啟";
-                        else if (error > 0) stationMessage = `合格停靠！提早停了 ${error}m，車門已開啟`;
-                        else stationMessage = `合格停靠！衝過頭了 ${Math.abs(error)}m，車門已開啟`;
+                        stationMessage = error === 0 ? "完美停靠！誤差 0m，車門已開啟" : `合格停靠！${error > 0 ? '提早' : '衝過頭'}了 ${Math.abs(error)}m，車門已開啟`;
                         messageTimer = 0;
                     } else if (distanceToStation < -10) {
-                        isMissionFailed = true;
-                        targetSpeed = 0; speed = 0;
-                        stationMessage = "任務失敗：過站未停！(正在將車移回到站處...)";
-                        failureResetTimer = 90; 
+                        isMissionFailed = true; targetSpeed = 0; speed = 0;
+                        stationMessage = "任務失敗：過站未停！(正在將車移回到站處...)"; failureResetTimer = 90; 
                     }
                 }
-                
                 if (distanceToStation < -50) {
-                    isMissionFailed = true;
-                    targetSpeed = 0; speed = 0;
-                    stationMessage = "任務失敗：過站未停！(正在將車移回到站處...)";
-                    failureResetTimer = 90; 
+                    isMissionFailed = true; targetSpeed = 0; speed = 0;
+                    stationMessage = "任務失敗：過站未停！(正在將車移回到站處...)"; failureResetTimer = 90; 
                 }
             }
 
-            if (messageTimer > 0) {
-                messageTimer--;
-                if (messageTimer <= 0) stationMessage = "";
-            }
+            if (messageTimer > 0) messageTimer -= 1 * timeRatio;
 
-            // 儀表介面刷新
             const distDisplay = document.getElementById('station-dist-display');
             if (distanceToStation > 1000) {
-                distDisplay.innerText = (distanceToStation / 1000).toFixed(2) + " km";
-                distDisplay.style.color = "#00e5ff";
+                distDisplay.innerText = (distanceToStation / 1000).toFixed(2) + " km"; distDisplay.style.color = "#00e5ff";
             } else if (distanceToStation > 0) {
-                distDisplay.innerText = Math.round(distanceToStation) + " m";
-                distDisplay.style.color = (distanceToStation < 150) ? "#ff3b3b" : "#eab308";
-            } else if (distanceToStation === 0) {
-                distDisplay.innerText = "0 m (ARRIVED)"; distDisplay.style.color = "#00ff88";
+                distDisplay.innerText = Math.round(distanceToStation) + " m"; distDisplay.style.color = (distanceToStation < 150) ? "#ff3b3b" : "#eab308";
             } else {
-                distDisplay.innerText = `過站 ${Math.abs(Math.round(distanceToStation))} m`; distDisplay.style.color = "#ff3b3b";
+                distDisplay.innerText = "0 m (ARRIVED)"; distDisplay.style.color = "#00ff88";
             }
 
-            const circle = document.getElementById('gauge-fill-circle');
-            const percent = speed / 320;
-            const offset = 220 - (220 * percent);
-            circle.style.strokeDashoffset = offset;
-            if (speed < 120) circle.style.stroke = "#00ff66";
-            else if (speed < 240) circle.style.stroke = "#eab308";
-            else circle.style.stroke = "#00e5ff";
-
+            document.getElementById('gauge-fill-circle').style.strokeDashoffset = 220 - (220 * (speed / 320));
             document.getElementById('speed-display').innerText = Math.round(speed).toString().padStart(3, '0');
             document.getElementById('odometer-display').innerText = (distance / 250).toFixed(1);
 
             document.getElementById('led-power').className = (targetSpeed > speed) ? 'status-led status-on' : 'status-led status-off';
             document.getElementById('led-brake').className = (isMovingDown || (targetSpeed === 0 && speed > 2) || isMissionFailed) ? 'status-led status-brake' : 'status-led status-off';
             document.getElementById('led-headlight').className = isHeadlightOn ? 'status-led status-yellow' : 'status-led status-off';
-            
-            if (distanceToStation < 150 && distanceToStation > 0 && speed > 60) {
-                document.getElementById('led-brake').className = (Math.floor(Date.now() / 200) % 2 === 0) ? 'status-led status-yellow' : 'status-led status-off';
-            }
-            document.getElementById('led-door').className = (doorWidthPercent > 0.1) ? 'status-led status-door' : 'status-led status-off';
 
             ctx.clearRect(0, 0, width, height);
-            drawBackground(); 
+            drawBackground(timeRatio); 
 
-            if (distanceToStation <= 250 && distanceToStation >= -120 || isArrived || isMissionFailed) {
-                drawPlatform(); 
-            }
+            if ((distanceToStation <= 250 && distanceToStation >= -120) || isArrived || isMissionFailed) drawPlatform(); 
 
             drawShinkansen(); 
-            drawWeather();    
+            drawWeather(timeRatio);    
 
-            if (stationMessage) {
-                ctx.save(); 
-                ctx.fillStyle = isMissionFailed ? 'rgba(44, 11, 14, 0.95)' : 'rgba(10, 15, 26, 0.85)';
-                ctx.fillRect(width / 2 - 270, 50, 540, 50);
-                ctx.strokeStyle = isMissionFailed ? '#ff3b3b' : 'var(--primary-color)'; ctx.lineWidth = isMissionFailed ? 2 : 1;
-                ctx.strokeRect(width / 2 - 270, 50, 540, 50);
-                ctx.fillStyle = isMissionFailed ? '#ff3b3b' : '#ffffff'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center';
-                ctx.fillText(stationMessage, width / 2, 82); ctx.restore();
+            if (stationMessage && messageTimer > 0) {
+                ctx.save(); ctx.fillStyle = isMissionFailed ? 'rgba(44, 11, 14, 0.95)' : 'rgba(10, 15, 26, 0.85)';
+                ctx.fillRect(width / 2 - 270, 50, 540, 50); ctx.strokeStyle = isMissionFailed ? '#ff3b3b' : 'var(--primary-color)';
+                ctx.strokeRect(width / 2 - 270, 50, 540, 50); ctx.fillStyle = isMissionFailed ? '#ff3b3b' : '#ffffff';
+                ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(stationMessage, width / 2, 82); ctx.restore();
             }
 
-            let activeScene = (transitionAlpha > 0.5 && nextScene) ? nextScene : currentScene;
-            let activeWeather = (transitionAlpha > 0.5 && nextWeather) ? nextWeather : currentWeather;
-            document.title = doorOpen ? "⚠️ 車門開放中 - 列車禁止起步" : `新幹線控制台 - 風景：${activeScene.label} | 氣候：${activeWeather.label}`;
             requestAnimationFrame(gameLoop);
         }
 
-        // 手勢監聽
-        let touchStartY = 0;
-        let isDragging = false;
-        const swipeThreshold = 30;
+        let touchStartY = 0; let isDragging = false; const swipeThreshold = 30;
+        let lastTouchTime = 0; // 用於手機端自訂雙擊偵測
 
+        // 核心修改：在非控制面板區域點擊時的操作監聽
         window.addEventListener('touchstart', (e) => {
             if (document.getElementById('dashboard').contains(e.target) || isMissionFailed) return;
-            touchStartY = e.touches[0].clientY; isDragging = true;
-            if (!audioCtx) initAudio(); // 第一次觸摸螢幕時啟動音訊環境
-        }, { passive: true });
+            
+            // 手機版自訂連點兩下（雙擊）偵測
+            const now = performance.now();
+            const timespan = now - lastTouchTime;
+            lastTouchTime = now;
+
+            if (timespan > 0 && timespan < 300) {
+                // 300毫秒內連點兩下，觸發開關燈
+                e.preventDefault(); // 關鍵：防止手機網頁放大晃動
+                isHeadlightOn = !isHeadlightOn;
+                isDragging = false;
+                return;
+            }
+
+            touchStartY = e.touches[0].clientY; isDragging = true; if (!audioCtx) initAudio(); 
+        }, { passive: false }); // 注意：為了預防網頁放大，這裡不能設為 passive: true
 
         window.addEventListener('touchmove', (e) => {
             if (!isDragging || isMissionFailed) return;
             const currentY = e.touches[0].clientY; const diffY = touchStartY - currentY;
             if (Math.abs(diffY) > swipeThreshold) {
-                if (diffY > 0) { isMovingUp = true; isMovingDown = false; } 
-                else { isMovingDown = true; isMovingUp = false; }
+                if (diffY > 0) { isMovingUp = true; isMovingDown = false; } else { isMovingDown = true; isMovingUp = false; }
                 isDragging = false; 
             }
         }, { passive: true });
@@ -1299,40 +1004,38 @@
         window.addEventListener('touchend', () => { isMovingUp = false; isMovingDown = false; isDragging = false; });
 
         window.addEventListener('mousedown', (e) => {
-            if (!audioCtx) initAudio(); // 第一次點擊滑鼠啟動音訊環境
+            if (!audioCtx) initAudio(); 
             if (document.getElementById('dashboard').contains(e.target) || isMissionFailed) return;
             if (e.button === 0) { touchStartY = e.clientY; isDragging = true; triggerHorn(); } 
-            else if (e.button === 2) { isHeadlightOn = !isHeadlightOn; }
+        });
+
+        // 核心修改：電腦版滑鼠連點兩下做開關燈
+        window.addEventListener('dblclick', (e) => {
+            if (document.getElementById('dashboard').contains(e.target) || isMissionFailed) return;
+            isHeadlightOn = !isHeadlightOn;
         });
 
         window.addEventListener('mousemove', (e) => {
             if (!isDragging || isMissionFailed) return;
             const diffY = touchStartY - e.clientY;
             if (Math.abs(diffY) > swipeThreshold) {
-                if (diffY > 0) { isMovingUp = true; isMovingDown = false; } 
-                else { isMovingDown = true; isMovingUp = false; }
+                if (diffY > 0) { isMovingUp = true; isMovingDown = false; } else { isMovingDown = true; isMovingUp = false; }
                 isDragging = false;
             }
         });
 
         window.addEventListener('mouseup', () => { isMovingUp = false; isMovingDown = false; isDragging = false; });
 
-        const btnAccel = document.getElementById('btn-accel');
-        const btnDecel = document.getElementById('btn-decel');
-
+        const btnAccel = document.getElementById('btn-accel'); const btnDecel = document.getElementById('btn-decel');
         btnAccel.addEventListener('mousedown', (e) => { e.preventDefault(); if (!audioCtx) initAudio(); if(!isMissionFailed) isMovingUp = true; });
         btnAccel.addEventListener('touchstart', (e) => { e.preventDefault(); if (!audioCtx) initAudio(); if(!isMissionFailed) isMovingUp = true; });
-        btnAccel.addEventListener('mouseup', () => isMovingUp = false);
-        btnAccel.addEventListener('touchend', () => isMovingUp = false);
-
+        btnAccel.addEventListener('mouseup', () => isMovingUp = false); btnAccel.addEventListener('touchend', () => isMovingUp = false);
         btnDecel.addEventListener('mousedown', (e) => { e.preventDefault(); if (!audioCtx) initAudio(); if(!isMissionFailed) isMovingDown = true; });
         btnDecel.addEventListener('touchstart', (e) => { e.preventDefault(); if (!audioCtx) initAudio(); if(!isMissionFailed) isMovingDown = true; });
-        btnDecel.addEventListener('mouseup', () => isMovingDown = false);
-        btnDecel.addEventListener('touchend', () => isMovingDown = false);
+        btnDecel.addEventListener('mouseup', () => isMovingDown = false); btnDecel.addEventListener('touchend', () => isMovingDown = false);
 
         window.addEventListener('keydown', (e) => {
-            if (!audioCtx) initAudio();
-            if (isMissionFailed) return;
+            if (!audioCtx) initAudio(); if (isMissionFailed) return;
             if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') isMovingUp = true;
             if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') isMovingDown = true;
         });
@@ -1342,13 +1045,11 @@
         });
 
         window.addEventListener('wheel', (e) => {
-            if (!audioCtx) initAudio();
-            if (isMissionFailed) return;
+            if (!audioCtx) initAudio(); if (isMissionFailed) return;
             if (e.deltaY < 0) {
                 if (doorOpen) { isMovingUp = true; setTimeout(() => { isMovingUp = false; }, 200); } 
-                else { targetSpeed = Math.min(320, targetSpeed + 15); }
-            }
-            else if (e.deltaY > 0) targetSpeed = Math.max(0, targetSpeed - 15);
+                else targetSpeed = Math.min(320, targetSpeed + 15);
+            } else if (e.deltaY > 0) targetSpeed = Math.max(0, targetSpeed - 15);
         });
 
         resize();
