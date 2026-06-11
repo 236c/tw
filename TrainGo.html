@@ -212,6 +212,7 @@
             color: #475569;
             font-weight: 800;
             letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
         .station-dist-num {
             font-family: 'Courier New', monospace;
@@ -418,13 +419,13 @@
 
         function playTrackClack() {
             const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); const filter = audioCtx.createBiquadFilter();
-            osc.type = 'sine'; osc.frequency.setValueAtTime(60, now);
+            const oscReal = audioCtx.createOscillator(); const gain = audioCtx.createGain(); const filter = audioCtx.createBiquadFilter();
+            oscReal.type = 'sine'; oscReal.frequency.setValueAtTime(60, now);
             filter.type = 'lowpass'; filter.frequency.setValueAtTime(100, now);
             const speedVol = (speed / 320) * 0.25;
             gain.gain.setValueAtTime(speedVol, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-            osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(now); osc.stop(now + 0.1);
+            oscReal.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+            oscReal.start(now); oscReal.stop(now + 0.1);
             setTimeout(() => {
                 if (!audioCtx || speed < 10) return;
                 const now2 = audioCtx.currentTime;
@@ -450,15 +451,15 @@
 
         const weatherPool = [
             { type: 'sunny', label: "晴天 (☀️ SUNNY)", mountainColor: 'rgba(0,0,0,0.06)' },
-            { type: 'cloudy', label: "陰天 (☁️ CLOUDY)", mountainColor: 'rgba(0,0,0,0.14)' },
-            { type: 'rain', label: "雨天 (🌧️ RAIN)", mountainColor: 'rgba(0,0,0,0.18)' },
-            { type: 'snow', label: "下雪 (❄️ SNOW)", mountainColor: 'rgba(0,0,0,0.22)' }
+            { type: 'cloudy', label: "陰天 (☁️ CLOUDY)", mountainColor: 'rgba(0,0,0,0.12)' },
+            { type: 'rain', label: "雨天 (🌧️ RAIN)", mountainColor: 'rgba(0,0,0,0.15)' },
+            { type: 'snow', label: "下雪 (❄️ SNOW)", mountainColor: 'rgba(0,0,0,0.18)' }
         ];
         const scenePool = [
-            { id: 'mountain', label: "山景 ⛰️", skyTop: '#87CEEB', skyBottom: '#E0F6FF' },
+            { id: 'mountain', label: "山景 ⛰️", skyTop: '#74b9ff', skyBottom: '#eccc68' }, // 升級清晨群山日落天空色彩
             { id: 'ocean', label: "海景 🌊", skyTop: '#0a3d62', skyBottom: '#3c6382' },
-            { id: 'forest', label: "樹林 🌲", skyTop: '#38ef7d', skyBottom: '#11998e' },
-            { id: 'city', label: "都市 🏙️", skyTop: '#2c3e50', skyBottom: '#bdc3c7' },
+            { id: 'forest', label: "樹林 🌲", skyTop: '#2bcbba', skyBottom: '#e8f8f5' },   // 升級林間清爽天空色
+            { id: 'city', label: "都市 🏙️", skyTop: '#1e272c', skyBottom: '#405059' }, 
             { id: 'country', label: "鄉村 🏡", skyTop: '#f6b93b', skyBottom: '#f8fafc' }
         ];
 
@@ -630,7 +631,7 @@
                 p.x += dynamicSpeedX * timeRatio; p.y += dynamicSpeedY * timeRatio;
 
                 if (p.y > height) { p.y = 0; p.x = Math.random() * width; }
-                if (p.x < 0) { e.x = width; p.y = Math.random() * height; }
+                if (p.x < 0) { p.x = width; p.y = Math.random() * height; } 
 
                 if (currentType === 'rain') {
                     ctx.strokeStyle = `rgba(174, 219, 255, ${0.4 * pAlpha})`; ctx.lineWidth = 1.0;
@@ -649,43 +650,232 @@
             if (weather.type === 'sunny') {
                 skyGrad.addColorStop(0, scene.skyTop); skyGrad.addColorStop(1, scene.skyBottom);
             } else if (weather.type === 'cloudy') {
-                skyGrad.addColorStop(0, '#57606f'); skyGrad.addColorStop(1, '#a5b1c2');
+                skyGrad.addColorStop(0, '#4a5568'); skyGrad.addColorStop(1, '#718096');
             } else if (weather.type === 'rain') {
-                skyGrad.addColorStop(0, '#2f3640'); skyGrad.addColorStop(1, '#718093');
+                skyGrad.addColorStop(0, '#2d3748'); skyGrad.addColorStop(1, '#4a5568');
             } else { 
-                skyGrad.addColorStop(0, '#1e272e'); skyGrad.addColorStop(1, '#485460');
+                skyGrad.addColorStop(0, '#1a202c'); skyGrad.addColorStop(1, '#2d3748');
             }
             return skyGrad;
         }
 
+        // 🛠️ 核心美化重構：精緻化山景（雙層3D向光切面、雪帽）、樹林（立體針葉、樹幹、遠近視差）
         function drawSceneDetails(scene, weather, horizonY) {
+            const scale = Math.max(0.4, width / 1200); 
+
+            // ================= ⛰️ 【精緻化山景】 =================
             if (scene.id === 'mountain') {
-                const offset = (distance * 0.1) % width;
-                ctx.fillStyle = weather.mountainColor; ctx.beginPath();
-                ctx.moveTo(0 - offset, horizonY); ctx.lineTo(width * 0.3 - offset, horizonY - height * 0.3);
-                ctx.lineTo(width * 0.7 - offset, horizonY); ctx.lineTo(width * 1.1 - offset, horizonY - height * 0.35);
-                ctx.lineTo(width * 1.6 - offset, horizonY); ctx.lineTo(width * 2, horizonY); ctx.lineTo(0, horizonY); ctx.fill();
+                ctx.save();
+                
+                // [1. 遠山 (Far Mountains)] - 移動速度極慢，顏色帶有遠景透視霧感
+                const farOffset = (distance * 0.05) % width;
+                let farColor = weather.type === 'sunny' ? '#9ab7d3' : '#4a5a6a';
+                ctx.fillStyle = farColor;
+                
+                ctx.beginPath();
+                ctx.moveTo(0 - farOffset, horizonY);
+                ctx.lineTo(width * 0.25 - farOffset, horizonY - height * 0.25);
+                ctx.lineTo(width * 0.55 - farOffset, horizonY);
+                ctx.lineTo(width * 0.8 - farOffset, horizonY - height * 0.22);
+                ctx.lineTo(width * 1.2 - farOffset, horizonY);
+                ctx.lineTo(width * 1.5 - farOffset, horizonY - height * 0.28);
+                ctx.lineTo(width * 2 - farOffset, horizonY);
+                ctx.lineTo(0, horizonY);
+                ctx.fill();
+
+                // [2. 近山 (Near Mountains)] - 移動速度稍快，具備明暗3D切面與皚皚雪帽
+                const nearOffset = (distance * 0.12) % width;
+                
+                // 定義三座近景主峰的相對頂點位置
+                const peaks = [
+                    { rx: 0.15, ry: 0.35, rw: 0.4 },
+                    { rx: 0.5, ry: 0.38, rw: 0.45 },
+                    { rx: 0.85, ry: 0.32, rw: 0.38 }
+                ];
+
+                peaks.forEach(p => {
+                    let peakX = width * p.rx - nearOffset;
+                    let peakY = horizonY - height * p.ry;
+                    let peakW = width * p.rw;
+                    let leftX = peakX - peakW * 0.5;
+                    let rightX = peakX + peakW * 0.5;
+
+                    // 確保群山在左右循環繪製時不會斷軌
+                    for (let loop = 0; loop <= 1; loop++) {
+                        let shift = loop * width;
+                        let curLeft = leftX + shift;
+                        let curPeak = peakX + shift;
+                        let curRight = rightX + shift;
+
+                        // A. 繪製背光面 (暗部 - 左側)
+                        ctx.fillStyle = weather.type === 'sunny' ? '#4a567d' : '#23293d';
+                        ctx.beginPath();
+                        ctx.moveTo(curLeft, horizonY);
+                        ctx.lineTo(curPeak, peakY);
+                        ctx.lineTo(curPeak, horizonY);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        // B. 繪製向光面 (亮部 - 右側)
+                        ctx.fillStyle = weather.type === 'sunny' ? '#687fa6' : '#2f3954';
+                        ctx.beginPath();
+                        ctx.moveTo(curPeak, peakY);
+                        ctx.lineTo(curRight, horizonY);
+                        ctx.lineTo(curPeak, horizonY);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        // C. 繪製山頂「立體積雪 (Snow Cap)」
+                        if (weather.type !== 'rain') {
+                            let snowH = height * 0.06;
+                            
+                            // 左側暗雪
+                            ctx.fillStyle = '#d2dae2';
+                            ctx.beginPath();
+                            ctx.moveTo(curPeak, peakY);
+                            ctx.lineTo(curPeak - snowH * 0.7, peakY + snowH);
+                            ctx.lineTo(curPeak, peakY + snowH * 0.8);
+                            ctx.closePath();
+                            ctx.fill();
+
+                            // 右側亮雪
+                            ctx.fillStyle = '#ffffff';
+                            ctx.beginPath();
+                            ctx.moveTo(curPeak, peakY);
+                            ctx.lineTo(curPeak + snowH * 0.7, peakY + snowH);
+                            ctx.lineTo(curPeak, peakY + snowH * 0.8);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+                });
+                ctx.restore();
             } 
             else if (scene.id === 'ocean') {
-                let oceanGrad = ctx.createLinearGradient(0, horizonY - height * 0.25, 0, horizonY);
+                let oceanHeight = Math.max(100, height * 0.25);
+                let oceanTopY = horizonY - oceanHeight;
+                let oceanGrad = ctx.createLinearGradient(0, oceanTopY, 0, horizonY);
                 oceanGrad.addColorStop(0, '#1b4f72'); oceanGrad.addColorStop(1, '#5dade2');
-                ctx.fillStyle = oceanGrad; ctx.fillRect(0, horizonY - height * 0.25, width, height * 0.25);
-            } 
-            else if (scene.id === 'forest') {
-                const offset = (distance * 0.4) % 120; ctx.fillStyle = '#1e824c';
-                for (let x = -120; x < width + 120; x += 60) {
-                    let drawX = x - offset; ctx.beginPath();
-                    ctx.moveTo(drawX, horizonY); ctx.lineTo(drawX + 30, horizonY - 110); ctx.lineTo(drawX + 60, horizonY);
-                    ctx.closePath(); ctx.fill();
+                ctx.fillStyle = oceanGrad; ctx.fillRect(0, oceanTopY, width, oceanHeight);
+                
+                ctx.fillStyle = 'rgba(255,255,255,0.18)';
+                const waveOffset = (distance * 0.5) % 80;
+                for (let i = -80; i < width + 80; i += 80) {
+                    let waveW = 40 + Math.sin(Date.now() / 200 + i) * 15;
+                    ctx.fillRect(i - waveOffset, oceanTopY + (oceanHeight * 0.4) + Math.sin(i) * 5, waveW, 2);
                 }
+            } 
+            // ================= 🌲 【精緻化樹林】 =================
+            else if (scene.id === 'forest') {
+                ctx.save();
+                
+                // [1. 遠景小樹林] - 顏色較淺、移動較慢
+                const farTreeOffset = (distance * 0.2) % 180;
+                for (let x = -100; x < width + 100; x += 45 * scale) {
+                    let drawX = x - farTreeOffset;
+                    let tHeight = (50 + (Math.sin(x) * 15)) * scale;
+                    let tWidth = 22 * scale;
+                    
+                    ctx.fillStyle = weather.type === 'sunny' ? '#1abc9c' : '#117a65'; // 遠方偏藍綠的林木
+                    ctx.beginPath();
+                    ctx.moveTo(drawX, horizonY);
+                    ctx.lineTo(drawX + tWidth/2, horizonY - tHeight);
+                    ctx.lineTo(drawX + tWidth, horizonY);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                // [2. 近景高精緻立體松樹林] - 擁有獨立樹幹、三層漸層針葉樹冠，且具備高低起伏
+                const nearTreeOffset = (distance * 0.45) % 240;
+                
+                for (let x = -120; x < width + 120; x += 55 * scale) {
+                    let drawX = x - nearTreeOffset;
+                    // 根據正弦函數創造自然高低變化的樹木高度
+                    let treeH = (85 + Math.sin(x * 0.05) * 25) * scale;
+                    let treeW = 38 * scale;
+
+                    // A. 繪製深棕色實體樹幹 (Trunk)
+                    ctx.fillStyle = '#5c3a21';
+                    let trunkW = 4 * scale;
+                    let trunkH = treeH * 0.25;
+                    ctx.fillRect(drawX + treeW/2 - trunkW/2, horizonY - trunkH, trunkW, trunkH);
+
+                    // B. 繪製三層立體漸層松葉 (三層三角形葉片疊加)
+                    let leafStartY = horizonY - trunkH;
+                    let layerH = (treeH - trunkH) / 3;
+
+                    // 顏色陣列 (底層最暗 -> 頂層最亮)
+                    let leafColors = weather.type === 'sunny' 
+                        ? ['#196f3d', '#229954', '#2ecc71']  
+                        : ['#145a32', '#196f3d', '#229954']; 
+
+                    for (let layer = 0; layer < 3; layer++) {
+                        ctx.fillStyle = leafColors[layer];
+                        
+                        let curBottomY = leafStartY - layer * (layerH * 0.7);
+                        let curHeight = layerH * (1.3 - layer * 0.15);
+                        let curWidth = treeW * (1.0 - layer * 0.22);
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(drawX + treeW/2 - curWidth/2, curBottomY);             // 左底點
+                        ctx.lineTo(drawX + treeW/2, curBottomY - curHeight);            // 頂點
+                        ctx.lineTo(drawX + treeW/2 + curWidth/2, curBottomY);            // 右底點
+                        ctx.closePath();
+                        ctx.fill();
+                        
+                        // 側邊向光立體高光線（亮部點綴）
+                        if (weather.type === 'sunny') {
+                            ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                            ctx.beginPath();
+                            ctx.moveTo(drawX + treeW/2, curBottomY - curHeight);
+                            ctx.lineTo(drawX + treeW/2 + curWidth/2, curBottomY);
+                            ctx.lineTo(drawX + treeW/2, curBottomY);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+                }
+                ctx.restore();
             } 
             else if (scene.id === 'city') {
-                const offset = (distance * 0.3) % 480; ctx.fillStyle = '#2c3e50';
-                for (let i = -1; i < (width / 240) + 2; i++) {
-                    let drawX = i * 240 - offset;
-                    ctx.fillRect(drawX + 10, horizonY - 160, 60, 160);
-                    ctx.fillRect(drawX + 80, horizonY - 220, 75, 220);
+                ctx.save();
+                const farOffset = (distance * 0.12) % 400;
+                ctx.fillStyle = weather.type === 'sunny' ? '#222f3e' : '#141d26'; 
+                for (let i = -1; i < (width / (100 * scale)) + 2; i++) {
+                    let drawX = i * (140 * scale) - farOffset;
+                    let bHeight = (120 + (i % 3) * 50) * scale; let bWidth = 55 * scale;
+                    ctx.fillRect(drawX, horizonY - bHeight, bWidth, bHeight);
+                    if (i % 2 === 0) ctx.fillRect(drawX + bWidth * 0.4, horizonY - bHeight - 15 * scale, 4 * scale, 15 * scale);
                 }
+
+                const nearOffset = (distance * 0.35) % 500;
+                for (let i = -1; i < (width / (150 * scale)) + 2; i++) {
+                    let drawX = i * (220 * scale) - nearOffset;
+                    let bHeight = (180 + (i * 73 % 4) * 45) * scale; let bWidth = 85 * scale;
+                    ctx.fillStyle = weather.type === 'sunny' ? '#34495e' : '#1c2631'; ctx.fillRect(drawX, horizonY - bHeight, bWidth, bHeight);
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.18)'; ctx.fillRect(drawX + bWidth * 0.75, horizonY - bHeight, bWidth * 0.25, bHeight);
+
+                    ctx.fillStyle = weather.type === 'sunny' ? '#2c3e50' : '#151c24';
+                    if (i % 2 === 0) {
+                        ctx.fillRect(drawX + bWidth * 0.2, horizonY - bHeight - 10 * scale, bWidth * 0.6, 10 * scale);
+                        ctx.fillStyle = '#ff3b3b'; ctx.fillRect(drawX + bWidth * 0.5 - 1 * scale, horizonY - bHeight - 25 * scale, 2 * scale, 2 * scale);
+                    } else if (i % 3 === 0) {
+                        ctx.fillRect(drawX + bWidth * 0.1, horizonY - bHeight - 6 * scale, bWidth * 0.8, 6 * scale);
+                        ctx.fillRect(drawX + bWidth * 0.25, horizonY - bHeight - 12 * scale, bWidth * 0.5, 6 * scale);
+                    }
+
+                    let winW = 5 * scale; let winH = 7 * scale; let gapX = 10 * scale; let gapY = 14 * scale;
+                    for (let wx = drawX + 10 * scale; wx < drawX + bWidth * 0.7; wx += gapX) {
+                        for (let wy = horizonY - bHeight + 15 * scale; wy < horizonY - 15 * scale; wy += gapY) {
+                            let seed = Math.sin(wx * 2 + wy * 5 + i);
+                            if (seed > -0.2) {
+                                ctx.fillStyle = `rgba(241, 196, 15, ${weather.type === 'sunny' ? 0.4 + Math.abs(seed) * 0.4 : 0.6 + Math.abs(seed) * 0.4})`; 
+                                ctx.fillRect(wx, wy, winW, winH);
+                            }
+                        }
+                    }
+                }
+                ctx.restore();
             } 
             else if (scene.id === 'country') {
                 const offset = (distance * 0.25) % 360;
@@ -748,8 +938,9 @@
             ctx.restore();
         }
 
+        UXScaleMax = 1200;
         function drawShinkansen() {
-            const horizonY = height - 30; const scale = Math.max(0.4, width / 1200); 
+            const horizonY = height - 30; const scale = Math.max(0.4, width / UXScaleMax); 
             const baseLength = 480 * scale; const headLength = 180 * scale; const trainHeight = 85 * scale;
             const bounce = speed > 0 ? Math.sin(Date.now() / 40) * 1.5 : 0;
             const firstCarStartX = width * 0.15; const secondCarStartX = firstCarStartX - baseLength - 12 * scale; 
@@ -767,59 +958,140 @@
                 ctx.closePath(); ctx.fill(); ctx.restore();
             }
 
+            // 【第二節車廂】
             ctx.save(); ctx.translate(secondCarStartX, horizonY - trainHeight + bounce);
             let bodyGrad2 = ctx.createLinearGradient(0, 0, 0, trainHeight);
-            bodyGrad2.addColorStop(0, '#ffffff'); bodyGrad2.addColorStop(1, '#94a3b8');
+            bodyGrad2.addColorStop(0, '#ffffff'); bodyGrad2.addColorStop(0.15, '#f8fafc');
+            bodyGrad2.addColorStop(0.75, '#e2e8f0'); bodyGrad2.addColorStop(1, '#94a3b8');
             ctx.fillStyle = bodyGrad2; ctx.fillRect(0, 0, baseLength, trainHeight);
             ctx.fillStyle = '#334155'; ctx.fillRect(0, trainHeight - 7 * scale, baseLength, 7 * scale);
             ctx.fillStyle = '#0033cc'; ctx.fillRect(0, trainHeight * 0.44, baseLength, trainHeight * 0.12);
+            
+            for (let i = 25 * scale; i < baseLength - 70 * scale; i += 65 * scale) {
+                ctx.fillStyle = '#475569'; ctx.fillRect(i - 1, trainHeight * 0.19, 44 * scale, 22 * scale);
+                let winGrad = ctx.createLinearGradient(i, trainHeight * 0.2, i, trainHeight * 0.38);
+                winGrad.addColorStop(0, '#1e293b'); winGrad.addColorStop(1, '#0f172a');
+                ctx.fillStyle = winGrad; ctx.fillRect(i, trainHeight * 0.2, 42 * scale, 20 * scale);
+            }
             drawPhysicalDoor(baseLength - 45 * scale, trainHeight, scale); ctx.restore();
 
+            // 【中央防風褶棚】
             ctx.save(); ctx.translate(secondCarStartX + baseLength, horizonY - trainHeight + bounce);
-            ctx.fillStyle = '#475569'; ctx.fillRect(0, trainHeight * 0.06, 12 * scale, trainHeight * 0.88); ctx.restore();
+            let gangwayGrad = ctx.createLinearGradient(0, 0, 12 * scale, 0);
+            gangwayGrad.addColorStop(0, '#0f172a'); gangwayGrad.addColorStop(0.5, '#475569'); gangwayGrad.addColorStop(1, '#0f172a');
+            ctx.fillStyle = gangwayGrad; ctx.fillRect(0, trainHeight * 0.06, 12 * scale, trainHeight * 0.88);
+            ctx.restore();
 
+            // 【第一節車廂】
             ctx.save(); ctx.translate(firstCarStartX, horizonY - trainHeight + bounce);
             let bodyGrad1 = ctx.createLinearGradient(0, 0, 0, trainHeight);
-            bodyGrad1.addColorStop(0, '#ffffff'); bodyGrad1.addColorStop(1, '#94a3b8');
-            ctx.fillStyle = bodyGrad1; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(baseLength, 0);
+            bodyGrad1.addColorStop(0, '#ffffff'); bodyGrad1.addColorStop(0.2, '#f8fafc');
+            bodyGrad1.addColorStop(0.7, '#e2e8f0'); bodyGrad1.addColorStop(1, '#94a3b8');
+            ctx.fillStyle = bodyGrad1;
+            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(baseLength, 0);
             ctx.quadraticCurveTo(baseLength + headLength * 0.75, -1 * scale, baseLength + headLength * 0.95, trainHeight * 0.62);
             ctx.quadraticCurveTo(baseLength + headLength, trainHeight * 0.76, baseLength + headLength, trainHeight);
             ctx.lineTo(0, trainHeight); ctx.closePath(); ctx.fill();
 
             ctx.fillStyle = '#334155'; ctx.fillRect(0, trainHeight - 7 * scale, baseLength + headLength * 0.7, 7 * scale);
-            ctx.fillStyle = '#0033cc'; ctx.beginPath(); ctx.moveTo(0, trainHeight * 0.44); ctx.lineTo(baseLength, trainHeight * 0.44);
+            ctx.fillStyle = '#0033cc'; ctx.beginPath();
+            ctx.moveTo(0, trainHeight * 0.44); ctx.lineTo(baseLength, trainHeight * 0.44);
             ctx.quadraticCurveTo(baseLength + headLength * 0.72, trainHeight * 0.44, baseLength + headLength * 0.92, trainHeight * 0.68);
             ctx.lineTo(baseLength + headLength * 0.85, trainHeight * 0.78);
             ctx.quadraticCurveTo(baseLength + headLength * 0.68, trainHeight * 0.56, baseLength, trainHeight * 0.56);
             ctx.lineTo(0, trainHeight * 0.56); ctx.fill();
 
             let cockpitGrad = ctx.createLinearGradient(baseLength - 20 * scale, trainHeight * 0.08, baseLength + 85 * scale, trainHeight * 0.35);
-            cockpitGrad.addColorStop(0, '#0f172a'); cockpitGrad.addColorStop(1, '#020617');
-            ctx.fillStyle = cockpitGrad; ctx.beginPath(); ctx.moveTo(baseLength - 20 * scale, trainHeight * 0.08); ctx.lineTo(baseLength + 50 * scale, trainHeight * 0.08);
+            cockpitGrad.addColorStop(0, '#0f172a'); cockpitGrad.addColorStop(0.5, '#1e293b'); cockpitGrad.addColorStop(1, '#020617');
+            ctx.fillStyle = cockpitGrad; ctx.beginPath();
+            ctx.moveTo(baseLength - 20 * scale, trainHeight * 0.08); ctx.lineTo(baseLength + 50 * scale, trainHeight * 0.08);
             ctx.quadraticCurveTo(baseLength + 90 * scale, trainHeight * 0.10, baseLength + 112 * scale, trainHeight * 0.35);
             ctx.lineTo(baseLength + 68 * scale, trainHeight * 0.35); ctx.closePath(); ctx.fill();
+            
+            for (let i = 65 * scale; i < baseLength - 40 * scale; i += 65 * scale) {
+                ctx.fillStyle = '#475569'; ctx.fillRect(i - 1, trainHeight * 0.19, 44 * scale, 22 * scale);
+                let winGrad1 = ctx.createLinearGradient(i, trainHeight * 0.2, i, trainHeight * 0.38);
+                winGrad1.addColorStop(0, '#1e293b'); winGrad1.addColorStop(1, '#0f172a');
+                ctx.fillStyle = winGrad1; ctx.fillRect(i, trainHeight * 0.2, 42 * scale, 20 * scale);
+            }
             drawPhysicalDoor(15 * scale, trainHeight, scale);
 
             if (isHeadlightOn) {
                 ctx.shadowColor = '#ffffcc'; ctx.shadowBlur = 10; ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.arc(baseLength + headLength - 15 * scale, trainHeight * 0.72, 4.5 * scale, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(baseLength + headLength - 15 * scale, trainHeight * 0.72, 4.5 * scale, 0, Math.PI * 2);
+                ctx.arc(baseLength + headLength - 25 * scale, trainHeight * 0.75, 3.5 * scale, 0, Math.PI * 2); ctx.fill();
                 ctx.shadowBlur = 0; 
             }
             ctx.restore(); drawHornWaves(lightSourceX, lightSourceY);
         }
 
         function drawPhysicalDoor(doorX, trainHeight, scale) {
-            const doorWidth = 32 * scale; const doorHeight = 58 * scale; const doorY = trainHeight - doorHeight - 7 * scale;
-            ctx.save(); ctx.fillStyle = '#111625'; ctx.fillRect(doorX, doorY, doorWidth, doorHeight);
+            const doorWidth = 32 * scale; 
+            const doorHeight = 58 * scale; 
+            const doorY = trainHeight - doorHeight - 7 * scale;
+
+            ctx.save();
+            ctx.fillStyle = '#111625'; 
+            ctx.fillRect(doorX, doorY, doorWidth, doorHeight);
+            
             const doorMoveOffset = (doorWidth / 2) * doorWidthPercent;
             let doorMetalGrad = ctx.createLinearGradient(doorX, doorY, doorX + doorWidth, doorY);
-            doorMetalGrad.addColorStop(0, '#cbd5e1'); doorMetalGrad.addColorStop(1, '#94a3b8'); ctx.fillStyle = doorMetalGrad;
+            doorMetalGrad.addColorStop(0, '#cbd5e1'); 
+            doorMetalGrad.addColorStop(0.5, '#f1f5f9'); 
+            doorMetalGrad.addColorStop(1, '#94a3b8');
+            ctx.fillStyle = doorMetalGrad;
 
-            ctx.save(); ctx.beginPath(); ctx.rect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight); ctx.clip();
-            ctx.fillRect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight); ctx.restore();
+            // 【左側半扇車門】
+            ctx.save();
+            ctx.beginPath(); 
+            ctx.rect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight); 
+            ctx.clip();
+            ctx.fillRect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight);
+            
+            ctx.strokeStyle = '#64748b'; 
+            ctx.lineWidth = Math.max(0.5, 1 * scale); 
+            ctx.strokeRect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight);
+            
+            ctx.fillStyle = '#0f172a'; 
+            ctx.fillRect(
+                doorX - doorMoveOffset + (doorWidth / 4) - 3 * scale, 
+                doorY + 10 * scale, 
+                6 * scale, 
+                18 * scale
+            );
+            ctx.restore();
 
-            ctx.save(); ctx.beginPath(); ctx.rect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight); ctx.clip();
-            ctx.fillRect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight); ctx.restore();
+            // 【右側半扇車門】
+            ctx.save();
+            ctx.beginPath(); 
+            ctx.rect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight); 
+            ctx.clip();
+            ctx.fillRect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight);
+            
+            ctx.strokeStyle = '#64748b'; 
+            ctx.lineWidth = Math.max(0.5, 1 * scale); 
+            ctx.strokeRect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight);
+            
+            ctx.fillStyle = '#0f172a'; 
+            ctx.fillRect(
+                doorX + (doorWidth / 2) + doorMoveOffset + 3 * scale, 
+                doorY + 10 * scale, 
+                6 * scale, 
+                18 * scale
+            );
+            ctx.restore();
+
+            ctx.fillStyle = '#1e293b'; 
+            ctx.fillRect(
+                doorX + (doorWidth / 2) - 0.75 * scale, 
+                doorY + 2 * scale, 
+                1.5 * scale, 
+                doorHeight - 4 * scale
+            );
+            
+            ctx.strokeStyle = '#475569'; 
+            ctx.lineWidth = Math.max(0.6, 1.5 * scale); 
+            ctx.strokeRect(doorX, doorY, doorWidth, doorHeight);
             ctx.restore();
         }
 
@@ -920,7 +1192,7 @@
                         isArrived = true; doorOpen = true;
                         let error = Math.round(distanceToStation);
                         stationMessage = error === 0 ? "完美停靠！誤差 0m，車門已開啟" : `合格停靠！${error > 0 ? '提早' : '衝過頭'}了 ${Math.abs(error)}m，車門已開啟`;
-                        messageTimer = 0;
+                        messageTimer = 120;
                     } else if (distanceToStation < -10) {
                         isMissionFailed = true; targetSpeed = 0; speed = 0;
                         stationMessage = "任務失敗：過站未停！(正在將車移回到站處...)"; failureResetTimer = 90; 
@@ -949,7 +1221,7 @@
 
             document.getElementById('led-power').className = (targetSpeed > speed) ? 'status-led status-on' : 'status-led status-off';
             document.getElementById('led-brake').className = (isMovingDown || (targetSpeed === 0 && speed > 2) || isMissionFailed) ? 'status-led status-brake' : 'status-led status-off';
-            document.getElementById('led-headlight').className = isHeadlightOn ? 'status-led status-yellow' : 'status-led status-off';
+            document.getElementById('led-door').className = (doorWidthPercent > 0.1) ? 'status-led status-door' : 'status-led status-off';
 
             ctx.clearRect(0, 0, width, height);
             drawBackground(timeRatio); 
@@ -970,27 +1242,24 @@
         }
 
         let touchStartY = 0; let isDragging = false; const swipeThreshold = 30;
-        let lastTouchTime = 0; // 用於手機端自訂雙擊偵測
+        let lastTouchTime = 0; 
 
-        // 核心修改：在非控制面板區域點擊時的操作監聽
         window.addEventListener('touchstart', (e) => {
             if (document.getElementById('dashboard').contains(e.target) || isMissionFailed) return;
             
-            // 手機版自訂連點兩下（雙擊）偵測
             const now = performance.now();
             const timespan = now - lastTouchTime;
             lastTouchTime = now;
 
             if (timespan > 0 && timespan < 300) {
-                // 300毫秒內連點兩下，觸發開關燈
-                e.preventDefault(); // 關鍵：防止手機網頁放大晃動
+                e.preventDefault(); 
                 isHeadlightOn = !isHeadlightOn;
                 isDragging = false;
                 return;
             }
 
             touchStartY = e.touches[0].clientY; isDragging = true; if (!audioCtx) initAudio(); 
-        }, { passive: false }); // 注意：為了預防網頁放大，這裡不能設為 passive: true
+        }, { passive: false }); 
 
         window.addEventListener('touchmove', (e) => {
             if (!isDragging || isMissionFailed) return;
@@ -1009,7 +1278,6 @@
             if (e.button === 0) { touchStartY = e.clientY; isDragging = true; triggerHorn(); } 
         });
 
-        // 核心修改：電腦版滑鼠連點兩下做開關燈
         window.addEventListener('dblclick', (e) => {
             if (document.getElementById('dashboard').contains(e.target) || isMissionFailed) return;
             isHeadlightOn = !isHeadlightOn;
