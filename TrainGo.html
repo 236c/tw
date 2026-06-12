@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>擬真新幹線控制台</title>
+    <title>極致擬真新幹線控制台 - 現代智慧與隨機和風造景旗艦版</title>
     <style>
         :root {
             --primary-color: #00e5ff;
-            --panel-glow: 0 0 20px rgba(0, 229, 255, 0.25);
-            --bg-dark: rgba(10, 15, 26, 0.95);
-            --metal-gradient: linear-gradient(180deg, #1e2640 0%, #111625 40%, #070a12 100%);
-            --btn-gradient: linear-gradient(180deg, #2d3859 0%, #1c233a 100%);
-            --border-radius: 12px;
+            --secondary-color: #00ff88;
+            --panel-glow: 0 0 25px rgba(0, 229, 255, 0.35);
+            --led-orange: #ff6c00;
+            --led-orange-glow: 0 0 12px rgba(255, 108, 0, 0.65);
+            --bg-dark: #0a0f1a;
+            --metal-brushed: linear-gradient(180deg, #252d42 0%, #161c2e 50%, #0d1220 100%);
         }
 
         body, html {
@@ -39,309 +40,564 @@
 
         #dashboard {
             width: 100%;
-            background: var(--metal-gradient);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: none;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 0; 
+            height: 175px; 
+            background: var(--metal-brushed);
+            border-top: 3px solid #3b4870;
             display: flex;
-            flex-direction: row;
-            flex-wrap: wrap; 
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 32px;
-            gap: 16px;
+            flex-direction: column; 
+            padding: 8px 12px;
+            gap: 6px;
             box-sizing: border-box;
             box-shadow: 
-                inset 0 1px 1px rgba(255,255,255,0.15), 
-                inset 0 -3px 10px rgba(0,0,0,0.95),
-                0 -10px 30px rgba(0, 0, 0, 0.5);
+                inset 0 2px 2px rgba(255,255,255,0.2), 
+                inset 0 -5px 15px rgba(0,0,0,0.9),
+                0 -15px 40px rgba(0, 0, 0, 0.7);
             color: #fff;
             z-index: 10;
             user-select: none;
             -webkit-user-select: none;
             flex-shrink: 0; 
-            max-height: 25vh; 
+            position: relative;
         }
 
-        #dashboard::after {
+        #dashboard::before {
             content: '';
             position: absolute;
-            top: 4px; right: 4px; bottom: 4px; left: 4px;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-image: 
-                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), 
-                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-            background-size: 8px 8px;
+                linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px),
+                linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: 4px 4px;
             pointer-events: none;
+            opacity: 0.4;
         }
 
-        .gauge-cluster {
+        /* 🎵 頂部跑馬燈與音樂按鈕區域 */
+        .top-bar {
+            display: flex;
+            width: 100%;
+            gap: 8px;
+            align-items: stretch;
+            flex-shrink: 0;
+        }
+
+        .led-ticker-zone {
+            flex: 1;
+            min-width: 0;
+            height: 26px;
+            background: #030200;
+            border: 2px solid #241d15;
+            border-radius: 5px;
+            box-shadow: inset 0 3px 8px rgba(0,0,0,1);
+            position: relative;
+            overflow: hidden;
             display: flex;
             align-items: center;
-            gap: 20px;
-            flex: 1;
-            min-width: 280px;
-            max-width: 450px; 
+            box-sizing: border-box;
+            padding: 0 8px;
+        }
+        .led-scroll-text {
+            white-space: nowrap;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--led-orange);
+            text-shadow: var(--led-orange-glow);
+            position: absolute;
+            will-change: transform;
         }
 
-        .segmented-gauge {
-            width: 84px;
-            height: 84px;
-            position: relative;
-            background: #04070f;
-            border-radius: 50%;
-            border: 2px solid #2d3748;
-            box-shadow: 
-                inset 0 4px 12px rgba(0,0,0,0.95), 
-                0 1px 2px rgba(255,255,255,0.08);
+        /* 🌸 日式極簡音樂按鈕樣式 (不顯眼、和風質感) */
+        #btn-music {
+            background: #1c1c1c; /* 日本傳統色：墨色 */
+            border: 1px solid #333333;
+            border-radius: 3px;
+            color: #6b7280;
+            font-size: 11px;
+            font-family: "Yu Mincho", "Noto Serif JP", "PMingLiU", serif; /* 日式明體/宋體 */
+            font-weight: normal;
+            letter-spacing: 1px;
+            padding: 0 14px;
+            cursor: pointer;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            outline: none;
+        }
+        #btn-music:hover { 
+            color: #d4d4d8; 
+            background: #262626;
+            border-color: #52525b; 
+        }
+        #btn-music.playing { 
+            color: #eab308; /* 鈍金色，優雅提示播放中 */
+            background: #2a241b; /* 帶有微弱溫度的漆黑色 */
+            border-color: #856934;
+            box-shadow: inset 0 0 6px rgba(133, 105, 52, 0.25);
+            text-shadow: 0 0 4px rgba(234, 179, 8, 0.3);
+        }
+
+        .dashboard-main-content {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 10px;
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .lever-outer-zone {
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-        }
-
-        .gauge-svg {
-            transform: rotate(-90deg);
-            width: 100%;
+            width: 70px;
             height: 100%;
         }
 
-        .gauge-track { fill: none; stroke: #141a29; stroke-width: 6; }
-        .gauge-fill {
-            fill: none;
-            stroke: var(--primary-color);
-            stroke-width: 6;
-            stroke-dasharray: 220;
-            stroke-dashoffset: 220;
-            transition: stroke-dashoffset 0.1s linear, stroke 0.3s ease;
+        .lever-container {
+            width: 100%;
+            height: 100%;
+            background: #02040a;
+            border: 2px solid #28324f;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: inset 0 5px 12px rgba(0,0,0,0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: none;
+        }
+        
+        .lever-labels {
+            position: absolute;
+            right: 8px;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 900;
+            color: #334155;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .lever-labels span.active-p { color: #00ff88; text-shadow: 0 0 8px #00ff88; }
+        .lever-labels span.active-n { color: #ffffff; text-shadow: 0 0 8px #ffffff; }
+        .lever-labels span.active-b { color: #ff3b3b; text-shadow: 0 0 8px #ff3b3b; }
+
+        .lever-track {
+            position: absolute;
+            left: 20px;
+            width: 6px;
+            height: 80%;
+            background: #090d16;
+            border-radius: 3px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .lever-handle {
+            position: absolute;
+            left: 4px;
+            width: 38px;
+            height: 26px; 
+            background: linear-gradient(180deg, #8a9bb4 0%, #4f5e76 50%, #222a3a 100%);
+            border: 1px solid #b3c2d4;
+            border-radius: 5px;
+            cursor: ns-resize;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.85);
+            z-index: 2;
+            top: 45px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .lever-handle::after {
+            content: '';
+            width: 18px;
+            height: 4px;
+            background: #090d16;
+            border-radius: 2px;
+        }
+
+        .info-main-zone {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 4px;
+            min-width: 0; 
+        }
+
+        .info-top-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex: 1;
+        }
+
+        .gauge-mini-cluster {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .segmented-gauge {
+            width: 54px;
+            height: 54px;
+            position: relative;
+            background: radial-gradient(circle, #0e1726 0%, #02050a 100%);
+            border-radius: 50%;
+            border: 2px solid #3a4b6e;
+            box-shadow: 
+                inset 0 4px 12px rgba(0,0,0,0.95),
+                0 2px 8px rgba(0, 229, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        
+        .segmented-gauge::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 40%, transparent 41%);
+            z-index: 4;
+            pointer-events: none;
         }
 
         .gauge-center-text {
             position: absolute;
-            font-size: 10px;
-            color: #475569;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            top: 20px;
+            font-size: 7px;
+            font-weight: 900;
+            color: #4f6a85;
+            letter-spacing: 0.5px;
+            bottom: 8px;
+            z-index: 3;
+            text-shadow: 0 1px 2px #000;
+        }
+
+        .gauge-ticks {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .gauge-tick {
+            position: absolute;
+            top: 0; left: 50%;
+            width: 1.5px;
+            height: 4px;
+            background-color: #24354f;
+            transform-origin: 0px 27px; 
+        }
+        .gauge-tick.active {
+            background-color: var(--primary-color);
+            box-shadow: 0 0 4px var(--primary-color);
+        }
+
+        .gauge-pointer-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            transform: rotate(-140deg);
+            transition: transform 0.08s linear;
+        }
+        .gauge-pointer {
+            position: absolute;
+            top: 6px; left: calc(50% - 1px);
+            width: 2px;
+            height: 22px;
+            background: linear-gradient(to bottom, #ff3b3b 0%, #ff8800 70%, #ffcc00 100%);
+            box-shadow: 0 0 5px rgba(255,59,59,0.8);
+            border-radius: 1px;
+        }
+        .gauge-center-cap {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gauge-center-cap::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #526685 0%, #1e293b 80%, #090d16 100%);
+            border-radius: 50%;
+            border: 1px solid #475d7c;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.6);
         }
 
         .dash-metrics {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            justify-content: center;
+            min-width: 0;
         }
-
         .dash-label {
-            font-size: 10px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 2.5px;
-            font-weight: 700;
+            font-size: 8px;
+            color: #8492a6;
+            letter-spacing: 0.5px;
+            font-weight: 800;
+            margin-bottom: 1px;
         }
-
         .dash-value-container {
             display: flex;
             align-items: baseline;
-            gap: 8px;
+            gap: 3px;
         }
-
         .dash-value {
-            font-size: 42px;
+            font-size: 26px;
             font-weight: 700;
             font-family: 'Courier New', Courier, monospace;
             color: var(--primary-color);
             text-shadow: var(--panel-glow);
-            background: #02050b;
-            padding: 4px 14px;
-            border-radius: 6px;
-            box-shadow: 
-                inset 0 4px 8px rgba(0,0,0,0.95),
-                0 1px 1px rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.02);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .dash-value::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(0, 229, 255, 0.04) 50%, transparent 50%);
-            background-size: 100% 3px;
-            pointer-events: none;
-        }
-
-        .dash-unit { font-size: 12px; color: #475569; font-weight: 800; letter-spacing: 1px; }
-        .odometer {
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            color: #64748b;
-            background-color: #050811;
-            padding: 3px 10px;
+            background: #010408;
+            padding: 1px 6px;
             border-radius: 4px;
-            width: fit-content;
-            border: 1px solid rgba(255,255,255,0.01);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.95);
         }
+        .dash-unit { font-size: 8.5px; color: #64748b; font-weight: 800; }
 
-        .dash-control-center {
+        .info-bottom-row {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            flex: 1.2;
-            min-width: 320px;
-            max-width: 600px;
+            flex-direction: row;
+            gap: 6px;
+            align-items: stretch;
+            flex: 1;
         }
 
         .station-panel {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            background: #02050b;
-            padding: 8px 14px;
-            border-radius: 6px;
-            border: 1px solid rgba(255,255,255,0.03);
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.8);
-            min-width: 120px;
-            flex: 1;
+            justify-content: center;
+            background: linear-gradient(180deg, #02050b 0%, #050b18 100%);
+            padding: 3px 8px;
+            border-radius: 5px;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.9);
+            flex: 1.3;
+            min-width: 0;
         }
-        .station-title {
-            font-size: 9px;
-            color: #475569;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-        }
+        .station-title { font-size: 7px; color: #64748b; font-weight: 800; }
+        .station-name { font-size: 10.5px; color: #cbd5e1; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .station-dist-num {
             font-family: 'Courier New', monospace;
-            font-size: 20px;
+            font-size: 15px;
             font-weight: 700;
             color: #ffcc00;
-            text-shadow: 0 0 10px rgba(255,204,0,0.3);
-            text-align: right;
         }
-        .station-name {
+
+        .odometer-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+            background: linear-gradient(180deg, #01040a 0%, #040914 100%);
+            padding: 3px 8px;
+            border-radius: 5px;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.9);
+            flex: 0.8;
+            min-width: 0;
+        }
+        .odo-title { font-size: 7px; color: #64748b; font-weight: 800; }
+        .odometer-num {
+            font-family: 'Courier New', monospace;
             font-size: 11px;
             color: #94a3b8;
             font-weight: bold;
-            letter-spacing: 0.5px;
         }
 
-        #status-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            font-size: 10px;
-            color: #475569;
-            font-weight: 800;
-            padding-right: 15px;
-            border-right: 1px solid rgba(255,255,255,0.08);
-            letter-spacing: 1px;
+        #sensor-matrix-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 3px;
+            background: radial-gradient(circle, #101626 0%, #070a12 100%);
+            padding: 5px;
+            border-radius: 6px;
+            border: 2px solid #2d3859;
+            box-shadow: inset 0 3px 10px rgba(0,0,0,0.95);
+            width: 32%; 
+            min-width: 110px;
+            max-width: 180px;
+            box-sizing: border-box;
             flex-shrink: 0;
         }
-        .status-item { display: flex; align-items: center; }
-        .status-led {
-            width: 8px;
-            height: 8px;
+
+        .matrix-led-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            border-radius: 3px;
+            padding: 2px 1px;
+            min-width: 0; 
+            overflow: hidden;
+        }
+
+        .matrix-led {
+            width: 6.5px;
+            height: 6.5px;
             border-radius: 50%;
-            margin-right: 8px;
-            border: 1px solid rgba(0,0,0,0.5);
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
+            border: 1px solid rgba(0,0,0,0.6);
+            margin-bottom: 1px;
+            background-color: #1e293b;
+            flex-shrink: 0;
         }
-        .status-on { background-color: #00ff88; box-shadow: 0 0 10px #00ff88, 0 0 4px #00ff88; }
-        .status-off { background-color: #1e293b; }
-        .status-brake { background-color: #ff3b3b; box-shadow: 0 0 10px #ff3b3b, 0 0 4px #ff3b3b; }
-        .status-yellow { background-color: #ffcc00; box-shadow: 0 0 10px #ffcc00, 0 0 4px #ffcc00; }
-        .status-door { background-color: #00e5ff; box-shadow: 0 0 10px #00e5ff, 0 0 4px #00e5ff; }
-
-        .button-matrix { display: flex; gap: 10px; flex-shrink: 0; }
-
-        .realistic-button {
-            background: var(--btn-gradient);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-top: 1px solid rgba(255,255,255,0.18);
-            color: #e2e8f0;
-            padding: 10px 20px;
-            border-radius: var(--border-radius);
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
-                inset 0 1px 0 rgba(255,255,255,0.1), 
-                0 4px 6px rgba(0,0,0,0.5),
-                0 1px 1px rgba(0,0,0,0.5);
-            touch-action: manipulation;
+        .matrix-label {
+            font-size: 7px;
+            font-weight: 900;
+            color: #475569;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; 
+            width: 100%;
+            transform: scale(0.85);
         }
 
-        @media (max-width: 768px) {
-            #dashboard {
-                padding: 12px 20px;
-                gap: 8px;
-                max-height: none; 
-            }
-            .gauge-cluster {
-                justify-content: center;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-                padding-bottom: 8px;
-                margin-bottom: 2px;
-                flex: 1 0 100%; 
-                max-width: 100%;
-            }
-            .dash-control-center {
-                flex: 1 0 100%; 
-                max-width: 100%;
-                gap: 8px;
-            }
+        .led-g-on { background-color: #00ff88; box-shadow: 0 0 8px #00ff88, inset 0 1px 1px #fff; }
+        .led-r-on { background-color: #ff3b3b; box-shadow: 0 0 8px #ff3b3b, inset 0 1px 1px #fff; }
+        .led-b-on { background-color: #00e5ff; box-shadow: 0 0 8px #00e5ff, inset 0 1px 1px #fff; }
+        .led-y-on { background-color: #ffcc00; box-shadow: 0 0 8px #ffcc00, inset 0 1px 1px #fff; }
+        .text-active { color: #94a3b8 !important; }
+
+        @media (max-width: 480px) {
+            #dashboard { height: 155px; padding: 5px 8px; gap: 4px; }
+            .top-bar { gap: 5px; }
+            .dashboard-main-content { gap: 5px; }
+            .lever-outer-zone { width: 48px; }
+            .lever-track { left: 11px; }
+            .lever-handle { left: 2px; width: 26px; height: 20px; top: 40px; }
+            .lever-labels { right: 2px; font-size: 8.5px; }
+            
+            #sensor-matrix-panel { width: 35%; min-width: 105px; padding: 3px; gap: 2px; }
+            .matrix-led { width: 4.8px; height: 4.8px; }
+            .matrix-label { font-size: 6px; transform: scale(0.75); }
+
+            .dash-value { font-size: 19px; padding: 1px 4px; }
+            .segmented-gauge { width: 40px; height: 40px; }
+            .segmented-gauge::before { display: none; } 
+            .gauge-tick { transform-origin: 0px 20px; height: 3px; }
+            .gauge-pointer { top: 4px; height: 16px; }
+            .station-name { font-size: 9.5px; }
+            .station-dist-num { font-size: 11.5px; }
+            .odometer-num { font-size: 9px; }
+            #btn-music { font-size: 9px; padding: 0 8px; }
         }
     </style>
 </head>
 <body>
 
     <canvas id="gameCanvas"></canvas>
-    <div id="transition-overlay"></div>
 
     <div id="dashboard" oncontextmenu="return false;">
-        <div class="gauge-cluster">
-            <div class="segmented-gauge">
-                <div class="gauge-center-text">TACHO</div>
-                <svg class="gauge-svg" viewBox="0 0 100 100">
-                    <circle class="gauge-track" cx="50" cy="50" r="40"></circle>
-                    <circle class="gauge-fill" id="gauge-fill-circle" cx="50" cy="50" r="40"></circle>
-                </svg>
+        
+        <div class="top-bar">
+            <div class="led-ticker-zone">
+                <div class="led-scroll-text" id="led-ticker">SYSTEM INITIALIZING... ATC SIGNAL ONLINE... WINDOWS NORMAL...</div>
             </div>
             
-            <div class="dash-metrics">
-                <div class="dash-label">CRUISE SPEED</div>
-                <div class="dash-value-container">
-                    <div class="dash-value" id="speed-display">000</div>
-                    <div class="dash-unit">KM/H</div>
-                </div>
-                <div class="odometer">ODO: <span id="odometer-display">0000.0</span> KM</div>
-            </div>
+            <button id="btn-music" title="點擊選擇並無限循環播放本機音樂">♪ 雅音</button>
+            <input type="file" id="music-upload" accept="audio/*" style="display: none;">
+            <audio id="bgm-player" loop></audio>
         </div>
-        
-        <div class="dash-control-center">
-            <div class="station-panel">
-                <div class="station-title">NEXT STATION</div>
-                <div class="station-name" id="station-name-display">東京 (TOKYO)</div>
-                <div class="station-dist-num" id="station-dist-display">3000m</div>
+
+        <div class="dashboard-main-content">
+            
+            <div class="info-main-zone">
+                <div class="info-top-row">
+                    <div class="gauge-mini-cluster">
+                        <div class="segmented-gauge">
+                            <div class="gauge-center-text">TACHO</div>
+                            
+                            <div class="gauge-ticks" id="gauge-ticks-container"></div>
+                            
+                            <div class="gauge-pointer-container" id="gauge-pointer-wrapper">
+                                <div class="gauge-pointer"></div>
+                            </div>
+
+                            <svg class="gauge-svg" viewBox="0 0 100 100" style="transform: rotate(-90deg); width:100%; height:100%; position: absolute; top:0; left:0; z-index: 2; pointer-events: none;">
+                                <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(15,22,38,0.5)" stroke-width="4"></circle>
+                                <circle class="gauge-fill" id="gauge-fill-circle" cx="50" cy="50" r="38" fill="none" stroke="url(#gauge-grad)" stroke-width="4.5" stroke-dasharray="240" stroke-dashoffset="240" style="transition: stroke-dashoffset 0.08s linear; stroke-linecap: round;"></circle>
+                                <defs>
+                                    <linearGradient id="gauge-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="var(--secondary-color)"></stop>
+                                        <stop offset="100%" stop-color="var(--primary-color)"></stop>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        
+                        <div class="dash-metrics">
+                            <div class="dash-label">CRUISE SPEED</div>
+                            <div class="dash-value-container">
+                                <div class="dash-value" id="speed-display">000</div>
+                                <div class="dash-unit">KM/H</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-bottom-row">
+                    <div class="station-panel">
+                        <div class="station-title">NEXT STATION</div>
+                        <div class="station-name" id="station-name-display">東京 (TOKYO)</div>
+                        <div class="station-dist-num" id="station-dist-display">3000m</div>
+                    </div>
+
+                    <div class="odometer-panel">
+                        <div class="odo-title">TOTAL ODO</div>
+                        <div class="odometer-num"><span id="odometer-display">0000.0</span> KM</div>
+                    </div>
+                </div>
             </div>
 
-            <div id="status-panel">
-                <div class="status-item"><span class="status-led status-off" id="led-power"></span>ENG PWR</div>
-                <div class="status-item"><span class="status-led status-off" id="led-brake"></span>BRK SYS</div>
-                <div class="status-item"><span class="status-led status-on" id="led-headlight"></span>H-LIGHT</div>
-                <div class="status-item"><span class="status-led status-off" id="led-door"></span>DOOR OPEN</div>
+            <div id="sensor-matrix-panel">
+                <div class="matrix-led-cell"><div class="matrix-led" id="m-pwr"></div><div class="matrix-label" id="ml-pwr">PWR</div></div>
+                <div class="matrix-led-cell"><div class="matrix-led" id="m-brk"></div><div class="matrix-label" id="ml-brk">BRK</div></div>
+                <div class="matrix-led-cell"><div class="matrix-led" id="m-lgt"></div><div class="matrix-label" id="ml-lgt">LGT</div></div>
+                <div class="matrix-led-cell"><div class="matrix-led" id="m-dor"></div><div class="matrix-label" id="ml-dor">DOR</div></div>
+                
+                <div class="matrix-led-cell"><div class="matrix-led" id="m-ptg"></div><div class="matrix-label" id="ml-ptg">PANTOGRAPH</div></div>
+                <div class="matrix-led-cell"><div class="matrix-led" id="m-mot"></div><div class="matrix-label" id="ml-mot">TRACTION</div></div>
+                <div class="matrix-led-cell"><div class="matrix-led" id="m-cat"></div><div class="matrix-label" id="ml-cat">CATENARY</div></div>
+                <div class="matrix-led-cell"><div class="matrix-led" id="m-atc"></div><div class="matrix-label" id="ml-atc">ATC SIG</div></div>
+                
+                <div class="matrix-led-cell"><div class="matrix-led" id="m-wls"></div><div class="matrix-label" id="ml-wls">WHEEL SLIP</div></div>
+                <div class="matrix-led-cell"><div class="matrix-led" id="m-atp"></div><div class="matrix-label" id="ml-atp">ATP SYS</div></div>
+                <div class="matrix-led-cell"><div class="matrix-led" id="m-com"></div><div class="matrix-label" id="ml-com">COMMS</div></div>
+                <div class="matrix-led-cell"><div class="matrix-led" id="m-acu"></div><div class="matrix-label" id="ml-acu">AC UNIT</div></div>
             </div>
-            
-            <div class="button-matrix">
-                <button class="realistic-button" id="btn-decel">減速 (↓)</button>
-                <button class="realistic-button" id="btn-accel">加速 (↑)</button>
+
+            <div class="lever-outer-zone">
+                <div class="lever-container" id="leverContainer">
+                    <div class="lever-labels">
+                        <span id="lbl-p">P</span>
+                        <span id="lbl-n" class="active-n">N</span>
+                        <span id="lbl-b">B</span>
+                    </div>
+                    <div class="lever-track"></div>
+                    <div class="lever-handle" id="leverHandle"></div>
+                </div>
             </div>
+
         </div>
     </div>
 
@@ -354,18 +610,128 @@
         let targetSpeed = 0;
         let distance = 0;
         
+        let isTurboMode = false;
+        let maxSpeedLimit = 320;
+
         let isHeadlightOn = true; 
         let hornWaves = []; 
 
         let isMovingUp = false;
         let isMovingDown = false;
         let weatherParticles = [];
+        let stars = []; 
+
+        let leavingPassengers = [];
+        let hasSpawnedLeavers = false;
+
+        let isLeavingStationPhase = false; 
+        let departureLeftShift = 0; 
 
         let lastTime = performance.now();
 
         let audioCtx = null;
         let runGainNode = null;      
         let lastTrackClackTime = 0;  
+
+        let currentStationLandscape = Math.floor(Math.random() * 4); 
+
+        function initTachoTicks() {
+            const container = document.getElementById('gauge-ticks-container');
+            container.innerHTML = '';
+            const totalTicks = 12; 
+            for (let i = 0; i < totalTicks; i++) {
+                const tick = document.createElement('div');
+                tick.className = 'gauge-tick';
+                const angle = -140 + (280 / (totalTicks - 1)) * i;
+                tick.style.transform = `rotate(${angle}deg)`;
+                container.appendChild(tick);
+            }
+        }
+
+        function updateTachoVisuals() {
+            const currentPercent = speed / maxSpeedLimit;
+            const targetRotation = -140 + (280 * currentPercent);
+            document.getElementById('gauge-pointer-wrapper').style.transform = `rotate(${targetRotation}deg)`;
+            
+            const ticks = document.querySelectorAll('.gauge-tick');
+            const activeCount = Math.floor(currentPercent * ticks.length);
+            ticks.forEach((tick, index) => {
+                if (index <= activeCount && speed > 0) {
+                    tick.classList.add('active');
+                } else {
+                    tick.classList.remove('active');
+                }
+            });
+        }
+
+        const tickerMessages = [
+            "ATC SIGNAL: Lvl 3 << II >> PANTOGRAPH 1: OPTIMAL << II >> CATENARY VOLTAGE: 25.1kV",
+            "WHEEL SLIP DET: ABSENT << II >> PAX INFO SYS: ONLINE & UPDATING << II >> TRAIN ID: E5-3001",
+            "AC SYSTEM: TEMPERATURE INSIDE 23C / OUTSIDE 14C << II >> PASSENGER INP: NORMAL",
+            "COMMUNICATION LINK: SECURE FLIGHT-LINE DATA << II >> EMERGENCY BRAKE READY",
+            "FORWARD TRACK SCAN: NO OBSTACLE DETECTED << II >> AUTOMATIC SPEED LIMIT MODE ACTIVE"
+        ];
+        let currentTickerText = tickerMessages[0];
+        let tickerX = 0;
+
+        let stationMessage = ""; 
+        let messageTimer = 0;
+
+        function updateLedTicker(timeRatio) {
+            const tickerEl = document.getElementById('led-ticker');
+            if (stationMessage && messageTimer > 0) {
+                let displayMsg = "⚠️ " + stationMessage.toUpperCase();
+                if (tickerEl.innerText !== displayMsg) {
+                    tickerEl.innerText = displayMsg;
+                    tickerX = 0;
+                    tickerEl.style.transform = `translateX(0px)`;
+                }
+                return;
+            }
+
+            if (tickerEl.innerText !== currentTickerText) {
+                tickerEl.innerText = currentTickerText;
+                tickerX = canvas.clientWidth * 0.4; 
+            }
+
+            tickerX -= 0.85 * timeRatio;
+            if (tickerX < -tickerEl.clientWidth) {
+                tickerX = canvas.clientWidth * 0.4;
+                currentTickerText = tickerMessages[Math.floor(Math.random() * tickerMessages.length)];
+            }
+            tickerEl.style.transform = `translateX(${tickerX}px)`;
+        }
+
+        function updateSensorMatrix() {
+            setMatrixLed('m-pwr', 'ml-pwr', targetSpeed > speed, 'led-g-on');
+            setMatrixLed('m-brk', 'ml-brk', isMovingDown || (targetSpeed === 0 && speed > 2) || isMissionFailed, 'led-r-on');
+            setMatrixLed('m-lgt', 'ml-lgt', isHeadlightOn, 'led-y-on');
+            setMatrixLed('m-dor', 'ml-dor', doorWidthPercent > 0.1, 'led-b-on');
+
+            setMatrixLed('m-ptg', 'ml-ptg', speed > 0, 'led-g-on'); 
+            setMatrixLed('m-mot', 'ml-mot', speed > 5, isTurboMode ? 'led-r-on' : 'led-g-on'); 
+            setMatrixLed('m-cat', 'ml-cat', !isMissionFailed, 'led-g-on'); 
+            setMatrixLed('m-atc', 'ml-atc', distanceToStation > 20 && !isLeavingStationPhase, 'led-g-on'); 
+
+            setMatrixLed('m-wls', 'ml-wls', speed > 280 && Math.random() > 0.85, 'led-y-on'); 
+            setMatrixLed('m-atp', 'ml-atp', !isMissionFailed, 'led-g-on'); 
+            setMatrixLed('m-com', 'ml-com', Math.sin(Date.now() * 0.003) > -0.8, 'led-g-on'); 
+            setMatrixLed('m-acu', 'ml-acu', true, 'led-g-on'); 
+        }
+
+        function setMatrixLed(id, labelId, isActive, activeClass) {
+            const led = document.getElementById(id);
+            const lbl = document.getElementById(labelId);
+            if (isActive) {
+                if (!led.classList.contains(activeClass)) {
+                    led.className = 'matrix-led ' + activeClass;
+                    lbl.classList.add('text-active');
+                }
+            } else {
+                led.className = 'matrix-led';
+                lbl.classList.remove('text-active');
+            }
+        }
 
         function initAudio() {
             if (audioCtx) return; 
@@ -407,7 +773,7 @@
         function updateTrainSounds() {
             if (!audioCtx || !runGainNode) return;
             const now = audioCtx.currentTime;
-            const currentSpeedPercent = speed / 320; 
+            const currentSpeedPercent = speed / maxSpeedLimit; 
             runGainNode.gain.setTargetAtTime(currentSpeedPercent * 0.15, now, 0.1);
             if (speed > 10) {
                 const clackInterval = 1500 / speed; 
@@ -419,46 +785,46 @@
 
         function playTrackClack() {
             const now = audioCtx.currentTime;
-            const oscReal = audioCtx.createOscillator(); const gain = audioCtx.createGain(); const filter = audioCtx.createBiquadFilter();
+            const oscReal = audioCtx.createOscillator(); const gain = audioCtx.createGain(); const audioFilter = audioCtx.createBiquadFilter();
             oscReal.type = 'sine'; oscReal.frequency.setValueAtTime(60, now);
-            filter.type = 'lowpass'; filter.frequency.setValueAtTime(100, now);
-            const speedVol = (speed / 320) * 0.25;
+            audioFilter.type = 'lowpass'; audioFilter.frequency.setValueAtTime(100, now);
+            const speedVol = (speed / maxSpeedLimit) * 0.25; 
             gain.gain.setValueAtTime(speedVol, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-            oscReal.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+            oscReal.connect(audioFilter); audioFilter.connect(gain); gain.connect(audioCtx.destination);
             oscReal.start(now); oscReal.stop(now + 0.1);
             setTimeout(() => {
                 if (!audioCtx || speed < 10) return;
                 const now2 = audioCtx.currentTime;
-                const osc2 = audioCtx.createOscillator(); const gain2 = audioCtx.createGain(); const filter2 = audioCtx.createBiquadFilter();
+                const osc2 = audioCtx.createOscillator(); const gain2 = audioCtx.createGain(); const audioFilter2 = audioCtx.createBiquadFilter();
                 osc2.type = 'sine'; osc2.frequency.setValueAtTime(55, now2);
-                filter2.type = 'lowpass'; filter2.frequency.setValueAtTime(90, now2);
+                audioFilter2.type = 'lowpass'; audioFilter2.frequency.setValueAtTime(90, now2);
                 gain2.gain.setValueAtTime(speedVol * 0.7, now2); gain2.gain.exponentialRampToValueAtTime(0.001, now2 + 0.07);
-                osc2.connect(filter2); filter2.connect(gain2); gain2.connect(audioCtx.destination);
+                osc2.connect(audioFilter2); audioFilter2.connect(gain2); gain2.connect(audioCtx.destination);
                 osc2.start(now2); osc2.stop(now2 + 0.09);
             }, 120);
         }
 
         const stationPool = [
-            { name: "東京 (TOKYO)" }, { name: "品川 (SHINAGAWA)" }, { name: "新横浜 (SHIN-YOKOHAMA)" },
+            { name: "東京 (TOKYO)" }, { name: "品川 (SHINAGAWA)" }, { name: "新橫濱 (SHIN-YOKOHAMA)" },
             { name: "名古屋 (NAGOYA)" }, { name: "京都 (KYOTO)" }, { name: "新大阪 (SHIN-OSAKA)" },
             { name: "博多 (HAKATA)" }, { name: "新青森 (SHIN-AOMORI)" }
         ];
         let currentStationName = "東京 (TOKYO)";
         let totalStationDistance = 3000; let distanceToStation = totalStationDistance; 
         let isArrived = false; let doorOpen = false; let isClosingDoors = false; 
-        let doorWidthPercent = 0; let stationMessage = ""; let messageTimer = 0;
+        let doorWidthPercent = 0; 
         let isMissionFailed = false; let failureResetTimer = 0;
 
         const weatherPool = [
-            { type: 'sunny', label: "晴天 (☀️ SUNNY)", mountainColor: 'rgba(0,0,0,0.06)' },
-            { type: 'cloudy', label: "陰天 (☁️ CLOUDY)", mountainColor: 'rgba(0,0,0,0.12)' },
-            { type: 'rain', label: "雨天 (🌧️ RAIN)", mountainColor: 'rgba(0,0,0,0.15)' },
-            { type: 'snow', label: "下雪 (❄️ SNOW)", mountainColor: 'rgba(0,0,0,0.18)' }
+            { type: 'sunny', label: "晴天 (☀️ SUNNY)" },
+            { type: 'cloudy', label: "陰天 (☁️ CLOUDY)" },
+            { type: 'rain', label: "雨天 (🌧️ RAIN)" },
+            { type: 'snow', label: "下雪 (❄️ SNOW)" }
         ];
         const scenePool = [
-            { id: 'mountain', label: "山景 ⛰️", skyTop: '#74b9ff', skyBottom: '#eccc68' }, // 升級清晨群山日落天空色彩
+            { id: 'mountain', label: "山景 ⛰️", skyTop: '#74b9ff', skyBottom: '#eccc68' }, 
             { id: 'ocean', label: "海景 🌊", skyTop: '#0a3d62', skyBottom: '#3c6382' },
-            { id: 'forest', label: "樹林 🌲", skyTop: '#2bcbba', skyBottom: '#e8f8f5' },   // 升級林間清爽天空色
+            { id: 'forest', label: "樹林 🌲", skyTop: '#2bcbba', skyBottom: '#e8f8f5' },   
             { id: 'city', label: "都市 🏙️", skyTop: '#1e272c', skyBottom: '#405059' }, 
             { id: 'country', label: "鄉村 🏡", skyTop: '#f6b93b', skyBottom: '#f8fafc' }
         ];
@@ -468,6 +834,19 @@
         let nextScene = null; let nextWeather = null;
         let transitionAlpha = 0; let isTransitioning = false; let hasTriggeredTransition = false; 
         let skyObjects = [];
+
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < 60; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * (height * 0.4),
+                    size: Math.random() * 1.5 + 0.5,
+                    alpha: Math.random(),
+                    speed: 0.02 + Math.random() * 0.03
+                });
+            }
+        }
 
         function initSkyObjects() {
             skyObjects = [];
@@ -508,18 +887,88 @@
             }
         }
 
+        function drawFlaringSun(x, y, radius) {
+            ctx.save();
+            let time = Date.now() * 0.002;
+            
+            let outerGlow = ctx.createRadialGradient(x, y, radius * 0.2, x, y, radius * 4);
+            outerGlow.addColorStop(0, 'rgba(255, 235, 200, 0.25)');
+            outerGlow.addColorStop(0.1, 'rgba(255, 180, 80, 0.08)');
+            outerGlow.addColorStop(0.4, 'rgba(255, 130, 40, 0.03)');
+            outerGlow.addColorStop(0.6, 'rgba(255, 90, 20, 0.01)');
+            outerGlow.addColorStop(0.65, 'rgba(255, 120, 40, 0.02)'); 
+            outerGlow.addColorStop(0.7, 'rgba(255, 90, 20, 0.005)');
+            outerGlow.addColorStop(1, 'rgba(255, 50, 0, 0)');
+            ctx.fillStyle = outerGlow;
+            ctx.beginPath(); ctx.arc(x, y, radius * 4, 0, Math.PI * 2); ctx.fill();
+
+            const rays = 10;
+            ctx.translate(x, y);
+            for (let i = 0; i < rays; i++) {
+                ctx.rotate((Math.PI * 2) / rays);
+                let rayLength = radius * (1.8 + Math.sin(time + i * 1.5) * 0.25);
+                let rayWidth = radius * (0.2 + Math.cos(time * 0.5 + i) * 0.05);
+
+                let rayGrad = ctx.createLinearGradient(0, 0, rayLength, 0);
+                rayGrad.addColorStop(0, 'rgba(255, 255, 240, 0.8)');
+                rayGrad.addColorStop(0.2, 'rgba(255, 210, 100, 0.4)');
+                rayGrad.addColorStop(0.6, 'rgba(255, 120, 30, 0.08)');
+                rayGrad.addColorStop(1, 'rgba(255, 60, 0, 0)');
+
+                ctx.fillStyle = rayGrad;
+                ctx.beginPath();
+                ctx.moveTo(0, -rayWidth);
+                ctx.lineTo(rayLength, 0);
+                ctx.lineTo(0, rayWidth);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.restore();
+
+            ctx.save();
+            let sunGlow = ctx.createRadialGradient(x, y, radius * 0.1, x, y, radius);
+            sunGlow.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            sunGlow.addColorStop(0.2, 'rgba(255, 250, 200, 0.95)');
+            sunGlow.addColorStop(0.5, 'rgba(255, 190, 60, 0.7)');
+            sunGlow.addColorStop(1, 'rgba(255, 100, 0, 0)');
+            ctx.fillStyle = sunGlow;
+            ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+        }
+
+        function drawStars(globalAlphaValue) {
+            let activeWeatherType = (transitionAlpha > 0.5 && nextWeather) ? nextWeather.type : currentWeather.type;
+            if (activeWeatherType === 'cloudy' || activeWeatherType === 'snow') return;
+
+            ctx.save();
+            let baseAlpha = (currentScene.id === 'city' || activeWeatherType === 'rain') ? 0.8 : 0.2;
+            ctx.globalAlpha = globalAlphaValue * baseAlpha;
+
+            stars.forEach(star => {
+                star.alpha += star.speed;
+                if (star.alpha > 1 || star.alpha < 0.2) star.speed = -star.speed;
+
+                star.x -= speed * 0.005;
+                if (star.x < 0) star.x = width;
+
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.restore();
+        }
+
         function updateAndDrawSkyObjects(globalAlphaValue, timeRatio) {
+            drawStars(globalAlphaValue);
+
             ctx.save();
             ctx.globalAlpha = globalAlphaValue;
 
             let activeWeatherType = (transitionAlpha > 0.5 && nextWeather) ? nextWeather.type : currentWeather.type;
             if (activeWeatherType === 'sunny') {
                 let sunX = width * 0.75; let sunY = height * 0.18;
-                let sunGlow = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 65);
-                sunGlow.addColorStop(0, 'rgba(255, 253, 230, 1)');
-                sunGlow.addColorStop(0.2, 'rgba(255, 200, 80, 0.8)');
-                sunGlow.addColorStop(1, 'rgba(255, 120, 0, 0)');
-                ctx.fillStyle = sunGlow; ctx.beginPath(); ctx.arc(sunX, sunY, 65, 0, Math.PI * 2); ctx.fill();
+                drawFlaringSun(sunX, sunY, 65);
             }
 
             for (let i = skyObjects.length - 1; i >= 0; i--) {
@@ -584,12 +1033,52 @@
         let passengers = [];
         function initPassengers() {
             passengers = [];
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 25; i++) {
                 passengers.push({
-                    relX: Math.random() * 1100 - 1120, type: Math.floor(Math.random() * 3), 
-                    color: ['#1e3a8a', '#b45309', '#047857'][Math.floor(Math.random() * 3)],
-                    height: Math.random() * 5 + 16, swayOffset: Math.random() * 100
+                    relX: Math.random() * 1200 - 1250, 
+                    color: ['#1e3a8a', '#b45309', '#047857', '#6d28d9', '#be123c'][Math.floor(Math.random() * 5)],
+                    heightFactor: Math.random() * 4 + 20, 
+                    widthFactor: Math.random() * 1.5 + 4.5
                 });
+            }
+            leavingPassengers = [];
+            hasSpawnedLeavers = false;
+        }
+
+        function spawnLeavingPassengers(door1CanvasX, door2CanvasX, scale) {
+            leavingPassengers = [];
+            [door1CanvasX, door2CanvasX].forEach(doorX => {
+                let count = Math.floor(Math.random() * 2) + 2; 
+                for (let i = 0; i < count; i++) {
+                    leavingPassengers.push({
+                        x: doorX, 
+                        walkX: 0,  
+                        dir: Math.random() > 0.5 ? 1 : -1, 
+                        speedFactor: 0.8 + Math.random() * 0.7, 
+                        color: ['#374151', '#0369a1', '#b91c1c', '#15803d', '#6b21a8'][Math.floor(Math.random() * 5)],
+                        heightFactor: Math.random() * 3 + 20, 
+                        widthFactor: Math.random() * 1 + 4.5,
+                        alpha: 1.0, 
+                        bobOffset: Math.random() * Math.PI 
+                    });
+                }
+            });
+        }
+
+        function updateLeavingPassengers(timeRatio, scale) {
+            for (let i = leavingPassengers.length - 1; i >= 0; i--) {
+                let lp = leavingPassengers[i];
+                let moveStep = lp.dir * lp.speedFactor * 0.4 * timeRatio * scale;
+                lp.walkX += moveStep;
+                lp.x += moveStep;
+                lp.bobOffset += 0.12 * timeRatio; 
+
+                if (Math.abs(lp.walkX) > 50 * scale) {
+                    lp.alpha -= 0.015 * timeRatio;
+                }
+                if (lp.alpha <= 0) {
+                    leavingPassengers.splice(i, 1);
+                }
             }
         }
 
@@ -600,14 +1089,16 @@
             canvas.width = width * dpr;
             canvas.height = height * dpr;
             ctx.scale(dpr, dpr); 
-            initWeatherParticles(); initPassengers(); initSkyObjects(); 
+            initWeatherParticles(); initPassengers(); initSkyObjects(); initStars();
+            recalcLeverPositions(); 
+            initTachoTicks();
         }
         window.addEventListener('resize', resize);
         window.addEventListener('contextmenu', (e) => e.preventDefault());
 
         function initWeatherParticles() {
             weatherParticles = [];
-            const count = width < 600 ? 70 : 130; 
+            const count = width < 600 ? 50 : 120; 
             for (let i = 0; i < count; i++) {
                 weatherParticles.push({
                     x: Math.random() * width, y: Math.random() * height,
@@ -659,15 +1150,11 @@
             return skyGrad;
         }
 
-        // 🛠️ 核心美化重構：精緻化山景（雙層3D向光切面、雪帽）、樹林（立體針葉、樹幹、遠近視差）
         function drawSceneDetails(scene, weather, horizonY) {
-            const scale = Math.max(0.4, width / 1200); 
+            const scale = Math.max(0.4, width / 600); 
 
-            // ================= ⛰️ 【精緻化山景】 =================
             if (scene.id === 'mountain') {
                 ctx.save();
-                
-                // [1. 遠山 (Far Mountains)] - 移動速度極慢，顏色帶有遠景透視霧感
                 const farOffset = (distance * 0.05) % width;
                 let farColor = weather.type === 'sunny' ? '#9ab7d3' : '#4a5a6a';
                 ctx.fillStyle = farColor;
@@ -678,19 +1165,12 @@
                 ctx.lineTo(width * 0.55 - farOffset, horizonY);
                 ctx.lineTo(width * 0.8 - farOffset, horizonY - height * 0.22);
                 ctx.lineTo(width * 1.2 - farOffset, horizonY);
-                ctx.lineTo(width * 1.5 - farOffset, horizonY - height * 0.28);
-                ctx.lineTo(width * 2 - farOffset, horizonY);
-                ctx.lineTo(0, horizonY);
                 ctx.fill();
 
-                // [2. 近山 (Near Mountains)] - 移動速度稍快，具備明暗3D切面與皚皚雪帽
                 const nearOffset = (distance * 0.12) % width;
-                
-                // 定義三座近景主峰的相對頂點位置
                 const peaks = [
-                    { rx: 0.15, ry: 0.35, rw: 0.4 },
-                    { rx: 0.5, ry: 0.38, rw: 0.45 },
-                    { rx: 0.85, ry: 0.32, rw: 0.38 }
+                    { rx: 0.2, ry: 0.32, rw: 0.5 },
+                    { rx: 0.7, ry: 0.35, rw: 0.6 }
                 ];
 
                 peaks.forEach(p => {
@@ -700,59 +1180,32 @@
                     let leftX = peakX - peakW * 0.5;
                     let rightX = peakX + peakW * 0.5;
 
-                    // 確保群山在左右循環繪製時不會斷軌
                     for (let loop = 0; loop <= 1; loop++) {
                         let shift = loop * width;
                         let curLeft = leftX + shift;
                         let curPeak = peakX + shift;
                         let curRight = rightX + shift;
 
-                        // A. 繪製背光面 (暗部 - 左側)
                         ctx.fillStyle = weather.type === 'sunny' ? '#4a567d' : '#23293d';
-                        ctx.beginPath();
-                        ctx.moveTo(curLeft, horizonY);
-                        ctx.lineTo(curPeak, peakY);
-                        ctx.lineTo(curPeak, horizonY);
-                        ctx.closePath();
-                        ctx.fill();
+                        ctx.beginPath(); ctx.moveTo(curLeft, horizonY); ctx.lineTo(curPeak, peakY); ctx.lineTo(curPeak, horizonY); ctx.closePath(); ctx.fill();
 
-                        // B. 繪製向光面 (亮部 - 右側)
                         ctx.fillStyle = weather.type === 'sunny' ? '#687fa6' : '#2f3954';
-                        ctx.beginPath();
-                        ctx.moveTo(curPeak, peakY);
-                        ctx.lineTo(curRight, horizonY);
-                        ctx.lineTo(curPeak, horizonY);
-                        ctx.closePath();
-                        ctx.fill();
+                        ctx.beginPath(); ctx.moveTo(curPeak, peakY); ctx.lineTo(curRight, horizonY); ctx.lineTo(curPeak, horizonY); ctx.closePath(); ctx.fill();
 
-                        // C. 繪製山頂「立體積雪 (Snow Cap)」
                         if (weather.type !== 'rain') {
-                            let snowH = height * 0.06;
-                            
-                            // 左側暗雪
+                            let snowH = height * 0.05;
                             ctx.fillStyle = '#d2dae2';
-                            ctx.beginPath();
-                            ctx.moveTo(curPeak, peakY);
-                            ctx.lineTo(curPeak - snowH * 0.7, peakY + snowH);
-                            ctx.lineTo(curPeak, peakY + snowH * 0.8);
-                            ctx.closePath();
-                            ctx.fill();
+                            ctx.beginPath(); ctx.moveTo(curPeak, peakY); ctx.lineTo(curPeak - snowH * 0.7, peakY + snowH); ctx.lineTo(curPeak, peakY + snowH * 0.8); ctx.closePath(); ctx.fill();
 
-                            // 右側亮雪
                             ctx.fillStyle = '#ffffff';
-                            ctx.beginPath();
-                            ctx.moveTo(curPeak, peakY);
-                            ctx.lineTo(curPeak + snowH * 0.7, peakY + snowH);
-                            ctx.lineTo(curPeak, peakY + snowH * 0.8);
-                            ctx.closePath();
-                            ctx.fill();
+                            ctx.beginPath(); ctx.moveTo(curPeak, peakY); ctx.lineTo(curPeak + snowH * 0.7, peakY + snowH); ctx.lineTo(curPeak, peakY + snowH * 0.8); ctx.closePath(); ctx.fill();
                         }
                     }
                 });
                 ctx.restore();
             } 
             else if (scene.id === 'ocean') {
-                let oceanHeight = Math.max(100, height * 0.25);
+                let oceanHeight = Math.max(80, height * 0.22);
                 let oceanTopY = horizonY - oceanHeight;
                 let oceanGrad = ctx.createLinearGradient(0, oceanTopY, 0, horizonY);
                 oceanGrad.addColorStop(0, '#1b4f72'); oceanGrad.addColorStop(1, '#5dade2');
@@ -765,74 +1218,32 @@
                     ctx.fillRect(i - waveOffset, oceanTopY + (oceanHeight * 0.4) + Math.sin(i) * 5, waveW, 2);
                 }
             } 
-            // ================= 🌲 【精緻化樹林】 =================
             else if (scene.id === 'forest') {
                 ctx.save();
-                
-                // [1. 遠景小樹林] - 顏色較淺、移動較慢
                 const farTreeOffset = (distance * 0.2) % 180;
-                for (let x = -100; x < width + 100; x += 45 * scale) {
+                for (let x = -100; x < width + 100; x += 40 * scale) {
                     let drawX = x - farTreeOffset;
-                    let tHeight = (50 + (Math.sin(x) * 15)) * scale;
-                    let tWidth = 22 * scale;
-                    
-                    ctx.fillStyle = weather.type === 'sunny' ? '#1abc9c' : '#117a65'; // 遠方偏藍綠的林木
-                    ctx.beginPath();
-                    ctx.moveTo(drawX, horizonY);
-                    ctx.lineTo(drawX + tWidth/2, horizonY - tHeight);
-                    ctx.lineTo(drawX + tWidth, horizonY);
-                    ctx.closePath();
-                    ctx.fill();
+                    let tHeight = (45 + (Math.sin(x) * 12)) * scale; let tWidth = 20 * scale;
+                    ctx.fillStyle = weather.type === 'sunny' ? '#1abc9c' : '#117a65'; 
+                    ctx.beginPath(); ctx.moveTo(drawX, horizonY); ctx.lineTo(drawX + tWidth/2, horizonY - tHeight); ctx.lineTo(drawX + tWidth, horizonY); ctx.closePath(); ctx.fill();
                 }
 
-                // [2. 近景高精緻立體松樹林] - 擁有獨立樹幹、三層漸層針葉樹冠，且具備高低起伏
                 const nearTreeOffset = (distance * 0.45) % 240;
-                
-                for (let x = -120; x < width + 120; x += 55 * scale) {
+                for (let x = -120; x < width + 120; x += 50 * scale) {
                     let drawX = x - nearTreeOffset;
-                    // 根據正弦函數創造自然高低變化的樹木高度
-                    let treeH = (85 + Math.sin(x * 0.05) * 25) * scale;
-                    let treeW = 38 * scale;
-
-                    // A. 繪製深棕色實體樹幹 (Trunk)
+                    let treeH = (75 + Math.sin(x * 0.05) * 20) * scale; let treeW = 34 * scale;
                     ctx.fillStyle = '#5c3a21';
-                    let trunkW = 4 * scale;
-                    let trunkH = treeH * 0.25;
+                    let trunkW = 3 * scale; let trunkH = treeH * 0.25;
                     ctx.fillRect(drawX + treeW/2 - trunkW/2, horizonY - trunkH, trunkW, trunkH);
 
-                    // B. 繪製三層立體漸層松葉 (三層三角形葉片疊加)
-                    let leafStartY = horizonY - trunkH;
-                    let layerH = (treeH - trunkH) / 3;
-
-                    // 顏色陣列 (底層最暗 -> 頂層最亮)
-                    let leafColors = weather.type === 'sunny' 
-                        ? ['#196f3d', '#229954', '#2ecc71']  
-                        : ['#145a32', '#196f3d', '#229954']; 
+                    let leafStartY = horizonY - trunkH; let layerH = (treeH - trunkH) / 3;
+                    let leafColors = weather.type === 'sunny' ? ['#196f3d', '#229954', '#2ecc71'] : ['#145a32', '#196f3d', '#229954']; 
 
                     for (let layer = 0; layer < 3; layer++) {
                         ctx.fillStyle = leafColors[layer];
-                        
                         let curBottomY = leafStartY - layer * (layerH * 0.7);
-                        let curHeight = layerH * (1.3 - layer * 0.15);
-                        let curWidth = treeW * (1.0 - layer * 0.22);
-                        
-                        ctx.beginPath();
-                        ctx.moveTo(drawX + treeW/2 - curWidth/2, curBottomY);             // 左底點
-                        ctx.lineTo(drawX + treeW/2, curBottomY - curHeight);            // 頂點
-                        ctx.lineTo(drawX + treeW/2 + curWidth/2, curBottomY);            // 右底點
-                        ctx.closePath();
-                        ctx.fill();
-                        
-                        // 側邊向光立體高光線（亮部點綴）
-                        if (weather.type === 'sunny') {
-                            ctx.fillStyle = 'rgba(255,255,255,0.08)';
-                            ctx.beginPath();
-                            ctx.moveTo(drawX + treeW/2, curBottomY - curHeight);
-                            ctx.lineTo(drawX + treeW/2 + curWidth/2, curBottomY);
-                            ctx.lineTo(drawX + treeW/2, curBottomY);
-                            ctx.closePath();
-                            ctx.fill();
-                        }
+                        let curHeight = layerH * (1.3 - layer * 0.15); let curWidth = treeW * (1.0 - layer * 0.22);
+                        ctx.beginPath(); ctx.moveTo(drawX + treeW/2 - curWidth/2, curBottomY); ctx.lineTo(drawX + treeW/2, curBottomY - curHeight); ctx.lineTo(drawX + treeW/2 + curWidth/2, curBottomY); ctx.closePath(); ctx.fill();
                     }
                 }
                 ctx.restore();
@@ -841,35 +1252,24 @@
                 ctx.save();
                 const farOffset = (distance * 0.12) % 400;
                 ctx.fillStyle = weather.type === 'sunny' ? '#222f3e' : '#141d26'; 
-                for (let i = -1; i < (width / (100 * scale)) + 2; i++) {
-                    let drawX = i * (140 * scale) - farOffset;
-                    let bHeight = (120 + (i % 3) * 50) * scale; let bWidth = 55 * scale;
+                for (let i = -1; i < (width / (80 * scale)) + 2; i++) {
+                    let drawX = i * (110 * scale) - farOffset;
+                    let bHeight = (100 + (i % 3) * 40) * scale; let bWidth = 45 * scale;
                     ctx.fillRect(drawX, horizonY - bHeight, bWidth, bHeight);
-                    if (i % 2 === 0) ctx.fillRect(drawX + bWidth * 0.4, horizonY - bHeight - 15 * scale, 4 * scale, 15 * scale);
                 }
 
                 const nearOffset = (distance * 0.35) % 500;
-                for (let i = -1; i < (width / (150 * scale)) + 2; i++) {
-                    let drawX = i * (220 * scale) - nearOffset;
-                    let bHeight = (180 + (i * 73 % 4) * 45) * scale; let bWidth = 85 * scale;
+                for (let i = -1; i < (width / (110 * scale)) + 2; i++) {
+                    let drawX = i * (160 * scale) - nearOffset;
+                    let bHeight = (140 + (i * 73 % 4) * 35) * scale; let bWidth = 65 * scale;
                     ctx.fillStyle = weather.type === 'sunny' ? '#34495e' : '#1c2631'; ctx.fillRect(drawX, horizonY - bHeight, bWidth, bHeight);
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.18)'; ctx.fillRect(drawX + bWidth * 0.75, horizonY - bHeight, bWidth * 0.25, bHeight);
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)'; ctx.fillRect(drawX + bWidth * 0.75, horizonY - bHeight, bWidth * 0.25, bHeight);
 
-                    ctx.fillStyle = weather.type === 'sunny' ? '#2c3e50' : '#151c24';
-                    if (i % 2 === 0) {
-                        ctx.fillRect(drawX + bWidth * 0.2, horizonY - bHeight - 10 * scale, bWidth * 0.6, 10 * scale);
-                        ctx.fillStyle = '#ff3b3b'; ctx.fillRect(drawX + bWidth * 0.5 - 1 * scale, horizonY - bHeight - 25 * scale, 2 * scale, 2 * scale);
-                    } else if (i % 3 === 0) {
-                        ctx.fillRect(drawX + bWidth * 0.1, horizonY - bHeight - 6 * scale, bWidth * 0.8, 6 * scale);
-                        ctx.fillRect(drawX + bWidth * 0.25, horizonY - bHeight - 12 * scale, bWidth * 0.5, 6 * scale);
-                    }
-
-                    let winW = 5 * scale; let winH = 7 * scale; let gapX = 10 * scale; let gapY = 14 * scale;
-                    for (let wx = drawX + 10 * scale; wx < drawX + bWidth * 0.7; wx += gapX) {
-                        for (let wy = horizonY - bHeight + 15 * scale; wy < horizonY - 15 * scale; wy += gapY) {
-                            let seed = Math.sin(wx * 2 + wy * 5 + i);
-                            if (seed > -0.2) {
-                                ctx.fillStyle = `rgba(241, 196, 15, ${weather.type === 'sunny' ? 0.4 + Math.abs(seed) * 0.4 : 0.6 + Math.abs(seed) * 0.4})`; 
+                    let winW = 4 * scale; let winH = 5 * scale; let gapX = 8 * scale; let gapY = 11 * scale;
+                    for (let wx = drawX + 6 * scale; wx < drawX + bWidth * 0.7; wx += gapX) {
+                        for (let wy = horizonY - bHeight + 10 * scale; wy < horizonY - 10 * scale; wy += gapY) {
+                            if (Math.sin(wx * 2 + wy * 5 + i) > -0.2) {
+                                ctx.fillStyle = `rgba(241, 196, 15, ${weather.type === 'sunny' ? 0.4 : 0.65})`; 
                                 ctx.fillRect(wx, wy, winW, winH);
                             }
                         }
@@ -878,14 +1278,13 @@
                 ctx.restore();
             } 
             else if (scene.id === 'country') {
-                const offset = (distance * 0.25) % 360;
-                ctx.fillStyle = '#27ae60'; ctx.fillRect(0, horizonY - 15, width, 15);
+                ctx.fillStyle = '#27ae60'; ctx.fillRect(0, horizonY - 12, width, 12);
             }
         }
 
         function drawBackground(timeRatio) {
             ctx.save();
-            const horizonY = height - 30; 
+            const horizonY = height - 25; 
 
             ctx.fillStyle = getSkyGradient(currentScene, currentWeather);
             ctx.fillRect(0, 0, width, height);
@@ -900,100 +1299,441 @@
             }
             ctx.restore();
 
-            ctx.fillStyle = '#1a202c'; ctx.fillRect(0, horizonY, width, 30);
+            ctx.fillStyle = '#1a202c'; ctx.fillRect(0, horizonY, width, 25);
             const trackOffset = (distance * 2) % 40; ctx.fillStyle = '#718096';
             for (let i = -1; i < width / 40 + 1; i++) {
-                ctx.fillRect(i * 40 - trackOffset, horizonY + 8, 14, 6);
+                ctx.fillRect(i * 40 - trackOffset, horizonY + 6, 14, 5);
             }
+        }
+
+        // ============================================================================
+        // 🏢 頂級現代化頂棚與日式傳統色系統
+        // ============================================================================
+        function drawModernPlatformRoof(platformX, platformTopY, platformWidth, scale, style) {
+            ctx.save();
+            const roofHeight = 85 * scale;
+            const roofY = platformTopY - 145 * scale;
+
+            let roofColors, pillarColor, pillarEdge;
+
+            if (style === 0) { 
+                roofColors = ['#17184b', '#20225c', '#0f1033', '#07081c'];
+                pillarColor = '#13143b'; pillarEdge = '#2b2d73';
+            } else if (style === 1) { 
+                roofColors = ['#3d2e27', '#4a3a32', '#2a201c', '#17100e'];
+                pillarColor = '#2a201c'; pillarEdge = '#4a3a32';
+            } else if (style === 2) { 
+                roofColors = ['#1a2924', '#283c36', '#121f1b', '#0a120f'];
+                pillarColor = '#121f1b'; pillarEdge = '#283c36';
+            } else { 
+                roofColors = ['#422933', '#523440', '#2b1a21', '#170d11'];
+                pillarColor = '#2b1a21'; pillarEdge = '#523440';
+            }
+
+            let roofGrad = ctx.createLinearGradient(0, roofY, 0, roofY + roofHeight);
+            roofGrad.addColorStop(0, roofColors[0]);
+            roofGrad.addColorStop(0.4, roofColors[1]);
+            roofGrad.addColorStop(0.8, roofColors[2]);
+            roofGrad.addColorStop(1, roofColors[3]);
+            ctx.fillStyle = roofGrad;
+            ctx.fillRect(platformX, roofY, platformWidth, roofHeight);
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1 * scale;
+            for (let rx = platformX; rx < platformX + platformWidth; rx += 45 * scale) {
+                ctx.beginPath();
+                ctx.moveTo(rx, roofY);
+                ctx.lineTo(rx + 10 * scale, roofY + roofHeight);
+                ctx.stroke();
+            }
+
+            let ledGlow = ctx.createLinearGradient(0, roofY + roofHeight - 5 * scale, 0, roofY + roofHeight);
+            if (style === 0) {
+                ledGlow.addColorStop(0, 'rgba(0, 229, 255, 0.95)'); 
+            } else if (style === 1) {
+                ledGlow.addColorStop(0, 'rgba(253, 230, 138, 0.9)'); 
+            } else if (style === 2) {
+                ledGlow.addColorStop(0, 'rgba(52, 211, 153, 0.9)'); 
+            } else {
+                ledGlow.addColorStop(0, 'rgba(251, 113, 133, 0.9)'); 
+            }
+            ledGlow.addColorStop(0.4, '#ffffff');
+            ledGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            ctx.fillStyle = ledGlow;
+            ctx.fillRect(platformX, roofY + roofHeight - 4 * scale, platformWidth, 4 * scale);
+
+            ctx.fillStyle = pillarColor;
+            for (let cx = platformX + 60 * scale; cx < platformX + platformWidth; cx += 320 * scale) {
+                ctx.fillRect(cx, roofY + roofHeight, 10 * scale, 145 * scale);
+                ctx.fillStyle = pillarEdge;
+                ctx.fillRect(cx, roofY + roofHeight, 1.5 * scale, 145 * scale); 
+                ctx.fillStyle = pillarColor;
+            }
+            ctx.restore();
         }
 
         function drawPlatform() {
             ctx.save();
-            const horizonY = height - 30; const scale = Math.max(0.4, width / 1200); 
+            const horizonY = height - 25; 
+            const scale = Math.max(0.4, width / 600); 
+            
             const trainStartX = width * 0.15; 
-            const baseLength = 480 * scale; const headLength = 180 * scale;
-            const platformTopY = horizonY - 4 * scale; const perfectStopCanvasX = trainStartX + baseLength + headLength; 
-            const stopLineX = perfectStopCanvasX + (distanceToStation * 8);
-            const platformX = stopLineX - 1150; const platformWidth = width * 3;
+            const baseLength = 240 * scale; 
+            const headLength = 90 * scale;
+            
+            const platformTopY = horizonY - 4 * scale; 
+            const perfectStopCanvasX = trainStartX + baseLength + headLength; 
+            
+            let stopLineX;
+            if (isLeavingStationPhase) {
+                stopLineX = perfectStopCanvasX - departureLeftShift;
+            } else {
+                stopLineX = perfectStopCanvasX + (distanceToStation * 8); 
+            }
+            
+            const platformX = stopLineX - 1300 * scale; 
+            const platformWidth = width * 10;
 
-            ctx.fillStyle = '#7f8c8d'; ctx.fillRect(platformX, platformTopY, platformWidth, height - platformTopY);
-            ctx.fillStyle = '#bdc3c7'; ctx.fillRect(platformX, platformTopY, platformWidth, 12);
-            ctx.fillStyle = '#f1c40f'; ctx.fillRect(platformX, platformTopY + 4, platformWidth, 4);
+            drawModernPlatformRoof(platformX, platformTopY, platformWidth, scale, currentStationLandscape);
+
+            let wallColor = '#e2e8f0';
+            let baseColor = '#0f172a';
+            if (currentStationLandscape === 0) { wallColor = '#1e293b'; baseColor = '#020617'; }
+            else if (currentStationLandscape === 1) { wallColor = '#e5e5e0'; baseColor = '#451a03'; }
+            else if (currentStationLandscape === 2) { wallColor = '#d1d5db'; baseColor = '#064e3b'; }
+            else if (currentStationLandscape === 3) { wallColor = '#fff1f2'; baseColor = '#881337'; }
+
+            ctx.fillStyle = wallColor;
+            ctx.fillRect(platformX, platformTopY - 55 * scale, platformWidth, 55 * scale);
+            ctx.fillStyle = baseColor;
+            ctx.fillRect(platformX, platformTopY - 5 * scale, platformWidth, 5 * scale);
+
+            let zenX = stopLineX + 50 * scale;
+            let zenW = 140 * scale; 
+            
+            if (zenX > platformX && zenX + zenW < platformX + platformWidth) {
+                ctx.save();
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(zenX, platformTopY - 50 * scale, zenW, 45 * scale);
+                ctx.fillStyle = '#020617'; ctx.fillRect(zenX + 2*scale, platformTopY - 48 * scale, zenW - 4*scale, 41 * scale);
+
+                if (currentStationLandscape === 0) {
+                    let lGrad = ctx.createLinearGradient(zenX, 0, zenX+zenW, 0);
+                    lGrad.addColorStop(0, '#020617'); lGrad.addColorStop(0.5, '#1e1b4b'); lGrad.addColorStop(1, '#020617');
+                    ctx.fillStyle = lGrad; ctx.fillRect(zenX + 2*scale, platformTopY - 48 * scale, zenW - 4*scale, 41 * scale);
+                    ctx.fillStyle = '#00e5ff';
+                    ctx.fillRect(zenX + zenW*0.2, platformTopY - 35*scale, 20*scale, 12*scale);
+                    ctx.fillStyle = '#00ff88';
+                    ctx.fillRect(zenX + zenW*0.6, platformTopY - 40*scale, 30*scale, 8*scale);
+                } 
+                else if (currentStationLandscape === 1) {
+                    ctx.fillStyle = '#e5e5e0'; ctx.fillRect(zenX + 2*scale, platformTopY - 48 * scale, zenW - 4*scale, 41 * scale); 
+                    ctx.fillStyle = '#f5f5f0'; ctx.fillRect(zenX + 2*scale, platformTopY - 18 * scale, zenW - 4*scale, 11 * scale); 
+                    ctx.strokeStyle = '#d4d4cc'; ctx.lineWidth = 0.8 * scale;
+                    ctx.beginPath(); ctx.arc(zenX + zenW*0.4, platformTopY - 14*scale, 12*scale, Math.PI, 0); ctx.stroke();
+                    ctx.fillStyle = '#14532d'; 
+                    ctx.beginPath(); ctx.arc(zenX + zenW*0.38, platformTopY - 33 * scale, 12*scale, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(zenX + zenW*0.54, platformTopY - 36 * scale, 9*scale, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = '#451a03'; 
+                    ctx.fillRect(zenX + zenW*0.44, platformTopY - 26 * scale, 3 * scale, 12 * scale);
+                    ctx.fillStyle = '#737373'; ctx.fillRect(zenX + zenW*0.75, platformTopY - 25 * scale, 6 * scale, 10 * scale);
+                    ctx.beginPath(); ctx.arc(zenX + zenW*0.75 + 3*scale, platformTopY - 25 * scale, 4*scale, 0, Math.PI*2); ctx.fill();
+                } 
+                else if (currentStationLandscape === 2) {
+                    ctx.fillStyle = '#064e3b'; ctx.fillRect(zenX + 2*scale, platformTopY - 48 * scale, zenW - 4*scale, 41 * scale); 
+                    ctx.fillStyle = '#059669'; ctx.beginPath(); ctx.arc(zenX+zenW*0.25, platformTopY-30*scale, 15*scale, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.arc(zenX+zenW*0.5, platformTopY-25*scale, 18*scale, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = '#34d399'; ctx.beginPath(); ctx.arc(zenX+zenW*0.75, platformTopY-35*scale, 14*scale, 0, Math.PI*2); ctx.fill();
+                    let pGlow = ctx.createRadialGradient(zenX+zenW/2, platformTopY-45*scale, 1, zenX+zenW/2, platformTopY-45*scale, 30*scale);
+                    pGlow.addColorStop(0, 'rgba(255,255,200,0.3)'); pGlow.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = pGlow; ctx.fillRect(zenX+2*scale, platformTopY-48*scale, zenW-4*scale, 41*scale);
+                } 
+                else {
+                    ctx.fillStyle = '#fff1f2'; ctx.fillRect(zenX + 2*scale, platformTopY - 48 * scale, zenW - 4*scale, 41 * scale); 
+                    ctx.fillStyle = '#fda4af';
+                    ctx.beginPath(); ctx.arc(zenX+zenW*0.45, platformTopY-32*scale, 15*scale, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = '#f43f5e';
+                    ctx.beginPath(); ctx.arc(zenX+zenW*0.6, platformTopY-28*scale, 12*scale, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = '#1e293b'; 
+                    ctx.fillRect(zenX + zenW*0.35, platformTopY - 18 * scale, zenW*0.35, 4 * scale);
+                }
+
+                let glassGrad = ctx.createLinearGradient(zenX, 0, zenX + zenW, 0);
+                glassGrad.addColorStop(0, 'rgba(255,255,255,0.22)');
+                glassGrad.addColorStop(0.3, 'rgba(255,255,255,0.04)');
+                glassGrad.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.fillStyle = glassGrad; ctx.fillRect(zenX + 2*scale, platformTopY - 48 * scale, zenW - 4*scale, 41 * scale);
+                ctx.restore();
+            }
+
+            let floorGrad = ctx.createLinearGradient(0, platformTopY, 0, height);
+            floorGrad.addColorStop(0, '#475569');
+            floorGrad.addColorStop(0.04, '#1e293b');
+            floorGrad.addColorStop(0.4, '#0f172a');
+            floorGrad.addColorStop(1, '#020617');
+            ctx.fillStyle = floorGrad;
+            ctx.fillRect(platformX, platformTopY, platformWidth, height - platformTopY);
+
+            ctx.save();
+            ctx.globalAlpha = 0.15; 
+            ctx.fillStyle = '#0033cc';
+            ctx.fillRect(platformX, platformTopY + 4 * scale, platformWidth, 8 * scale);
+            if (isHeadlightOn) {
+                let reflectLight = ctx.createRadialGradient(perfectStopCanvasX, platformTopY, 0, perfectStopCanvasX, platformTopY, 120 * scale);
+                reflectLight.addColorStop(0, 'rgba(0, 229, 255, 0.55)');
+                reflectLight.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = reflectLight;
+                ctx.beginPath(); ctx.ellipse(perfectStopCanvasX + 40*scale, platformTopY + 10*scale, 100*scale, 15*scale, 0, 0, Math.PI*2); ctx.fill();
+            }
+            ctx.restore();
+
+            ctx.fillStyle = '#94a3b8'; ctx.fillRect(platformX, platformTopY, platformWidth, 8 * scale);
+            ctx.fillStyle = '#ca8a04'; ctx.fillRect(platformX, platformTopY + 2.5 * scale, platformWidth, 3 * scale);
+            ctx.strokeStyle = '#eab308'; ctx.lineWidth = 1 * scale;
+            ctx.beginPath();
+            for (let bx = platformX; bx < platformX + platformWidth; bx += 6 * scale) {
+                ctx.moveTo(bx, platformTopY + 2.5 * scale);
+                ctx.lineTo(bx + 2 * scale, platformTopY + 5.5 * scale);
+            }
+            ctx.stroke();
 
             passengers.forEach(p => {
-                const pX = stopLineX + p.relX;
+                const pX = stopLineX + p.relX * scale;
                 if (pX > platformX && pX < platformX + platformWidth) {
-                    ctx.save(); ctx.translate(pX, platformTopY);
-                    ctx.fillStyle = p.color; ctx.fillRect(-2.5, -p.height, 5, p.height);
-                    ctx.fillStyle = '#ffdbb5'; ctx.beginPath(); ctx.arc(0, -p.height - 2, 2.5, 0, Math.PI*2); ctx.fill();
+                    ctx.save(); 
+                    let breathe = Math.sin(Date.now() * 0.003 + p.relX) * 0.4 * scale;
+                    ctx.translate(pX, platformTopY - 1 * scale);
+                    
+                    const pHeight = p.heightFactor * scale + breathe;
+                    const pWidth = p.widthFactor * scale;
+                    
+                    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+                    ctx.beginPath(); ctx.ellipse(0, 0, pWidth * 1.2, 1.8 * scale, 0, 0, Math.PI * 2); ctx.fill();
+
+                    ctx.fillStyle = p.color; 
+                    ctx.fillRect(-pWidth / 2, -pHeight * 0.82, pWidth, pHeight * 0.82);
+                    if(p.relX % 3 === 0) {
+                        ctx.fillStyle = '#475569';
+                        ctx.fillRect(pWidth * 0.6, -pHeight * 0.5, 4 * scale, pHeight * 0.5);
+                        ctx.fillStyle = '#1e293b';
+                        ctx.fillRect(pWidth * 0.6 + 1*scale, -pHeight * 0.5 - 3*scale, 2 * scale, 3 * scale);
+                    }
+                    ctx.fillStyle = '#ffdbb5'; 
+                    ctx.beginPath(); ctx.arc(0, -pHeight * 0.82 - (pWidth * 0.5), pWidth * 0.55, 0, Math.PI * 2); ctx.fill();
                     ctx.restore();
                 }
             });
 
-            const signX = stopLineX - 120; ctx.fillStyle = '#95a5a6'; ctx.fillRect(signX, platformTopY - 65, 5, 65);
-            ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#2c3e50'; ctx.lineWidth = 1.5;
-            let container = signX - 50; ctx.fillRect(container, platformTopY - 95, 106, 32); ctx.strokeRect(container, platformTopY - 95, 106, 32);
-            ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 11px sans-serif'; ctx.fillText(currentStationName.split(" ")[0], signX - 25, platformTopY - 76);
-            ctx.fillStyle = '#e74c3c'; ctx.fillRect(stopLineX - 3, platformTopY, 6, 25);
+            leavingPassengers.forEach(lp => {
+                let currentLpX = isLeavingStationPhase ? (lp.x - departureLeftShift) : lp.x;
+                if (currentLpX > platformX && currentLpX < platformX + platformWidth) {
+                    ctx.save();
+                    ctx.globalAlpha = lp.alpha; 
+                    
+                    let stepBob = Math.abs(Math.sin(lp.bobOffset)) * 2.5 * scale;
+                    ctx.translate(currentLpX, platformTopY + stepBob);
+                    
+                    const pHeight = lp.heightFactor * scale;
+                    const pWidth = lp.widthFactor * scale;
+                    
+                    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                    ctx.beginPath(); ctx.ellipse(0, -stepBob, pWidth, 1.5 * scale, 0, 0, Math.PI * 2); ctx.fill();
+
+                    ctx.fillStyle = lp.color;
+                    ctx.fillRect(-pWidth / 2, -pHeight * 0.82, pWidth, pHeight * 0.82);
+                    ctx.fillStyle = '#ffdbb5';
+                    ctx.beginPath(); ctx.arc(0, -pHeight * 0.82 - (pWidth * 0.5), pWidth * 0.55, 0, Math.PI * 2); ctx.fill();
+                    ctx.restore();
+                }
+            });
+
+            const signX = stopLineX - 120 * scale; 
+            ctx.fillStyle = '#334155'; ctx.fillRect(signX, platformTopY - 125 * scale, 4 * scale, 55 * scale); 
+            
+            let containerX = signX - 45 * scale; 
+            ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2 * scale;
+            ctx.fillRect(containerX, platformTopY - 95 * scale, 94 * scale, 30 * scale); 
+            ctx.strokeRect(containerX, platformTopY - 95 * scale, 94 * scale, 30 * scale);
+            ctx.fillStyle = '#0033cc'; ctx.fillRect(containerX, platformTopY - 95 * scale, 94 * scale, 4 * scale);
+            
+            ctx.fillStyle = '#0f172a'; ctx.font = `bold ${Math.round(11 * scale)}px 'Segoe UI', sans-serif`; 
+            ctx.fillText(currentStationName.split(" ")[0], signX - 25 * scale, platformTopY - 76 * scale);
+            ctx.fillStyle = '#64748b'; ctx.font = `600 ${Math.round(6.5 * scale)}px sans-serif`;
+            ctx.fillText("のりば Track 1", signX - 25 * scale, platformTopY - 68 * scale);
+
+            const infoBoardX = stopLineX + 220 * scale;
+            ctx.fillStyle = '#1e293b'; ctx.fillRect(infoBoardX, platformTopY - 110 * scale, 3 * scale, 45 * scale); 
+            ctx.fillStyle = '#020617'; ctx.strokeStyle = '#475569'; ctx.lineWidth = 1 * scale;
+            ctx.fillRect(infoBoardX - 40 * scale, platformTopY - 95 * scale, 83 * scale, 32 * scale);
+            ctx.strokeRect(infoBoardX - 40 * scale, platformTopY - 95 * scale, 83 * scale, 32 * scale);
+            
+            ctx.fillStyle = '#000000'; ctx.fillRect(infoBoardX - 37 * scale, platformTopY - 92 * scale, 77 * scale, 26 * scale);
+            let blinkState = Math.sin(Date.now() * 0.005) > 0;
+            ctx.fillStyle = blinkState ? '#ffcc00' : '#ff9900';
+            ctx.font = `900 ${Math.round(7 * scale)}px monospace`;
+            ctx.fillText("先発 15:32 新幹線", infoBoardX - 34 * scale, platformTopY - 82 * scale);
+            ctx.fillStyle = doorOpen ? '#ef4444' : '#00ff88';
+            ctx.font = `700 ${Math.round(6 * scale)}px sans-serif`;
+            ctx.fillText(doorOpen ? "● 当駅止まり" : "● 1-12号車乗車位置", infoBoardX - 34 * scale, platformTopY - 71 * scale);
+
+            const psdY = platformTopY - 24 * scale;
+            const doorWidth = 16 * scale;
+            const psdMoveOffset = (doorWidth / 2) * doorWidthPercent; 
+
+            let psdDoor1X = trainStartX + 8 * scale;
+            let psdDoor2X = (trainStartX - (240 * scale) - 8 * scale) + (240 * scale) - 25 * scale;
+            
+            if (isLeavingStationPhase) {
+                psdDoor1X -= departureLeftShift;
+                psdDoor2X -= departureLeftShift;
+            } else if (!isArrived && distanceToStation > 0) {
+                psdDoor1X = stopLineX - baseLength - 80 * scale; 
+                psdDoor2X = stopLineX - baseLength * 2 - 110 * scale;
+            }
+
+            [psdDoor1X, psdDoor2X].forEach(px => {
+                if (px > platformX - 50 && px < platformX + platformWidth + 50) {
+                    ctx.fillStyle = '#e2e8f0'; ctx.fillRect(px - 14 * scale, psdY, 14 * scale, 24 * scale);
+                    ctx.fillStyle = '#e2e8f0'; ctx.fillRect(px + doorWidth, psdY, 14 * scale, 24 * scale);
+                    ctx.fillStyle = 'rgba(0, 149, 255, 0.2)'; ctx.fillRect(px - 10 * scale, psdY + 4 * scale, 10 * scale, 16 * scale);
+                    ctx.fillRect(px + doorWidth, psdY + 4 * scale, 10 * scale, 16 * scale);
+
+                    ctx.fillStyle = '#eab308';
+                    ctx.fillRect(px - 14 * scale, psdY, 14 * scale, 3 * scale);
+                    ctx.fillRect(px + doorWidth, psdY, 14 * scale, 3 * scale);
+
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)'; 
+                    ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1 * scale;
+                    ctx.fillRect(px - psdMoveOffset, psdY + 2 * scale, doorWidth / 2, 22 * scale);
+                    ctx.strokeRect(px - psdMoveOffset, psdY + 2 * scale, doorWidth / 2, 22 * scale);
+                    ctx.fillRect(px + doorWidth / 2 + psdMoveOffset, psdY + 2 * scale, doorWidth / 2, 22 * scale);
+                    ctx.strokeRect(px + doorWidth / 2 + psdMoveOffset, psdY + 2 * scale, doorWidth / 2, 22 * scale);
+
+                    ctx.fillStyle = doorWidthPercent > 0.9 ? '#00ff88' : (Math.sin(Date.now()*0.02)>0 ? '#ef4444' : '#7f1d1d');
+                    ctx.beginPath(); ctx.arc(px - 7 * scale, psdY + 6 * scale, 1.5 * scale, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(px + doorWidth + 7 * scale, psdY + 6 * scale, 1.5 * scale, 0, Math.PI * 2); ctx.fill();
+                }
+            });
+
+            ctx.save();
+            ctx.translate(stopLineX, platformTopY);
+            
+            const totalZWidth = 70 * scale;  
+            const zoneHeight = 28 * scale;   
+            
+            let beamGrad = ctx.createLinearGradient(0, -120 * scale, 0, 0);
+            beamGrad.addColorStop(0, 'rgba(255, 59, 59, 0)');
+            beamGrad.addColorStop(0.5, 'rgba(255, 59, 59, 0.15)');
+            beamGrad.addColorStop(1, 'rgba(255, 59, 59, 0.6)');
+            ctx.fillStyle = beamGrad;
+            ctx.fillRect(-1.5 * scale, -120 * scale, 3 * scale, 120 * scale);
+
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(-totalZWidth / 2, 0, totalZWidth, zoneHeight);
+            
+            ctx.strokeStyle = '#ffee00';
+            ctx.lineWidth = 6 * scale;
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(-totalZWidth / 2, 0, totalZWidth, zoneHeight);
+            ctx.clip(); 
+            for (let offset = -totalZWidth; offset < totalZWidth; offset += 12 * scale) {
+                ctx.moveTo(offset, 0);
+                ctx.lineTo(offset + 16 * scale, zoneHeight);
+            }
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.shadowColor = '#ff3b3b';
+            ctx.shadowBlur = 10 * scale;
+            ctx.strokeStyle = '#ff3b3b';
+            ctx.lineWidth = 4 * scale;
+            ctx.beginPath();
+            ctx.moveTo(0, -5 * scale); 
+            ctx.lineTo(0, zoneHeight + 5 * scale);
+            ctx.stroke();
+            ctx.shadowBlur = 0; 
+
+            let blink = Math.sin(Date.now() * 0.008) > 0;
+            ctx.shadowColor = blink ? '#00ff88' : '#ff003c';
+            ctx.shadowBlur = 12 * scale;
+            ctx.fillStyle = blink ? '#00ff88' : '#ff3b3b';
+            ctx.font = `900 ${Math.round(16 * scale)}px Impact, sans-serif`; 
+            ctx.textAlign = 'center';
+            
+            ctx.lineWidth = 2.5 * scale;
+            ctx.strokeStyle = '#020617';
+            ctx.strokeText("STOP", 0, zoneHeight + 18 * scale);
+            ctx.fillText("STOP", 0, zoneHeight + 18 * scale);
+            
+            ctx.restore();
             ctx.restore();
         }
 
-        UXScaleMax = 1200;
         function drawShinkansen() {
-            const horizonY = height - 30; const scale = Math.max(0.4, width / UXScaleMax); 
-            const baseLength = 480 * scale; const headLength = 180 * scale; const trainHeight = 85 * scale;
-            const bounce = speed > 0 ? Math.sin(Date.now() / 40) * 1.5 : 0;
-            const firstCarStartX = width * 0.15; const secondCarStartX = firstCarStartX - baseLength - 12 * scale; 
-            const lightSourceX = firstCarStartX + baseLength + headLength - 5 * scale;
-            const lightSourceY = horizonY - trainHeight * 0.25 + bounce;
+            const horizonY = height - 25; 
+            const scale = Math.max(0.4, width / 600); 
+            const baseLength = 240 * scale; const headLength = 90 * scale; const trainHeight = 45 * scale;
+            const bounce = speed > 0 ? Math.sin(Date.now() / 40) * 1.0 : 0;
+            const firstCarStartX = width * 0.15; const secondCarStartX = firstCarStartX - baseLength - 8 * scale; 
+            const lightSourceX = firstCarStartX + baseLength + headLength - 6 * scale; 
+            const lightSourceY = horizonY - trainHeight * 0.23 + bounce;
 
             if (isHeadlightOn) {
                 ctx.save();
                 let lightBeamGrad = ctx.createLinearGradient(lightSourceX, lightSourceY, width, lightSourceY);
-                lightBeamGrad.addColorStop(0, 'rgba(255, 255, 230, 0.45)');
-                lightBeamGrad.addColorStop(0.3, 'rgba(255, 255, 240, 0.12)');
-                lightBeamGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-                ctx.fillStyle = lightBeamGrad; ctx.beginPath(); ctx.moveTo(lightSourceX, lightSourceY - 3);
-                ctx.lineTo(width, lightSourceY - height * 0.4); ctx.lineTo(width, lightSourceY + height * 0.4);
-                ctx.closePath(); ctx.fill(); ctx.restore();
+                lightBeamGrad.addColorStop(0, 'rgba(255, 255, 245, 0.85)');    
+                lightBeamGrad.addColorStop(0.04, 'rgba(235, 250, 255, 0.55)');  
+                lightBeamGrad.addColorStop(0.15, 'rgba(255, 255, 240, 0.25)'); 
+                lightBeamGrad.addColorStop(0.5, 'rgba(255, 255, 240, 0.08)');  
+                lightBeamGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');       
+                
+                ctx.fillStyle = lightBeamGrad; 
+                ctx.beginPath(); 
+                ctx.moveTo(lightSourceX, lightSourceY - 1.5 * scale);
+                ctx.lineTo(width, lightSourceY - height * 0.25); 
+                ctx.lineTo(width, lightSourceY + height * 0.35); 
+                ctx.closePath(); 
+                ctx.fill(); 
+
+                let groundGlow = ctx.createRadialGradient(lightSourceX, lightSourceY, 10 * scale, lightSourceX + 120 * scale, lightSourceY + 15 * scale, 130 * scale);
+                groundGlow.addColorStop(0, 'rgba(255, 255, 230, 0.35)');
+                groundGlow.addColorStop(0.5, 'rgba(255, 255, 240, 0.1)');
+                groundGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                ctx.fillStyle = groundGlow;
+                ctx.beginPath();
+                ctx.ellipse(lightSourceX + 80 * scale, lightSourceY + 12 * scale, 120 * scale, 22 * scale, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
             }
 
-            // 【第二節車廂】
             ctx.save(); ctx.translate(secondCarStartX, horizonY - trainHeight + bounce);
             let bodyGrad2 = ctx.createLinearGradient(0, 0, 0, trainHeight);
-            bodyGrad2.addColorStop(0, '#ffffff'); bodyGrad2.addColorStop(0.15, '#f8fafc');
-            bodyGrad2.addColorStop(0.75, '#e2e8f0'); bodyGrad2.addColorStop(1, '#94a3b8');
+            bodyGrad2.addColorStop(0, '#ffffff'); bodyGrad2.addColorStop(0.15, '#f8fafc'); bodyGrad2.addColorStop(0.75, '#e2e8f0'); bodyGrad2.addColorStop(1, '#94a3b8');
             ctx.fillStyle = bodyGrad2; ctx.fillRect(0, 0, baseLength, trainHeight);
-            ctx.fillStyle = '#334155'; ctx.fillRect(0, trainHeight - 7 * scale, baseLength, 7 * scale);
+            ctx.fillStyle = '#334155'; ctx.fillRect(0, trainHeight - 4 * scale, baseLength, 4 * scale);
             ctx.fillStyle = '#0033cc'; ctx.fillRect(0, trainHeight * 0.44, baseLength, trainHeight * 0.12);
-            
-            for (let i = 25 * scale; i < baseLength - 70 * scale; i += 65 * scale) {
-                ctx.fillStyle = '#475569'; ctx.fillRect(i - 1, trainHeight * 0.19, 44 * scale, 22 * scale);
-                let winGrad = ctx.createLinearGradient(i, trainHeight * 0.2, i, trainHeight * 0.38);
-                winGrad.addColorStop(0, '#1e293b'); winGrad.addColorStop(1, '#0f172a');
-                ctx.fillStyle = winGrad; ctx.fillRect(i, trainHeight * 0.2, 42 * scale, 20 * scale);
+            for (let i = 15 * scale; i < baseLength - 35 * scale; i += 32 * scale) {
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(i, trainHeight * 0.2, 22 * scale, 11 * scale);
             }
-            drawPhysicalDoor(baseLength - 45 * scale, trainHeight, scale); ctx.restore();
+            drawPhysicalDoor(baseLength - 25 * scale, trainHeight, scale); ctx.restore();
 
-            // 【中央防風褶棚】
             ctx.save(); ctx.translate(secondCarStartX + baseLength, horizonY - trainHeight + bounce);
-            let gangwayGrad = ctx.createLinearGradient(0, 0, 12 * scale, 0);
+            let gangwayGrad = ctx.createLinearGradient(0, 0, 8 * scale, 0);
             gangwayGrad.addColorStop(0, '#0f172a'); gangwayGrad.addColorStop(0.5, '#475569'); gangwayGrad.addColorStop(1, '#0f172a');
-            ctx.fillStyle = gangwayGrad; ctx.fillRect(0, trainHeight * 0.06, 12 * scale, trainHeight * 0.88);
+            ctx.fillStyle = gangwayGrad; ctx.fillRect(0, trainHeight * 0.06, 8 * scale, trainHeight * 0.88);
             ctx.restore();
 
-            // 【第一節車廂】
             ctx.save(); ctx.translate(firstCarStartX, horizonY - trainHeight + bounce);
             let bodyGrad1 = ctx.createLinearGradient(0, 0, 0, trainHeight);
-            bodyGrad1.addColorStop(0, '#ffffff'); bodyGrad1.addColorStop(0.2, '#f8fafc');
-            bodyGrad1.addColorStop(0.7, '#e2e8f0'); bodyGrad1.addColorStop(1, '#94a3b8');
+            bodyGrad1.addColorStop(0, '#ffffff'); bodyGrad1.addColorStop(0.2, '#f8fafc'); bodyGrad1.addColorStop(0.7, '#e2e8f0'); bodyGrad1.addColorStop(1, '#94a3b8');
             ctx.fillStyle = bodyGrad1;
             ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(baseLength, 0);
-            ctx.quadraticCurveTo(baseLength + headLength * 0.75, -1 * scale, baseLength + headLength * 0.95, trainHeight * 0.62);
+            ctx.quadraticCurveTo(baseLength + headLength * 0.75, -0.5 * scale, baseLength + headLength * 0.95, trainHeight * 0.62);
             ctx.quadraticCurveTo(baseLength + headLength, trainHeight * 0.76, baseLength + headLength, trainHeight);
             ctx.lineTo(0, trainHeight); ctx.closePath(); ctx.fill();
 
-            ctx.fillStyle = '#334155'; ctx.fillRect(0, trainHeight - 7 * scale, baseLength + headLength * 0.7, 7 * scale);
+            ctx.fillStyle = '#334155'; ctx.fillRect(0, trainHeight - 4 * scale, baseLength + headLength * 0.7, 4 * scale);
             ctx.fillStyle = '#0033cc'; ctx.beginPath();
             ctx.moveTo(0, trainHeight * 0.44); ctx.lineTo(baseLength, trainHeight * 0.44);
             ctx.quadraticCurveTo(baseLength + headLength * 0.72, trainHeight * 0.44, baseLength + headLength * 0.92, trainHeight * 0.68);
@@ -1001,34 +1741,61 @@
             ctx.quadraticCurveTo(baseLength + headLength * 0.68, trainHeight * 0.56, baseLength, trainHeight * 0.56);
             ctx.lineTo(0, trainHeight * 0.56); ctx.fill();
 
-            let cockpitGrad = ctx.createLinearGradient(baseLength - 20 * scale, trainHeight * 0.08, baseLength + 85 * scale, trainHeight * 0.35);
-            cockpitGrad.addColorStop(0, '#0f172a'); cockpitGrad.addColorStop(0.5, '#1e293b'); cockpitGrad.addColorStop(1, '#020617');
-            ctx.fillStyle = cockpitGrad; ctx.beginPath();
-            ctx.moveTo(baseLength - 20 * scale, trainHeight * 0.08); ctx.lineTo(baseLength + 50 * scale, trainHeight * 0.08);
-            ctx.quadraticCurveTo(baseLength + 90 * scale, trainHeight * 0.10, baseLength + 112 * scale, trainHeight * 0.35);
-            ctx.lineTo(baseLength + 68 * scale, trainHeight * 0.35); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = '#0f172a'; ctx.beginPath();
+            ctx.moveTo(baseLength - 10 * scale, trainHeight * 0.08); ctx.lineTo(baseLength + 25 * scale, trainHeight * 0.08);
+            ctx.quadraticCurveTo(baseLength + 45 * scale, trainHeight * 0.10, baseLength + 56 * scale, trainHeight * 0.35);
+            ctx.lineTo(baseLength + 34 * scale, trainHeight * 0.35); ctx.closePath(); ctx.fill();
             
-            for (let i = 65 * scale; i < baseLength - 40 * scale; i += 65 * scale) {
-                ctx.fillStyle = '#475569'; ctx.fillRect(i - 1, trainHeight * 0.19, 44 * scale, 22 * scale);
-                let winGrad1 = ctx.createLinearGradient(i, trainHeight * 0.2, i, trainHeight * 0.38);
-                winGrad1.addColorStop(0, '#1e293b'); winGrad1.addColorStop(1, '#0f172a');
-                ctx.fillStyle = winGrad1; ctx.fillRect(i, trainHeight * 0.2, 42 * scale, 20 * scale);
+            for (let i = 35 * scale; i < baseLength - 20 * scale; i += 32 * scale) {
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(i, trainHeight * 0.2, 22 * scale, 11 * scale);
             }
-            drawPhysicalDoor(15 * scale, trainHeight, scale);
+            drawPhysicalDoor(8 * scale, trainHeight, scale);
+
+            const lampX = baseLength + headLength - 8 * scale;
+            const lampY = trainHeight * 0.72;
+
+            ctx.fillStyle = '#111625';
+            ctx.beginPath();
+            ctx.ellipse(lampX, lampY, 4 * scale, 2.8 * scale, -Math.PI/12, 0, Math.PI * 2);
+            ctx.fill();
 
             if (isHeadlightOn) {
-                ctx.shadowColor = '#ffffcc'; ctx.shadowBlur = 10; ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.arc(baseLength + headLength - 15 * scale, trainHeight * 0.72, 4.5 * scale, 0, Math.PI * 2);
-                ctx.arc(baseLength + headLength - 25 * scale, trainHeight * 0.75, 3.5 * scale, 0, Math.PI * 2); ctx.fill();
-                ctx.shadowBlur = 0; 
+                ctx.save();
+                let pulse = 0.96 + Math.sin(Date.now() * 0.08) * 0.04;
+                let flareGrad = ctx.createRadialGradient(lampX, lampY, 0.2 * scale, lampX, lampY, 15 * scale);
+                flareGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+                flareGrad.addColorStop(0.1, 'rgba(255, 255, 220, 0.8)');
+                flareGrad.addColorStop(0.25, 'rgba(0, 229, 255, 0.35)'); 
+                flareGrad.addColorStop(0.6, 'rgba(255, 255, 240, 0.06)');
+                flareGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                
+                ctx.fillStyle = flareGrad;
+                ctx.globalAlpha = pulse;
+                ctx.beginPath(); 
+                ctx.arc(lampX, lampY, 15 * scale, 0, Math.PI * 2); 
+                ctx.fill();
+
+                ctx.shadowColor = '#00e5ff'; 
+                ctx.shadowBlur = 8 * scale; 
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); 
+                ctx.arc(lampX - 0.5 * scale, lampY, 1.8 * scale, 0, Math.PI * 2); 
+                ctx.arc(lampX + 1.2 * scale, lampY + 0.3 * scale, 1.2 * scale, 0, Math.PI * 2); 
+                ctx.fill();
+                ctx.restore(); 
+            } else {
+                ctx.fillStyle = '#475569';
+                ctx.beginPath();
+                ctx.arc(lampX, lampY, 1.5 * scale, 0, Math.PI * 2);
+                ctx.fill();
             }
             ctx.restore(); drawHornWaves(lightSourceX, lightSourceY);
         }
 
         function drawPhysicalDoor(doorX, trainHeight, scale) {
-            const doorWidth = 32 * scale; 
-            const doorHeight = 58 * scale; 
-            const doorY = trainHeight - doorHeight - 7 * scale;
+            const doorWidth = 16 * scale; 
+            const doorHeight = 31 * scale; 
+            const doorY = trainHeight - doorHeight - 4 * scale;
 
             ctx.save();
             ctx.fillStyle = '#111625'; 
@@ -1041,70 +1808,48 @@
             doorMetalGrad.addColorStop(1, '#94a3b8');
             ctx.fillStyle = doorMetalGrad;
 
-            // 【左側半扇車門】
             ctx.save();
             ctx.beginPath(); 
             ctx.rect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight); 
             ctx.clip();
             ctx.fillRect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight);
-            
             ctx.strokeStyle = '#64748b'; 
-            ctx.lineWidth = Math.max(0.5, 1 * scale); 
+            ctx.lineWidth = Math.max(0.5, 0.5 * scale); 
             ctx.strokeRect(doorX - doorMoveOffset, doorY, doorWidth / 2, doorHeight);
-            
             ctx.fillStyle = '#0f172a'; 
-            ctx.fillRect(
-                doorX - doorMoveOffset + (doorWidth / 4) - 3 * scale, 
-                doorY + 10 * scale, 
-                6 * scale, 
-                18 * scale
-            );
+            ctx.fillRect(doorX - doorMoveOffset + (doorWidth / 4) - 1.5 * scale, doorY + 5 * scale, 3 * scale, 9 * scale);
             ctx.restore();
 
-            // 【右側半扇車門】
             ctx.save();
             ctx.beginPath(); 
             ctx.rect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight); 
             ctx.clip();
             ctx.fillRect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight);
-            
             ctx.strokeStyle = '#64748b'; 
-            ctx.lineWidth = Math.max(0.5, 1 * scale); 
+            ctx.lineWidth = Math.max(0.5, 0.5 * scale); 
             ctx.strokeRect(doorX + doorWidth / 2 + doorMoveOffset, doorY, doorWidth / 2, doorHeight);
-            
             ctx.fillStyle = '#0f172a'; 
-            ctx.fillRect(
-                doorX + (doorWidth / 2) + doorMoveOffset + 3 * scale, 
-                doorY + 10 * scale, 
-                6 * scale, 
-                18 * scale
-            );
+            ctx.fillRect(doorX + (doorWidth / 2) + doorMoveOffset + 1.5 * scale, doorY + 5 * scale, 3 * scale, 9 * scale);
             ctx.restore();
 
             ctx.fillStyle = '#1e293b'; 
-            ctx.fillRect(
-                doorX + (doorWidth / 2) - 0.75 * scale, 
-                doorY + 2 * scale, 
-                1.5 * scale, 
-                doorHeight - 4 * scale
-            );
-            
+            ctx.fillRect(doorX + (doorWidth / 2) - 0.4 * scale, doorY + 1 * scale, 0.8 * scale, doorHeight - 2 * scale);
             ctx.strokeStyle = '#475569'; 
-            ctx.lineWidth = Math.max(0.6, 1.5 * scale); 
+            ctx.lineWidth = Math.max(0.5, 0.8 * scale); 
             ctx.strokeRect(doorX, doorY, doorWidth, doorHeight);
             ctx.restore();
         }
 
         function triggerHorn() {
-            hornWaves.push({ radius: 10, alpha: 1.0, maxRadius: 135 }); playHornSound(); 
+            hornWaves.push({ radius: 8, alpha: 1.0, maxRadius: 100 }); playHornSound(); 
         }
 
         function drawHornWaves(startX, startY) {
             ctx.save();
             for (let i = hornWaves.length - 1; i >= 0; i--) {
-                let wave = hornWaves[i]; wave.radius += 3.5; wave.alpha -= 0.025;
+                let wave = hornWaves[i]; wave.radius += 3; wave.alpha -= 0.03;
                 if (wave.alpha <= 0) { hornWaves.splice(i, 1); continue; }
-                ctx.strokeStyle = `rgba(0, 229, 255, ${wave.alpha})`; ctx.lineWidth = 3;
+                ctx.strokeStyle = `rgba(0, 229, 255, ${wave.alpha})`; ctx.lineWidth = 2;
                 ctx.beginPath(); ctx.arc(startX, startY, wave.radius, -Math.PI/3, Math.PI/3, false); ctx.stroke();
             }
             ctx.restore();
@@ -1123,7 +1868,10 @@
             document.getElementById('station-name-display').innerText = currentStationName;
             if (nextScene && nextWeather) { currentScene = nextScene; currentWeather = nextWeather; }
             isTransitioning = false; hasTriggeredTransition = false; transitionAlpha = 0;
-            initWeatherParticles(); initSkyObjects(); 
+            
+            currentStationLandscape = Math.floor(Math.random() * 4); 
+
+            initWeatherParticles(); initSkyObjects(); initStars();
         }
 
         function gameLoop(timestamp) {
@@ -1132,13 +1880,10 @@
             lastTime = timestamp;
 
             const timeRatio = dt / 16.66; 
+            const scale = Math.max(0.4, width / 600); 
 
-            if (skyObjects.filter(o => o.type === 'plane').length === 0 && Math.random() < 0.001 * timeRatio) {
-                skyObjects.push(generatePlane());
-            }
-            if (skyObjects.filter(o => o.type === 'bird').length === 0 && Math.random() < 0.002 * timeRatio) {
-                generateBirdFlock();
-            }
+            if (skyObjects.filter(o => o.type === 'plane').length === 0 && Math.random() < 0.001 * timeRatio) skyObjects.push(generatePlane());
+            if (skyObjects.filter(o => o.type === 'bird').length === 0 && Math.random() < 0.002 * timeRatio) generateBirdFlock();
 
             if (isMissionFailed) {
                 failureResetTimer -= 1 * timeRatio;
@@ -1146,23 +1891,41 @@
                 if (failureResetTimer <= 0) {
                     isMissionFailed = false; distanceToStation = 10; 
                     isArrived = false; doorOpen = false; isClosingDoors = false; doorWidthPercent = 0; 
-                    stationMessage = "重新挑戰！請上下滑動精準停靠 0m 處"; messageTimer = 180;
+                    isLeavingStationPhase = false; departureLeftShift = 0;
+                    resetLeverUI(); 
+                    stationMessage = "重新挑戰！請拖動左側拉桿精準停靠 0m 處"; messageTimer = 180;
                 }
             }
 
-            if (isMovingUp && doorOpen && !isClosingDoors && !isMissionFailed) isClosingDoors = true; 
+            if (isMovingUp && doorOpen && !isClosingDoors && !isMissionFailed) {
+                isClosingDoors = true; 
+                hasSpawnedLeavers = false;
+                isLeavingStationPhase = true; 
+                departureLeftShift = 0; 
+            } 
 
             if (isClosingDoors) {
                 targetSpeed = 0; speed = 0; doorWidthPercent -= 0.05 * timeRatio; 
                 if (doorWidthPercent <= 0) {
                     doorWidthPercent = 0; doorOpen = false; isClosingDoors = false; isArrived = false;
-                    commitNextStation(); 
-                    stationMessage = `出發！前方進入【${currentScene.label}】，氣候：${currentWeather.label}`; messageTimer = 160;
+                    stationMessage = "列車啟動，正全速離開月台..."; messageTimer = 100;
                 }
             } else {
-                if (isMovingUp && !isMissionFailed && !doorOpen) targetSpeed = Math.min(320, targetSpeed + 2.5 * timeRatio);
+                let accelRate = isTurboMode ? 7.5 : 2.5;
+                if (isMovingUp && !isMissionFailed && !doorOpen) targetSpeed = Math.min(maxSpeedLimit, targetSpeed + accelRate * timeRatio);
+                
                 if (isArrived && speed === 0 && !isMissionFailed) {
                     doorWidthPercent = Math.min(1.0, doorWidthPercent + 0.04 * timeRatio);
+                    
+                    if (doorWidthPercent >= 1.0 && !hasSpawnedLeavers) {
+                        const trainStartX = width * 0.15;
+                        const baseLength = 240 * scale;
+                        let door1CanvasX = trainStartX + 8 * scale + (16 * scale / 2); 
+                        let door2CanvasX = (trainStartX - baseLength - 8 * scale) + baseLength - 25 * scale + (16 * scale / 2); 
+                        
+                        spawnLeavingPassengers(door1CanvasX, door2CanvasX, scale);
+                        hasSpawnedLeavers = true;
+                    }
                 }
             }
 
@@ -1172,20 +1935,44 @@
                 speed += (targetSpeed - speed) * (0.03 * timeRatio);
                 if (Math.abs(speed) < 0.1) speed = 0;
                 distance += speed * 0.5 * timeRatio;
+                
+                if (isLeavingStationPhase) {
+                    departureLeftShift += speed * 0.5 * timeRatio; 
+                    
+                    const trainStartX = width * 0.15;
+                    const baseLength = 240 * scale;
+                    const headLength = 90 * scale;
+                    const perfectStopCanvasX = trainStartX + baseLength + headLength;
+                    const stopLineX = perfectStopCanvasX - departureLeftShift;
+                    const platformX = stopLineX - 1300 * scale;
+                    const platformWidth = width * 8;
+                    const platformRightEdge = platformX + platformWidth; 
+                    
+                    if (platformRightEdge < 0) {
+                        isLeavingStationPhase = false; 
+                        departureLeftShift = 0; 
+                        commitNextStation(); 
+                        stationMessage = `出發！前方進入【${currentScene.label}】`; messageTimer = 160;
+                    }
+                }
             }
+
+            if (!isTurboMode && targetSpeed > 320) targetSpeed = 320;
 
             updateTrainSounds();
             
-            if (!isArrived && !isMissionFailed) {
+            if (hasSpawnedLeavers && leavingPassengers.length > 0) {
+                updateLeavingPassengers(timeRatio, scale);
+            }
+            
+            if (!isArrived && !isMissionFailed && !isLeavingStationPhase) {
                 distanceToStation -= (speed / 360) * timeRatio; 
 
                 if (distanceToStation <= 500 && distanceToStation > 0 && !hasTriggeredTransition) {
                     prepareNextStationScene(); hasTriggeredTransition = true;
                 }
 
-                if (isTransitioning) {
-                    transitionAlpha = (distanceToStation > 50) ? 1 - ((distanceToStation - 50) / 450) : 1;
-                }
+                if (isTransitioning) transitionAlpha = (distanceToStation > 50) ? 1 - ((distanceToStation - 50) / 450) : 1;
                 
                 if (speed === 0 && distanceToStation <= 20) { 
                     if (Math.abs(distanceToStation) <= 10) {
@@ -1195,19 +1982,19 @@
                         messageTimer = 120;
                     } else if (distanceToStation < -10) {
                         isMissionFailed = true; targetSpeed = 0; speed = 0;
-                        stationMessage = "任務失敗：過站未停！(正在將車移回到站處...)"; failureResetTimer = 90; 
+                        stationMessage = "任務失敗：過站未停！(正在回送中...)"; failureResetTimer = 90; 
                     }
                 }
                 if (distanceToStation < -50) {
                     isMissionFailed = true; targetSpeed = 0; speed = 0;
-                    stationMessage = "任務失敗：過站未停！(正在將車移回到站處...)"; failureResetTimer = 90; 
+                    stationMessage = "任務失敗：過站未停！"; failureResetTimer = 90; 
                 }
             }
 
-            if (messageTimer > 0) messageTimer -= 1 * timeRatio;
-
             const distDisplay = document.getElementById('station-dist-display');
-            if (distanceToStation > 1000) {
+            if (isLeavingStationPhase) {
+                distDisplay.innerText = "出站中..."; distDisplay.style.color = "#64748b";
+            } else if (distanceToStation > 1000) {
                 distDisplay.innerText = (distanceToStation / 1000).toFixed(2) + " km"; distDisplay.style.color = "#00e5ff";
             } else if (distanceToStation > 0) {
                 distDisplay.innerText = Math.round(distanceToStation) + " m"; distDisplay.style.color = (distanceToStation < 150) ? "#ff3b3b" : "#eab308";
@@ -1215,67 +2002,135 @@
                 distDisplay.innerText = "0 m (ARRIVED)"; distDisplay.style.color = "#00ff88";
             }
 
-            document.getElementById('gauge-fill-circle').style.strokeDashoffset = 220 - (220 * (speed / 320));
+            document.getElementById('gauge-fill-circle').style.strokeDashoffset = 240 - (240 * (speed / maxSpeedLimit));
+            updateTachoVisuals();
+
             document.getElementById('speed-display').innerText = Math.round(speed).toString().padStart(3, '0');
             document.getElementById('odometer-display').innerText = (distance / 250).toFixed(1);
 
-            document.getElementById('led-power').className = (targetSpeed > speed) ? 'status-led status-on' : 'status-led status-off';
-            document.getElementById('led-brake').className = (isMovingDown || (targetSpeed === 0 && speed > 2) || isMissionFailed) ? 'status-led status-brake' : 'status-led status-off';
-            document.getElementById('led-door').className = (doorWidthPercent > 0.1) ? 'status-led status-door' : 'status-led status-off';
+            updateLedTicker(timeRatio);
+            updateSensorMatrix();
 
             ctx.clearRect(0, 0, width, height);
             drawBackground(timeRatio); 
 
-            if ((distanceToStation <= 250 && distanceToStation >= -120) || isArrived || isMissionFailed) drawPlatform(); 
+            if ((distanceToStation <= 250 && distanceToStation >= -120) || isArrived || isMissionFailed || isLeavingStationPhase) {
+                drawPlatform(); 
+            }
 
             drawShinkansen(); 
             drawWeather(timeRatio);    
 
-            if (stationMessage && messageTimer > 0) {
-                ctx.save(); ctx.fillStyle = isMissionFailed ? 'rgba(44, 11, 14, 0.95)' : 'rgba(10, 15, 26, 0.85)';
-                ctx.fillRect(width / 2 - 270, 50, 540, 50); ctx.strokeStyle = isMissionFailed ? '#ff3b3b' : 'var(--primary-color)';
-                ctx.strokeRect(width / 2 - 270, 50, 540, 50); ctx.fillStyle = isMissionFailed ? '#ff3b3b' : '#ffffff';
-                ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(stationMessage, width / 2, 82); ctx.restore();
-            }
-
             requestAnimationFrame(gameLoop);
         }
 
-        let touchStartY = 0; let isDragging = false; const swipeThreshold = 30;
-        let lastTouchTime = 0; 
+        /* 🎛️ 拉桿控制邏輯 */
+        const container = document.getElementById('leverContainer');
+        const handle = document.getElementById('leverHandle');
+        const lblP = document.getElementById('lbl-p');
+        const lblN = document.getElementById('lbl-n');
+        const lblB = document.getElementById('lbl-b');
 
+        let MIN_TOP = 6;    
+        let MID_TOP = 47;   
+        let MAX_TOP = 88;  
+
+        function recalcLeverPositions() {
+            const containerHeight = container.clientHeight;
+            const handleHeight = handle.clientHeight;
+            MIN_TOP = 6;
+            MAX_TOP = containerHeight - handleHeight - 6;
+            MID_TOP = (containerHeight - handleHeight) / 2;
+            if(!isInteractingWithLever) {
+                handle.style.top = MID_TOP + 'px';
+            }
+        }
+
+        let isInteractingWithLever = false;
+        let startClientY = 0;
+        let startTop = MID_TOP;
+
+        function updateLeverUI(currentTop) {
+            handle.style.top = currentTop + 'px';
+            lblP.className = (currentTop < MID_TOP - 10) ? 'active-p' : '';
+            lblN.className = (currentTop >= MID_TOP - 10 && currentTop <= MID_TOP + 10) ? 'active-n' : '';
+            lblB.className = (currentTop > MID_TOP + 10) ? 'active-b' : '';
+        }
+
+        function resetLeverUI() {
+            isMovingUp = false;
+            isMovingDown = false;
+            updateLeverUI(MID_TOP);
+        }
+
+        function handleLeverStart(clientY) {
+            if (isMissionFailed) return;
+            if (!audioCtx) initAudio();
+            isInteractingWithLever = true;
+            startClientY = clientY;
+            startTop = parseFloat(handle.style.top) || MID_TOP;
+            handle.style.transition = 'none'; 
+        }
+
+        function handleLeverMove(clientY) {
+            if (!isInteractingWithLever) return;
+            const deltaY = clientY - startClientY;
+            let newTop = startTop + deltaY;
+
+            if (newTop < MIN_TOP) newTop = MIN_TOP;
+            if (newTop > MAX_TOP) newTop = MAX_TOP;
+
+            updateLeverUI(newTop);
+
+            if (newTop < MID_TOP - 12) {
+                isMovingUp = true;   
+                isMovingDown = false;
+            } else if (newTop > MID_TOP + 12) {
+                isMovingDown = true; 
+                isMovingUp = false;
+            } else {
+                isMovingUp = false;  
+                isMovingDown = false;
+            }
+        }
+
+        function handleLeverEnd() {
+            if (!isInteractingWithLever) return;
+            isInteractingWithLever = false;
+            handle.style.transition = 'top 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            resetLeverUI();
+        }
+
+        handle.addEventListener('mousedown', (e) => { e.preventDefault(); handleLeverStart(e.clientY); });
+        window.addEventListener('mousemove', (e) => { handleLeverMove(e.clientY); });
+        window.addEventListener('mouseup', handleLeverEnd);
+
+        handle.addEventListener('touchstart', (e) => { e.preventDefault(); handleLeverStart(e.touches[0].clientY); }, { passive: false });
+        window.addEventListener('touchmove', (e) => { handleLeverMove(e.touches[0].clientY); }, { passive: false });
+        window.addEventListener('touchend', handleLeverEnd);
+
+        /* ⌨️ 鍵盤/點擊監聽 */
+        let lastTouchTime = 0; 
         window.addEventListener('touchstart', (e) => {
             if (document.getElementById('dashboard').contains(e.target) || isMissionFailed) return;
-            
-            const now = performance.now();
-            const timespan = now - lastTouchTime;
-            lastTouchTime = now;
-
-            if (timespan > 0 && timespan < 300) {
-                e.preventDefault(); 
-                isHeadlightOn = !isHeadlightOn;
-                isDragging = false;
-                return;
-            }
-
-            touchStartY = e.touches[0].clientY; isDragging = true; if (!audioCtx) initAudio(); 
+            const MathNow = performance.now();
+            const timespan = MathNow - lastTouchTime;
+            lastTouchTime = MathNow;
+            if (timespan > 0 && timespan < 300) { e.preventDefault(); isHeadlightOn = !isHeadlightOn; return; }
+            if (!audioCtx) initAudio(); 
         }, { passive: false }); 
-
-        window.addEventListener('touchmove', (e) => {
-            if (!isDragging || isMissionFailed) return;
-            const currentY = e.touches[0].clientY; const diffY = touchStartY - currentY;
-            if (Math.abs(diffY) > swipeThreshold) {
-                if (diffY > 0) { isMovingUp = true; isMovingDown = false; } else { isMovingDown = true; isMovingUp = false; }
-                isDragging = false; 
-            }
-        }, { passive: true });
-
-        window.addEventListener('touchend', () => { isMovingUp = false; isMovingDown = false; isDragging = false; });
 
         window.addEventListener('mousedown', (e) => {
             if (!audioCtx) initAudio(); 
             if (document.getElementById('dashboard').contains(e.target) || isMissionFailed) return;
-            if (e.button === 0) { touchStartY = e.clientY; isDragging = true; triggerHorn(); } 
+            
+            if (e.button === 2) {
+                e.preventDefault();
+                isHeadlightOn = !isHeadlightOn;
+            } 
+            else if (e.button === 0) { 
+                triggerHorn(); 
+            } 
         });
 
         window.addEventListener('dblclick', (e) => {
@@ -1283,44 +2138,99 @@
             isHeadlightOn = !isHeadlightOn;
         });
 
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging || isMissionFailed) return;
-            const diffY = touchStartY - e.clientY;
-            if (Math.abs(diffY) > swipeThreshold) {
-                if (diffY > 0) { isMovingUp = true; isMovingDown = false; } else { isMovingDown = true; isMovingUp = false; }
-                isDragging = false;
+        window.addEventListener('keydown', (e) => {
+            if (!audioCtx) initAudio(); if (isMissionFailed) return;
+            
+            if (e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault(); 
+                triggerHorn();
+                return;
+            }
+
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                isHeadlightOn = !isHeadlightOn;
+                return;
+            }
+
+            if (e.key === 't' || e.key === 'T') {
+                isTurboMode = !isTurboMode;
+                if (isTurboMode) {
+                    maxSpeedLimit = 960; 
+                    targetSpeed = targetSpeed * 3;
+                    stationMessage = "⚡ 限制完全解除！進入 3 倍超載模式 (極速 960 KM/H)";
+                    messageTimer = 140;
+                } else {
+                    maxSpeedLimit = 320;
+                    targetSpeed = Math.min(320, targetSpeed / 3);
+                    stationMessage = "安全保護恢復：標準速限 320 KM/H";
+                    messageTimer = 120;
+                }
+                return;
+            }
+
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+                if(e.key === 'ArrowUp') e.preventDefault(); 
+                isMovingUp = true; isMovingDown = false;
+                handle.style.transition = 'top 0.1s ease-out'; updateLeverUI(MIN_TOP);
+            }
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+                if(e.key === 'ArrowDown') e.preventDefault();
+                isMovingDown = true; isMovingUp = false;
+                handle.style.transition = 'top 0.1s ease-out'; updateLeverUI(MAX_TOP);
             }
         });
 
-        window.addEventListener('mouseup', () => { isMovingUp = false; isMovingDown = false; isDragging = false; });
-
-        const btnAccel = document.getElementById('btn-accel'); const btnDecel = document.getElementById('btn-decel');
-        btnAccel.addEventListener('mousedown', (e) => { e.preventDefault(); if (!audioCtx) initAudio(); if(!isMissionFailed) isMovingUp = true; });
-        btnAccel.addEventListener('touchstart', (e) => { e.preventDefault(); if (!audioCtx) initAudio(); if(!isMissionFailed) isMovingUp = true; });
-        btnAccel.addEventListener('mouseup', () => isMovingUp = false); btnAccel.addEventListener('touchend', () => isMovingUp = false);
-        btnDecel.addEventListener('mousedown', (e) => { e.preventDefault(); if (!audioCtx) initAudio(); if(!isMissionFailed) isMovingDown = true; });
-        btnDecel.addEventListener('touchstart', (e) => { e.preventDefault(); if (!audioCtx) initAudio(); if(!isMissionFailed) isMovingDown = true; });
-        btnDecel.addEventListener('mouseup', () => isMovingDown = false); btnDecel.addEventListener('touchend', () => isMovingDown = false);
-
-        window.addEventListener('keydown', (e) => {
-            if (!audioCtx) initAudio(); if (isMissionFailed) return;
-            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') isMovingUp = true;
-            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') isMovingDown = true;
-        });
         window.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') isMovingUp = false;
-            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') isMovingDown = false;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+                handle.style.transition = 'top 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)'; resetLeverUI();
+            }
         });
 
         window.addEventListener('wheel', (e) => {
             if (!audioCtx) initAudio(); if (isMissionFailed) return;
+            let wheelStep = isTurboMode ? 45 : 15; 
             if (e.deltaY < 0) {
                 if (doorOpen) { isMovingUp = true; setTimeout(() => { isMovingUp = false; }, 200); } 
-                else targetSpeed = Math.min(320, targetSpeed + 15);
-            } else if (e.deltaY > 0) targetSpeed = Math.max(0, targetSpeed - 15);
+                else targetSpeed = Math.min(maxSpeedLimit, targetSpeed + wheelStep);
+            } else if (e.deltaY > 0) targetSpeed = Math.max(0, targetSpeed - wheelStep);
         });
 
+        /* 🎵 音樂播放器精簡功能 */
+        const btnMusic = document.getElementById('btn-music');
+        const musicUpload = document.getElementById('music-upload');
+        const bgmPlayer = document.getElementById('bgm-player');
+
+        btnMusic.addEventListener('mousedown', (e) => {
+            e.stopPropagation(); // 防止點擊按鈕時觸發火車鳴笛
+            if (!bgmPlayer.src || bgmPlayer.src === window.location.href) {
+                musicUpload.click(); // 尚未選擇音樂時，彈出選擇視窗
+            } else {
+                if (bgmPlayer.paused) { 
+                    bgmPlayer.play(); 
+                    btnMusic.classList.add('playing'); 
+                } else { 
+                    bgmPlayer.pause(); 
+                    btnMusic.classList.remove('playing'); 
+                }
+            }
+        });
+
+        musicUpload.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                bgmPlayer.src = URL.createObjectURL(file);
+                bgmPlayer.play();
+                btnMusic.classList.add('playing');
+                // 利用跑馬燈顯示正在播放的音樂
+                stationMessage = "🎵 播放 BGM: " + file.name;
+                messageTimer = 180;
+            }
+        });
+
+        initTachoTicks();
         resize();
+        recalcLeverPositions();
         requestAnimationFrame(gameLoop);
     </script>
 </body>
