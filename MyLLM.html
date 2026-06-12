@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise AI Hub - WebLLM</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+    
+    <style>
+        :root {
+            /* 💡 商務深邃科技色調 */
+            --bg-color: #0d111c;
+            --card-bg: #141b27;
+            --accent-blue: #00d2ff;
+            --accent-purple: #6366f1; /* 調整為更優雅的商務靛紫 */
+            --text-main: #f3f4f6;
+            --text-muted: #8692a6;     /* 提高日式內斂感 */
+            --border-color: #1e293b;
+            
+            /* 💡 使用優雅細緻的單色或微幅漸層，告別過度飽和的亮藍 */
+            --user-msg-bg: #1e293b; 
+            --bot-msg-bg: rgba(255, 255, 255, 0.03);
+            
+            --jp-sakura: #fda4af;
+            --jp-ink: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1100px; /* 🚀 擴大最大寬度，大器且舒適 */
+            height: 90vh;      /* 🚀 增加垂直高度，釋放對話空間 */
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 💡 頂部標頭與控制台融合：極致壓縮垂直高度，全面釋放版面 */
+        header {
+            padding: 14px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.3);
+        }
+
+        header h1 {
+            font-size: 1.05rem;
+            font-weight: 500;
+            letter-spacing: -0.3px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-dot.ready {
+            background-color: #10b981;
+            box-shadow: 0 0 6px #10b981;
+        }
+
+        /* 🚀 【控制面板重構】將所有設定微縮整合成一排，不再向下吃掉版面 */
+        .control-panel {
+            padding: 10px 24px;
+            background-color: rgba(15, 23, 42, 0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .control-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            max-width: 65%;
+        }
+
+        .control-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        select {
+            flex: 1;
+            background-color: rgba(15, 23, 42, 0.6);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238692a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            transition: all 0.2s;
+        }
+        select:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* 💡 移除粗重按鈕，改用精緻的商務小按鈕 */
+        button {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 400;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent-purple);
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            filter: brightness(1.1);
+        }
+        .btn-primary:disabled {
+            background: #1e293b;
+            color: rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background-color: transparent;
+            color: #f43f5e;
+            border: 1px solid rgba(244, 63, 94, 0.15);
+        }
+        .btn-danger:hover:not(:disabled) {
+            background-color: rgba(244, 63, 94, 0.08);
+            border-color: #f43f5e;
+        }
+        .btn-danger:disabled {
+            color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.05);
+            cursor: not-allowed;
+        }
+
+        .translate-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+        .translate-label input {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            accent-color: var(--accent-purple);
+        }
+
+        /* 🌸 日式極細進度條 */
+        .progress-wrapper {
+            display: none;
+            padding: 2px 0;
+        }
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .jp-progress-container {
+            width: 100%;
+            height: 2px;
+            background-color: var(--jp-ink);
+            border-radius: 1px;
+            overflow: hidden;
+        }
+        .jp-progress-bar-inner {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #4f46e5, var(--jp-sakura));
+            box-shadow: 0 0 4px var(--jp-sakura);
+            transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* 🚀 【對話主體】獲得大幅釋放的高空感版面 */
+        .chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px 40px; /* 加大內邊距，更顯大器舒適 */
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            background: radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.1) 0%, transparent 70%);
+        }
+
+        .chat-body::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+        }
+
+        /* 💡 重新定義交談氣泡：去除圓潤的胖氣泡感，採用極簡矩形線條 */
+        .message {
+            max-width: 80%;
+            padding: 16px 20px;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            line-height: 1.65;
+            word-break: break-word;
+        }
+
+        /* 🚀 使用者訊息改為沉穩的灰藍色，與整體介面更融合，不刺眼 */
+        .user-msg {
+            background-color: var(--user-msg-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #f8fafc;
+            align-self: flex-end;
+        }
+
+        /* 🚀 AI 訊息改為無框毛玻璃質感，非常具有現代高階感 */
+        .bot-msg {
+            background-color: var(--bot-msg-bg);
+            color: #e2e8f0;
+            align-self: flex-start;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .system-msg {
+            align-self: center;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            padding: 6px 16px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            letter-spacing: 0.5px;
+        }
+
+        .bot-msg p {
+            margin-bottom: 12px;
+        }
+        .bot-msg p:last-child {
+            margin-bottom: 0;
+        }
+        .bot-msg ul, .bot-msg ol {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+        .bot-msg code {
+            font-family: Consolas, monospace;
+            font-size: 0.85rem;
+            padding: 2px 6px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 4px;
+            color: #fda4af;
+        }
+
+        .code-container {
+            margin: 16px 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #1a202c;
+            padding: 6px 14px;
+            font-size: 0.72rem;
+            color: #abb2bf;
+            user-select: none;
+        }
+
+        .copy-code-btn {
+            background: transparent;
+            color: #8692a6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+        }
+        .copy-code-btn:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .bot-msg pre {
+            margin: 0 !important;
+            padding: 14px;
+            background-color: #0f141c !important;
+            overflow-x: auto;
+        }
+
+        /* 💡 輸入區塊優化：提升文字輸入區域的穿透感 */
+        .input-panel {
+            padding: 20px 40px 28px 40px; /* 底部稍微留空，顯得精緻 */
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            background-color: rgba(15, 23, 42, 0.2);
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        #user-input {
+            width: 100%;
+            height: 44px; 
+            min-height: 44px;
+            max-height: 180px; 
+            background-color: rgba(15, 23, 42, 0.6);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 11px 16px;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            outline: none;
+            resize: none; 
+            overflow-y: hidden; 
+            font-family: inherit;
+            transition: border-color 0.2s, height 0.05s ease-out; 
+        }
+        #user-input:focus {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        #user-input:disabled {
+            background-color: rgba(15, 23, 42, 0.2);
+            color: rgba(255, 255, 255, 0.15);
+            cursor: not-allowed;
+            border-color: rgba(255, 255, 255, 0.02);
+        }
+
+        #send-btn, #abort-btn {
+            height: 44px; 
+            padding: 0 20px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+
+        #send-btn {
+            background: #fff; /* 改為高階的白底黑字，極具現代 SaaS 風格 */
+            color: #0f172a;
+        }
+        #send-btn:disabled {
+            background: #1e293b;
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        #abort-btn {
+            background: rgba(244, 63, 94, 0.1);
+            color: #f43f5e;
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            display: none;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1><span id="status-indicator" class="status-dot"></span> Enterprise AI Hub</h1>
+        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace;">WebGPU Local Mode</span>
+    </header>
+
+    <div class="control-panel">
+        <div class="control-row">
+            <div class="control-left">
+                <select id="model-select">
+                    <option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen2.5-1.5B (推薦！中文寫作與邏輯最佳)</option>
+                    <option value="gemma-2-2b-it-q4f16_1-MLC">Gemma-2-2B-IT (Google 輕量指令微調版)</option>
+                    <option value="Phi-3-mini-4k-instruct-q4f16_1-MLC">Phi-3-mini (微軟輕量模型)</option>
+                    <option value="Llama-3-8B-Instruct-q4f32_1-MLC">Llama-3-8B (Meta 大型高精確度模型)</option>
+                </select>
+                <button id="load-btn" class="btn-primary">初始化引擎</button>
+            </div>
+            
+            <div class="control-right">
+                <label class="translate-label">
+                    <input type="checkbox" id="translate-mode">
+                    中文輸入 ➔ 自動翻譯日文輸出
+                </label>
+                <button id="clear-btn" class="btn-danger" disabled>清除對話</button>
+            </div>
+        </div>
+
+        <div id="progress-wrapper" class="progress-wrapper">
+            <div class="progress-info">
+                <span id="progress-text">準備載入資源...</span>
+                <span id="progress-perc">00%</span>
+            </div>
+            <div class="jp-progress-container">
+                <div id="jp-progress-bar-inner" class="jp-progress-bar-inner"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-body" id="chat-history">
+        <div class="message bot-msg">系統就緒。請在上方選擇您要調用的 AI 模組，並點擊「初始化引擎」。</div>
+    </div>
+
+    <div class="input-panel">
+        <div class="input-wrapper">
+            <textarea id="user-input" placeholder="請先初始化 AI 模組..." disabled autocomplete="off"></textarea>
+        </div>
+        <button id="send-btn" disabled>發送請求</button>
+        <button id="abort-btn">取消生成</button>
+    </div>
+</div>
+
+<script type="module">
+    import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+
+    marked.setOptions({
+        highlight: function (code, lang) {
+            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+            return hljs.highlight(code, { language }).value;
+        },
+        langPrefix: 'hljs language-'
+    });
+
+    const modelSelect = document.getElementById('model-select');
+    const loadBtn = document.getElementById('load-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const translateMode = document.getElementById('translate-mode');
+    const progressWrapper = document.getElementById('progress-wrapper');
+    const progressText = document.getElementById('progress-text');
+    const progressPerc = document.getElementById('progress-perc');
+    const progressBarInner = document.getElementById('jp-progress-bar-inner');
+    const chatHistory = document.getElementById('chat-history');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const abortBtn = document.getElementById('abort-btn');
+    const statusIndicator = document.getElementById('status-indicator');
+
+    let engine = null;
+    let chatMessages = [];
+    let abortController = null;
+
+    function autoResizeInput() {
+        userInput.style.height = 'auto'; 
+        const scrollH = userInput.scrollHeight;
+        const targetHeight = Math.min(scrollH + 2, 180);
+        userInput.style.height = targetHeight + 'px';
+        
+        if (scrollH > targetHeight || targetHeight >= 180) {
+            userInput.style.overflowY = 'auto';
+        } else {
+            userInput.style.overflowY = 'hidden';
+        }
+    }
+
+    userInput.addEventListener('input', autoResizeInput);
+
+    window.addEventListener('DOMContentLoaded', async () => {
+        const savedText = sessionStorage.getItem('pending_user_text');
+        const savedModel = sessionStorage.getItem('pending_model');
+        const savedTranslate = sessionStorage.getItem('pending_translate');
+
+        if (savedTranslate === 'true') {
+            translateMode.checked = true;
+        }
+
+        if (savedText && savedModel) {
+            modelSelect.value = savedModel;
+            userInput.value = savedText;
+            sessionStorage.clear(); 
+
+            chatMessages = [];
+            chatHistory.innerHTML = '';
+
+            appendMessage('system', '🔄 偵測到硬體記憶體崩潰。系統已成功重置 WebGPU 緩衝區，正在為您建立全新的 AI 引擎對話通道...');
+            await initEngine(savedModel);
+            autoResizeInput(); 
+        }
+    });
+
+    async function initEngine(selectedModel) {
+        statusIndicator.className = 'status-dot';
+        progressWrapper.style.display = 'block'; 
+        progressBarInner.style.width = '0%'; 
+        loadBtn.disabled = true;
+        modelSelect.disabled = true;
+        clearBtn.disabled = true;
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+
+        try {
+            const initProgressCallback = (initProgress) => {
+                progressText.textContent = `核心モジュール・${initProgress.text}`;
+                const percentage = Math.round(initProgress.progress * 100);
+                progressBarInner.style.width = `${percentage}%`;
+                progressPerc.textContent = `${percentage.toString().padStart(2, '0')}%`;
+            };
+
+            engine = await webllm.CreateMLCEngine(selectedModel, {
+                initProgressCallback: initProgressCallback
+            });
+
+            try {
+                await engine.resetChat();
+            } catch(e){}
+
+            statusIndicator.className = 'status-dot ready';
+            progressText.textContent = "模組載入成功";
+            appendMessage('system', `全新模組 [ ${selectedModel} ] 載入完成，通道已建立。`);
+            
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            clearBtn.disabled = false;
+            userInput.placeholder = "請輸入問題...";
+            userInput.focus();
+
+            progressWrapper.style.display = 'none';
+
+            return true;
+        } catch (error) {
+            console.error("載入失敗:", error);
+            progressText.textContent = "模組初始化失敗";
+            appendMessage('system', '錯誤：無法初始化該模組，請確保瀏覽器支援 WebGPU。');
+            engine = null;
+            return false;
+        } finally {
+            loadBtn.disabled = false;
+            modelSelect.disabled = false;
+        }
+    }
+
+    function appendMessage(role, text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${role === 'user' ? 'user-msg' : (role === 'system' ? 'system-msg' : 'bot-msg')}`;
+        
+        if (role === 'user') {
+            msgDiv.textContent = text;
+        } else {
+            msgDiv.innerHTML = marked.parse(text);
+            renderCodeHeadersWithCopy(msgDiv);
+        }
+        
+        chatHistory.appendChild(msgDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        return msgDiv;
+    }
+
+    function renderCodeHeadersWithCopy(containerDiv) {
+        const preElements = containerDiv.querySelectorAll('pre');
+        
+        preElements.forEach((pre) => {
+            if (pre.parentElement.classList.contains('code-container')) return;
+
+            const codeEl = pre.querySelector('code');
+            let langName = 'code';
+            if (codeEl) {
+                const langClass = Array.from(codeEl.classList).find(c => c.startsWith('language-'));
+                if (langClass) {
+                    langName = langClass.replace('language-', '');
+                }
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'code-container';
+            
+            const codeHeader = document.createElement('div');
+            codeHeader.className = 'code-header';
+            
+            const langLabel = document.createElement('span');
+            langLabel.className = 'code-lang';
+            langLabel.textContent = langName;
+            
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-code-btn';
+            copyBtn.textContent = '複製';
+            
+            copyBtn.addEventListener('click', async () => {
+                const textToCopy = codeEl ? codeEl.innerText : pre.innerText;
+                try {
+                    await navigator.clipboard.writeText(textToCopy);
+                    copyBtn.textContent = '已複製！';
+                    copyBtn.classList.add('copied');
+                    setTimeout(() => {
+                        copyBtn.textContent = '複製';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    console.error('複製失敗: ', err);
+                }
+            });
+
+            codeHeader.appendChild(langLabel);
+            codeHeader.appendChild(copyBtn);
+
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(codeHeader);
+            wrapper.appendChild(pre);
+
+            if (codeEl) {
+                hljs.highlightElement(codeEl);
+            }
+        });
+    }
+
+    loadBtn.addEventListener('click', async () => {
+        const selectedModel = modelSelect.value;
+        if (engine) {
+            appendMessage('system', '正在釋放前一個模組的 VRAM 記憶體並重置介面...');
+            statusIndicator.className = 'status-dot';
+            try {
+                await engine.unload();
+                engine = null;
+            } catch (e) {
+                console.error("重置舊模組時發生錯誤:", e);
+            }
+            chatMessages = [];
+            chatHistory.innerHTML = '';
+        }
+        await initEngine(selectedModel);
+    });
+
+    clearBtn.addEventListener('click', async () => {
+        const selectedModel = modelSelect.value;
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+        clearBtn.disabled = true;
+
+        try {
+            if (engine) {
+                await engine.resetChat();
+            }
+            chatMessages = [];
+            chatHistory.innerHTML = '';
+            appendMessage('system', '對話快取與上下文記憶已成功清空。您可以開始全新的交談。');
+            statusIndicator.className = 'status-dot ready';
+            
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            clearBtn.disabled = false;
+            userInput.value = '';
+            userInput.style.height = '44px'; 
+            userInput.style.overflowY = 'hidden'; 
+            userInput.focus();
+        } catch (error) {
+            console.error("軟清除記憶失敗，啟動 VRAM 硬體重置重載流程...", error);
+            chatMessages = [];
+            chatHistory.innerHTML = '';
+            try {
+                if (engine) await engine.unload();
+            } catch(e){}
+            engine = null;
+            await initEngine(selectedModel);
+        }
+    });
+
+    translateMode.addEventListener('change', async () => {
+        if (!engine) return;
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+        clearBtn.disabled = true;
+
+        try {
+            await engine.resetChat();
+            chatMessages = [];
+            chatHistory.innerHTML = '';
+            if (translateMode.checked) {
+                appendMessage('system', '已切換至「強制中翻日模式」，接下來的所有中文輸入都將直接輸出為日文。');
+            } else {
+                appendMessage('system', '已關閉翻譯模式，恢復正常對話。');
+            }
+        } catch (error) {
+            console.error("切換翻譯模式重置失敗:", error);
+            chatMessages = [];
+        } finally {
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            clearBtn.disabled = false;
+            userInput.value = '';
+            userInput.style.height = '44px'; 
+            userInput.style.overflowY = 'hidden'; 
+            userInput.focus();
+        }
+    });
+
+    async function handleSend() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        const selectedModel = modelSelect.value;
+
+        if (!engine) {
+            appendMessage('system', '偵測到 AI 核心先前已崩潰死機，系統正自動為您重新初始化引擎，請稍候...');
+            const success = await initEngine(selectedModel);
+            if (!success) return;
+        }
+
+        appendMessage('user', text);
+        userInput.value = '';
+        userInput.style.height = '44px'; 
+        userInput.style.overflowY = 'hidden'; 
+        
+        userInput.disabled = true;
+        clearBtn.disabled = true;
+        sendBtn.style.display = 'none';
+        abortBtn.style.display = 'block';
+
+        if (translateMode.checked && chatMessages.length === 0) {
+            chatMessages.push({
+                role: "system",
+                content: "你是精密的中日翻譯核心。不要回答問題，不要提供 any 解釋或聊天，收到 any 中文請直接且唯一的輸出對應的日文翻譯結果。"
+            });
+        }
+
+        const finalContent = translateMode.checked 
+            ? `【系統強制指令：請將下方引號內的中文內容直接翻譯成日文，禁止做 any 回回答、禁止提供 any 中文解釋，直接輸出日文翻譯結果】\n「${text}」`
+            : text;
+
+        chatMessages.push({ role: "user", content: finalContent });
+        const botMsgDiv = appendMessage('bot', '思考中...');
+
+        abortController = new AbortController();
+
+        try {
+            const asyncChunkGenerator = await engine.chat.completions.create(
+                {
+                    messages: chatMessages,
+                    stream: true
+                },
+                {
+                    signal: abortController.signal
+                }
+            );
+
+            let fullReply = "";
+            botMsgDiv.textContent = ""; 
+
+            for await (const chunk of asyncChunkGenerator) {
+                if (abortController.signal.aborted) {
+                    const abortError = new Error('AbortError');
+                    abortError.name = 'AbortError';
+                    throw abortError;
+                }
+
+                const delta = chunk.choices[0]?.delta?.content || "";
+                fullReply += delta;
+                
+                botMsgDiv.innerHTML = marked.parse(fullReply);
+                renderCodeHeadersWithCopy(botMsgDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
+
+            chatMessages.push({ role: "assistant", content: fullReply });
+
+        } catch (error) {
+            if (error.name === 'AbortError' || abortController?.signal.aborted) {
+                const currentContent = botMsgDiv.innerHTML;
+                if (currentContent === '思考中...') {
+                    botMsgDiv.innerHTML = "<em style='color:var(--text-muted); font-size:0.9rem;'>（已取消生成）</em>";
+                } else {
+                    botMsgDiv.innerHTML = currentContent + " <em style='color:var(--text-muted); font-size:0.9rem;'>（已由使用者中斷生成）</em>";
+                }
+                renderCodeHeadersWithCopy(botMsgDiv);
+                
+                chatMessages = []; 
+                statusIndicator.className = 'status-dot';
+                
+                const oldEngine = engine;
+                engine = null; 
+                
+                setTimeout(async () => {
+                    try {
+                        if (oldEngine) await oldEngine.unload();
+                    } catch(e){}
+                    console.log("正在背景靜默重新建立硬體通道...");
+                    await initEngine(selectedModel);
+                }, 50);
+
+            } else {
+                console.error("核心硬體拋出致命異常:", error);
+                botMsgDiv.textContent = "本地 WebGPU 上下文已被瀏覽器強制釋放（Context Lost）。系統正在為您啟動硬體無縫重置流程...";
+                botMsgDiv.style.color = "#ef4444";
+                
+                chatMessages = []; 
+                statusIndicator.className = 'status-dot';
+                
+                try {
+                    if (engine) await engine.unload();
+                } catch(e){}
+                engine = null;
+                
+                const success = await initEngine(selectedModel);
+                
+                if (!success) {
+                    appendMessage('system', '⚠️ 偵測到網頁硬體加速通道已完全鎖死，系統正在安全暫存您的問題，並將在 1.5 秒後自動刷新網頁釋放 VRAM...');
+                    
+                    sessionStorage.setItem('pending_user_text', text);
+                    sessionStorage.setItem('pending_model', selectedModel);
+                    sessionStorage.setItem('pending_translate', translateMode.checked ? 'true' : 'false');
+                    
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                    return;
+                }
+            }
+        } finally {
+            abortController = null;
+            abortBtn.style.display = 'none';
+            sendBtn.style.display = 'block';
+            
+            userInput.disabled = false; 
+            sendBtn.disabled = false;
+            clearBtn.disabled = false;
+            
+            userInput.placeholder = translateMode.checked ? "請輸入問題，若開啟翻譯模式將自動轉為日文..." : "請輸入問題...";
+            userInput.focus();
+            sendBtn.textContent = "發送請求"; 
+        }
+    }
+
+    abortBtn.addEventListener('click', () => {
+        if (abortController) abortController.abort();
+    });
+
+    sendBtn.addEventListener('click', handleSend);
+    
+    userInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault(); 
+            handleSend();
+        }
+    });
+</script>
+
+</body>
+</html>
