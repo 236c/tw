@@ -208,6 +208,8 @@
             display: inline-block;
             border: 1px solid var(--border-ink);
             letter-spacing: 1px;
+            white-space: nowrap; /* 防止文字垂直擠壓 */
+            flex-shrink: 0;      /* 防止標籤被壓縮 */
         }
         
         .badge-tag.gold { border-color: var(--accent-gold); color: var(--accent-gold); background-color: rgba(181,141,61,0.05); }
@@ -460,6 +462,15 @@
                 margin-bottom: auto; 
             }
 
+            /* 手機排版修正：避免標籤被壓縮變成垂直排列，並允許自動換行 */
+            .min-w-0 .d-flex.align-items-center {
+                flex-wrap: wrap;
+                gap: 4px 8px;
+            }
+            .min-w-0 .d-flex.align-items-center .ms-2 {
+                margin-left: 0 !important; /* 改用 gap 控制間距 */
+            }
+
             #food .handbook-card .d-flex.align-items-center.justify-content-center.me-4 {
                 width: auto !important;
                 height: auto !important;
@@ -544,51 +555,35 @@
                     <p class="lead mt-2 text-muted" style="font-family: 'Noto Serif TC', serif; font-size: clamp(1.1rem, 4vw, 1.3rem); letter-spacing: 8px; font-weight: 500;">浮世之悠 · 漫步江戶</p>
                     
 				    <div class="mt-4 mb-2 d-flex justify-content-center" style="width: 100%;">
-                        <!-- 🏮 終極修正版：大和墨繪寫實剪影車伕與人力車 SVG -->
                         <div class="rickshaw-anim" title="點擊讓車夫快跑！">
                             <svg width="210" height="60" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
-                                <!-- 地面虛線 -->
                                 <line x1="-40" y1="110" x2="440" y2="110" stroke="var(--border-ink)" stroke-width="1.5" opacity="0.2" stroke-dasharray="6 6" />
                                 
                                 <g class="rickshaw-body-group">
-                                    <!-- 前方長拉桿 -->
                                     <path d="M 160 85 L 270 85 C 290 85, 310 88, 345 93" fill="none" stroke="var(--border-ink)" stroke-width="3" stroke-linecap="round"/>
                                     <path d="M 160 80 L 270 80 C 290 80, 310 83, 345 88" fill="none" stroke="var(--border-ink)" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
                                     <line x1="265" y1="85" x2="272" y2="108" stroke="var(--border-ink)" stroke-width="2.5" stroke-linecap="round"/>
                                     
-                                    <!-- ❖ 完美握持版：大和墨繪寫實剪影車伕 (Rickshaw Puller) ❖ -->
                                     <g class="rickshaw-puller-refined">
-                                        <!-- 後腿 (大腿到小腿，向後蹬的推進動態) -->
                                         <path class="puller-leg-1" d="M 295 85 L 275 98 L 258 110" fill="none" stroke="var(--border-ink)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <!-- 前腿 (向前大跨步，著地反作用力) -->
                                         <path class="puller-leg-2" d="M 295 85 L 315 95 L 305 110" fill="none" stroke="var(--border-ink)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <!-- 寬實軀幹 (完美45度前傾發力，空間不與拉桿重疊) -->
                                         <path d="M 295 85 L 320 60" fill="none" stroke="var(--border-ink)" stroke-width="6.5" stroke-linecap="round"/>
-                                        <!-- 結實手臂 (精準向前扣住拉桿末端握把 345) -->
                                         <path d="M 320 60 L 335 75 L 345 88" fill="none" stroke="var(--border-ink)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <!-- 頭部 -->
                                         <circle cx="325" cy="52" r="6" fill="var(--text-sumi)"/>
-                                        <!-- 高級消金斗笠 -->
                                         <path d="M 311 52 C 311 40, 341 40, 339 52 Z" fill="var(--accent-gold)" stroke="var(--border-ink)" stroke-width="2" stroke-linejoin="round"/>
                                     </g>
 
-                                    <!-- 車廂主體與靠背 -->
                                     <path d="M 110 45 L 122 82 L 182 82 L 176 45 Z" fill="#FFFFFF" stroke="var(--border-ink)" stroke-width="3" stroke-linejoin="round" />
-                                    <!-- 茜赤座墊 -->
                                     <rect x="126" y="74" width="48" height="8" fill="var(--accent-akane)" stroke="var(--border-ink)" stroke-width="1"/>
                                     
-                                    <!-- 紺青色復古車篷 -->
                                     <path d="M 110 45 C 105 18, 142 12, 170 22 C 182 28, 186 38, 176 56" fill="none" stroke="var(--border-ink)" stroke-width="3" stroke-linecap="round"/>
                                     <path d="M 110 45 C 105 18, 142 12, 170 22 C 182 28, 186 38, 176 56 Z" fill="var(--accent-kon)" opacity="0.15"/>
-                                    <!-- 消金擋泥板 -->
                                     <path d="M 120 82 C 114 60, 132 52, 160 52 C 182 52, 196 64, 192 84" fill="none" stroke="var(--accent-gold)" stroke-width="2.5" />
                                     
-                                    <!-- 江戶裝飾小燈籠 -->
                                     <path d="M 255 85 L 248 95" stroke="var(--border-ink)" stroke-width="1.5" />
                                     <ellipse cx="246" cy="102" rx="6" ry="8" fill="var(--bg-washi)" stroke="var(--border-ink)" stroke-width="1.5" />
                                     <line x1="242" y1="102" x2="250" y2="102" stroke="var(--accent-akane)" stroke-width="2" />
                                     
-                                    <!-- 輻條大輪 -->
                                     <g class="rickshaw-wheel">
                                         <circle cx="160" cy="85" r="25" fill="#FFFFFF" stroke="var(--border-ink)" stroke-width="3" />
                                         <circle cx="160" cy="85" r="5" fill="var(--border-ink)" />
@@ -679,12 +674,10 @@
                 </div>
             </section>
 
-			<!-- 精選路線區塊開始 -->
 			<section id="route">
 				<div class="container">
 					<h2 class="section-title">精選路線</h2>
 					
-					<!-- 其之壹：下町風情與水上夜宴 -->
 					<div class="mb-5">
 						<h4 class="mb-4 fs-5"><span class="badge badge-route me-3 text-white">其之壹</span> 下町風情與水上夜宴</h4>
 						<div class="handbook-card p-4">
@@ -693,7 +686,6 @@
 								<a href="https://youtu.be/4UA9zOhjoVk?si=QS82am-O_5cNOeZH" target="_blank" class="action-btn btn-yt py-1 px-3"><i class="fab fa-youtube"></i> 映像</a>
 							</div>
 							
-							<!-- 條目：午前 -->
 							<div class="d-flex mb-3 p-3 time-bg-morning align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-solid fa-utensils mt-1 me-3 fs-5" style="color: var(--accent-gold)"></i>
@@ -705,7 +697,6 @@
 								<a href="https://www.google.com/maps/search/?api=1&query=合羽橋道具街" target="_blank" class="action-btn btn-map ms-3 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
 							</div>
 
-							<!-- 條目：日中 -->
 							<div class="d-flex mb-3 p-3 time-bg-noon align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-regular fa-sun mt-1 me-3 fs-5" style="color: #6C7A6B;"></i>
@@ -717,7 +708,6 @@
 								<a href="https://www.google.com/maps/search/?api=1&query=淺草寺" target="_blank" class="action-btn btn-map ms-3 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
 							</div>
 
-							<!-- 條目：夜闌 -->
 							<div class="d-flex p-3 time-bg-night align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-regular fa-moon mt-1 me-3 fs-5" style="color: var(--accent-kon);"></i>
@@ -731,7 +721,6 @@
 						</div>
 					</div>
 
-					<!-- 其之貳：東京都會百變魅力 -->
 					<div class="mb-5">
 						<h4 class="mb-4 fs-5"><span class="badge badge-route me-3 text-white">其之貳</span> 東京都會百變魅力</h4>
 						<div class="handbook-card p-4">
@@ -743,7 +732,6 @@
 								</div>
 							</div>
 							
-							<!-- 條目：晨間 -->
 							<div class="d-flex mb-3 p-3 time-bg-morning align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-regular fa-sun mt-1 me-3 fs-5" style="color: var(--accent-gold);"></i>
@@ -755,7 +743,6 @@
 								<a href="https://www.google.com/maps/search/?api=1&query=築地場外市場" target="_blank" class="action-btn btn-map ms-3 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
 							</div>
 
-							<!-- 條目：日中 -->
 							<div class="d-flex mb-3 p-3 time-bg-noon align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-solid fa-bag-shopping mt-1 me-3 fs-5" style="color: #6C7A6B;"></i>
@@ -767,7 +754,6 @@
 								<a href="https://www.google.com/maps/search/?api=1&query=銀座商圈" target="_blank" class="action-btn btn-map ms-3 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
 							</div>
 
-							<!-- 條目：黃昏 -->
 							<div class="d-flex p-3 time-bg-night align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-solid fa-city mt-1 me-3 fs-5" style="color: var(--accent-kon);"></i>
@@ -781,7 +767,6 @@
 						</div>
 					</div>
 
-					<!-- 其之參：澀谷次文化與都會潮流 -->
 					<div class="mb-5">
 						<h4 class="mb-4 fs-5"><span class="badge badge-route me-3 text-white">其之參</span> 澀谷次文化與都會潮流</h4>
 						<div class="handbook-card p-4">
@@ -790,7 +775,6 @@
 								<a href="https://youtu.be/AVNPQHsvAFg?si=sCnxX7iInATA2kA9" target="_blank" class="action-btn btn-yt py-1 px-3"><i class="fab fa-youtube"></i> 映像</a>
 							</div>
 							
-							<!-- 條目：午前 -->
 							<div class="d-flex mb-3 p-3 time-bg-morning align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-solid fa-camera mt-1 me-3 fs-5" style="color: var(--accent-gold);"></i>
@@ -802,7 +786,6 @@
 								<a href="https://www.google.com/maps/search/?api=1&query=忠犬八公像+澀谷" target="_blank" class="action-btn btn-map ms-3 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
 							</div>
 
-							<!-- 條目：日中 -->
 							<div class="d-flex mb-3 p-3 time-bg-noon align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-solid fa-gamepad mt-1 me-3 fs-5" style="color: #6C7A6B;"></i>
@@ -814,7 +797,6 @@
 								<a href="https://www.google.com/maps/search/?api=1&query=澀谷+PARCO" target="_blank" class="action-btn btn-map ms-3 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
 							</div>
 
-							<!-- 條目：午後 -->
 							<div class="d-flex mb-3 p-3 time-bg-afternoon align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-solid fa-tree mt-1 me-3 fs-5" style="color: #A86B5A;"></i>
@@ -826,7 +808,6 @@
 								<a href="https://www.google.com/maps/search/?api=1&query=宮下公園" target="_blank" class="action-btn btn-map ms-3 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
 							</div>
 
-							<!-- 條目：夜闌 -->
 							<div class="d-flex p-3 time-bg-night align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-solid fa-moon mt-1 me-3 fs-5" style="color: var(--accent-kon);"></i>
@@ -840,7 +821,6 @@
 						</div>
 					</div>
 
-					<!-- 其之肆：歷史遺緒與動漫聖地 -->
 					<div>
 						<h4 class="mb-4 fs-5"><span class="badge badge-route me-3 text-white">其之肆</span> 歷史遺緒與動漫聖地</h4>
 						<div class="handbook-card p-4">
@@ -849,7 +829,6 @@
 								<span class="text-muted small" style="letter-spacing: 2px;"><i class="fa-solid fa-route"></i> 經典混搭動線</span>
 							</div>
 							
-							<!-- 條目：晨間 -->
 							<div class="d-flex mb-3 p-3 time-bg-morning align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-solid fa-monument mt-1 me-3 fs-5" style="color: var(--accent-gold);"></i>
@@ -861,7 +840,6 @@
 								<a href="https://www.google.com/maps/search/?api=1&query=皇居東御苑" target="_blank" class="action-btn btn-map ms-3 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
 							</div>
 
-							<!-- 條目：日中 -->
 							<div class="d-flex mb-3 p-3 time-bg-noon align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-solid fa-building-columns mt-1 me-3 fs-5" style="color: #6C7A6B;"></i>
@@ -873,13 +851,12 @@
 								<a href="https://www.google.com/maps/search/?api=1&query=日本橋三越本店" target="_blank" class="action-btn btn-map ms-3 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
 							</div>
 
-							<!-- 條目：夜闌 -->
 							<div class="d-flex p-3 time-bg-night align-items-center justify-content-between">
 								<div class="d-flex align-items-start">
 									<i class="fa-solid fa-mask mt-1 me-3 fs-5" style="color: var(--accent-kon);"></i>
 									<div>
 										<h6 class="mb-1 fw-bold">夜闌｜秋葉原電器街極致追番 <span class="badge bg-white text-muted border fw-normal ms-2 rounded-0" style="font-size: 0.75rem; border-color: var(--border-soft) !important;"><i class="fa-solid fa-train"></i> 15 分</span></h6>
-										<p class="text-muted small mb-0">黃昏投身全球次文化的霓虹殿堂。穿梭於 Radio 會館、Animate 等動漫大樓搜尋限定模型與周邊，感受滿街女僕咖啡廳與電玩街的獨特活力。</p>
+										<p class="text-muted small mb-0">黃昏投身全球次文化的霓虹殿堂。穿梭於 Radio 會館、Animate 等動漫大樓搜尋限定模型與周邊，感受滿街女 ব্রিজ咖啡廳與電玩街的獨特活力。</p>
 									</div>
 								</div>
 								<a href="https://www.google.com/maps/search/?api=1&query=秋葉原電器街" target="_blank" class="action-btn btn-map ms-3 flex-shrink-0"><i class="fas fa-map-marker-alt m-0"></i></a>
@@ -889,15 +866,11 @@
 
 				</div>
 			</section>
-			<!-- 精選路線區塊結束 -->
-			
-			<!-- 職人與物販區塊開始 -->
 			<section id="shopping">
 				<div class="container">
 					<h2 class="section-title">職人與物販</h2>
 					<div class="row g-2 g-md-3">
 						
-						<!-- 1. 淺草愛和服 3號店 (5分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -912,7 +885,6 @@
 							</div>
 						</div>
 
-						<!-- 2. 桐生堂 (5分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -927,7 +899,6 @@
 							</div>
 						</div>
 
-						<!-- 3. Adachiya (6分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -942,7 +913,6 @@
 							</div>
 						</div>
 
-						<!-- 4. 淺草中屋 本店 (7分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -957,7 +927,6 @@
 							</div>
 						</div>
 
-						<!-- 5. 唐吉訶德 淺草店 (8分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -972,7 +941,6 @@
 							</div>
 						</div>
 
-						<!-- 6. 淺草ROX (8分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -987,7 +955,6 @@
 							</div>
 						</div>
 
-						<!-- 7. MEGA Tansuya (8分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1002,7 +969,6 @@
 							</div>
 						</div>
 
-						<!-- 8. Kimono Lily (10分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1017,7 +983,6 @@
 							</div>
 						</div>
 
-						<!-- 9. 阿美橫町 (搭車10分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1032,7 +997,6 @@
 							</div>
 						</div>
 
-						<!-- 10. Animate (搭車15-35分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1050,7 +1014,6 @@
 							</div>
 						</div>
 
-						<!-- 11. 東京站一番街 (搭車15分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1065,7 +1028,6 @@
 							</div>
 						</div>
 
-						<!-- 12. 銀座 Loft (搭車15分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1081,10 +1043,8 @@
 						</div>
 
 
-						<!-- ─── 特色推薦 ─── -->
 						<div class="col-12 mt-4"><h5 class="mb-2 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 特色推薦 —</h5></div>
 						
-						<!-- 13. 淺草文化觀光中心 (4分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1099,7 +1059,6 @@
 							</div>
 						</div>
 
-						<!-- 14. 仲見世通 (5分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1117,7 +1076,6 @@
 							</div>
 						</div>
 
-						<!-- 15. 傳法院通 (6分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1132,7 +1090,6 @@
 							</div>
 						</div>
 
-						<!-- 16. 日本橋三越本店 (搭車10分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1147,7 +1104,6 @@
 							</div>
 						</div>
 
-						<!-- 【新加入】17. 東京晴空塔 (搭車10分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1162,7 +1118,6 @@
 							</div>
 						</div>
 
-						<!-- 18. 淺草花屋敷 (12分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1177,7 +1132,6 @@
 							</div>
 						</div>
 
-						<!-- 19. 合羽橋道具街 (15分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1192,7 +1146,6 @@
 							</div>
 						</div>
 
-						<!-- 20. 東京中央郵便局 (搭車15分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1207,7 +1160,6 @@
 							</div>
 						</div>
 
-						<!-- 21. 銀座 鳩居堂 (搭車15分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1222,7 +1174,6 @@
 							</div>
 						</div>
 
-						<!-- 22. 銀座 伊東屋 ITOYA (搭車15分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1237,7 +1188,6 @@
 							</div>
 						</div>
 
-						<!-- 23. 澀谷 Jordan World of Flight (搭車35分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1255,7 +1205,6 @@
 							</div>
 						</div>
 
-						<!-- 24. GALLERY_2 (搭車35分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1271,10 +1220,8 @@
 						</div>
 
 
-						<!-- ─── 合羽橋道具街精選 ─── -->
 						<div class="col-12 mt-4"><h5 class="mb-2 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 合羽橋道具街精選 —</h5></div>
 
-						<!-- 25. 本間商店 (11分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1289,7 +1236,6 @@
 							</div>
 						</div>
 
-						<!-- 26. 釜浅商店 (13分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1304,7 +1250,6 @@
 							</div>
 						</div>
 
-						<!-- 27. Union (13分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1319,7 +1264,6 @@
 							</div>
 						</div>
 
-						<!-- 28. 風和里 (14分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1334,7 +1278,6 @@
 							</div>
 						</div>
 
-						<!-- 29. 馬嶋屋 (14分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1349,7 +1292,6 @@
 							</div>
 						</div>
 
-						<!-- 30. Iidaya (15分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1364,7 +1306,6 @@
 							</div>
 						</div>
 
-						<!-- 31. 金屋毛刷店 (15分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1379,7 +1320,6 @@
 							</div>
 						</div>
 
-						<!-- 32. 浅草屋 (15分) -->
 						<div class="col-6 col-md-6">
 							<div class="handbook-card d-flex align-items-center p-3">
 								<div class="flex-grow-1 min-w-0">
@@ -1397,8 +1337,7 @@
 					</div>
 				</div>
 			</section>
-			<!-- 職人與物販區塊結束 -->
-            <section id="food">
+			<section id="food">
                 <div class="container">
                     <h2 class="section-title">味覺與尋鮮</h2>
                     
@@ -1611,11 +1550,9 @@
                         </div>
                     </div>
 
-					<!-- 夏祭與花火區塊開始 -->
 					<h5 class="mb-4 mt-5 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 夏祭與花火 —</h5>
 					<div class="row g-2 g-md-3 mb-4">
 						
-						<!-- 築地本願寺納涼盆踊 -->
 						<div class="col-12 col-md-4">
 							<div class="handbook-card p-4 h-100 d-flex flex-column matsuri-card">
 								<div class="d-flex justify-content-between align-items-start mb-3">
@@ -1633,7 +1570,6 @@
 							</div>
 						</div>
 
-						<!-- 新加入：東京晴空塔城夏祭 -->
 						<div class="col-12 col-md-4">
 							<div class="handbook-card p-4 h-100 d-flex flex-column matsuri-card">
 								<div class="d-flex justify-content-between align-items-start mb-3">
@@ -1651,7 +1587,6 @@
 							</div>
 						</div>
 
-						<!-- 東京都 8.1 花火大會 -->
 						<div class="col-12 col-md-4">
 							<div class="handbook-card p-4 h-100 d-flex flex-column fireworks-card">
 								<div class="d-flex justify-content-between align-items-start mb-3">
@@ -1667,8 +1602,6 @@
 						</div>
 
 					</div>
-					<!-- 夏祭與花火區塊結束 -->
-
 					<h5 class="mb-3 mt-4 text-center" style="color: var(--accent-gold); font-size: 1.15rem;">— 啟程與歸途 —</h5>
 					<div class="row g-2 g-md-3">
 						
