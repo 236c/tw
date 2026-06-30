@@ -404,7 +404,7 @@
         </button>
     </div>
     
-    <input type="file" id="importFile" accept=".json" class="d-none">
+    <input type="file" id="importFile" accept=".json,.txt" class="d-none">
 </nav>
 
 <div class="calendar-container">
@@ -930,6 +930,7 @@
         const importInput = document.getElementById('importFile');
         document.getElementById('importBtn').onclick = () => importInput.click();
         
+        // 🔥 已修改：移除特定的檔案類型驗證，改為直接檢查解析後的 JSON 內容是否有效，完美兼容 .json 與符合 JSON 格式的 .txt
         importInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (!file) return;
@@ -959,8 +960,8 @@
                                 await saveNotesToDB(); renderCalendar();
                             }
                         });
-                    } else swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '無效的檔案格式！', confirmButtonText: '了解' });
-                } catch (error) { swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '讀取檔案失敗！', confirmButtonText: '了解' }); }
+                    } else swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '無效的檔案格式！內容必須符合 JSON 結構。', confirmButtonText: '了解' });
+                } catch (error) { swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '讀取檔案失敗！請確認內容為正確的 JSON 格式。', confirmButtonText: '了解' }); }
                 importInput.value = ''; 
             };
             reader.readAsText(file);
