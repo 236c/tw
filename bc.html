@@ -32,6 +32,15 @@
             --chip-shadow: rgba(0,0,0,0.08);
             --lunar-highlight-bg: #eff6ff;
             --lunar-highlight-text: #1d4ed8;
+
+            /* 行程視窗農民曆說明專用色 */
+            --modal-lunar-bg: #f8fafc;
+            --modal-lunar-border: #cbd5e1;
+            --modal-lunar-text: #1e293b;
+            --modal-lunar-yi-title: #15803d;
+            --modal-lunar-yi-text: #166534;
+            --modal-lunar-ji-title: #b91c1c;
+            --modal-lunar-ji-text: #991b1b;
         }
 
         body.theme-dark {
@@ -50,6 +59,15 @@
             --chip-shadow: rgba(0,0,0,0.4);
             --lunar-highlight-bg: rgba(96, 165, 250, 0.2);
             --lunar-highlight-text: #93c5fd;
+
+            /* 暗黑模式高對比度清晰配色 */
+            --modal-lunar-bg: #1e293b;
+            --modal-lunar-border: #475569;
+            --modal-lunar-text: #f1f5f9;
+            --modal-lunar-yi-title: #4ade80;
+            --modal-lunar-yi-text: #86efac;
+            --modal-lunar-ji-title: #f87171;
+            --modal-lunar-ji-text: #fca5a5;
         }
 
         body.theme-dark .text-primary {
@@ -72,6 +90,9 @@
             --chip-shadow: rgba(0,0,0,0.06);
             --lunar-highlight-bg: #e0e6e1;
             --lunar-highlight-text: #2f3d31;
+            --modal-lunar-bg: #f8f6f2;
+            --modal-lunar-border: #d6d3cb;
+            --modal-lunar-text: #2f3d31;
         }
 
         body.theme-sakura {
@@ -90,6 +111,9 @@
             --chip-shadow: rgba(229,115,153,0.15);
             --lunar-highlight-bg: #ffdbe8;
             --lunar-highlight-text: #c2255c;
+            --modal-lunar-bg: #fff5f8;
+            --modal-lunar-border: #f7b2ce;
+            --modal-lunar-text: #4c1d2e;
         }
 
         body.theme-fresh {
@@ -108,6 +132,9 @@
             --chip-shadow: rgba(50, 153, 97, 0.15);
             --lunar-highlight-bg: #d0edd9;
             --lunar-highlight-text: #165b35;
+            --modal-lunar-bg: #f3faf5;
+            --modal-lunar-border: #c1decb;
+            --modal-lunar-text: #143823;
         }
 
         /* ================= 核心清晰度排版 ================= */
@@ -173,7 +200,7 @@
 
         .month-title { font-weight: 800; font-size: 1.35rem; margin: 0; color: var(--text-main); white-space: nowrap; }
 
-        /* 🔥 商務分段控制器（‹ 今日 › 導航按鈕組） 🔥 */
+        /* 商務分段控制器（‹ 今日 › 導航按鈕組） */
         .nav-segmented-control {
             display: inline-flex;
             align-items: center;
@@ -250,7 +277,7 @@
             color: var(--primary-color) !important;
         }
         
-        /* 商務質感「新增行程」旗艦級按鈕設計 */
+        /* 商務質感「新增行程」按鈕設計 */
         .btn-primary-custom { 
             background: linear-gradient(135deg, var(--primary-color) 0%, #1e40af 100%) !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important; 
@@ -585,7 +612,7 @@
         }
         .event-chip.highlight-border::after {
             content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
-            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 100%);
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 100%));
             transform: skewX(-25deg); animation: shimmer-sweep 3s infinite; pointer-events: none;
         }
         @keyframes shimmer-sweep { 0% { left: -150%; } 30% { left: 150%; } 100% { left: 150%; } }
@@ -721,7 +748,36 @@
             display: flex !important;
         }
 
-        /* Modal 控制項 */
+        /* Modal 控制項與高對比度農民曆說明框 */
+        .modal-lunar-box {
+            background-color: var(--modal-lunar-bg) !important;
+            border: 1px dashed var(--modal-lunar-border) !important;
+            color: var(--modal-lunar-text) !important;
+            border-radius: 8px;
+            font-size: 0.86rem;
+            transition: all 0.2s ease;
+        }
+        .modal-lunar-box .lunar-header-line {
+            color: var(--modal-lunar-text) !important;
+            font-weight: 700;
+        }
+        .modal-lunar-box .lunar-yi-title {
+            color: var(--modal-lunar-yi-title) !important;
+            font-weight: 800;
+        }
+        .modal-lunar-box .lunar-yi-content {
+            color: var(--modal-lunar-yi-text) !important;
+            font-weight: 600;
+        }
+        .modal-lunar-box .lunar-ji-title {
+            color: var(--modal-lunar-ji-title) !important;
+            font-weight: 800;
+        }
+        .modal-lunar-box .lunar-ji-content {
+            color: var(--modal-lunar-ji-text) !important;
+            font-weight: 600;
+        }
+
         .icon-selector { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
         .icon-selector input[type="radio"], .color-selector input[type="radio"] { display: none; }
         .icon-selector label { width: 100%; aspect-ratio: 1; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-color); border-radius: 50%; cursor: pointer; font-size: 1.35rem; transition: all 0.2s; background: var(--bg-surface); }
@@ -756,7 +812,8 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.6);
         }
 
-        .color-selector input[type="radio"]#colorLightYellow:checked + label::after {
+        .color-selector input[type="radio"]#colorLightYellow:checked + label::after,
+        .color-selector input[type="radio"]#colorLime:checked + label::after {
             color: #0f172a;
             text-shadow: none;
         }
@@ -882,7 +939,7 @@
     
     <div class="nav-month">
         <h4 class="month-title" id="monthYearDisplay">載入中...</h4>
-        <!-- 🔥 商務分段控制器（‹ 今日 › 導航按鈕組） 🔥 -->
+        <!-- 商務分段控制器（‹ 今日 › 導航按鈕組） -->
         <div class="nav-segmented-control">
             <button class="btn-nav-seg" id="prevMonth" title="上個月"><i class="bi bi-chevron-left"></i></button>
             <button class="btn-nav-seg btn-nav-today" id="todayBtn" title="返回今天">今日</button>
@@ -999,9 +1056,9 @@
                     <label class="form-label fw-bold opacity-75 small mb-2">🗓️ 選擇日期區間：</label>
                     <input type="text" class="form-control form-control-lg fw-bold fs-6" id="dateRange" placeholder="選擇日期區間" readonly>
                     
-                    <div id="modalLunarInfo" class="small mt-2 px-3 py-2 rounded d-flex align-items-start gap-2" style="background: var(--bg-header); border: 1px dashed var(--border-color); color: var(--text-muted); font-size: 0.85rem;">
-                        <i class="bi bi-compass text-primary mt-1"></i>
-                        <div id="modalLunarText" class="fw-semibold">載入農曆資訊中...</div>
+                    <div id="modalLunarInfo" class="modal-lunar-box mt-2 px-3 py-2 rounded align-items-start gap-2 d-none">
+                        <i class="bi bi-compass text-primary mt-1 fs-6"></i>
+                        <div id="modalLunarText" class="fw-semibold flex-1 w-100"></div>
                     </div>
                 </div>
                 
@@ -1034,48 +1091,63 @@
                 <div class="mb-4">
                     <label class="form-label fw-bold opacity-75 small mb-2">選擇顏色：</label>
                     <div class="color-selector" id="colorPicker">
-                        <input type="radio" name="noteColor" id="colorRed" value="#dc2626">
-                        <label for="colorRed" style="--base-color: #dc2626;" title="熱烈紅"></label>
+                        <!-- 1. 典雅酒紅 (移至第1順位) -->
+                        <input type="radio" name="noteColor" id="colorWine" value="#be123c">
+                        <label for="colorWine" style="--base-color: #be123c;" title="典雅酒紅"></label>
 
+                        <!-- 2. 亮麗洋紅(粉紅) -->
                         <input type="radio" name="noteColor" id="colorPink" value="#d946ef">
                         <label for="colorPink" style="--base-color: #d946ef;" title="亮麗洋紅(粉紅)"></label>
 
+                        <!-- 3. 活力橘 -->
                         <input type="radio" name="noteColor" id="colorOrange" value="#ea580c">
                         <label for="colorOrange" style="--base-color: #ea580c;" title="活力橘"></label>
 
+                        <!-- 4. 柔和淡黃 -->
                         <input type="radio" name="noteColor" id="colorLightYellow" value="#fef08a">
                         <label for="colorLightYellow" style="--base-color: #fef08a;" title="柔和淡黃"></label>
 
+                        <!-- 5. 琥珀金黃 -->
                         <input type="radio" name="noteColor" id="colorAmber" value="#ca8a04">
                         <label for="colorAmber" style="--base-color: #ca8a04;" title="琥珀金黃"></label>
 
+                        <!-- 6. 森林翠綠 -->
                         <input type="radio" name="noteColor" id="colorGreen" value="#16a34a">
                         <label for="colorGreen" style="--base-color: #16a34a;" title="森林翠綠"></label>
 
-                        <input type="radio" name="noteColor" id="colorTeal" value="#10b981">
-                        <label for="colorTeal" style="--base-color: #10b981;" title="翡翠薄荷"></label>
+                        <!-- 7. 孔雀湖藍 -->
+                        <input type="radio" name="noteColor" id="colorCyan" value="#0891b2">
+                        <label for="colorCyan" style="--base-color: #0891b2;" title="孔雀湖藍"></label>
 
+                        <!-- 8. 蔚藍天藍 -->
                         <input type="radio" name="noteColor" id="colorSky" value="#0284c7">
                         <label for="colorSky" style="--base-color: #0284c7;" title="蔚藍天藍"></label>
 
+                        <!-- 9. 商務深藍 (預設) -->
                         <input type="radio" name="noteColor" id="colorBlue" value="#2563eb" checked>
                         <label for="colorBlue" style="--base-color: #2563eb;" title="商務深藍"></label>
 
+                        <!-- 10. 深海軍藍 -->
                         <input type="radio" name="noteColor" id="colorNavy" value="#1e3a8a">
                         <label for="colorNavy" style="--base-color: #1e3a8a;" title="深海軍藍"></label>
 
+                        <!-- 11. 尊爵皇家紫 -->
                         <input type="radio" name="noteColor" id="colorPurple" value="#7c3aed">
                         <label for="colorPurple" style="--base-color: #7c3aed;" title="尊爵皇家紫"></label>
 
-                        <input type="radio" name="noteColor" id="colorLavender" value="#c084fc">
-                        <label for="colorLavender" style="--base-color: #c084fc;" title="丁香粉紫"></label>
+                        <!-- 12. 清新嫩綠 (#a3e635) -->
+                        <input type="radio" name="noteColor" id="colorLime" value="#a3e635">
+                        <label for="colorLime" style="--base-color: #a3e635;" title="清新嫩綠"></label>
 
+                        <!-- 13. 大地焦糖棕 -->
                         <input type="radio" name="noteColor" id="colorBrown" value="#854d0e">
                         <label for="colorBrown" style="--base-color: #854d0e;" title="大地焦糖棕"></label>
 
+                        <!-- 14. 雅緻霧冷灰 -->
                         <input type="radio" name="noteColor" id="colorSlate" value="#64748b">
                         <label for="colorSlate" style="--base-color: #64748b;" title="雅緻霧冷灰"></label>
 
+                        <!-- 15. 沉穩曜石黑 -->
                         <input type="radio" name="noteColor" id="colorDark" value="#18181b">
                         <label for="colorDark" style="--base-color: #18181b;" title="沉穩曜石黑"></label>
 
@@ -1120,9 +1192,9 @@
 
     const PRESET_ICONS = ['📌', '⭐️', '🏀', '🦁', '🏃', '📖', '🍜', '👨‍👩‍👧‍👦', '🎬', '🚗', '✈️', '💤'];
     const PRESET_COLORS = [
-        '#dc2626', '#d946ef', '#ea580c', '#fef08a', '#ca8a04', 
-        '#16a34a', '#10b981', '#0284c7', '#2563eb', '#1e3a8a', 
-        '#7c3aed', '#c084fc', '#854d0e', '#64748b', '#18181b'
+        '#be123c', '#d946ef', '#ea580c', '#fef08a', '#ca8a04', 
+        '#16a34a', '#0891b2', '#0284c7', '#2563eb', '#1e3a8a', 
+        '#7c3aed', '#a3e635', '#854d0e', '#64748b', '#18181b'
     ];
 
     let currentDate = new Date();
@@ -1160,13 +1232,7 @@
             textarea.blur();
         } else {
             mainContainer.classList.remove('memo-collapsed');
-            if (!isMemoPreviewMode) {
-                setTimeout(() => {
-                    textarea.focus();
-                    textarea.setSelectionRange(0, 0);
-                    textarea.scrollTop = 0;
-                }, 60);
-            }
+            textarea.blur();
         }
         localStorage.setItem(MEMO_COLLAPSE_KEY, isMemoCollapsed);
     }
@@ -1202,13 +1268,10 @@
             toggleBtn.classList.remove('active-tool');
             toggleBtn.innerHTML = '<i class="bi bi-link-45deg"></i> <span>連結</span>';
             toggleBtn.title = "切換至連結模式 (可點擊網址)";
-            textarea.focus();
-            textarea.setSelectionRange(0, 0);
-            textarea.scrollTop = 0;
         }
     }
 
-    /* ================= 🇹🇼 台灣專屬節日與農民曆解析 ================= */
+    /* ================= 台灣專屬節日與農民曆解析 ================= */
     const TW_SOLAR_FESTIVALS = {
         '01-01': '元旦',
         '02-14': '情人節',
@@ -1255,7 +1318,11 @@
         '立秋': '立秋', '处暑': '處暑', '白露': '白露', '秋分': '秋分', '寒露': '寒露', '霜降': '霜降',
         '立冬': '立冬', '小雪': '小雪', '大雪': '大雪', '冬至': '冬至', '小寒': '小寒', '大寒': '大寒',
         '鼠': '鼠', '牛': '牛', '虎': '虎', '兔': '兔', '龙': '龍', '蛇': '蛇',
-        '马': '馬', '羊': '羊', '猴': '猴', '鸡': '雞', '狗': '狗', '猪': '豬'
+        '马': '馬', '羊': '羊', '猴': '猴', '鸡': '雞', '狗': '狗', '猪': '豬',
+        '祭祀': '祭祀', '祈福': '祈福', '嫁娶': '嫁娶', '出行': '出行', '开市': '開市', '動土': '動土',
+        '动土': '動土', '破土': '破土', '安葬': '安葬', '修造': '修造', '移徙': '移徙', '入宅': '入宅',
+        '纳采': '納採', '订盟': '訂盟', '纳财': '納財', '栽种': '栽種', '安床': '安床', '扫舍': '掃舍',
+        '平治道涂': '平治道塗', '修饰垣墙': '修飾垣牆', '余事勿取': '餘事勿取', '诸事不宜': '諸事不宜'
     };
 
     function toTrad(str) {
@@ -1326,8 +1393,10 @@
 
             const gzYear = toTrad(lunar.getYearInGanZhi());
             const shengXiao = toTrad(lunar.getYearShengXiao());
-            const yi = (lunar.getDayYi() || []).slice(0, 6).join('、');
-            const ji = (lunar.getDayJi() || []).slice(0, 6).join('、');
+            const rawYi = (lunar.getDayYi() || []).slice(0, 6);
+            const rawJi = (lunar.getDayJi() || []).slice(0, 6);
+            const yi = rawYi.map(toTrad).join('、');
+            const ji = rawJi.map(toTrad).join('、');
 
             let tooltip = `農曆 ${gzYear}(${shengXiao})年 ${lunarMonth}月${lunarDay}`;
             if (jieQi) tooltip += `【節氣：${jieQi}】`;
@@ -1462,27 +1531,44 @@
     }
 
     function updateModalLunarInfo(selectedDates) {
+        const container = document.getElementById('modalLunarInfo');
         const el = document.getElementById('modalLunarText');
-        if (!selectedDates || selectedDates.length === 0) {
-            el.innerHTML = '<span class="text-muted">請選擇日期</span>';
+        
+        // 若關閉農民曆選項，完整隱藏方塊
+        if (!showLunar) {
+            container.classList.remove('d-flex');
+            container.classList.add('d-none');
+            el.innerHTML = '';
             return;
         }
+
+        if (!selectedDates || selectedDates.length === 0) {
+            container.classList.remove('d-flex');
+            container.classList.add('d-none');
+            el.innerHTML = '';
+            return;
+        }
+
         const d = selectedDates[0];
         const info = getLunarInfo(d.getFullYear(), d.getMonth(), d.getDate());
         if (info) {
-            let html = `<div><b>農曆：</b>${info.gzYear}(${info.shengXiao})年 ${info.lunarMonth}月${info.lunarDay}`;
+            container.classList.remove('d-none');
+            container.classList.add('d-flex');
+            let html = `<div class="lunar-header-line"><b>農曆：</b>${info.gzYear}(${info.shengXiao})年 ${info.lunarMonth}月${info.lunarDay}`;
             if (info.jieQi) html += ` <span class="badge bg-primary ms-1">${info.jieQi}</span>`;
             if (info.twFestivals && info.twFestivals.length > 0) html += ` <span class="badge bg-danger ms-1">${info.twFestivals.join('、')}</span>`;
             html += `</div>`;
             if (info.yi || info.ji) {
-                html += `<div class="mt-1" style="font-size: 0.8rem;">`;
-                if (info.yi) html += `<span class="text-success me-2"><b>宜：</b>${info.yi}</span>`;
-                if (info.ji) html += `<span class="text-danger"><b>忌：</b>${info.ji}</span>`;
+                html += `<div class="mt-1" style="font-size: 0.83rem; line-height: 1.55;">`;
+                if (info.yi) html += `<span class="me-3 d-inline-block"><span class="lunar-yi-title">宜：</span><span class="lunar-yi-content">${info.yi}</span></span>`;
+                if (info.ji) html += `<span class="d-inline-block"><span class="lunar-ji-title">忌：</span><span class="lunar-ji-content">${info.ji}</span></span>`;
                 html += `</div>`;
             }
             el.innerHTML = html;
         } else {
-            el.innerHTML = '<span class="text-muted">無農曆資料</span>';
+            container.classList.remove('d-flex');
+            container.classList.add('d-none');
+            el.innerHTML = '';
         }
     }
 
@@ -1566,7 +1652,7 @@
             const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
             
             const midLunar = getLunarInfo(year, month, 15);
-            const lunarYearStr = midLunar ? `${midLunar.gzYear}(${midLunar.shengXiao})年` : '';
+            const lunarYearStr = (showLunar && midLunar) ? `${midLunar.gzYear}(${midLunar.shengXiao})年` : '';
             document.getElementById('monthYearDisplay').innerHTML = `${year} 年 ${monthNames[month]} ${lunarYearStr ? `<span class="fs-6 fw-bold ms-1 text-primary d-none d-sm-inline">(${lunarYearStr})</span>` : ''}`;
             
             const rawFirstDay = new Date(year, month, 1).getDay(); 
@@ -1869,7 +1955,7 @@
             currentDate = new Date(); renderCalendar(); e.target.blur(); 
         };
         
-        // 鍵盤快捷鍵監聽（改為 Tab 鍵一鍵收合／展開）
+        // 鍵盤快捷鍵監聽（Tab 鍵收合／展開）
         document.addEventListener('keydown', (e) => {
             const activeTag = document.activeElement.tagName.toLowerCase();
             const isSwalOpen = document.body.classList.contains('swal2-shown');
