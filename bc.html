@@ -1087,67 +1087,54 @@
 					</div>
 				</div>
 
-                <!-- 色彩選擇器 -->
+                <!-- 色彩選擇器（依色彩光譜優化排序，包含所有原有顏色） -->
                 <div class="mb-4">
                     <label class="form-label fw-bold opacity-75 small mb-2">選擇顏色：</label>
                     <div class="color-selector" id="colorPicker">
-                        <!-- 1. 典雅酒紅 (移至第1順位) -->
-                        <input type="radio" name="noteColor" id="colorWine" value="#be123c">
-                        <label for="colorWine" style="--base-color: #be123c;" title="典雅酒紅"></label>
+                        <!-- 第一排：色彩光譜過渡（紅 -> 橘 -> 黃 -> 嫩綠 -> 綠 -> 青 -> 藍） -->
+                        <input type="radio" name="noteColor" id="colorRed" value="#dc2626">
+                        <label for="colorRed" style="--base-color: #dc2626;" title="熱烈紅"></label>
 
-                        <!-- 2. 亮麗洋紅(粉紅) -->
-                        <input type="radio" name="noteColor" id="colorPink" value="#d946ef">
-                        <label for="colorPink" style="--base-color: #d946ef;" title="亮麗洋紅(粉紅)"></label>
-
-                        <!-- 3. 活力橘 -->
                         <input type="radio" name="noteColor" id="colorOrange" value="#ea580c">
                         <label for="colorOrange" style="--base-color: #ea580c;" title="活力橘"></label>
 
-                        <!-- 4. 柔和淡黃 -->
-                        <input type="radio" name="noteColor" id="colorLightYellow" value="#fef08a">
-                        <label for="colorLightYellow" style="--base-color: #fef08a;" title="柔和淡黃"></label>
-
-                        <!-- 5. 琥珀金黃 -->
                         <input type="radio" name="noteColor" id="colorAmber" value="#ca8a04">
                         <label for="colorAmber" style="--base-color: #ca8a04;" title="琥珀金黃"></label>
 
-                        <!-- 6. 森林翠綠 -->
-                        <input type="radio" name="noteColor" id="colorGreen" value="#16a34a">
-                        <label for="colorGreen" style="--base-color: #16a34a;" title="森林翠綠"></label>
+                        <input type="radio" name="noteColor" id="colorLightYellow" value="#fef08a">
+                        <label for="colorLightYellow" style="--base-color: #fef08a;" title="柔和淡黃"></label>
 
-                        <!-- 7. 孔雀湖藍 -->
-                        <input type="radio" name="noteColor" id="colorCyan" value="#0891b2">
-                        <label for="colorCyan" style="--base-color: #0891b2;" title="孔雀湖藍"></label>
-
-                        <!-- 8. 蔚藍天藍 -->
-                        <input type="radio" name="noteColor" id="colorSky" value="#0284c7">
-                        <label for="colorSky" style="--base-color: #0284c7;" title="蔚藍天藍"></label>
-
-                        <!-- 9. 商務深藍 (預設) -->
-                        <input type="radio" name="noteColor" id="colorBlue" value="#2563eb" checked>
-                        <label for="colorBlue" style="--base-color: #2563eb;" title="商務深藍"></label>
-
-                        <!-- 10. 深海軍藍 -->
-                        <input type="radio" name="noteColor" id="colorNavy" value="#1e3a8a">
-                        <label for="colorNavy" style="--base-color: #1e3a8a;" title="深海軍藍"></label>
-
-                        <!-- 11. 尊爵皇家紫 -->
-                        <input type="radio" name="noteColor" id="colorPurple" value="#7c3aed">
-                        <label for="colorPurple" style="--base-color: #7c3aed;" title="尊爵皇家紫"></label>
-
-                        <!-- 12. 清新嫩綠 (#a3e635) -->
                         <input type="radio" name="noteColor" id="colorLime" value="#a3e635">
                         <label for="colorLime" style="--base-color: #a3e635;" title="清新嫩綠"></label>
 
-                        <!-- 13. 大地焦糖棕 -->
+                        <input type="radio" name="noteColor" id="colorGreen" value="#16a34a">
+                        <label for="colorGreen" style="--base-color: #16a34a;" title="森林翠綠"></label>
+
+                        <input type="radio" name="noteColor" id="colorCyan" value="#0891b2">
+                        <label for="colorCyan" style="--base-color: #0891b2;" title="孔雀湖藍"></label>
+
+                        <input type="radio" name="noteColor" id="colorBlue" value="#2563eb" checked>
+                        <label for="colorBlue" style="--base-color: #2563eb;" title="商務深藍"></label>
+
+                        <!-- 第二排：深色系 -> 紫粉色系 -> 中性色系 -> 自訂 -->
+                        <input type="radio" name="noteColor" id="colorNavy" value="#1e3a8a">
+                        <label for="colorNavy" style="--base-color: #1e3a8a;" title="深海軍藍"></label>
+
+                        <input type="radio" name="noteColor" id="colorPurple" value="#7c3aed">
+                        <label for="colorPurple" style="--base-color: #7c3aed;" title="尊爵皇家紫"></label>
+
+                        <input type="radio" name="noteColor" id="colorPink" value="#d946ef">
+                        <label for="colorPink" style="--base-color: #d946ef;" title="亮麗洋紅(粉紅)"></label>
+
+                        <input type="radio" name="noteColor" id="colorWine" value="#be123c">
+                        <label for="colorWine" style="--base-color: #be123c;" title="典雅酒紅"></label>
+
                         <input type="radio" name="noteColor" id="colorBrown" value="#854d0e">
                         <label for="colorBrown" style="--base-color: #854d0e;" title="大地焦糖棕"></label>
 
-                        <!-- 14. 雅緻霧冷灰 -->
                         <input type="radio" name="noteColor" id="colorSlate" value="#64748b">
                         <label for="colorSlate" style="--base-color: #64748b;" title="雅緻霧冷灰"></label>
 
-                        <!-- 15. 沉穩曜石黑 -->
                         <input type="radio" name="noteColor" id="colorDark" value="#18181b">
                         <label for="colorDark" style="--base-color: #18181b;" title="沉穩曜石黑"></label>
 
@@ -1192,9 +1179,9 @@
 
     const PRESET_ICONS = ['📌', '⭐️', '🏀', '🦁', '🏃', '📖', '🍜', '👨‍👩‍👧‍👦', '🎬', '🚗', '✈️', '💤'];
     const PRESET_COLORS = [
-        '#be123c', '#d946ef', '#ea580c', '#fef08a', '#ca8a04', 
-        '#16a34a', '#0891b2', '#0284c7', '#2563eb', '#1e3a8a', 
-        '#7c3aed', '#a3e635', '#854d0e', '#64748b', '#18181b'
+        '#dc2626', '#ea580c', '#ca8a04', '#fef08a', '#a3e635', 
+        '#16a34a', '#0891b2', '#2563eb', '#1e3a8a', '#7c3aed', 
+        '#d946ef', '#be123c', '#854d0e', '#64748b', '#18181b'
     ];
 
     let currentDate = new Date();
