@@ -122,7 +122,7 @@
             --bg-header: #e8f0ec;
             --border-color: #d1e0d7;
             --text-main: #1f2f27;
-            --text-muted: #496353;
+            --text-muted: #44423e;
             --primary-color: #278552;
             --today-bg: #e6f2eb;
             --weekend-sat: #3d7920;
@@ -137,7 +137,7 @@
             --modal-lunar-text: #143823;
         }
 
-        /* ================= 核心清晰度排版 ================= */
+        /* ================= 核心排版 ================= */
         body {
             background-color: var(--bg-body);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
@@ -200,7 +200,7 @@
 
         .month-title { font-weight: 800; font-size: 1.35rem; margin: 0; color: var(--text-main); white-space: nowrap; }
 
-        /* 商務分段控制器（‹ 今日 › 導航按鈕組） */
+        /* 商務分段控制器 */
         .nav-segmented-control {
             display: inline-flex;
             align-items: center;
@@ -249,7 +249,6 @@
             box-shadow: 0 2px 6px rgba(37,99,235,0.15);
         }
 
-        /* 暗黑模式專屬分段導航配色 */
         body.theme-dark .nav-segmented-control {
             background-color: #0b1120;
             border-color: #334155;
@@ -277,7 +276,6 @@
             color: var(--primary-color) !important;
         }
         
-        /* 商務質感「新增行程」按鈕設計 */
         .btn-primary-custom { 
             background: linear-gradient(135deg, var(--primary-color) 0%, #1e40af 100%) !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important; 
@@ -343,17 +341,16 @@
         /* ================= 行事曆主佈局 ================= */
         .calendar-container {
             display: grid;
-            grid-template-columns: 1fr 360px;
+            grid-template-columns: 1fr 380px;
             gap: 20px;
             padding: 20px; 
-            max-width: 1700px; 
+            max-width: 1720px; 
             margin: 0 auto;
             align-items: start;
             transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-sizing: border-box;
         }
 
-        /* 記事本收合狀態佈局 */
         .calendar-container.memo-collapsed {
             grid-template-columns: 1fr 46px;
         }
@@ -407,7 +404,7 @@
             gap: 4px; 
             min-width: 0; 
             box-sizing: border-box;
-            transition: background-color 0.2s, opacity 0.2s;
+            transition: background-color 0.2s, box-shadow 0.15s;
         }
 
         .day-cell.weekend-sat-cell { background-color: var(--weekend-sat-bg); }
@@ -420,6 +417,32 @@
         .day-cell.other-month.weekend-sun-cell { background-color: var(--weekend-sun-bg); opacity: 0.45; }
         .day-cell.other-month:hover { background-color: var(--bg-header); opacity: 0.85; }
         .day-cell.other-month .date-number { color: var(--text-muted); font-weight: 600; }
+
+        /* ================= 「今日」專屬標記：圓形反白數字 ================= */
+        .day-cell.today .date-number { 
+            color: #ffffff; 
+            background-color: var(--primary-color); 
+            font-weight: 800;
+            width: 25px;
+            height: 25px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            padding: 0;
+            margin: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.25); 
+        }
+        body.theme-dark .day-cell.today .date-number {
+            color: #0f172a;
+        }
+
+        /* ================= 「單一選取框」：跟隨點選移動 ================= */
+        .day-cell.selected-day {
+            box-shadow: inset 0 0 0 2px var(--primary-color) !important;
+            background-color: var(--today-bg) !important;
+            z-index: 3;
+        }
 
         .day-cell-top {
             display: flex;
@@ -465,30 +488,7 @@
 
         .day-cell.other-month .lunar-tag { opacity: 0.5; }
 
-        .day-cell.today { 
-            background-color: var(--today-bg) !important; 
-            box-shadow: inset 0 0 0 2.5px var(--primary-color);
-            z-index: 2; 
-        }
-        .day-cell.today .date-number { 
-            color: #ffffff; 
-            background-color: var(--primary-color); 
-            font-weight: 800;
-            width: 25px;
-            height: 25px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            padding: 0;
-            margin: 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.25); 
-        }
-        body.theme-dark .day-cell.today .date-number {
-            color: #0f172a;
-        }
-
-        /* 事件容器與多筆小格子佈局 */
+        /* 事件容器與標籤 */
         .events-wrapper {
             display: flex;
             flex-direction: column;
@@ -505,7 +505,6 @@
             align-content: start;
         }
 
-        /* 基礎標籤樣式 */
         .event-chip {
             font-size: 0.88rem; 
             font-weight: 700 !important; 
@@ -519,6 +518,7 @@
             transition: all 0.15s ease;
             text-align: left;
             min-width: 0;
+            user-select: none;
         }
         .event-chip:hover { 
             opacity: 0.94; 
@@ -526,7 +526,6 @@
             box-shadow: 0 3px 6px rgba(0,0,0,0.15); 
         }
 
-        /* 單筆/少筆資料時的展示樣式 */
         .event-chip.single-line-full {
             display: block !important;
             white-space: normal !important;
@@ -577,7 +576,6 @@
             line-height: 1.34;
         }
 
-        /* 4筆以上多資料時的小格子樣式 */
         .event-chip.mini-grid-item {
             padding: 3px 5px;
             font-size: 0.78rem;
@@ -617,36 +615,76 @@
         }
         @keyframes shimmer-sweep { 0% { left: -150%; } 30% { left: 150%; } 100% { left: 150%; } }
 
-        /* 記事本樣式 */
+        /* ================= 右側複合面板 (Tab + 記事本 + 事件列表) ================= */
         .memo-wrapper { 
             display: flex; 
             flex-direction: column; 
             height: 100%; 
             position: relative;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 520px;
         }
-        .memo-header { 
-            padding: 14px 16px; 
+        
+        .side-tab-header { 
+            padding: 10px 14px; 
             border-bottom: 1px solid var(--border-color); 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            gap: 8px;
+            background-color: var(--bg-header);
+            gap: 6px;
         }
-        .memo-header h6 {
+
+        .side-tab-buttons {
+            display: flex;
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2px;
+            gap: 2px;
+        }
+
+        .side-tab-btn {
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 800;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.18s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            line-height: 1.2;
             white-space: nowrap;
         }
-        .memo-badge { background-color: var(--today-bg); color: var(--primary-color); font-size: 0.72rem; font-weight: 800; padding: 4px 8px; border-radius: 12px; border: 1px solid rgba(96, 165, 250, 0.25); letter-spacing: 0.5px; }
-        
-        .memo-body { 
-            flex: 1; 
-            padding: 0;
-            display: flex; 
-            flex-direction: column; 
-            min-height: 400px; 
-            position: relative; 
-            overflow: hidden;
+        .side-tab-btn:hover {
+            color: var(--text-main);
+            background: var(--bg-header);
         }
+        .side-tab-btn.active {
+            background-color: var(--primary-color) !important;
+            color: #ffffff !important;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        .side-tab-btn.active .badge {
+            background-color: #ffffff !important;
+            color: var(--primary-color) !important;
+        }
+
+        .side-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 440px;
+        }
+
+        /* 記事本區域 */
+        .memo-badge { background-color: var(--today-bg); color: var(--primary-color); font-size: 0.72rem; font-weight: 800; padding: 4px 8px; border-radius: 12px; border: 1px solid rgba(96, 165, 250, 0.25); letter-spacing: 0.5px; }
         
         #sideMemoArea { 
             flex: 1; 
@@ -660,7 +698,7 @@
             line-height: 1.6; 
             font-size: 0.92rem; 
             font-weight: 600;
-            padding: 16px 12px 16px 20px; 
+            padding: 16px; 
             box-sizing: border-box;
             overflow-y: auto;
         }
@@ -678,25 +716,24 @@
             overflow-y: auto;
             cursor: default;
             user-select: text;
-            padding: 16px 12px 16px 20px; 
+            padding: 16px; 
             box-sizing: border-box;
         }
 
         #sideMemoArea::-webkit-scrollbar,
-        .memo-preview-area::-webkit-scrollbar { 
+        .memo-preview-area::-webkit-scrollbar,
+        .side-events-scroll::-webkit-scrollbar { 
             width: 6px; 
         }
-        #sideMemoArea::-webkit-scrollbar-track,
-        .memo-preview-area::-webkit-scrollbar-track { 
-            background: transparent; 
-        }
         #sideMemoArea::-webkit-scrollbar-thumb,
-        .memo-preview-area::-webkit-scrollbar-thumb { 
+        .memo-preview-area::-webkit-scrollbar-thumb,
+        .side-events-scroll::-webkit-scrollbar-thumb { 
             background: rgba(0,0,0,0.22); 
             border-radius: 4px; 
         }
         body.theme-dark #sideMemoArea::-webkit-scrollbar-thumb,
-        body.theme-dark .memo-preview-area::-webkit-scrollbar-thumb { 
+        body.theme-dark .memo-preview-area::-webkit-scrollbar-thumb,
+        body.theme-dark .side-events-scroll::-webkit-scrollbar-thumb { 
             background: rgba(255,255,255,0.25); 
         }
 
@@ -708,9 +745,71 @@
             word-break: break-all;
             transition: opacity 0.15s;
         }
-        .memo-clickable-link:hover { opacity: 0.75; }
 
-        /* 記事本收合垂直側條 */
+        /* 當日事件清單分頁樣式 */
+        .side-events-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .side-date-header {
+            padding: 12px 16px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .side-event-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 10px 12px;
+            box-shadow: 0 1px 4px var(--chip-shadow);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .side-event-card:hover {
+            box-shadow: 0 3px 8px var(--chip-shadow);
+            transform: translateY(-1px);
+        }
+
+        .side-event-title {
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--text-main);
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.45;
+        }
+
+        .side-event-meta {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .side-event-actions {
+            display: flex;
+            gap: 6px;
+            opacity: 0.85;
+        }
+        .side-event-actions button {
+            padding: 2px 6px;
+            font-size: 0.74rem;
+        }
+
+        /* 記事本/面板收合垂直側條 */
         .memo-collapsed-bar {
             display: none;
             flex-direction: column;
@@ -739,8 +838,8 @@
             margin: 8px 0;
         }
 
-        .calendar-container.memo-collapsed .memo-header,
-        .calendar-container.memo-collapsed .memo-body {
+        .calendar-container.memo-collapsed .side-tab-header,
+        .calendar-container.memo-collapsed .side-pane {
             display: none !important;
         }
 
@@ -783,7 +882,6 @@
         .icon-selector label { width: 100%; aspect-ratio: 1; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-color); border-radius: 50%; cursor: pointer; font-size: 1.35rem; transition: all 0.2s; background: var(--bg-surface); }
         .icon-selector input[type="radio"]:checked + label { border-color: var(--primary-color); background-color: var(--today-bg); transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.12); }
         
-        /* 色彩選擇器樣式 */
         .color-selector { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; }
         .color-selector label { 
             width: 100%; 
@@ -930,7 +1028,7 @@
 
 <nav class="top-navbar sticky-top shadow-sm">
 	<div class="nav-title">
-		<a href="javascript:void(0)" class="app-title" id="appTitleBtn" title="點擊自訂行事曆名稱">
+		<a href="javascript:void(0)" class="app-title" id="appTitleBtn" title="點擊自訂行事曆名稱 (快捷鍵: F2)">
 			<i class="bi bi-calendar3-range"></i> 
             <span id="appTitleText">商務行事曆</span>
             <i class="bi bi-pencil-fill edit-title-icon" title="修改名稱"></i>
@@ -939,11 +1037,10 @@
     
     <div class="nav-month">
         <h4 class="month-title" id="monthYearDisplay">載入中...</h4>
-        <!-- 商務分段控制器（‹ 今日 › 導航按鈕組） -->
         <div class="nav-segmented-control">
-            <button class="btn-nav-seg" id="prevMonth" title="上個月"><i class="bi bi-chevron-left"></i></button>
-            <button class="btn-nav-seg btn-nav-today" id="todayBtn" title="返回今天">今日</button>
-            <button class="btn-nav-seg" id="nextMonth" title="下個月"><i class="bi bi-chevron-right"></i></button>
+            <button class="btn-nav-seg" id="prevMonth" title="上個月 (快捷鍵: PageUp)"><i class="bi bi-chevron-left"></i></button>
+            <button class="btn-nav-seg btn-nav-today" id="todayBtn" title="返回今天 (快捷鍵: Home)">今日</button>
+            <button class="btn-nav-seg" id="nextMonth" title="下個月 (快捷鍵: PageDown)"><i class="bi bi-chevron-right"></i></button>
         </div>
     </div>
     
@@ -957,37 +1054,36 @@
         </select>
         
         <div class="d-flex gap-1 align-items-center flex-nowrap">
-            <button class="btn btn-custom-outline btn-sm d-flex align-items-center gap-1 px-2" id="lunarToggleBtn" title="開啟/關閉農民曆顯示">
+            <button class="btn btn-custom-outline btn-sm d-flex align-items-center gap-1 px-2" id="lunarToggleBtn" title="開啟/關閉農民曆顯示 (快捷鍵: Alt+L)">
                 <i class="bi bi-moon-stars"></i><span class="d-none d-xl-inline">農民曆</span>
             </button>
 
-            <button class="btn btn-custom-outline btn-sm d-flex align-items-center gap-1 px-2" id="importBtn" title="匯入資料">
+            <button class="btn btn-custom-outline btn-sm d-flex align-items-center gap-1 px-2" id="importBtn" title="匯入資料 (快捷鍵: Ctrl+O 或 Alt+I)">
                 <i class="bi bi-box-arrow-in-down"></i><span class="d-none d-xl-inline">匯入</span>
             </button>
-            <button class="btn btn-custom-outline btn-sm d-flex align-items-center gap-1 px-2" id="exportBtn" title="備份行事曆 (匯出 JSON)">
+            <button class="btn btn-custom-outline btn-sm d-flex align-items-center gap-1 px-2" id="exportBtn" title="備份行事曆 (快捷鍵: Ctrl+S 或 Alt+E)">
                 <i class="bi bi-cloud-download"></i><span class="d-none d-xl-inline">備份</span>
             </button>
 
             <div class="vr mx-1 d-none d-md-block border-2" style="opacity: 0.15;"></div>
             
-            <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 px-2 fw-bold" id="deleteOldBtn" title="刪除舊紀錄">
+            <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 px-2 fw-bold" id="deleteOldBtn" title="刪除舊紀錄 (快捷鍵: Alt+D)">
                 <i class="bi bi-calendar-x"></i><span class="d-none d-xl-inline">刪紀錄</span>
             </button>
-            <button class="btn btn-danger btn-sm d-flex align-items-center gap-1 px-2 fw-bold shadow-sm" id="clearAllBtn" title="清空所有資料">
+            <button class="btn btn-danger btn-sm d-flex align-items-center gap-1 px-2 fw-bold shadow-sm" id="clearAllBtn" title="清空所有資料 (快捷鍵: Ctrl+Shift+Delete)">
                 <i class="bi bi-trash3-fill"></i><span class="d-none d-xl-inline">清空</span>
             </button>
 
             <div class="vr mx-1 d-none d-md-block border-2" style="opacity: 0.15;"></div>
 
-            <button class="btn btn-custom-outline btn-sm px-2" id="darkModeBtn" title="切換深色模式">
+            <button class="btn btn-custom-outline btn-sm px-2" id="darkModeBtn" title="切換深色/淺色模式 (快捷鍵: Alt+J)">
                 <i class="bi bi-moon"></i>
             </button>
         </div>
     </div>
 
-    <!-- 商務旗艦「新增行程」按鈕 -->
     <div class="nav-add">
-        <button class="btn btn-primary-custom btn-sm" id="topAddEventBtn">
+        <button class="btn btn-primary-custom btn-sm" id="topAddEventBtn" title="新增行程 (快捷鍵: Alt+N 或 Ctrl+N)">
             <i class="bi bi-calendar-plus fs-6"></i> 
             <span class="d-none d-sm-inline">新增行程</span>
             <span class="d-inline d-sm-none">新增</span>
@@ -1011,32 +1107,66 @@
         <div class="calendar-grid" id="calendarBody"></div>
     </div>
 
-    <!-- 記事本 -->
+    <!-- 右側分頁面板 (事件列表 / 記事本) -->
     <div class="card-container memo-wrapper" id="sideMemoContainer">
-        <div class="memo-header">
-            <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-journal-text text-primary fs-5"></i>
-                <h6 class="m-0 fw-bold letter-spacing-1 text-nowrap">記事本</h6>
+        <div class="side-tab-header">
+            <div class="side-tab-buttons">
+                <button class="side-tab-btn" id="tabBtnEvents" onclick="switchSideTab('events')" title="切換至當日事件 (快捷鍵: Ctrl+1)">
+                    <i class="bi bi-calendar-event"></i> 當日事件 <span class="badge rounded-pill bg-primary ms-1" id="sideEventBadge">0</span>
+                </button>
+                <button class="side-tab-btn active" id="tabBtnMemo" onclick="switchSideTab('memo')" title="切換至記事本 (快捷鍵: Ctrl+2)">
+                    <i class="bi bi-journal-text"></i> 記事本
+                </button>
             </div>
             <div class="d-flex align-items-center gap-1">
-                <button class="btn btn-custom-outline btn-sm py-0 px-2 fw-bold" id="memoToggleBtn" title="切換 編輯 / 連結模式" style="font-size: 0.76rem; height: 26px;">
-                    <i class="bi bi-link-45deg"></i> <span id="memoToggleText">連結</span>
-                </button>
-                <span class="memo-badge" id="saveStatus">AUTO-SAVE</span>
-                <button class="btn btn-custom-outline btn-sm py-0 px-2 fw-bold" id="memoCollapseBtn" title="收合成一條線 (快捷鍵: Tab)" style="font-size: 0.8rem; height: 26px;">
+                <!-- 記事本專用工具 -->
+                <div id="memoToolsGroup" class="d-flex align-items-center gap-1">
+                    <button class="btn btn-custom-outline btn-sm py-0 px-2 fw-bold" id="memoToggleBtn" title="切換 編輯 / 連結模式" style="font-size: 0.76rem; height: 26px;">
+                        <i class="bi bi-link-45deg"></i> <span id="memoToggleText">連結</span>
+                    </button>
+                    <span class="memo-badge" id="saveStatus">AUTO-SAVE</span>
+                </div>
+                
+                <!-- 收合按鈕 (Ctrl + M) -->
+                <button class="btn btn-custom-outline btn-sm py-0 px-2 fw-bold" id="memoCollapseBtn" title="收合成一條線 (快捷鍵: Ctrl+M)" style="font-size: 0.8rem; height: 26px;">
                     <i class="bi bi-chevron-bar-right"></i>
                 </button>
             </div>
         </div>
         
-        <div class="memo-body">
+        <!-- 當日事件 Page -->
+        <div class="side-pane d-none" id="paneEvents">
+            <div class="side-date-header">
+                <div>
+                    <h6 class="m-0 fw-bold text-main" id="sideSelectedDateTitle">--</h6>
+                    <small class="text-muted fw-bold" id="sideSelectedDateSub">點選日曆格子切換日期</small>
+                </div>
+                <button class="btn btn-primary-custom btn-sm py-1 px-3" id="sideAddEventBtn" title="新增這天的行程 (快捷鍵: Alt+N)">
+                    <i class="bi bi-plus-lg"></i> 新增
+                </button>
+            </div>
+
+            <!-- 農民曆即時資訊區塊 -->
+            <div id="sideLunarBox" class="modal-lunar-box mx-3 mt-3 px-3 py-2 rounded d-none">
+                <div id="sideLunarText"></div>
+            </div>
+
+            <!-- 事件卡片滾動區 -->
+            <div class="side-events-scroll" id="sideEventsList">
+                <!-- 動態注入事件 -->
+            </div>
+        </div>
+
+        <!-- 記事本 Page -->
+        <div class="side-pane" id="paneMemo">
             <textarea id="sideMemoArea" placeholder="在此記錄您的臨時想法、待辦事項或網址連結...內容會自動儲存。"></textarea>
             <div id="sideMemoPreview" class="memo-preview-area d-none"></div>
         </div>
 
-        <div class="memo-collapsed-bar" id="memoCollapsedBar" title="點擊展開記事本 (快捷鍵: Tab)">
-            <i class="bi bi-journal-text text-primary fs-5"></i>
-            <span class="collapsed-title">記事本</span>
+        <!-- 收合條 (Ctrl + M) -->
+        <div class="memo-collapsed-bar" id="memoCollapsedBar" title="點擊展開 (快捷鍵: Ctrl+M)">
+            <i class="bi bi-layout-sidebar-inset-reverse text-primary fs-5"></i>
+            <span class="collapsed-title" id="collapsedTitle">側邊面板</span>
             <i class="bi bi-chevron-bar-left text-muted mt-auto mb-2" style="font-size: 1.1rem;"></i>
         </div>
     </div>
@@ -1087,11 +1217,9 @@
 					</div>
 				</div>
 
-                <!-- 色彩選擇器（依色彩光譜優化排序，包含所有原有顏色） -->
                 <div class="mb-4">
                     <label class="form-label fw-bold opacity-75 small mb-2">選擇顏色：</label>
                     <div class="color-selector" id="colorPicker">
-                        <!-- 第一排：色彩光譜過渡（紅 -> 橘 -> 黃 -> 嫩綠 -> 綠 -> 青 -> 藍） -->
                         <input type="radio" name="noteColor" id="colorRed" value="#dc2626">
                         <label for="colorRed" style="--base-color: #dc2626;" title="熱烈紅"></label>
 
@@ -1116,7 +1244,6 @@
                         <input type="radio" name="noteColor" id="colorBlue" value="#2563eb" checked>
                         <label for="colorBlue" style="--base-color: #2563eb;" title="商務深藍"></label>
 
-                        <!-- 第二排：深色系 -> 紫粉色系 -> 中性色系 -> 自訂 -->
                         <input type="radio" name="noteColor" id="colorNavy" value="#1e3a8a">
                         <label for="colorNavy" style="--base-color: #1e3a8a;" title="深海軍藍"></label>
 
@@ -1176,15 +1303,13 @@
     const LUNAR_KEY = 'my_calendar_lunar_pref';
     const TITLE_KEY = 'my_calendar_custom_title_v4';
     const MEMO_COLLAPSE_KEY = 'my_calendar_memo_collapsed_pref';
+    const ACTIVE_TAB_KEY = 'my_calendar_active_tab_pref';
 
     const PRESET_ICONS = ['📌', '⭐️', '🏀', '🦁', '🏃', '📖', '🍜', '👨‍👩‍👧‍👦', '🎬', '🚗', '✈️', '💤'];
-    const PRESET_COLORS = [
-        '#dc2626', '#ea580c', '#ca8a04', '#fef08a', '#a3e635', 
-        '#16a34a', '#0891b2', '#2563eb', '#1e3a8a', '#7c3aed', 
-        '#d946ef', '#be123c', '#854d0e', '#64748b', '#18181b'
-    ];
 
     let currentDate = new Date();
+    let selectedDateStr = flatpickr.formatDate(new Date(), "Y-m-d"); 
+    let currentSideTab = localStorage.getItem(ACTIVE_TAB_KEY) || 'memo';
     let events = []; 
     let noteModal;
     let dateRangePicker;
@@ -1201,6 +1326,58 @@
         },
         buttonsStyling: false
     });
+
+    function promptEditTitle() {
+        swalWithBootstrapButtons.fire({
+            title: '自訂行事曆名稱',
+            input: 'text',
+            inputValue: appTitle,
+            showCancelButton: true,
+            confirmButtonText: '儲存名稱',
+            cancelButtonText: '取消',
+            inputPlaceholder: '請輸入行事曆名稱 (例如：我的商務日誌)',
+            inputValidator: (value) => {
+                if (!value || !value.trim()) return '名稱不能為空！';
+                if (value.trim().length > 20) return '名稱建議在 20 字以內。';
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                updateAppTitle(result.value);
+                swalWithBootstrapButtons.fire({ icon: 'success', title: '已更新名稱', text: `已將標題更改為「${appTitle}」`, timer: 1500, showConfirmButton: false });
+            }
+        });
+    }
+
+    function toggleDarkMode() {
+        const currentTheme = document.body.className || 'theme-default';
+        const newTheme = currentTheme === 'theme-dark' ? 'theme-default' : 'theme-dark';
+        document.getElementById('themeSelector').value = newTheme;
+        applyTheme(newTheme);
+    }
+
+    function toggleLunarDisplay() {
+        showLunar = !showLunar;
+        localStorage.setItem(LUNAR_KEY, showLunar);
+        updateLunarButtonState();
+        renderCalendar();
+        renderSideEventsList();
+    }
+
+    function triggerExport() {
+        document.getElementById('exportBtn').click();
+    }
+
+    function triggerImport() {
+        document.getElementById('importFile').click();
+    }
+
+    function triggerDeleteOld() {
+        document.getElementById('deleteOldBtn').click();
+    }
+
+    function triggerClearAll() {
+        document.getElementById('clearAllBtn').click();
+    }
 
     function updateAppTitle(newTitle) {
         appTitle = (newTitle && newTitle.trim()) ? newTitle.trim() : '商務行事曆';
@@ -1222,6 +1399,36 @@
             textarea.blur();
         }
         localStorage.setItem(MEMO_COLLAPSE_KEY, isMemoCollapsed);
+    }
+
+    /* ================= 右側分頁切換邏輯 ================= */
+    function switchSideTab(tabName) {
+        currentSideTab = tabName;
+        localStorage.setItem(ACTIVE_TAB_KEY, tabName);
+
+        const tabBtnEvents = document.getElementById('tabBtnEvents');
+        const tabBtnMemo = document.getElementById('tabBtnMemo');
+        const paneEvents = document.getElementById('paneEvents');
+        const paneMemo = document.getElementById('paneMemo');
+        const memoTools = document.getElementById('memoToolsGroup');
+        const collapsedTitle = document.getElementById('collapsedTitle');
+
+        if (tabName === 'events') {
+            tabBtnEvents.classList.add('active');
+            tabBtnMemo.classList.remove('active');
+            paneEvents.classList.remove('d-none');
+            paneMemo.classList.add('d-none');
+            memoTools.classList.add('d-none');
+            collapsedTitle.textContent = "當日事件";
+            renderSideEventsList();
+        } else {
+            tabBtnMemo.classList.add('active');
+            tabBtnEvents.classList.remove('active');
+            paneMemo.classList.remove('d-none');
+            paneEvents.classList.add('d-none');
+            memoTools.classList.remove('d-none');
+            collapsedTitle.textContent = "記事本";
+        }
     }
 
     function formatMemoTextWithLinks(text) {
@@ -1258,44 +1465,19 @@
         }
     }
 
-    /* ================= 台灣專屬節日與農民曆解析 ================= */
+    /* ================= 台灣節日與農民曆 ================= */
     const TW_SOLAR_FESTIVALS = {
-        '01-01': '元旦',
-        '02-14': '情人節',
-        '02-28': '和平紀念日',
-        '03-08': '婦女節',
-        '03-14': '白色情人節',
-        '03-29': '青年節',
-        '04-04': '兒童節',
-        '05-01': '勞動節',
-        '08-08': '父親節',
-        '09-03': '軍人節',
-        '09-28': '教師節',
-        '10-10': '國慶日',
-        '10-25': '光復節',
-        '10-31': '萬聖夜',
-        '11-12': '國父誕辰',
-        '12-25': '行憲紀念日'
+        '01-01': '元旦', '02-14': '情人節', '02-28': '和平紀念日', '03-08': '婦女節',
+        '03-14': '白色情人節', '03-29': '青年節', '04-04': '兒童節', '05-01': '勞動節',
+        '08-08': '父親節', '09-03': '軍人節', '09-28': '教師節', '10-10': '國慶日',
+        '10-25': '光復節', '10-31': '萬聖夜', '11-12': '國父誕辰', '12-25': '行憲紀念日'
     };
 
     const TW_LUNAR_FESTIVALS = {
-        '01-01': '春節',
-        '01-02': '回娘家',
-        '01-05': '開工',
-        '01-09': '天公生',
-        '01-15': '元宵節',
-        '02-02': '頭牙',
-        '03-23': '媽祖生',
-        '05-05': '端午節',
-        '07-01': '鬼門開',
-        '07-07': '七夕',
-        '07-15': '中元節',
-        '08-15': '中秋節',
-        '09-09': '重陽節',
-        '10-15': '下元節',
-        '12-08': '臘八',
-        '12-16': '尾牙',
-        '12-24': '送神日'
+        '01-01': '春節', '01-02': '回娘家', '01-05': '開工', '01-09': '天公生',
+        '01-15': '元宵節', '02-02': '頭牙', '03-23': '媽祖生', '05-05': '端午節',
+        '07-01': '鬼門開', '07-07': '七夕', '07-15': '中元節', '08-15': '中秋節',
+        '09-09': '重陽節', '10-15': '下元節', '12-08': '臘八', '12-16': '尾牙', '12-24': '送神日'
     };
 
     const ZH_MAP = {
@@ -1309,7 +1491,7 @@
         '祭祀': '祭祀', '祈福': '祈福', '嫁娶': '嫁娶', '出行': '出行', '开市': '開市', '動土': '動土',
         '动土': '動土', '破土': '破土', '安葬': '安葬', '修造': '修造', '移徙': '移徙', '入宅': '入宅',
         '纳采': '納採', '订盟': '訂盟', '纳财': '納財', '栽种': '栽種', '安床': '安床', '扫舍': '掃舍',
-        '平治道涂': '平治道塗', '修饰垣墙': '修飾垣牆', '余事勿取': '餘事勿取', '诸事不宜': '諸事不宜'
+        '平治道涂': '平治道塗', '修饰垣墙': '修飾垣牆', '余事勿取': '餘事勿取', '諸事不宜': '諸事不宜'
     };
 
     function toTrad(str) {
@@ -1392,17 +1574,7 @@
             if (ji) tooltip += `\n忌：${ji}`;
 
             return {
-                label,
-                isSpecial,
-                tooltip,
-                lunarDay,
-                lunarMonth,
-                gzYear,
-                shengXiao,
-                jieQi,
-                twFestivals,
-                yi,
-                ji
+                label, isSpecial, tooltip, lunarDay, lunarMonth, gzYear, shengXiao, jieQi, twFestivals, yi, ji
             };
         } catch (e) {
             console.error("農民曆解析錯誤:", e);
@@ -1486,6 +1658,7 @@
         await loadMemoFromDB();
         
         renderCalendar();
+        switchSideTab(currentSideTab);
         setupEventListeners();
     });
 
@@ -1521,15 +1694,7 @@
         const container = document.getElementById('modalLunarInfo');
         const el = document.getElementById('modalLunarText');
         
-        // 若關閉農民曆選項，完整隱藏方塊
-        if (!showLunar) {
-            container.classList.remove('d-flex');
-            container.classList.add('d-none');
-            el.innerHTML = '';
-            return;
-        }
-
-        if (!selectedDates || selectedDates.length === 0) {
+        if (!showLunar || !selectedDates || selectedDates.length === 0) {
             container.classList.remove('d-flex');
             container.classList.add('d-none');
             el.innerHTML = '';
@@ -1557,6 +1722,113 @@
             container.classList.add('d-none');
             el.innerHTML = '';
         }
+    }
+
+    /* ================= 當日事件清單渲染 ================= */
+    function renderSideEventsList() {
+        if (!selectedDateStr) return;
+        
+        const dateObj = new Date(selectedDateStr + 'T00:00:00');
+        const y = dateObj.getFullYear();
+        const m = dateObj.getMonth();
+        const d = dateObj.getDate();
+        const weekDays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+        const dayOfWeekStr = weekDays[dateObj.getDay()];
+
+        document.getElementById('sideSelectedDateTitle').textContent = `${y} 年 ${m + 1} 月 ${d} 日 (${dayOfWeekStr})`;
+        
+        const isToday = flatpickr.formatDate(new Date(), "Y-m-d") === selectedDateStr;
+        document.getElementById('sideSelectedDateSub').textContent = isToday ? '🌟 今天' : '已選擇日期';
+
+        const lunarBox = document.getElementById('sideLunarBox');
+        const lunarText = document.getElementById('sideLunarText');
+
+        if (showLunar) {
+            const lInfo = getLunarInfo(y, m, d);
+            if (lInfo) {
+                let html = `<div class="lunar-header-line"><b>農曆：</b>${lInfo.gzYear}(${lInfo.shengXiao})年 ${lInfo.lunarMonth}月${lInfo.lunarDay}`;
+                if (lInfo.jieQi) html += ` <span class="badge bg-primary ms-1">${lInfo.jieQi}</span>`;
+                if (lInfo.twFestivals && lInfo.twFestivals.length > 0) html += ` <span class="badge bg-danger ms-1">${lInfo.twFestivals.join('、')}</span>`;
+                html += `</div>`;
+                if (lInfo.yi || lInfo.ji) {
+                    html += `<div class="mt-1" style="font-size: 0.82rem; line-height: 1.5;">`;
+                    if (lInfo.yi) html += `<div class="mb-1"><span class="lunar-yi-title">宜：</span><span class="lunar-yi-content">${lInfo.yi}</span></div>`;
+                    if (lInfo.ji) html += `<div><span class="lunar-ji-title">忌：</span><span class="lunar-ji-content">${lInfo.ji}</span></div>`;
+                    html += `</div>`;
+                }
+                lunarText.innerHTML = html;
+                lunarBox.classList.remove('d-none');
+            } else {
+                lunarBox.classList.add('d-none');
+            }
+        } else {
+            lunarBox.classList.add('d-none');
+        }
+
+        const dayEvents = events.filter(evt => selectedDateStr >= evt.start && selectedDateStr <= (evt.end || evt.start));
+        
+        const badge = document.getElementById('sideEventBadge');
+        badge.textContent = dayEvents.length;
+
+        const listContainer = document.getElementById('sideEventsList');
+        listContainer.innerHTML = '';
+
+        if (dayEvents.length === 0) {
+            listContainer.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-check opacity-25" style="font-size: 3rem;"></i>
+                    <p class="text-muted fw-bold mt-2 mb-3">本日尚無排定行程</p>
+                    <button class="btn btn-primary-custom btn-sm" onclick="openModalForNew('${selectedDateStr}')">
+                        <i class="bi bi-plus-circle"></i> 新增當日行程
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        dayEvents.forEach(evt => {
+            const card = document.createElement('div');
+            card.className = 'side-event-card';
+            card.style.borderLeftColor = evt.color || 'var(--primary-color)';
+
+            const isMultiDay = evt.end && evt.end !== evt.start;
+            const rangeStr = isMultiDay ? `${evt.start} ~ ${evt.end}` : evt.start;
+
+            let iconHtml = evt.icon && evt.icon.startsWith('bi-') 
+                ? `<i class="bi ${evt.icon} me-1"></i>` 
+                : `<span class="me-1">${escapeHtml(evt.icon || '📌')}</span>`;
+
+            card.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div class="side-event-title">${iconHtml}${escapeHtml(evt.text || '')}</div>
+                </div>
+                <div class="side-event-meta">
+                    <span><i class="bi bi-clock me-1"></i>${rangeStr}</span>
+                    <div class="side-event-actions">
+                        <button class="btn btn-custom-outline btn-sm" title="編輯" onclick="openModalForEdit('${evt.id}')">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" title="刪除" onclick="quickDeleteEvent('${evt.id}')">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            listContainer.appendChild(card);
+        });
+    }
+
+    function quickDeleteEvent(eventId) {
+        swalWithBootstrapButtons.fire({ 
+            title: '確定刪除此行程？', icon: 'warning', showCancelButton: true, confirmButtonText: '確定刪除', cancelButtonText: '取消', reverseButtons: true
+        }).then(async (res) => {
+            if (res.isConfirmed) {
+                events = events.filter(e => e.id !== eventId);
+                await saveNotesToDB(); 
+                renderCalendar(); 
+                renderSideEventsList();
+            }
+        });
     }
 
     async function loadNotesFromDB() {
@@ -1629,6 +1901,23 @@
         return div.innerHTML;
     }
 
+    function selectDate(dateString, shouldSwitchTab = true) {
+        selectedDateStr = dateString;
+        
+        document.querySelectorAll('.day-cell').forEach(cell => cell.classList.remove('selected-day'));
+        
+        const targetCell = document.querySelector(`.day-cell[data-date="${dateString}"]`);
+        if (targetCell) {
+            targetCell.classList.add('selected-day');
+        }
+
+        if (shouldSwitchTab) {
+            switchSideTab('events');
+        } else {
+            renderSideEventsList();
+        }
+    }
+
     function renderCalendar() {
         const calendarBody = document.getElementById('calendarBody');
         calendarBody.classList.add('calendar-transitioning');
@@ -1673,6 +1962,11 @@
                 }
 
                 const dateString = `${cYear}-${String(cMonth + 1).padStart(2, '0')}-${String(cDay).padStart(2, '0')}`;
+                cell.setAttribute('data-date', dateString);
+
+                if (dateString === selectedDateStr) {
+                    cell.classList.add('selected-day');
+                }
                 
                 const topRow = document.createElement('div');
                 topRow.className = 'day-cell-top';
@@ -1696,7 +1990,6 @@
 
                 const dayEvents = events.filter(evt => dateString >= evt.start && dateString <= (evt.end || evt.start));
                 const isSingleEvent = dayEvents.length === 1;
-
                 const isMiniGrid = dayEvents.length >= 4;
 
                 const eventsWrapper = document.createElement('div');
@@ -1747,12 +2040,35 @@
                     }
 
                     chip.title = evt.text;
-                    chip.onclick = (e) => { e.stopPropagation(); openModalForEdit(evt.id); };
+                    
+                    // 單擊事件標籤：選取日期並切換至事件 Tab
+                    chip.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        selectDate(dateString, true);
+                    };
+
+                    // 連點兩下事件標籤：進入編輯
+                    chip.ondblclick = (e) => {
+                        e.stopPropagation();
+                        selectDate(dateString, false);
+                        openModalForEdit(evt.id);
+                    };
+
                     eventsWrapper.appendChild(chip);
                 });
 
                 cell.appendChild(eventsWrapper);
-                cell.onclick = () => openModalForNew(dateString);
+                
+                // 單擊日期格子：選取日期
+                cell.onclick = () => {
+                    selectDate(dateString, true);
+                };
+
+                // 連按兩下日期格子空白處：新增行程
+                cell.ondblclick = () => {
+                    openModalForNew(dateString);
+                };
+
                 return cell;
             };
 
@@ -1772,13 +2088,15 @@
             }
 
             calendarBody.classList.remove('calendar-transitioning');
+            renderSideEventsList();
         }, 150);
     }
 
     function openModalForNew(dateString) {
         document.getElementById('modalTitle').textContent = '新增行程';
         document.getElementById('currentEditId').value = ''; 
-        dateRangePicker.setDate([dateString, dateString]);
+        const dateToSet = dateString || selectedDateStr || flatpickr.formatDate(new Date(), "Y-m-d");
+        dateRangePicker.setDate([dateToSet, dateToSet]);
         updateModalLunarInfo(dateRangePicker.selectedDates);
         document.getElementById('noteTextarea').value = '';
         document.getElementById('highlightCheckbox').checked = false; 
@@ -1836,40 +2154,26 @@
     }
 
     function setupEventListeners() {
-        document.getElementById('appTitleBtn').onclick = () => {
-            swalWithBootstrapButtons.fire({
-                title: '自訂行事曆名稱',
-                input: 'text',
-                inputValue: appTitle,
-                showCancelButton: true,
-                confirmButtonText: '儲存名稱',
-                cancelButtonText: '取消',
-                inputPlaceholder: '請輸入行事曆名稱 (例如：我的商務日誌)',
-                inputValidator: (value) => {
-                    if (!value || !value.trim()) return '名稱不能為空！';
-                    if (value.trim().length > 20) return '名稱建議在 20 字以內。';
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    updateAppTitle(result.value);
-                    swalWithBootstrapButtons.fire({ icon: 'success', title: '已更新名稱', text: `已將標題更改為「${appTitle}」`, timer: 1500, showConfirmButton: false });
-                }
-            });
-        };
+        document.getElementById('appTitleBtn').onclick = promptEditTitle;
 
         // 記事本 模式切換
         document.getElementById('memoToggleBtn').onclick = () => {
             toggleMemoMode();
         };
 
-        // 記事本 收合 按鈕
+        // 右側收合按鈕
         document.getElementById('memoCollapseBtn').onclick = () => {
             applyMemoCollapseState(true);
         };
 
-        // 記事本 展開 側條點擊
+        // 展開側條點擊
         document.getElementById('memoCollapsedBar').onclick = () => {
             applyMemoCollapseState(false);
+        };
+
+        // 當日事件分頁快捷新增按鈕
+        document.getElementById('sideAddEventBtn').onclick = () => {
+            openModalForNew(selectedDateStr);
         };
 
         let memoDebounceTimer;
@@ -1880,20 +2184,8 @@
         };
 
         document.getElementById('themeSelector').onchange = (e) => applyTheme(e.target.value);
-        
-        document.getElementById('darkModeBtn').onclick = () => {
-            const currentTheme = document.body.className || 'theme-default';
-            const newTheme = currentTheme === 'theme-dark' ? 'theme-default' : 'theme-dark';
-            document.getElementById('themeSelector').value = newTheme;
-            applyTheme(newTheme);
-        };
-
-        document.getElementById('lunarToggleBtn').onclick = () => {
-            showLunar = !showLunar;
-            localStorage.setItem(LUNAR_KEY, showLunar);
-            updateLunarButtonState();
-            renderCalendar();
-        };
+        document.getElementById('darkModeBtn').onclick = toggleDarkMode;
+        document.getElementById('lunarToggleBtn').onclick = toggleLunarDisplay;
 
         const customInput = document.getElementById('customIconInput');
         const customRadio = document.getElementById('iconCustom');
@@ -1931,41 +2223,114 @@
         });
 
         document.getElementById('topAddEventBtn').onclick = () => {
-            const todayStr = flatpickr.formatDate(new Date(), "Y-m-d");
-            openModalForNew(todayStr);
+            openModalForNew(selectedDateStr || flatpickr.formatDate(new Date(), "Y-m-d"));
         };
 
         document.getElementById('prevMonth').onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); };
         document.getElementById('nextMonth').onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
         
         document.getElementById('todayBtn').onclick = (e) => { 
-            currentDate = new Date(); renderCalendar(); e.target.blur(); 
+            currentDate = new Date(); 
+            selectDate(flatpickr.formatDate(new Date(), "Y-m-d"), true);
+            renderCalendar(); 
+            e.target.blur(); 
         };
         
-        // 鍵盤快捷鍵監聽（Tab 鍵收合／展開）
+        /* ================= 全局鍵盤快捷鍵系統 ================= */
         document.addEventListener('keydown', (e) => {
             const activeTag = document.activeElement.tagName.toLowerCase();
             const isSwalOpen = document.body.classList.contains('swal2-shown');
             const isModalOpen = document.getElementById('noteModal').classList.contains('show');
+            const keyLower = e.key.toLowerCase();
+            const isCtrlOrCmd = e.ctrlKey || e.metaKey;
 
-            // 彈出視窗或文字輸入框內打字時，保留原生 Tab 焦點切換功能
-            if (isSwalOpen || isModalOpen || activeTag === 'input' || (activeTag === 'textarea' && document.activeElement.id !== 'sideMemoArea')) {
+            if (isSwalOpen || isModalOpen) {
                 return;
             }
 
-            // 按下 Tab 鍵切換記事本開關
-            if (e.key === 'Tab' || e.code === 'Tab') {
+            // 備份匯出 (Ctrl + S 或 Alt + E)
+            if ((isCtrlOrCmd && keyLower === 's') || (e.altKey && keyLower === 'e')) {
+                e.preventDefault();
+                triggerExport();
+                return;
+            }
+
+            // 匯入資料 (Ctrl + O 或 Alt + I)
+            if ((isCtrlOrCmd && keyLower === 'o') || (e.altKey && keyLower === 'i')) {
+                e.preventDefault();
+                triggerImport();
+                return;
+            }
+
+            // 新增行程 (Alt + N 或 Ctrl + N)
+            if ((e.altKey && keyLower === 'n') || (isCtrlOrCmd && keyLower === 'n')) {
+                e.preventDefault();
+                openModalForNew(selectedDateStr);
+                return;
+            }
+
+            // 側邊面板收合/展開 (Ctrl + M 或 Cmd + M)
+            if (isCtrlOrCmd && (keyLower === 'm' || e.code === 'KeyM')) {
                 e.preventDefault();
                 applyMemoCollapseState(!isMemoCollapsed);
                 return;
             }
 
-            if (activeTag === 'textarea' || activeTag === 'select') {
+            // 切換右側 Tab 分頁 (Ctrl + 1: 當日事件, Ctrl + 2: 記事本)
+            if (isCtrlOrCmd && (e.key === '1' || e.code === 'Digit1')) {
+                e.preventDefault();
+                if (isMemoCollapsed) applyMemoCollapseState(false);
+                switchSideTab('events');
+                return;
+            }
+            if (isCtrlOrCmd && (e.key === '2' || e.code === 'Digit2')) {
+                e.preventDefault();
+                if (isMemoCollapsed) applyMemoCollapseState(false);
+                switchSideTab('memo');
                 return;
             }
 
-            let changed = false;
+            // 開啟/關閉農民曆 (Alt + L)
+            if (e.altKey && keyLower === 'l') {
+                e.preventDefault();
+                toggleLunarDisplay();
+                return;
+            }
 
+            // 刪除舊紀錄 (Alt + D)
+            if (e.altKey && keyLower === 'd') {
+                e.preventDefault();
+                triggerDeleteOld();
+                return;
+            }
+
+            // 清空所有資料 (Ctrl + Shift + Delete)
+            if (isCtrlOrCmd && e.shiftKey && (e.key === 'Delete' || e.code === 'Delete')) {
+                e.preventDefault();
+                triggerClearAll();
+                return;
+            }
+
+            // 切換深淺模式 (Alt + J)
+            if (e.altKey && keyLower === 'j') {
+                e.preventDefault();
+                toggleDarkMode();
+                return;
+            }
+
+            // 自訂行事曆名稱 (F2)
+            if (e.key === 'F2') {
+                e.preventDefault();
+                promptEditTitle();
+                return;
+            }
+
+            if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') {
+                return;
+            }
+
+            // 日曆導航 (PageUp: 上月, PageDown: 下月, Home: 回今日)
+            let changed = false;
             if (e.key === 'PageDown') {
                 currentDate.setMonth(currentDate.getMonth() + 1);
                 changed = true;
@@ -1974,6 +2339,7 @@
                 changed = true;
             } else if (e.key === 'Home') {
                 currentDate = new Date(); 
+                selectDate(flatpickr.formatDate(new Date(), "Y-m-d"), false);
                 changed = true;
             }
 
@@ -2061,7 +2427,7 @@
                                     }
                                     if (importedData.title) updateAppTitle(importedData.title);
                                 }
-                                await saveNotesToDB(); renderCalendar();
+                                await saveNotesToDB(); renderCalendar(); renderSideEventsList();
                             } else if (result.isDenied) {
                                 events = newEvents;
                                 if (!isArray) {
@@ -2071,7 +2437,7 @@
                                     }
                                     if (importedData.title) updateAppTitle(importedData.title);
                                 }
-                                await saveNotesToDB(); renderCalendar();
+                                await saveNotesToDB(); renderCalendar(); renderSideEventsList();
                             }
                         });
                     } else swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '無效的檔案格式！內容必須符合 JSON 結構。', confirmButtonText: '了解' });
@@ -2108,7 +2474,10 @@
             } else {
                 events.push({ id: generateId(), start, end, text, color, icon, isHighlighted }); 
             }
-            await saveNotesToDB(); renderCalendar(); noteModal.hide();
+            await saveNotesToDB(); 
+            renderCalendar(); 
+            renderSideEventsList();
+            noteModal.hide();
         };
 
         document.getElementById('deleteNoteBtn').onclick = () => {
@@ -2117,7 +2486,10 @@
             }).then(async (res) => {
                 if (res.isConfirmed) {
                     events = events.filter(e => e.id !== document.getElementById('currentEditId').value);
-                    await saveNotesToDB(); renderCalendar(); noteModal.hide();
+                    await saveNotesToDB(); 
+                    renderCalendar(); 
+                    renderSideEventsList();
+                    noteModal.hide();
                 }
             });
         };
@@ -2140,7 +2512,9 @@
                     const cutoffDate = result.value;
                     const originalCount = events.length;
                     events = events.filter(e => { const eventEnd = e.end || e.start; return eventEnd >= cutoffDate; });
-                    await saveNotesToDB(); renderCalendar();
+                    await saveNotesToDB(); 
+                    renderCalendar(); 
+                    renderSideEventsList();
                     swalWithBootstrapButtons.fire({ icon: 'success', title: '完成', text: `刪除了 ${originalCount - events.length} 筆紀錄。`, confirmButtonText: '了解' });
                 }
             });
@@ -2166,7 +2540,9 @@
                             events = []; await dbRemove(MEMO_KEY);
                             document.getElementById('sideMemoArea').value = "";
                             document.getElementById('sideMemoPreview').innerHTML = "";
-                            await saveNotesToDB(); renderCalendar();
+                            await saveNotesToDB(); 
+                            renderCalendar(); 
+                            renderSideEventsList();
                             swalWithBootstrapButtons.fire({ icon: 'success', title: '已清空', text: '資料已經成功清除。', confirmButtonText: '了解' });
                         }
                     });
