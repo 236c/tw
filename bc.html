@@ -137,7 +137,14 @@
             --modal-lunar-text: #143823;
         }
 
-        /* ================= 核心排版 ================= */
+        /* ================= 核心排版 (一屏自適應 100vh Fit) ================= */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; 
+        }
+
         body {
             background-color: var(--bg-body);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
@@ -147,31 +154,51 @@
             text-rendering: optimizeLegibility;
             letter-spacing: 0.015em; 
             transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
 
         .btn { white-space: nowrap !important; }
 
+        /* 快捷鍵鍵盤標籤樣式 */
+        kbd {
+            background-color: var(--bg-header);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-bottom: 2px solid var(--border-color);
+            font-size: 0.82rem;
+            font-family: inherit;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 5px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+            display: inline-block;
+            white-space: nowrap;
+        }
+
         /* 頂部 Navbar */
         .top-navbar {
+            flex-shrink: 0;
             background-color: var(--bg-surface); 
             border-bottom: 1px solid var(--border-color);
-            padding: 12px 24px; 
+            padding: 10px 22px; 
             display: grid; 
             grid-template-columns: auto auto 1fr auto;
             grid-template-areas: "title month tools add";
-            gap: 12px 24px; 
+            gap: 12px 22px; 
             align-items: center;
+            z-index: 10;
         }
 
         .nav-title { grid-area: title; margin: 0; }
-        .nav-month { grid-area: month; display: flex; align-items: center; gap: 16px; }
-        .nav-tools { grid-area: tools; display: flex; align-items: center; gap: 10px; justify-self: center; }
+        .nav-month { grid-area: month; display: flex; align-items: center; gap: 14px; }
+        .nav-tools { grid-area: tools; display: flex; align-items: center; gap: 8px; justify-self: center; }
         .nav-add   { grid-area: add; justify-self: end; }
 
         .app-title { 
             color: var(--primary-color); 
             font-weight: 800; 
-            font-size: 1.3rem; 
+            font-size: 1.35rem; 
             display: flex; 
             align-items: center; 
             gap: 8px; 
@@ -198,7 +225,7 @@
             color: var(--primary-color);
         }
 
-        .month-title { font-weight: 800; font-size: 1.35rem; margin: 0; color: var(--text-main); white-space: nowrap; }
+        .month-title { font-weight: 800; font-size: 1.38rem; margin: 0; color: var(--text-main); white-space: nowrap; }
 
         /* 商務分段控制器 */
         .nav-segmented-control {
@@ -219,7 +246,7 @@
             font-weight: 700;
             padding: 4px 10px;
             border-radius: 6px;
-            font-size: 0.88rem;
+            font-size: 0.92rem;
             transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
             align-items: center;
@@ -267,7 +294,7 @@
 
         .btn-custom-outline {
             border: 1px solid var(--border-color); color: var(--text-main); background: var(--bg-surface);
-            box-shadow: 0 1px 2px var(--chip-shadow); transition: all 0.2s; font-weight: 700; padding: 6px 12px; 
+            box-shadow: 0 1px 2px var(--chip-shadow); transition: all 0.2s; font-weight: 700; padding: 5px 12px; font-size: 0.92rem;
         }
         .btn-custom-outline:hover { background: var(--bg-header); border-color: var(--text-muted); color: var(--text-main); }
         .btn-custom-outline.active-tool {
@@ -281,7 +308,8 @@
             border: 1px solid rgba(255, 255, 255, 0.2) !important; 
             color: #ffffff !important; 
             font-weight: 700; 
-            padding: 8px 18px; 
+            padding: 7px 18px; 
+            font-size: 0.95rem;
             border-radius: 8px;
             letter-spacing: 0.5px;
             display: inline-flex;
@@ -314,45 +342,25 @@
             box-shadow: 0 4px 18px rgba(96, 165, 250, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.55);
         }
 
-        body.theme-japanese .btn-primary-custom {
-            background: linear-gradient(135deg, #556657 0%, #3e4d40 100%) !important;
-            box-shadow: 0 2px 8px rgba(85, 102, 87, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-        }
-        body.theme-japanese .btn-primary-custom:hover {
-            background: linear-gradient(135deg, #687d6a 0%, #556657 100%) !important;
-        }
-
-        body.theme-sakura .btn-primary-custom {
-            background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
-            box-shadow: 0 2px 10px rgba(225, 29, 72, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-        }
-        body.theme-sakura .btn-primary-custom:hover {
-            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%) !important;
-        }
-
-        body.theme-fresh .btn-primary-custom {
-            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
-            box-shadow: 0 2px 10px rgba(22, 163, 74, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-        }
-        body.theme-fresh .btn-primary-custom:hover {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
-        }
-
         /* ================= 行事曆主佈局 ================= */
         .calendar-container {
+            flex: 1;
+            min-height: 0; 
+            height: 100%;
             display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 20px;
-            padding: 20px; 
-            max-width: 1720px; 
+            grid-template-columns: 1fr 390px;
+            gap: 16px;
+            padding: 12px 20px 16px 20px; 
+            max-width: 1860px; 
+            width: 100%;
             margin: 0 auto;
-            align-items: start;
+            align-items: stretch;
             transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-sizing: border-box;
         }
 
         .calendar-container.memo-collapsed {
-            grid-template-columns: 1fr 46px;
+            grid-template-columns: 1fr 48px;
         }
 
         .card-container {
@@ -363,6 +371,8 @@
             box-shadow: 0 4px 20px var(--chip-shadow); 
             display: flex; 
             flex-direction: column;
+            height: 100%;
+            min-height: 0;
         }
 
         .calendar-grid { 
@@ -371,18 +381,25 @@
             align-content: start;
         }
 
+        #calendarHeader {
+            flex-shrink: 0;
+        }
+
         #calendarBody { 
+            flex: 1;
+            min-height: 0;
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            align-content: start;
-            transition: opacity 0.3s ease, transform 0.3s ease; 
+            grid-auto-rows: 1fr; 
+            height: 100%;
+            transition: opacity 0.2s ease, transform 0.2s ease; 
             opacity: 1; 
             transform: translateY(0); 
         }
-        .calendar-transitioning { opacity: 0 !important; transform: translateY(10px) !important; }
+        .calendar-transitioning { opacity: 0 !important; transform: translateY(6px) !important; }
 
         .day-header {
-			font-size: 0.88rem; font-weight: 800; color: var(--text-muted); text-align: center; padding: 12px 0;
+			font-size: 0.96rem; font-weight: 800; color: var(--text-muted); text-align: center; padding: 8px 0;
 			background-color: var(--bg-header); border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color);
 		}
         .day-header:nth-child(7n) { border-right: none; }
@@ -392,16 +409,17 @@
         /* 日期格子 */
         .day-cell {
             background-color: var(--bg-surface); 
-            height: 148px;
+            height: 100%; 
+            min-height: 0;
             overflow: hidden; 
-            padding: 6px 7px; 
+            padding: 4px 6px; 
             cursor: pointer;
             border-right: 1px solid var(--border-color); 
             border-bottom: 1px solid var(--border-color);
             position: relative; 
             display: flex; 
             flex-direction: column; 
-            gap: 4px; 
+            gap: 3px; 
             min-width: 0; 
             box-sizing: border-box;
             transition: background-color 0.2s, box-shadow 0.15s;
@@ -418,28 +436,29 @@
         .day-cell.other-month:hover { background-color: var(--bg-header); opacity: 0.85; }
         .day-cell.other-month .date-number { color: var(--text-muted); font-weight: 600; }
 
-        /* ================= 「今日」專屬標記：圓形反白數字 ================= */
+        /* ================= 「今日」專屬標記 ================= */
         .day-cell.today .date-number { 
             color: #ffffff; 
             background-color: var(--primary-color); 
             font-weight: 800;
-            width: 25px;
-            height: 25px;
+            width: 27px;
+            height: 27px;
+            font-size: 0.98rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
             padding: 0;
             margin: 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.25); 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25); 
         }
         body.theme-dark .day-cell.today .date-number {
             color: #0f172a;
         }
 
-        /* ================= 「單一選取框」：跟隨點選移動 ================= */
+        /* ================= 「單一選取框」 ================= */
         .day-cell.selected-day {
-            box-shadow: inset 0 0 0 2px var(--primary-color) !important;
+            box-shadow: inset 0 0 0 2.5px var(--primary-color) !important;
             background-color: var(--today-bg) !important;
             z-index: 3;
         }
@@ -448,26 +467,27 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 3px;
-            min-height: 25px;
+            margin-bottom: 2px;
+            min-height: 26px;
             line-height: 1;
+            flex-shrink: 0;
         }
 
         .date-number { 
             font-weight: 800; 
             color: var(--text-main); 
-            font-size: 0.98rem; 
+            font-size: 1.12rem; 
             text-align: left; 
             padding-left: 2px; 
             letter-spacing: -0.01em;
         }
 
         .lunar-tag {
-            font-size: 0.74rem;
+            font-size: 0.84rem; 
             font-weight: 700;
             color: var(--text-muted);
-            opacity: 0.9;
-            padding: 2px 4px;
+            opacity: 0.92;
+            padding: 2px 5px;
             border-radius: 4px;
             white-space: nowrap;
             overflow: hidden;
@@ -492,23 +512,26 @@
         .events-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 3px;
             flex: 1;
             min-height: 0;
             width: 100%;
+            overflow-y: auto;
+            scrollbar-width: none;
         }
+        .events-wrapper::-webkit-scrollbar { display: none; }
 
         .events-wrapper.multi-items {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 4px 5px;
+            gap: 3px 4px;
             align-content: start;
         }
 
         .event-chip {
-            font-size: 0.88rem; 
+            font-size: 0.94rem; 
             font-weight: 700 !important; 
-            padding: 4px 6px; 
+            padding: 3px 6px; 
             border-radius: 6px; 
             width: 100%; 
             border: 1px solid transparent; 
@@ -519,6 +542,7 @@
             text-align: left;
             min-width: 0;
             user-select: none;
+            flex-shrink: 0;
         }
         .event-chip:hover { 
             opacity: 0.94; 
@@ -526,30 +550,33 @@
             box-shadow: 0 3px 6px rgba(0,0,0,0.15); 
         }
 
-        .event-chip.single-line-full {
+        /* 單一事件模式：完整顯示所有文字 */
+        .event-chip.single-event-mode {
             display: block !important;
-            white-space: normal !important;
+            white-space: pre-wrap !important;
             word-break: break-word !important;
             overflow-wrap: anywhere !important;
+            line-height: 1.38;
+            padding: 4px 6px;
         }
-        .event-chip.single-line-full .chip-icon {
+        .event-chip.single-event-mode .chip-icon {
             display: inline-block;
             margin-right: 4px;
-            font-size: 1.02em;
+            font-size: 1.05em;
             line-height: 1;
             vertical-align: -1px;
         }
-        .event-chip.single-line-full .full-text {
+        .event-chip.single-event-mode .full-text {
             display: inline;
-            white-space: normal !important;
+            white-space: pre-wrap !important;
             word-break: break-word !important;
-            line-height: 1.34;
         }
 
+        /* 多事件模式：單行節錄 */
         .event-chip.multi-line-mode {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 1px;
         }
         .event-line {
             display: flex;
@@ -562,7 +589,7 @@
         .event-line .chip-icon { 
             flex-shrink: 0;
             margin-right: 4px;
-            font-size: 1.02em; 
+            font-size: 1.05em; 
             line-height: 1;
             display: inline-flex;
             align-items: center;
@@ -577,15 +604,15 @@
         }
 
         .event-chip.mini-grid-item {
-            padding: 3px 5px;
-            font-size: 0.78rem;
+            padding: 2px 5px;
+            font-size: 0.82rem;
             font-weight: 700 !important;
             border-radius: 5px;
             display: flex;
             align-items: center;
             gap: 3px;
             min-width: 0;
-            height: 26px;
+            height: 25px;
             white-space: nowrap;
             overflow: hidden;
         }
@@ -615,17 +642,18 @@
         }
         @keyframes shimmer-sweep { 0% { left: -150%; } 30% { left: 150%; } 100% { left: 150%; } }
 
-        /* ================= 右側複合面板 (Tab + 記事本 + 事件列表) ================= */
+        /* ================= 右側複合面板 ================= */
         .memo-wrapper { 
             display: flex; 
             flex-direction: column; 
             height: 100%; 
+            min-height: 0;
             position: relative;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            min-height: 520px;
         }
         
         .side-tab-header { 
+            flex-shrink: 0;
             padding: 10px 14px; 
             border-bottom: 1px solid var(--border-color); 
             display: flex; 
@@ -649,15 +677,15 @@
             border: none;
             background: transparent;
             color: var(--text-muted);
-            font-size: 0.82rem;
+            font-size: 0.9rem;
             font-weight: 800;
-            padding: 5px 10px;
+            padding: 5px 12px;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.18s;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
             line-height: 1.2;
             white-space: nowrap;
         }
@@ -677,14 +705,14 @@
 
         .side-pane {
             flex: 1;
+            min-height: 0;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            min-height: 440px;
         }
 
         /* 記事本區域 */
-        .memo-badge { background-color: var(--today-bg); color: var(--primary-color); font-size: 0.72rem; font-weight: 800; padding: 4px 8px; border-radius: 12px; border: 1px solid rgba(96, 165, 250, 0.25); letter-spacing: 0.5px; }
+        .memo-badge { background-color: var(--today-bg); color: var(--primary-color); font-size: 0.74rem; font-weight: 800; padding: 3px 7px; border-radius: 12px; border: 1px solid rgba(96, 165, 250, 0.25); letter-spacing: 0.5px; }
         
         #sideMemoArea { 
             flex: 1; 
@@ -695,8 +723,8 @@
             outline: none; 
             background-color: transparent; 
             color: var(--text-main); 
-            line-height: 1.6; 
-            font-size: 0.92rem; 
+            line-height: 1.65; 
+            font-size: 1.02rem; 
             font-weight: 600;
             padding: 16px; 
             box-sizing: border-box;
@@ -708,8 +736,8 @@
             width: 100%;
             height: 100%;
             color: var(--text-main);
-            line-height: 1.6; 
-            font-size: 0.92rem; 
+            line-height: 1.65; 
+            font-size: 1.02rem; 
             font-weight: 600;
             white-space: pre-wrap;
             word-break: break-word;
@@ -749,14 +777,16 @@
         /* 當日事件清單分頁樣式 */
         .side-events-scroll {
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
-            padding: 14px 16px;
+            padding: 12px 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
         .side-date-header {
+            flex-shrink: 0;
             padding: 12px 16px;
             background: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
@@ -770,10 +800,11 @@
             border: 1px solid var(--border-color);
             border-left: 5px solid var(--primary-color);
             border-radius: 8px;
-            padding: 10px 12px;
+            padding: 10px 14px;
             box-shadow: 0 1px 4px var(--chip-shadow);
             transition: all 0.2s ease;
             position: relative;
+            flex-shrink: 0;
         }
         .side-event-card:hover {
             box-shadow: 0 3px 8px var(--chip-shadow);
@@ -782,7 +813,7 @@
 
         .side-event-title {
             font-weight: 700;
-            font-size: 0.92rem;
+            font-size: 1rem; 
             color: var(--text-main);
             white-space: pre-wrap;
             word-break: break-word;
@@ -790,7 +821,7 @@
         }
 
         .side-event-meta {
-            font-size: 0.78rem;
+            font-size: 0.86rem; 
             font-weight: 600;
             color: var(--text-muted);
             margin-top: 6px;
@@ -805,22 +836,21 @@
             opacity: 0.85;
         }
         .side-event-actions button {
-            padding: 2px 6px;
-            font-size: 0.74rem;
+            padding: 2px 7px;
+            font-size: 0.78rem;
         }
 
-        /* 記事本/面板收合垂直側條 */
+        /* 側條收合 */
         .memo-collapsed-bar {
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 16px 6px;
+            padding: 14px 6px;
             height: 100%;
-            min-height: 400px;
             cursor: pointer;
             user-select: none;
-            gap: 16px;
+            gap: 14px;
             background-color: var(--bg-surface);
             transition: background-color 0.2s ease;
         }
@@ -830,12 +860,12 @@
 
         .memo-collapsed-bar .collapsed-title {
             writing-mode: vertical-rl;
-            letter-spacing: 5px;
+            letter-spacing: 4px;
             font-size: 0.95rem;
             font-weight: 800;
             color: var(--text-main);
             opacity: 0.85;
-            margin: 8px 0;
+            margin: 6px 0;
         }
 
         .calendar-container.memo-collapsed .side-tab-header,
@@ -847,13 +877,13 @@
             display: flex !important;
         }
 
-        /* Modal 控制項與高對比度農民曆說明框 */
+        /* Modal 控制項 */
         .modal-lunar-box {
             background-color: var(--modal-lunar-bg) !important;
             border: 1px dashed var(--modal-lunar-border) !important;
             color: var(--modal-lunar-text) !important;
             border-radius: 8px;
-            font-size: 0.86rem;
+            font-size: 0.9rem; 
             transition: all 0.2s ease;
         }
         .modal-lunar-box .lunar-header-line {
@@ -877,12 +907,12 @@
             font-weight: 600;
         }
 
-        .icon-selector { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .icon-selector { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
         .icon-selector input[type="radio"], .color-selector input[type="radio"] { display: none; }
         .icon-selector label { width: 100%; aspect-ratio: 1; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-color); border-radius: 50%; cursor: pointer; font-size: 1.35rem; transition: all 0.2s; background: var(--bg-surface); }
         .icon-selector input[type="radio"]:checked + label { border-color: var(--primary-color); background-color: var(--today-bg); transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.12); }
         
-        .color-selector { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; }
+        .color-selector { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
         .color-selector label { 
             width: 100%; 
             aspect-ratio: 1; 
@@ -905,7 +935,7 @@
         .color-selector input[type="radio"]:checked + label::after { 
             content: '\2714'; 
             color: #fff; 
-            font-size: 15px; 
+            font-size: 14px; 
             font-weight: 900; 
             text-shadow: 0 1px 3px rgba(0,0,0,0.6);
         }
@@ -922,11 +952,34 @@
             background-color: var(--base-color);
         }
 
-        .swal2-popup { background-color: var(--bg-surface) !important; color: var(--text-main) !important; border-radius: 16px !important; border: 1px solid var(--border-color); padding: 2em 1.5em !important; }
-        .swal2-title { color: var(--text-main) !important; font-weight: 800 !important; padding-bottom: 10px; }
-        .swal2-html-container { color: var(--text-muted) !important; font-weight: 600; }
-        .swal2-actions { display: flex !important; flex-wrap: nowrap !important; justify-content: center !important; gap: 16px !important; margin-top: 1.8em !important; } 
-        .swal2-actions button { margin: 0 !important; font-weight: 700 !important; letter-spacing: 0.5px; padding: 10px 24px !important; border-radius: 8px !important; white-space: nowrap !important; }
+        /* 快捷鍵說明視窗樣式 */
+        .shortcut-group-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+        .shortcut-item:last-child {
+            border-bottom: none;
+        }
+
+        .swal2-popup { background-color: var(--bg-surface) !important; color: var(--text-main) !important; border-radius: 16px !important; border: 1px solid var(--border-color); padding: 1.8em 1.4em !important; }
+        .swal2-title { color: var(--text-main) !important; font-weight: 800 !important; padding-bottom: 8px; font-size: 1.35rem !important; }
+        .swal2-html-container { color: var(--text-muted) !important; font-weight: 600; font-size: 1rem !important; }
+        .swal2-actions { display: flex !important; flex-wrap: nowrap !important; justify-content: center !important; gap: 14px !important; margin-top: 1.6em !important; } 
+        .swal2-actions button { margin: 0 !important; font-weight: 700 !important; letter-spacing: 0.5px; padding: 8px 22px !important; border-radius: 8px !important; white-space: nowrap !important; }
 
         /* ================= 響應式排版 (RWD) ================= */
         @media (max-width: 1400px) {
@@ -935,10 +988,11 @@
                 grid-template-areas: 
                     "title month add"
                     "tools tools tools";
-                padding: 12px 20px;
+                padding: 10px 16px;
             }
             .calendar-container {
-                padding: 16px 20px;
+                padding: 10px 16px;
+                gap: 12px;
             }
             .nav-month { justify-self: center; }
             .nav-tools {
@@ -946,20 +1000,31 @@
                 justify-content: space-between;
                 background-color: var(--bg-body);
                 border: 1px solid var(--border-color);
-                padding: 8px 12px;
+                padding: 6px 10px;
                 border-radius: 8px;
             }
         }
 
         @media (max-width: 992px) {
-            .calendar-container { grid-template-columns: 1fr; padding: 12px 16px; }
+            html, body {
+                overflow: auto; 
+                height: auto;
+                min-height: 100%;
+            }
+            .calendar-container { 
+                grid-template-columns: 1fr; 
+                padding: 12px 14px; 
+                height: auto;
+                min-height: auto;
+            }
             .calendar-container.memo-collapsed { grid-template-columns: 1fr; }
-            .day-cell { height: 125px; padding: 5px; }
+            .day-cell { height: 125px; } 
+            .memo-wrapper { min-height: 480px; }
             .memo-collapsed-bar {
                 flex-direction: row;
                 min-height: auto;
-                height: 48px;
-                padding: 10px 18px;
+                height: 46px;
+                padding: 10px 16px;
                 justify-content: space-between;
             }
             .memo-collapsed-bar .collapsed-title {
@@ -977,13 +1042,13 @@
                     "month month"
                     "tools tools";
                 padding: 10px 12px;
-                gap: 12px;
+                gap: 10px;
             }
             .nav-month {
                 justify-self: stretch;
                 justify-content: space-between;
                 background-color: var(--bg-header); 
-                padding: 6px 12px;
+                padding: 6px 10px;
                 border-radius: 8px;
             }
             
@@ -991,33 +1056,29 @@
                 flex-direction: row;
                 align-items: center;
                 justify-content: flex-start;
-                gap: 8px;
-                padding: 8px 12px;
+                gap: 6px;
+                padding: 6px 10px;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
             .nav-tools::-webkit-scrollbar { display: none; }
             .nav-tools { -ms-overflow-style: none; scrollbar-width: none; }
             
-            .nav-tools > select { width: auto !important; flex-shrink: 0; }
-            .nav-tools > div { justify-content: flex-start; width: auto; }
-            
             .app-title { font-size: 1.15rem; }
             .month-title { font-size: 1.2rem; }
-            #topAddEventBtn { padding: 6px 14px; font-size: 0.92rem; }
+            #topAddEventBtn { padding: 6px 12px; font-size: 0.9rem; }
         }
 
         @media (max-width: 576px) {
-            .calendar-container { padding: 8px 10px; }
-            .day-header { font-size: 0.82rem; padding: 8px 0; }
-            .day-cell { height: 108px; padding: 3px; gap: 2px; }
-            .date-number { font-size: 0.86rem; }
-            .lunar-tag { font-size: 0.68rem; padding: 1px 3px; }
-            .day-cell.today .date-number { width: 22px; height: 22px; font-size: 0.78rem; }
-            .event-chip { padding: 2px 4px; font-size: 0.76rem; line-height: 1.26; }
+            .calendar-container { padding: 8px; }
+            .day-header { font-size: 0.85rem; padding: 6px 0; }
+            .day-cell { height: 110px; padding: 3px; }
+            .date-number { font-size: 0.95rem; }
+            .lunar-tag { font-size: 0.72rem; padding: 1px 3px; }
+            .day-cell.today .date-number { width: 22px; height: 22px; font-size: 0.8rem; }
+            .event-chip { padding: 2px 4px; font-size: 0.8rem; line-height: 1.25; }
             .events-wrapper.multi-items { grid-template-columns: 1fr; gap: 2px; }
-            .event-chip.mini-grid-item { height: 20px; font-size: 0.7rem; padding: 1px 3px; }
-            .color-selector { grid-template-columns: repeat(6, 1fr); gap: 10px; }
+            .color-selector { grid-template-columns: repeat(6, 1fr); gap: 8px; }
 
             .swal2-actions { flex-direction: column !important; width: 100% !important; }
             .swal2-actions button { width: 100% !important; }
@@ -1045,7 +1106,7 @@
     </div>
     
     <div class="nav-tools">
-        <select class="form-select form-select-sm shadow-none fw-bold" id="themeSelector" style="width: auto; background-color: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);">
+        <select class="form-select form-select-sm shadow-none fw-bold" id="themeSelector" style="width: auto; font-size: 0.9rem; background-color: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);">
             <option value="theme-default">👔 商務預設</option>
             <option value="theme-fresh">🌿 綠意清新</option>
             <option value="theme-sakura">🌸 櫻花浪漫</option>
@@ -1067,10 +1128,10 @@
 
             <div class="vr mx-1 d-none d-md-block border-2" style="opacity: 0.15;"></div>
             
-            <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 px-2 fw-bold" id="deleteOldBtn" title="刪除舊紀錄 (快捷鍵: Alt+D)">
+            <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 px-2 fw-bold" id="deleteOldBtn" title="刪除舊紀錄 (快捷鍵: Alt+D)" style="font-size: 0.9rem;">
                 <i class="bi bi-calendar-x"></i><span class="d-none d-xl-inline">刪紀錄</span>
             </button>
-            <button class="btn btn-danger btn-sm d-flex align-items-center gap-1 px-2 fw-bold shadow-sm" id="clearAllBtn" title="清空所有資料 (快捷鍵: Ctrl+Shift+Delete)">
+            <button class="btn btn-danger btn-sm d-flex align-items-center gap-1 px-2 fw-bold shadow-sm" id="clearAllBtn" title="清空所有資料 (快捷鍵: Ctrl+Shift+Delete)" style="font-size: 0.9rem;">
                 <i class="bi bi-trash3-fill"></i><span class="d-none d-xl-inline">清空</span>
             </button>
 
@@ -1078,6 +1139,10 @@
 
             <button class="btn btn-custom-outline btn-sm px-2" id="darkModeBtn" title="切換深色/淺色模式 (快捷鍵: Alt+J)">
                 <i class="bi bi-moon"></i>
+            </button>
+
+            <button class="btn btn-custom-outline btn-sm px-2" id="helpBtn" title="快捷鍵說明 (快捷鍵: F1 或 ?)">
+                <i class="bi bi-question-circle"></i>
             </button>
         </div>
     </div>
@@ -1111,24 +1176,24 @@
     <div class="card-container memo-wrapper" id="sideMemoContainer">
         <div class="side-tab-header">
             <div class="side-tab-buttons">
-                <button class="side-tab-btn" id="tabBtnEvents" onclick="switchSideTab('events')" title="切換至當日事件 (快捷鍵: Ctrl+1)">
+                <button class="side-tab-btn" id="tabBtnEvents" onclick="switchSideTab('events')" title="切換至當日事件 (快捷鍵: Alt+1)">
                     <i class="bi bi-calendar-event"></i> 當日事件 <span class="badge rounded-pill bg-primary ms-1" id="sideEventBadge">0</span>
                 </button>
-                <button class="side-tab-btn active" id="tabBtnMemo" onclick="switchSideTab('memo')" title="切換至記事本 (快捷鍵: Ctrl+2)">
+                <button class="side-tab-btn active" id="tabBtnMemo" onclick="switchSideTab('memo')" title="切換至記事本 (快捷鍵: Alt+2)">
                     <i class="bi bi-journal-text"></i> 記事本
                 </button>
             </div>
             <div class="d-flex align-items-center gap-1">
                 <!-- 記事本專用工具 -->
                 <div id="memoToolsGroup" class="d-flex align-items-center gap-1">
-                    <button class="btn btn-custom-outline btn-sm py-0 px-2 fw-bold" id="memoToggleBtn" title="切換 編輯 / 連結模式" style="font-size: 0.76rem; height: 26px;">
+                    <button class="btn btn-custom-outline btn-sm py-0 px-2 fw-bold" id="memoToggleBtn" title="切換 編輯 / 連結模式" style="font-size: 0.82rem; height: 28px;">
                         <i class="bi bi-link-45deg"></i> <span id="memoToggleText">連結</span>
                     </button>
                     <span class="memo-badge" id="saveStatus">AUTO-SAVE</span>
                 </div>
                 
                 <!-- 收合按鈕 (Ctrl + M) -->
-                <button class="btn btn-custom-outline btn-sm py-0 px-2 fw-bold" id="memoCollapseBtn" title="收合成一條線 (快捷鍵: Ctrl+M)" style="font-size: 0.8rem; height: 26px;">
+                <button class="btn btn-custom-outline btn-sm py-0 px-2 fw-bold" id="memoCollapseBtn" title="收合成一條線 (快捷鍵: Ctrl+M)" style="font-size: 0.85rem; height: 28px;">
                     <i class="bi bi-chevron-bar-right"></i>
                 </button>
             </div>
@@ -1138,8 +1203,8 @@
         <div class="side-pane d-none" id="paneEvents">
             <div class="side-date-header">
                 <div>
-                    <h6 class="m-0 fw-bold text-main" id="sideSelectedDateTitle">--</h6>
-                    <small class="text-muted fw-bold" id="sideSelectedDateSub">點選日曆格子切換日期</small>
+                    <h6 class="m-0 fw-bold text-main" id="sideSelectedDateTitle" style="font-size: 1.05rem;">--</h6>
+                    <small class="text-muted fw-bold" id="sideSelectedDateSub" style="font-size: 0.84rem;">點選日曆格子切換日期</small>
                 </div>
                 <button class="btn btn-primary-custom btn-sm py-1 px-3" id="sideAddEventBtn" title="新增這天的行程 (快捷鍵: Alt+N)">
                     <i class="bi bi-plus-lg"></i> 新增
@@ -1172,6 +1237,7 @@
     </div>
 </div>
 
+<!-- 新增/編輯行程 Modal -->
 <div class="modal fade" id="noteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="background-color: var(--bg-surface); border-color: var(--border-color); border-radius: 12px;">
@@ -1183,8 +1249,8 @@
                 <input type="hidden" id="currentEditId">
                 
                 <div class="mb-4">
-                    <label class="form-label fw-bold opacity-75 small mb-2">🗓️ 選擇日期區間：</label>
-                    <input type="text" class="form-control form-control-lg fw-bold fs-6" id="dateRange" placeholder="選擇日期區間" readonly>
+                    <label class="form-label fw-bold opacity-75 mb-2" style="font-size: 0.95rem;">🗓️ 選擇日期區間：</label>
+                    <input type="text" class="form-control form-control-lg fw-bold" id="dateRange" placeholder="選擇日期區間" readonly style="font-size: 1rem;">
                     
                     <div id="modalLunarInfo" class="modal-lunar-box mt-2 px-3 py-2 rounded align-items-start gap-2 d-none">
                         <i class="bi bi-compass text-primary mt-1 fs-6"></i>
@@ -1194,9 +1260,9 @@
                 
 				<div class="mb-4">
 					<div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="form-label fw-bold opacity-75 small m-0">選擇圖示：</label>
+                        <label class="form-label fw-bold opacity-75 m-0" style="font-size: 0.95rem;">選擇圖示：</label>
                         <div class="d-flex align-items-center gap-1" style="max-width: 170px;">
-                            <input type="text" class="form-control form-control-sm text-center fw-bold" id="customIconInput" placeholder="自訂 Emoji/文字" maxlength="4" style="font-size: 0.85rem; background: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);" title="輸入 Emoji 或文字 (快捷鍵: Win + . 或 Mac Cmd+Ctrl+Space)">
+                            <input type="text" class="form-control form-control-sm text-center fw-bold" id="customIconInput" placeholder="自訂 Emoji/文字" maxlength="4" style="font-size: 0.9rem; background: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);" title="輸入 Emoji 或文字 (快捷鍵: Win + . 或 Mac Cmd+Ctrl+Space)">
                         </div>
                     </div>
 					<div class="icon-selector" id="iconPicker">
@@ -1218,7 +1284,7 @@
 				</div>
 
                 <div class="mb-4">
-                    <label class="form-label fw-bold opacity-75 small mb-2">選擇顏色：</label>
+                    <label class="form-label fw-bold opacity-75 mb-2" style="font-size: 0.95rem;">選擇顏色：</label>
                     <div class="color-selector" id="colorPicker">
                         <input type="radio" name="noteColor" id="colorRed" value="#dc2626">
                         <label for="colorRed" style="--base-color: #dc2626;" title="熱烈紅"></label>
@@ -1273,20 +1339,84 @@
                     </div>
                 </div>
                 
-                <textarea class="form-control fw-bold mb-3" id="noteTextarea" rows="4" placeholder="請輸入行程內容..."></textarea>
+                <textarea class="form-control fw-bold mb-3" id="noteTextarea" rows="4" placeholder="請輸入行程內容..." style="font-size: 1rem; line-height: 1.5;"></textarea>
                 
                 <div class="form-check form-switch mt-3">
 					<input class="form-check-input" type="checkbox" role="switch" id="highlightCheckbox">
-					<label class="form-check-label fw-bold opacity-75 small" for="highlightCheckbox" style="cursor: pointer;">✨ 啟用金屬掃光 (凸顯高質感重要行程)</label>
+					<label class="form-check-label fw-bold opacity-75" for="highlightCheckbox" style="cursor: pointer; font-size: 0.92rem;">✨ 啟用金屬掃光 (凸顯高質感重要行程)</label>
 				</div>
 
             </div>
             <div class="modal-footer border-top p-3 d-flex justify-content-between">
-                <button type="button" class="btn btn-outline-danger fw-bold px-4" id="deleteNoteBtn" style="display: none;">刪除</button>
+                <button type="button" class="btn btn-outline-danger fw-bold px-4" id="deleteNoteBtn" style="display: none; font-size: 0.95rem;">刪除</button>
                 <div class="ms-auto">
-                    <button type="button" class="btn btn-secondary fw-bold me-2 px-4" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary-custom px-5" id="saveNoteBtn">儲存</button>
+                    <button type="button" class="btn btn-secondary fw-bold me-2 px-4" data-bs-dismiss="modal" style="font-size: 0.95rem;">取消</button>
+                    <button type="button" class="btn btn-primary-custom px-5" id="saveNoteBtn" style="font-size: 0.95rem;">儲存</button>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 快捷鍵與功能說明 Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="background-color: var(--bg-surface); border-color: var(--border-color); border-radius: 14px;">
+            <div class="modal-header border-bottom py-3 px-4">
+                <h6 class="modal-title fw-bold fs-5 text-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-keyboard fs-4"></i> 快捷鍵與操作指南
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
+                <div class="row g-4">
+                    <!-- 常用操作 -->
+                    <div class="col-md-6">
+                        <div class="shortcut-group-title"><i class="bi bi-lightning-charge"></i> 核心常用</div>
+                        <div class="shortcut-item"><span>新增行程</span><span><kbd>Alt + N</kbd> 或 <kbd>Ctrl + N</kbd></span></div>
+                        <div class="shortcut-item"><span>切換至 當日事件</span><span><kbd>Alt + 1</kbd></span></div>
+                        <div class="shortcut-item"><span>切換至 記事本</span><span><kbd>Alt + 2</kbd></span></div>
+                        <div class="shortcut-item"><span>收合 / 展開側面板</span><span><kbd>Ctrl + M</kbd></span></div>
+                        <div class="shortcut-item"><span>自訂行事曆名稱</span><span><kbd>F2</kbd></span></div>
+                        <div class="shortcut-item"><span>開啟此說明視窗</span><span><kbd>F1</kbd> 或 <kbd>?</kbd></span></div>
+                    </div>
+
+                    <!-- 月曆導航 -->
+                    <div class="col-md-6">
+                        <div class="shortcut-group-title"><i class="bi bi-calendar-range"></i> 日曆導航</div>
+                        <div class="shortcut-item"><span>返回今天</span><span><kbd>Home</kbd></span></div>
+                        <div class="shortcut-item"><span>切換至 上個月</span><span><kbd>PageUp</kbd></span></div>
+                        <div class="shortcut-item"><span>切換至 下個月</span><span><kbd>PageDown</kbd></span></div>
+                        <div class="shortcut-item"><span>滾輪 / 觸控切換</span><span><kbd>滾動滾輪</kbd> / <kbd>左右滑動</kbd></span></div>
+                    </div>
+
+                    <!-- 檢視與主題 -->
+                    <div class="col-md-6">
+                        <div class="shortcut-group-title"><i class="bi bi-palette"></i> 顯示與檢視</div>
+                        <div class="shortcut-item"><span>開啟 / 關閉農民曆</span><span><kbd>Alt + L</kbd></span></div>
+                        <div class="shortcut-item"><span>切換深色 / 淺色模式</span><span><kbd>Alt + J</kbd></span></div>
+                    </div>
+
+                    <!-- 資料管理 -->
+                    <div class="col-md-6">
+                        <div class="shortcut-group-title"><i class="bi bi-shield-check"></i> 資料備份與管理</div>
+                        <div class="shortcut-item"><span>備份行事曆 (JSON)</span><span><kbd>Ctrl + S</kbd> 或 <kbd>Alt + E</kbd></span></div>
+                        <div class="shortcut-item"><span>匯入行事曆檔案</span><span><kbd>Ctrl + O</kbd> 或 <kbd>Alt + I</kbd></span></div>
+                        <div class="shortcut-item"><span>刪除指定日期前紀錄</span><span><kbd>Alt + D</kbd></span></div>
+                        <div class="shortcut-item"><span>清空全部資料</span><span><kbd>Ctrl + Shift + Del</kbd></span></div>
+                    </div>
+
+                    <!-- 滑鼠與點擊互動 -->
+                    <div class="col-12">
+                        <div class="shortcut-group-title"><i class="bi bi-mouse"></i> 滑鼠與觸控操作</div>
+                        <div class="shortcut-item"><span>單擊日期格子 / 行程標籤</span><span class="text-muted fw-bold">選取日期並切換查看「當日事件」</span></div>
+                        <div class="shortcut-item"><span>連按兩下 (雙擊) 日期格空白處</span><span class="text-muted fw-bold">直接在該日期建立新行程</span></div>
+                        <div class="shortcut-item"><span>連按兩下 (雙擊) 行程標籤</span><span class="text-muted fw-bold">直接開啟該行程的編輯視窗</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top py-2 px-3">
+                <button type="button" class="btn btn-primary-custom px-4 ms-auto" data-bs-dismiss="modal">我知道了</button>
             </div>
         </div>
     </div>
@@ -1312,6 +1442,7 @@
     let currentSideTab = localStorage.getItem(ACTIVE_TAB_KEY) || 'memo';
     let events = []; 
     let noteModal;
+    let helpModal;
     let dateRangePicker;
     let showLunar = localStorage.getItem(LUNAR_KEY) !== 'false';
     let appTitle = localStorage.getItem(TITLE_KEY) || '商務行事曆';
@@ -1326,6 +1457,12 @@
         },
         buttonsStyling: false
     });
+
+    function openHelpModal() {
+        if (helpModal) {
+            helpModal.show();
+        }
+    }
 
     function promptEditTitle() {
         swalWithBootstrapButtons.fire({
@@ -1637,6 +1774,7 @@
     /* ================= 啟動與資料載入 ================= */
     document.addEventListener('DOMContentLoaded', async () => {
         noteModal = new bootstrap.Modal(document.getElementById('noteModal'));
+        helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
         
         flatpickr.l10ns.zh_tw.rangeSeparator = " 至 "; 
         dateRangePicker = flatpickr("#dateRange", {
@@ -1711,7 +1849,7 @@
             if (info.twFestivals && info.twFestivals.length > 0) html += ` <span class="badge bg-danger ms-1">${info.twFestivals.join('、')}</span>`;
             html += `</div>`;
             if (info.yi || info.ji) {
-                html += `<div class="mt-1" style="font-size: 0.83rem; line-height: 1.55;">`;
+                html += `<div class="mt-1" style="font-size: 0.88rem; line-height: 1.55;">`;
                 if (info.yi) html += `<span class="me-3 d-inline-block"><span class="lunar-yi-title">宜：</span><span class="lunar-yi-content">${info.yi}</span></span>`;
                 if (info.ji) html += `<span class="d-inline-block"><span class="lunar-ji-title">忌：</span><span class="lunar-ji-content">${info.ji}</span></span>`;
                 html += `</div>`;
@@ -1751,7 +1889,7 @@
                 if (lInfo.twFestivals && lInfo.twFestivals.length > 0) html += ` <span class="badge bg-danger ms-1">${lInfo.twFestivals.join('、')}</span>`;
                 html += `</div>`;
                 if (lInfo.yi || lInfo.ji) {
-                    html += `<div class="mt-1" style="font-size: 0.82rem; line-height: 1.5;">`;
+                    html += `<div class="mt-1" style="font-size: 0.88rem; line-height: 1.5;">`;
                     if (lInfo.yi) html += `<div class="mb-1"><span class="lunar-yi-title">宜：</span><span class="lunar-yi-content">${lInfo.yi}</span></div>`;
                     if (lInfo.ji) html += `<div><span class="lunar-ji-title">忌：</span><span class="lunar-ji-content">${lInfo.ji}</span></div>`;
                     html += `</div>`;
@@ -1777,7 +1915,7 @@
             listContainer.innerHTML = `
                 <div class="text-center py-5">
                     <i class="bi bi-calendar-check opacity-25" style="font-size: 3rem;"></i>
-                    <p class="text-muted fw-bold mt-2 mb-3">本日尚無排定行程</p>
+                    <p class="text-muted fw-bold mt-2 mb-3" style="font-size: 0.95rem;">本日尚無排定行程</p>
                     <button class="btn btn-primary-custom btn-sm" onclick="openModalForNew('${selectedDateStr}')">
                         <i class="bi bi-plus-circle"></i> 新增當日行程
                     </button>
@@ -2012,28 +2150,18 @@
                     
                     const rawLines = (evt.text || '').split('\n');
                     
-                    if (isMiniGrid) {
+                    if (isSingleEvent) {
+                        // 當天只有 1 個事件：全部文字完整顯示 (包含 Enter 換行與折行)
+                        chip.classList.add('single-event-mode');
+                        const safeText = escapeHtml(evt.text || '');
+                        chip.innerHTML = `${iconHtml}<span class="full-text">${safeText}</span>`;
+                    } else if (isMiniGrid) {
+                        // >= 4 個事件：縮圖九宮格模式
                         chip.classList.add('mini-grid-item');
                         const firstLineSafe = escapeHtml(rawLines[0] || '');
                         chip.innerHTML = `${iconHtml}<span class="line-text">${firstLineSafe}</span>`;
-                    } else if (isSingleEvent) {
-                        if (rawLines.length <= 1) {
-                            chip.classList.add('single-line-full');
-                            const safeText = escapeHtml(evt.text || '');
-                            chip.innerHTML = `${iconHtml}<span class="full-text">${safeText}</span>`;
-                        } else {
-                            chip.classList.add('multi-line-mode');
-                            let linesHtml = rawLines.map((lineText, idx) => {
-                                const safeLine = escapeHtml(lineText);
-                                if (idx === 0) {
-                                    return `<div class="event-line">${iconHtml}<span class="line-text">${safeLine}</span></div>`;
-                                } else {
-                                    return `<div class="event-line"><span class="line-text">${safeLine}</span></div>`;
-                                }
-                            }).join('');
-                            chip.innerHTML = linesHtml;
-                        }
                     } else {
+                        // 2~3 個事件：單行節錄模式
                         chip.classList.add('multi-line-mode');
                         const firstLineSafe = escapeHtml(rawLines[0] || '');
                         chip.innerHTML = `<div class="event-line">${iconHtml}<span class="line-text">${firstLineSafe}</span></div>`;
@@ -2041,13 +2169,11 @@
 
                     chip.title = evt.text;
                     
-                    // 單擊事件標籤：選取日期並切換至事件 Tab
                     chip.onclick = (e) => { 
                         e.stopPropagation(); 
                         selectDate(dateString, true);
                     };
 
-                    // 連點兩下事件標籤：進入編輯
                     chip.ondblclick = (e) => {
                         e.stopPropagation();
                         selectDate(dateString, false);
@@ -2059,12 +2185,10 @@
 
                 cell.appendChild(eventsWrapper);
                 
-                // 單擊日期格子：選取日期
                 cell.onclick = () => {
                     selectDate(dateString, true);
                 };
 
-                // 連按兩下日期格子空白處：新增行程
                 cell.ondblclick = () => {
                     openModalForNew(dateString);
                 };
@@ -2089,7 +2213,7 @@
 
             calendarBody.classList.remove('calendar-transitioning');
             renderSideEventsList();
-        }, 150);
+        }, 100);
     }
 
     function openModalForNew(dateString) {
@@ -2155,6 +2279,7 @@
 
     function setupEventListeners() {
         document.getElementById('appTitleBtn').onclick = promptEditTitle;
+        document.getElementById('helpBtn').onclick = openHelpModal;
 
         // 記事本 模式切換
         document.getElementById('memoToggleBtn').onclick = () => {
@@ -2240,11 +2365,19 @@
         document.addEventListener('keydown', (e) => {
             const activeTag = document.activeElement.tagName.toLowerCase();
             const isSwalOpen = document.body.classList.contains('swal2-shown');
-            const isModalOpen = document.getElementById('noteModal').classList.contains('show');
+            const isNoteModalOpen = document.getElementById('noteModal').classList.contains('show');
+            const isHelpModalOpen = document.getElementById('helpModal').classList.contains('show');
             const keyLower = e.key.toLowerCase();
             const isCtrlOrCmd = e.ctrlKey || e.metaKey;
 
-            if (isSwalOpen || isModalOpen) {
+            // Help 說明快捷鍵 (F1 或 ? 或 Alt + H)
+            if (e.key === 'F1' || e.key === '?' || (e.altKey && keyLower === 'h')) {
+                e.preventDefault();
+                openHelpModal();
+                return;
+            }
+
+            if (isSwalOpen || isNoteModalOpen || isHelpModalOpen) {
                 return;
             }
 
@@ -2276,14 +2409,14 @@
                 return;
             }
 
-            // 切換右側 Tab 分頁 (Ctrl + 1: 當日事件, Ctrl + 2: 記事本)
-            if (isCtrlOrCmd && (e.key === '1' || e.code === 'Digit1')) {
+            // 切換右側 Tab 分頁 (Alt + 1: 當日事件, Alt + 2: 記事本)
+            if (e.altKey && (e.key === '1' || e.code === 'Digit1')) {
                 e.preventDefault();
                 if (isMemoCollapsed) applyMemoCollapseState(false);
                 switchSideTab('events');
                 return;
             }
-            if (isCtrlOrCmd && (e.key === '2' || e.code === 'Digit2')) {
+            if (e.altKey && (e.key === '2' || e.code === 'Digit2')) {
                 e.preventDefault();
                 if (isMemoCollapsed) applyMemoCollapseState(false);
                 switchSideTab('memo');
