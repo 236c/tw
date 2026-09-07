@@ -33,6 +33,13 @@
             --lunar-highlight-bg: #eff6ff;
             --lunar-highlight-text: #1d4ed8;
 
+            /* 使用者自訂國定假日與連假色彩 */
+            --holiday-text: #dc2626;
+            --holiday-streak-border: #ef4444;
+            --holiday-banner-bg: linear-gradient(135deg, #fee2e2 0%, #ffedd5 100%);
+            --holiday-banner-border: #fca5a5;
+            --holiday-banner-text: #b91c1c;
+
             /* 行程視窗農民曆說明專用色 */
             --modal-lunar-bg: #f8fafc;
             --modal-lunar-border: #cbd5e1;
@@ -60,7 +67,12 @@
             --lunar-highlight-bg: rgba(96, 165, 250, 0.2);
             --lunar-highlight-text: #93c5fd;
 
-            /* 暗黑模式高對比度清晰配色 */
+            --holiday-text: #f87171;
+            --holiday-streak-border: #f87171;
+            --holiday-banner-bg: linear-gradient(135deg, rgba(220, 38, 38, 0.35) 0%, rgba(234, 88, 12, 0.3) 100%);
+            --holiday-banner-border: rgba(248, 113, 113, 0.5);
+            --holiday-banner-text: #fecaca;
+
             --modal-lunar-bg: #1e293b;
             --modal-lunar-border: #475569;
             --modal-lunar-text: #f1f5f9;
@@ -160,7 +172,6 @@
 
         .btn { white-space: nowrap !important; }
 
-        /* 快捷鍵鍵盤標籤樣式 */
         kbd {
             background-color: var(--bg-header);
             color: var(--text-main);
@@ -419,7 +430,7 @@
             position: relative; 
             display: flex; 
             flex-direction: column; 
-            gap: 3px; 
+            gap: 2px; 
             min-width: 0; 
             box-sizing: border-box;
             transition: background-color 0.2s, box-shadow 0.15s;
@@ -436,10 +447,96 @@
         .day-cell.other-month:hover { background-color: var(--bg-header); opacity: 0.85; }
         .day-cell.other-month .date-number { color: var(--text-muted); font-weight: 600; }
 
+        /* ================= 國定假日與連續假期視覺樣式 (僅標示上方紅線，維持原本底色) ================= */
+        .day-cell.holiday-cell,
+        .day-cell.holiday-streak-cell {
+            border-top: 3.5px solid var(--holiday-streak-border) !important;
+        }
+        .date-number.text-holiday {
+            color: var(--holiday-text) !important;
+            font-weight: 800;
+        }
+
+        .holiday-mini-badge {
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 1px 4px;
+            border-radius: 4px;
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+        body.theme-dark .holiday-mini-badge {
+            background-color: rgba(220, 38, 38, 0.3);
+            color: #fca5a5;
+            border-color: rgba(248, 113, 113, 0.4);
+        }
+
+        /* 連假彩帶橫幅 (Streak Banner) */
+        .holiday-streak-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2px 5px;
+            border-radius: 5px;
+            font-size: 0.79rem;
+            font-weight: 800;
+            margin-bottom: 2px;
+            background: var(--holiday-banner-bg);
+            border: 1px solid var(--holiday-banner-border);
+            color: var(--holiday-banner-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            user-select: none;
+            cursor: pointer;
+            line-height: 1.25;
+            flex-shrink: 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            transition: all 0.15s ease;
+        }
+        .holiday-streak-banner:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(220, 38, 38, 0.2);
+        }
+        .streak-icon { margin-right: 3px; font-size: 0.85rem; flex-shrink: 0; }
+        .streak-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+        .streak-count { 
+            font-size: 0.7rem; 
+            padding: 1px 4px; 
+            border-radius: 4px; 
+            background: rgba(220,38,38,0.14); 
+            color: #b91c1c; 
+            font-weight: 900; 
+            margin-left: 3px; 
+            flex-shrink: 0; 
+        }
+        body.theme-dark .streak-count { 
+            background: rgba(254,202,202,0.2); 
+            color: #fecaca; 
+        }
+
+        /* 側欄國定假日詳細卡片 */
+        .holiday-detail-box {
+            background-color: #fff1f2;
+            border: 1px solid #fecdd3;
+            border-left: 4px solid #ef4444;
+            color: #9f1239;
+        }
+        body.theme-dark .holiday-detail-box {
+            background-color: rgba(225, 29, 72, 0.15);
+            border-color: rgba(244, 63, 94, 0.35);
+            border-left: 4px solid #f43f5e;
+            color: #fecdd3;
+        }
+
         /* ================= 「今日」專屬標記 ================= */
         .day-cell.today .date-number { 
-            color: #ffffff; 
-            background-color: var(--primary-color); 
+            color: #ffffff !important; 
+            background-color: var(--primary-color) !important; 
             font-weight: 800;
             width: 27px;
             height: 27px;
@@ -453,7 +550,7 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.25); 
         }
         body.theme-dark .day-cell.today .date-number {
-            color: #0f172a;
+            color: #0f172a !important;
         }
 
         /* ================= 「單一選取框」 ================= */
@@ -550,7 +647,6 @@
             box-shadow: 0 3px 6px rgba(0,0,0,0.15); 
         }
 
-        /* 單一事件模式：完整顯示所有文字 */
         .event-chip.single-event-mode {
             display: block !important;
             white-space: pre-wrap !important;
@@ -572,7 +668,6 @@
             word-break: break-word !important;
         }
 
-        /* 多事件模式：單行節錄 */
         .event-chip.multi-line-mode {
             display: flex;
             flex-direction: column;
@@ -833,7 +928,7 @@
         .side-event-actions {
             display: flex;
             gap: 6px;
-            opacity: 0.85;
+            opacity: 0.9;
         }
         .side-event-actions button {
             padding: 2px 7px;
@@ -877,45 +972,149 @@
             display: flex !important;
         }
 
-        /* Modal 控制項 */
+        /* ================= 彈窗與字體放大優化 (Modal Fonts & Layout) ================= */
+        #noteModal .modal-dialog {
+            max-width: 580px;
+            max-height: 94vh;
+            margin: 1.75rem auto;
+        }
+        #noteModal .modal-content {
+            max-height: 94vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.35);
+        }
+        #noteModal .modal-header {
+            padding: 14px 22px;
+            flex-shrink: 0;
+        }
+        #noteModal .modal-title {
+            font-size: 1.42rem !important;
+            letter-spacing: 0.5px;
+        }
+        #noteModal .modal-body {
+            padding: 16px 22px;
+            overflow-y: auto;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        #noteModal .modal-footer {
+            padding: 14px 22px;
+            flex-shrink: 0;
+            background-color: var(--bg-header);
+        }
+
+        #noteModal .modal-body::-webkit-scrollbar { width: 6px; }
+        #noteModal .modal-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 4px; }
+        body.theme-dark #noteModal .modal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); }
+
+        /* 表單標籤字體加大 */
+        #noteModal .form-label {
+            font-size: 1.05rem !important;
+            font-weight: 800 !important;
+            margin-bottom: 6px;
+        }
+
+        /* 日期輸入框字體加大 */
+        #dateRange {
+            font-size: 1.14rem !important;
+            padding: 8px 12px !important;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        /* 農民曆資訊方塊字體加大 */
         .modal-lunar-box {
             background-color: var(--modal-lunar-bg) !important;
             border: 1px dashed var(--modal-lunar-border) !important;
             color: var(--modal-lunar-text) !important;
             border-radius: 8px;
-            font-size: 0.9rem; 
+            font-size: 1.02rem !important; 
+            line-height: 1.6;
+            padding: 10px 14px !important;
             transition: all 0.2s ease;
         }
         .modal-lunar-box .lunar-header-line {
             color: var(--modal-lunar-text) !important;
-            font-weight: 700;
+            font-weight: 800;
+            font-size: 1.06rem !important;
         }
         .modal-lunar-box .lunar-yi-title {
             color: var(--modal-lunar-yi-title) !important;
-            font-weight: 800;
+            font-weight: 900;
+            font-size: 1.02rem;
         }
         .modal-lunar-box .lunar-yi-content {
             color: var(--modal-lunar-yi-text) !important;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 1.02rem;
         }
         .modal-lunar-box .lunar-ji-title {
             color: var(--modal-lunar-ji-title) !important;
-            font-weight: 800;
+            font-weight: 900;
+            font-size: 1.02rem;
         }
         .modal-lunar-box .lunar-ji-content {
             color: var(--modal-lunar-ji-text) !important;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 1.02rem;
         }
 
-        .icon-selector { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        /* 連假提示字體加大 */
+        #modalHolidayInfo {
+            font-size: 1.02rem !important;
+            padding: 8px 12px !important;
+        }
+
+        /* 自訂圖示輸入框加大 */
+        #customIconInput {
+            height: 32px !important;
+            font-size: 0.95rem !important;
+            border-radius: 6px;
+        }
+
+        /* 圖示與顏色選擇器尺寸加大 */
+        .icon-selector { 
+            display: grid; 
+            grid-template-columns: repeat(8, 1fr); 
+            gap: 8px; 
+            margin-top: 4px;
+        }
         .icon-selector input[type="radio"], .color-selector input[type="radio"] { display: none; }
-        .icon-selector label { width: 100%; aspect-ratio: 1; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-color); border-radius: 50%; cursor: pointer; font-size: 1.35rem; transition: all 0.2s; background: var(--bg-surface); }
-        .icon-selector input[type="radio"]:checked + label { border-color: var(--primary-color); background-color: var(--today-bg); transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.12); }
+        .icon-selector label { 
+            width: 100%; 
+            aspect-ratio: 1; 
+            max-width: 48px;
+            margin: 0 auto;
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            border: 1.5px solid var(--border-color); 
+            border-radius: 50%; 
+            cursor: pointer; 
+            font-size: 1.55rem !important; 
+            transition: all 0.16s ease; 
+            background: var(--bg-surface); 
+        }
+        .icon-selector input[type="radio"]:checked + label { 
+            border-color: var(--primary-color); 
+            background-color: var(--today-bg); 
+            transform: scale(1.12); 
+            box-shadow: 0 3px 8px rgba(0,0,0,0.18); 
+        }
         
-        .color-selector { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
+        .color-selector { 
+            display: grid; 
+            grid-template-columns: repeat(8, 1fr); 
+            gap: 8px; 
+            margin-top: 4px;
+        }
         .color-selector label { 
             width: 100%; 
             aspect-ratio: 1; 
+            max-width: 38px;
+            margin: 0 auto;
             border-radius: 50%; 
             cursor: pointer; 
             border: 2px solid rgba(0,0,0,0.14); 
@@ -923,19 +1122,19 @@
             align-items: center; 
             justify-content: center; 
             background-color: var(--base-color); 
-            transition: all 0.18s ease;
+            transition: all 0.16s ease;
             position: relative;
         }
         .color-selector label:hover { transform: scale(1.08); }
         .color-selector input[type="radio"]:checked + label { 
-            border: 2.5px solid var(--text-main); 
+            border: 3px solid var(--text-main); 
             transform: scale(1.15); 
-            box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
         }
         .color-selector input[type="radio"]:checked + label::after { 
             content: '\2714'; 
             color: #fff; 
-            font-size: 14px; 
+            font-size: 16px; 
             font-weight: 900; 
             text-shadow: 0 1px 3px rgba(0,0,0,0.6);
         }
@@ -948,8 +1147,36 @@
 
         .custom-color-item label {
             border: 2px dashed var(--border-color) !important;
-            font-size: 1.1rem;
+            font-size: 1.25rem !important;
             background-color: var(--base-color);
+        }
+
+        /* 行程內容文字輸入框字體加大 */
+        #noteTextarea {
+            font-size: 1.12rem !important;
+            line-height: 1.55 !important;
+            padding: 10px 14px !important;
+            border-radius: 8px;
+        }
+
+        /* 功能開關 */
+        .form-switch .form-check-input {
+            width: 2.3em !important;
+            height: 1.25em !important;
+            margin-right: 8px;
+        }
+        .form-check-label {
+            font-size: 1.02rem !important;
+            line-height: 1.45;
+            user-select: none;
+        }
+
+        /* 彈窗按鈕字體加大 */
+        #noteModal .modal-footer .btn {
+            font-size: 1.02rem !important;
+            padding: 8px 22px !important;
+            border-radius: 8px;
+            font-weight: 800 !important;
         }
 
         /* 快捷鍵說明視窗樣式 */
@@ -1018,7 +1245,7 @@
                 min-height: auto;
             }
             .calendar-container.memo-collapsed { grid-template-columns: 1fr; }
-            .day-cell { height: 125px; } 
+            .day-cell { height: 128px; } 
             .memo-wrapper { min-height: 480px; }
             .memo-collapsed-bar {
                 flex-direction: row;
@@ -1072,13 +1299,17 @@
         @media (max-width: 576px) {
             .calendar-container { padding: 8px; }
             .day-header { font-size: 0.85rem; padding: 6px 0; }
-            .day-cell { height: 110px; padding: 3px; }
+            .day-cell { height: 115px; padding: 3px; }
             .date-number { font-size: 0.95rem; }
             .lunar-tag { font-size: 0.72rem; padding: 1px 3px; }
             .day-cell.today .date-number { width: 22px; height: 22px; font-size: 0.8rem; }
+            .holiday-streak-banner { font-size: 0.72rem; padding: 1px 3px; }
+            .streak-icon { font-size: 0.75rem; margin-right: 2px; }
+            .streak-count { font-size: 0.65rem; padding: 0 2px; }
             .event-chip { padding: 2px 4px; font-size: 0.8rem; line-height: 1.25; }
             .events-wrapper.multi-items { grid-template-columns: 1fr; gap: 2px; }
-            .color-selector { grid-template-columns: repeat(6, 1fr); gap: 8px; }
+            .icon-selector { grid-template-columns: repeat(6, 1fr); gap: 6px; }
+            .color-selector { grid-template-columns: repeat(8, 1fr); gap: 4px; }
 
             .swal2-actions { flex-direction: column !important; width: 100% !important; }
             .swal2-actions button { width: 100% !important; }
@@ -1211,6 +1442,11 @@
                 </button>
             </div>
 
+            <!-- 國定假日與連假通知區塊 (包含直接編輯/刪除按鈕) -->
+            <div id="sideHolidayBox" class="holiday-detail-box mx-3 mt-3 px-3 py-2 rounded d-none">
+                <div id="sideHolidayText"></div>
+            </div>
+
             <!-- 農民曆即時資訊區塊 -->
             <div id="sideLunarBox" class="modal-lunar-box mx-3 mt-3 px-3 py-2 rounded d-none">
                 <div id="sideLunarText"></div>
@@ -1218,7 +1454,7 @@
 
             <!-- 事件卡片滾動區 -->
             <div class="side-events-scroll" id="sideEventsList">
-                <!-- 動態注入事件 -->
+                <!-- 動態注入行程 -->
             </div>
         </div>
 
@@ -1239,52 +1475,60 @@
 
 <!-- 新增/編輯行程 Modal -->
 <div class="modal fade" id="noteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="background-color: var(--bg-surface); border-color: var(--border-color); border-radius: 12px;">
-            <div class="modal-header border-bottom padding-4">
-                <h6 class="modal-title fw-bold fs-5" id="modalTitle">新增行程</h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="background-color: var(--bg-surface); border-color: var(--border-color); border-radius: 16px;">
+            <div class="modal-header border-bottom">
+                <h6 class="modal-title fw-bold" id="modalTitle">新增行程</h6>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
+            
+            <div class="modal-body">
                 <input type="hidden" id="currentEditId">
                 
-                <div class="mb-4">
-                    <label class="form-label fw-bold opacity-75 mb-2" style="font-size: 0.95rem;">🗓️ 選擇日期區間：</label>
-                    <input type="text" class="form-control form-control-lg fw-bold" id="dateRange" placeholder="選擇日期區間" readonly style="font-size: 1rem;">
+                <!-- 選擇日期區間 -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold opacity-85">🗓️ 選擇日期區間：</label>
+                    <input type="text" class="form-control fw-bold" id="dateRange" placeholder="選擇日期區間" readonly>
                     
+                    <div id="modalHolidayInfo" class="holiday-detail-box mt-2 px-3 py-2 rounded align-items-center gap-2 d-none">
+                        <i class="bi bi-flag-fill text-danger fs-5"></i>
+                        <div id="modalHolidayText" class="fw-bold flex-1 w-100"></div>
+                    </div>
+
                     <div id="modalLunarInfo" class="modal-lunar-box mt-2 px-3 py-2 rounded align-items-start gap-2 d-none">
-                        <i class="bi bi-compass text-primary mt-1 fs-6"></i>
+                        <i class="bi bi-compass text-primary mt-1 fs-5"></i>
                         <div id="modalLunarText" class="fw-semibold flex-1 w-100"></div>
                     </div>
                 </div>
                 
-				<div class="mb-4">
-					<div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="form-label fw-bold opacity-75 m-0" style="font-size: 0.95rem;">選擇圖示：</label>
-                        <div class="d-flex align-items-center gap-1" style="max-width: 170px;">
-                            <input type="text" class="form-control form-control-sm text-center fw-bold" id="customIconInput" placeholder="自訂 Emoji/文字" maxlength="4" style="font-size: 0.9rem; background: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);" title="輸入 Emoji 或文字 (快捷鍵: Win + . 或 Mac Cmd+Ctrl+Space)">
+                <!-- 選擇圖示 (包含無圖示選項) -->
+				<div class="mb-3">
+					<div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label fw-bold opacity-85 m-0">選擇圖示：</label>
+                        <div class="d-flex align-items-center gap-1" style="max-width: 160px;">
+                            <input type="text" class="form-control form-control-sm text-center fw-bold px-2" id="customIconInput" placeholder="自訂圖示" maxlength="4" style="background: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);" title="輸入 Emoji 或文字 (快捷鍵: Win + . 或 Mac Cmd+Ctrl+Space)">
                         </div>
                     </div>
 					<div class="icon-selector" id="iconPicker">
+                        <input type="radio" name="noteIcon" id="iconNone" value=""><label for="iconNone" title="無圖示" style="font-size: 1.18rem !important;"><i class="bi bi-slash-circle"></i></label>
 						<input type="radio" name="noteIcon" id="iconPin" value="📌" checked><label for="iconPin" title="一般">📌</label>
-						<input type="radio" name="noteIcon" id="iconStar" value="⭐️"><label for="iconStar" title="重要">⭐️</label>						
-						<input type="radio" name="noteIcon" id="iconBasketball" value="🏀"><label for="iconBasketball" title="運動">🏀</label>
-						<input type="radio" name="noteIcon" id="iconLion" value="🦁"><label for="iconLion" title="獅子">🦁</label>
+						<input type="radio" name="noteIcon" id="iconStar" value="⭐️"><label for="iconStar" title="重要">⭐️</label>
+						<input type="radio" name="noteIcon" id="iconVacation" value="🏖️"><label for="iconVacation" title="連假">🏖️</label>
+						<input type="radio" name="noteIcon" id="iconLantern" value="🏮"><label for="iconLantern" title="傳統節慶">🏮</label>
+                        <input type="radio" name="noteIcon" id="iconBasketball" value="🏀"><label for="iconBasketball" title="運動">🏀</label>
 						<input type="radio" name="noteIcon" id="iconRun" value="🏃"><label for="iconRun" title="健身">🏃</label>						
 						<input type="radio" name="noteIcon" id="iconBook" value="📖"><label for="iconBook" title="閱讀">📖</label>
 						<input type="radio" name="noteIcon" id="iconFood" value="🍜"><label for="iconFood" title="聚餐">🍜</label>						
-						<input type="radio" name="noteIcon" id="iconPeople" value="👨‍👩‍👧‍👦"><label for="iconPeople" title="家庭">👨‍👩‍👧‍👦</label>
 						<input type="radio" name="noteIcon" id="iconMovie" value="🎬"><label for="iconMovie" title="娛樂">🎬</label>
-						<input type="radio" name="noteIcon" id="iconCar" value="🚗"><label for="iconCar" title="開車">🚗</label>
 						<input type="radio" name="noteIcon" id="iconPlane" value="✈️"><label for="iconPlane" title="出差旅遊">✈️</label>						
-						<input type="radio" name="noteIcon" id="iconSleep" value="💤"><label for="iconSleep" title="休假">💤</label>
                         
-                        <input type="radio" name="noteIcon" id="iconCustom" value="CUSTOM"><label for="iconCustom" id="iconCustomLabel" title="自訂圖示" style="border-style: dashed; font-size: 1.15rem;">➕</label>
+                        <input type="radio" name="noteIcon" id="iconCustom" value="CUSTOM"><label for="iconCustom" id="iconCustomLabel" title="自訂圖示" style="border-style: dashed; font-size: 1.25rem !important;">➕</label>
 					</div>
 				</div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold opacity-75 mb-2" style="font-size: 0.95rem;">選擇顏色：</label>
+                <!-- 選擇顏色 -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold opacity-85">選擇顏色：</label>
                     <div class="color-selector" id="colorPicker">
                         <input type="radio" name="noteColor" id="colorRed" value="#dc2626">
                         <label for="colorRed" style="--base-color: #dc2626;" title="熱烈紅"></label>
@@ -1339,19 +1583,36 @@
                     </div>
                 </div>
                 
-                <textarea class="form-control fw-bold mb-3" id="noteTextarea" rows="4" placeholder="請輸入行程內容..." style="font-size: 1rem; line-height: 1.5;"></textarea>
+                <!-- 行程內容輸入框 -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold opacity-85">行程內容：</label>
+                    <textarea class="form-control fw-bold" id="noteTextarea" rows="3" placeholder="請輸入行程內容..."></textarea>
+                </div>
                 
-                <div class="form-check form-switch mt-3">
-					<input class="form-check-input" type="checkbox" role="switch" id="highlightCheckbox">
-					<label class="form-check-label fw-bold opacity-75" for="highlightCheckbox" style="cursor: pointer; font-size: 0.92rem;">✨ 啟用金屬掃光 (凸顯高質感重要行程)</label>
-				</div>
+                <!-- 功能開關 -->
+                <div class="d-flex flex-column gap-2 pt-1">
+                    <div class="form-check form-switch m-0 d-flex align-items-center">
+                        <input class="form-check-input mt-0" type="checkbox" role="switch" id="holidayCheckbox" style="cursor: pointer;">
+                        <label class="form-check-label fw-bold text-danger" for="holidayCheckbox" style="cursor: pointer;">
+                            🏖️ 設為國定連假 / 連續假期 (日曆顯示放假彩帶與天數進度)
+                        </label>
+                    </div>
+
+                    <div class="form-check form-switch m-0 d-flex align-items-center">
+                        <input class="form-check-input mt-0" type="checkbox" role="switch" id="highlightCheckbox" style="cursor: pointer;">
+                        <label class="form-check-label fw-bold opacity-85" for="highlightCheckbox" style="cursor: pointer;">
+                            ✨ 啟用金屬掃光 (凸顯高質感重要行程)
+                        </label>
+                    </div>
+                </div>
 
             </div>
-            <div class="modal-footer border-top p-3 d-flex justify-content-between">
-                <button type="button" class="btn btn-outline-danger fw-bold px-4" id="deleteNoteBtn" style="display: none; font-size: 0.95rem;">刪除</button>
-                <div class="ms-auto">
-                    <button type="button" class="btn btn-secondary fw-bold me-2 px-4" data-bs-dismiss="modal" style="font-size: 0.95rem;">取消</button>
-                    <button type="button" class="btn btn-primary-custom px-5" id="saveNoteBtn" style="font-size: 0.95rem;">儲存</button>
+            
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-danger fw-bold" id="deleteNoteBtn" style="display: none;">刪除</button>
+                <div class="ms-auto d-flex gap-2">
+                    <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary-custom" id="saveNoteBtn">儲存</button>
                 </div>
             </div>
         </div>
@@ -1370,7 +1631,6 @@
             </div>
             <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
                 <div class="row g-4">
-                    <!-- 常用操作 -->
                     <div class="col-md-6">
                         <div class="shortcut-group-title"><i class="bi bi-lightning-charge"></i> 核心常用</div>
                         <div class="shortcut-item"><span>新增行程</span><span><kbd>Alt + N</kbd> 或 <kbd>Ctrl + N</kbd></span></div>
@@ -1381,23 +1641,21 @@
                         <div class="shortcut-item"><span>開啟此說明視窗</span><span><kbd>F1</kbd> 或 <kbd>?</kbd></span></div>
                     </div>
 
-                    <!-- 月曆導航 -->
                     <div class="col-md-6">
-                        <div class="shortcut-group-title"><i class="bi bi-calendar-range"></i> 日曆導航</div>
+                        <div class="shortcut-group-title"><i class="bi bi-flag"></i> 自訂國定連假與導航</div>
+                        <div class="shortcut-item"><span>自訂連續假期</span><span class="text-muted fw-bold">新增行程時勾選「設為國定連假」即可</span></div>
+                        <div class="shortcut-item"><span>連假視覺效果</span><span class="text-muted fw-bold">顯示橫幅彩帶、天數進度與休假標籤</span></div>
                         <div class="shortcut-item"><span>返回今天</span><span><kbd>Home</kbd></span></div>
-                        <div class="shortcut-item"><span>切換至 上個月</span><span><kbd>PageUp</kbd></span></div>
-                        <div class="shortcut-item"><span>切換至 下個月</span><span><kbd>PageDown</kbd></span></div>
+                        <div class="shortcut-item"><span>切換 上月 / 下月</span><span><kbd>PageUp</kbd> / <kbd>PageDown</kbd></span></div>
                         <div class="shortcut-item"><span>滾輪 / 觸控切換</span><span><kbd>滾動滾輪</kbd> / <kbd>左右滑動</kbd></span></div>
                     </div>
 
-                    <!-- 檢視與主題 -->
                     <div class="col-md-6">
                         <div class="shortcut-group-title"><i class="bi bi-palette"></i> 顯示與檢視</div>
                         <div class="shortcut-item"><span>開啟 / 關閉農民曆</span><span><kbd>Alt + L</kbd></span></div>
                         <div class="shortcut-item"><span>切換深色 / 淺色模式</span><span><kbd>Alt + J</kbd></span></div>
                     </div>
 
-                    <!-- 資料管理 -->
                     <div class="col-md-6">
                         <div class="shortcut-group-title"><i class="bi bi-shield-check"></i> 資料備份與管理</div>
                         <div class="shortcut-item"><span>備份行事曆 (JSON)</span><span><kbd>Ctrl + S</kbd> 或 <kbd>Alt + E</kbd></span></div>
@@ -1406,12 +1664,11 @@
                         <div class="shortcut-item"><span>清空全部資料</span><span><kbd>Ctrl + Shift + Del</kbd></span></div>
                     </div>
 
-                    <!-- 滑鼠與點擊互動 -->
                     <div class="col-12">
                         <div class="shortcut-group-title"><i class="bi bi-mouse"></i> 滑鼠與觸控操作</div>
-                        <div class="shortcut-item"><span>單擊日期格子 / 行程標籤</span><span class="text-muted fw-bold">選取日期並切換查看「當日事件」</span></div>
+                        <div class="shortcut-item"><span>單擊日期格子 / 連假彩帶</span><span class="text-muted fw-bold">選取日期並切換查看「當日事件」</span></div>
                         <div class="shortcut-item"><span>連按兩下 (雙擊) 日期格空白處</span><span class="text-muted fw-bold">直接在該日期建立新行程</span></div>
-                        <div class="shortcut-item"><span>連按兩下 (雙擊) 行程標籤</span><span class="text-muted fw-bold">直接開啟該行程的編輯視窗</span></div>
+                        <div class="shortcut-item"><span>連按兩下 (雙擊) 連假彩帶或行程</span><span class="text-muted fw-bold">直接開啟該行程的編輯視窗</span></div>
                     </div>
                 </div>
             </div>
@@ -1435,7 +1692,7 @@
     const MEMO_COLLAPSE_KEY = 'my_calendar_memo_collapsed_pref';
     const ACTIVE_TAB_KEY = 'my_calendar_active_tab_pref';
 
-    const PRESET_ICONS = ['📌', '⭐️', '🏀', '🦁', '🏃', '📖', '🍜', '👨‍👩‍👧‍👦', '🎬', '🚗', '✈️', '💤'];
+    const PRESET_ICONS = ['', '📌', '⭐️', '🏖️', '🏮', '🏀', '🏃', '📖', '🍜', '🎬', '✈️'];
 
     let currentDate = new Date();
     let selectedDateStr = flatpickr.formatDate(new Date(), "Y-m-d"); 
@@ -1602,7 +1859,7 @@
         }
     }
 
-    /* ================= 台灣節日與農民曆 ================= */
+    /* ================= 台灣節日與農民曆繁體字典 ================= */
     const TW_SOLAR_FESTIVALS = {
         '01-01': '元旦', '02-14': '情人節', '02-28': '和平紀念日', '03-08': '婦女節',
         '03-14': '白色情人節', '03-29': '青年節', '04-04': '兒童節', '05-01': '勞動節',
@@ -1619,23 +1876,63 @@
 
     const ZH_MAP = {
         '腊月': '臘月', '正月': '正月', '腊': '臘',
-        '立春': '立春', '雨水': '雨水', '惊蛰': '驚蟄', '春分': '春分', '清明': '清明', '谷雨': '穀雨',
-        '立夏': '立夏', '小满': '小滿', '芒种': '芒種', '夏至': '夏至', '小暑': '小暑', '大暑': '大暑',
-        '立秋': '立秋', '处暑': '處暑', '白露': '白露', '秋分': '秋分', '寒露': '寒露', '霜降': '霜降',
-        '立冬': '立冬', '小雪': '小雪', '大雪': '大雪', '冬至': '冬至', '小寒': '小寒', '大寒': '大寒',
-        '鼠': '鼠', '牛': '牛', '虎': '虎', '兔': '兔', '龙': '龍', '蛇': '蛇',
-        '马': '馬', '羊': '羊', '猴': '猴', '鸡': '雞', '狗': '狗', '猪': '豬',
-        '祭祀': '祭祀', '祈福': '祈福', '嫁娶': '嫁娶', '出行': '出行', '开市': '開市', '動土': '動土',
-        '动土': '動土', '破土': '破土', '安葬': '安葬', '修造': '修造', '移徙': '移徙', '入宅': '入宅',
-        '纳采': '納採', '订盟': '訂盟', '纳财': '納財', '栽种': '栽種', '安床': '安床', '扫舍': '掃舍',
-        '平治道涂': '平治道塗', '修饰垣墙': '修飾垣牆', '余事勿取': '餘事勿取', '諸事不宜': '諸事不宜'
+        '惊蛰': '驚蟄', '谷雨': '穀雨', '小满': '小滿', '芒种': '芒種', '处暑': '處暑',
+        '龙': '龍', '马': '馬', '鸡': '雞', '猪': '豬',
+
+        '平治道涂': '平治道塗', '修饰垣墙': '修飾垣牆', '补垣塞穴': '補垣塞穴',
+        '余事勿取': '餘事勿取', '馀事勿取': '餘事勿取', '诸事不宜': '諸事不宜', '诸事皆宜': '諸事皆宜',
+        '诸事不利': '諸事不利', '出货财': '出貨財', '开生坟': '開生墳', '合寿木': '合壽木',
+        '整手足甲': '整手足甲', '会亲友': '會親友', '进人口': '進人口', '造车器': '造車器',
+        '造畜稠': '造畜稠', '修仓库': '修倉庫',
+
+        '开市': '開市', '开光': '開光', '开仓': '開倉', '开工': '開工', '开业': '開業',
+        '开渠': '開渠', '开池': '開池', '动土': '動土', '破土': '破土', '安葬': '安葬',
+        '修坟': '修墳', '启攒': '啟攢', '迁坟': '遷墳', '破屋': '破屋', '坏垣': '壞垣',
+        '补垣': '補垣', '塞穴': '塞穴', '纳采': '納採', '纳财': '納財', '纳畜': '納畜',
+        '纳婿': '納婿', '问名': '問名', '订盟': '訂盟', '订婚': '訂婚', '栽种': '栽種',
+        '扫舍': '掃舍', '竖柱': '豎柱', '上梁': '上樑', '经络': '經絡', '酝酿': '醞釀',
+        '理发': '理髮', '剃头': '剃頭', '针灸': '針灸', '疗目': '療目', '求医': '求醫',
+        '治病': '治病', '词讼': '詞訟', '诉讼': '訴訟', '归宁': '歸寧', '安门': '安門',
+        '买车': '買車', '架马': '架馬', '筑堤': '築堤', '造仓': '造倉', '取渔': '取漁',
+        '捕鱼': '捕魚', '畋猎': '畋獵', '结网': '結網', '牧养': '牧養', '塑绘': '塑繪',
+        '斋醮': '齋醮', '设醮': '設醮', '酬神': '酬神', '入殓': '入殮', '移柩': '移柩',
+        '合帐': '合帳', '断蚁': '斷蟻', '乘船': '乘船', '渡水': '渡水', '习艺': '習藝',
+
+        '开': '開', '关': '關', '门': '門', '进': '進', '纳': '納', '财': '財',
+        '订': '訂', '结': '結', '网': '網', '竖': '豎', '梁': '樑', '经': '經',
+        '络': '絡', '织': '織', '医': '醫', '药': '藥', '疗': '療', '针': '針',
+        '寿': '壽', '坟': '墳', '迁': '遷', '归': '歸', '宁': '寧', '仓': '倉',
+        '库': '庫', '筑': '築', '墙': '牆', '猎': '獵', '鱼': '魚', '种': '種',
+        '养': '養', '扫': '掃', '绘': '繪', '画': '畫', '斋': '齋', '词': '詞',
+        '讼': '訟', '余': '餘', '馀': '餘', '诸': '諸', '坏': '壞', '补': '補',
+        '发': '髮', '酿': '釀', '酝': '醞', '涂': '塗', '饰': '飾', '启': '啟',
+        '攒': '攢', '挂': '掛', '见': '見', '买': '買', '车': '車', '断': '斷',
+        '蚁': '蟻', '双': '雙', '两': '兩', '头': '頭', '蚕': '蠶', '岁': '歲',
+        '禄': '祿', '兽': '獸', '蛊': '蠱', '习': '習', '艺': '藝', '广': '廣',
+        '炼': '煉', '炉': '爐', '殓': '殮', '枢': '樞', '桩': '樁', '柜': '櫃',
+        '极': '極', '桥': '橋', '机': '機', '权': '權', '构': '構', '样': '樣',
+        '标': '標', '检': '檢', '树': '樹', '楼': '樓', '类': '類', '粮': '糧',
+        '紧': '緊', '纸': '紙', '线': '線', '练': '練', '续': '續', '绳': '繩',
+        '维': '維', '绩': '績', '纲': '綱', '缚': '縛', '缝': '縫', '义': '義',
+        '乡': '鄉', '亲': '親', '变': '變', '问': '問', '间': '間', '闻': '聞',
+        '闲': '閑', '阁': '閣', '阅': '閱', '阔': '闊', '队': '隊', '阳': '陽',
+        '阴': '陰', '阵': '陣', '阶': '階', '际': '際', '陆': '陸', '陈': '陳',
+        '随': '隨', '险': '險', '隐': '隱', '难': '難', '静': '靜', '顶': '頂',
+        '项': '項', '顺': '順', '须': '須', '顾': '顧', '顿': '頓', '预': '預',
+        '领': '領', '频': '頻', '题': '題', '额': '額', '颜': '顏', '风': '風',
+        '飞': '飛', '饱': '飽', '饲': '飼', '馆': '館', '驾': '駕', '验': '驗',
+        '骑': '騎', '骗': '騙', '体': '體', '鲜': '鮮', '鸟': '鳥', '鸣': '鳴',
+        '鸭': '鴨', '鸿': '鴻', '鹤': '鶴', '麦': '麥', '黄': '黃', '点': '點',
+        '齐': '齊', '齿': '齒'
     };
+
+    const ZH_KEYS = Object.keys(ZH_MAP).sort((a, b) => b.length - a.length);
 
     function toTrad(str) {
         if (!str) return '';
         let res = String(str);
-        for (const [s, t] of Object.entries(ZH_MAP)) {
-            res = res.replaceAll(s, t);
+        for (const s of ZH_KEYS) {
+            res = res.replaceAll(s, ZH_MAP[s]);
         }
         return res;
     }
@@ -1719,6 +2016,38 @@
         }
     }
 
+    /* ================= 使用者自訂連續假期與國定假日解析 ================= */
+    function getHolidayAndLongWeekendInfo(dateStr) {
+        if (!dateStr || !events) return null;
+        
+        const match = events.find(e => e.isHoliday && dateStr >= e.start && dateStr <= (e.end || e.start));
+        if (!match) return null;
+
+        const startObj = new Date(match.start + 'T00:00:00');
+        const endObj = new Date((match.end || match.start) + 'T00:00:00');
+        const curObj = new Date(dateStr + 'T00:00:00');
+
+        const totalDays = Math.round((endObj - startObj) / (1000 * 60 * 60 * 24)) + 1;
+        const dayIndex = Math.round((curObj - startObj) / (1000 * 60 * 60 * 24)) + 1;
+        const isLongWeekend = totalDays >= 2;
+        const holidayTitle = (match.text || '').split('\n')[0] || '連續假期';
+
+        return {
+            id: match.id,
+            name: holidayTitle,
+            holidayName: holidayTitle,
+            streakName: holidayTitle,
+            start: match.start,
+            end: match.end || match.start,
+            totalDays: totalDays,
+            dayIndex: dayIndex,
+            isLongWeekend: isLongWeekend,
+            isHoliday: true,
+            icon: (match.icon !== undefined && match.icon !== null) ? match.icon : '🏖️',
+            color: match.color
+        };
+    }
+
     /* ================= IndexedDB 核心封裝 ================= */
     const DB_NAME = 'BusinessCalendarDB';
     const DB_VERSION = 1;
@@ -1784,6 +2113,7 @@
             allowInput: true,
             onChange: function(selectedDates) {
                 updateModalLunarInfo(selectedDates);
+                updateModalHolidayInfo(selectedDates);
             }
         });
 
@@ -1845,13 +2175,13 @@
             container.classList.remove('d-none');
             container.classList.add('d-flex');
             let html = `<div class="lunar-header-line"><b>農曆：</b>${info.gzYear}(${info.shengXiao})年 ${info.lunarMonth}月${info.lunarDay}`;
-            if (info.jieQi) html += ` <span class="badge bg-primary ms-1">${info.jieQi}</span>`;
-            if (info.twFestivals && info.twFestivals.length > 0) html += ` <span class="badge bg-danger ms-1">${info.twFestivals.join('、')}</span>`;
+            if (info.jieQi) html += ` <span class="badge bg-primary ms-1 fs-6">${info.jieQi}</span>`;
+            if (info.twFestivals && info.twFestivals.length > 0) html += ` <span class="badge bg-danger ms-1 fs-6">${info.twFestivals.join('、')}</span>`;
             html += `</div>`;
             if (info.yi || info.ji) {
-                html += `<div class="mt-1" style="font-size: 0.88rem; line-height: 1.55;">`;
-                if (info.yi) html += `<span class="me-3 d-inline-block"><span class="lunar-yi-title">宜：</span><span class="lunar-yi-content">${info.yi}</span></span>`;
-                if (info.ji) html += `<span class="d-inline-block"><span class="lunar-ji-title">忌：</span><span class="lunar-ji-content">${info.ji}</span></span>`;
+                html += `<div class="mt-2" style="font-size: 1.02rem; line-height: 1.6;">`;
+                if (info.yi) html += `<div class="d-block"><span class="lunar-yi-title">宜：</span><span class="lunar-yi-content">${info.yi}</span></div>`;
+                if (info.ji) html += `<div class="d-block mt-0.5"><span class="lunar-ji-title">忌：</span><span class="lunar-ji-content">${info.ji}</span></div>`;
                 html += `</div>`;
             }
             el.innerHTML = html;
@@ -1862,7 +2192,28 @@
         }
     }
 
-    /* ================= 當日事件清單渲染 ================= */
+    function updateModalHolidayInfo(selectedDates) {
+        const container = document.getElementById('modalHolidayInfo');
+        const el = document.getElementById('modalHolidayText');
+        if (!selectedDates || selectedDates.length === 0) {
+            container.classList.remove('d-flex');
+            container.classList.add('d-none');
+            return;
+        }
+        const dStr = flatpickr.formatDate(selectedDates[0], "Y-m-d");
+        const holidayInfo = getHolidayAndLongWeekendInfo(dStr);
+        if (holidayInfo) {
+            container.classList.remove('d-none');
+            container.classList.add('d-flex');
+            const iconPart = holidayInfo.icon ? `${holidayInfo.icon} ` : '';
+            el.innerHTML = `<span>${iconPart}<b>${escapeHtml(holidayInfo.holidayName)}</b> ${holidayInfo.isLongWeekend ? `（連假 ${holidayInfo.totalDays} 天）` : '（自訂假期）'}</span>`;
+        } else {
+            container.classList.remove('d-flex');
+            container.classList.add('d-none');
+        }
+    }
+
+    /* ================= 當日事件清單渲染 (僅顯示上方連假資訊，不重複出現在下方列表) ================= */
     function renderSideEventsList() {
         if (!selectedDateStr) return;
         
@@ -1877,6 +2228,36 @@
         
         const isToday = flatpickr.formatDate(new Date(), "Y-m-d") === selectedDateStr;
         document.getElementById('sideSelectedDateSub').textContent = isToday ? '🌟 今天' : '已選擇日期';
+
+        // 檢查當日連假資訊 (上方唯一顯示卡片，附帶編輯與刪除功能)
+        const holidayBox = document.getElementById('sideHolidayBox');
+        const holidayText = document.getElementById('sideHolidayText');
+        const holidayInfo = getHolidayAndLongWeekendInfo(selectedDateStr);
+
+        if (holidayInfo) {
+            holidayBox.classList.remove('d-none');
+            const iconSpan = holidayInfo.icon ? `<span class="me-1">${holidayInfo.icon}</span>` : '';
+            let hHtml = `
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="fw-bold fs-6">${iconSpan}${escapeHtml(holidayInfo.holidayName)}</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge ${holidayInfo.isLongWeekend ? 'bg-danger' : 'bg-warning text-dark'}">${holidayInfo.isLongWeekend ? `連假 ${holidayInfo.totalDays} 天` : '假期'}</span>
+                        <div class="side-event-actions ms-1">
+                            <button class="btn btn-custom-outline btn-sm py-0 px-2" title="編輯連假" onclick="openModalForEdit('${holidayInfo.id}')">
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm py-0 px-2" title="刪除連假" onclick="quickDeleteEvent('${holidayInfo.id}')">
+                                <i class="bi bi-trash3-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                ${holidayInfo.isLongWeekend ? `<div class="mt-1 small fw-bold opacity-85"><i class="bi bi-calendar2-range me-1"></i>連假進度：第 ${holidayInfo.dayIndex} 天 / 共 ${holidayInfo.totalDays} 天（${holidayInfo.start} ~ ${holidayInfo.end}）</div>` : ''}
+            `;
+            holidayText.innerHTML = hHtml;
+        } else {
+            holidayBox.classList.add('d-none');
+        }
 
         const lunarBox = document.getElementById('sideLunarBox');
         const lunarText = document.getElementById('sideLunarText');
@@ -1903,24 +2284,33 @@
             lunarBox.classList.add('d-none');
         }
 
-        const dayEvents = events.filter(evt => selectedDateStr >= evt.start && selectedDateStr <= (evt.end || evt.start));
+        // 關鍵過濾：排除已在上方區塊顯示的連假事件 (!evt.isHoliday)，避免重複顯示且佔用空間
+        const dayEvents = events.filter(evt => selectedDateStr >= evt.start && selectedDateStr <= (evt.end || evt.start) && !evt.isHoliday);
         
         const badge = document.getElementById('sideEventBadge');
-        badge.textContent = dayEvents.length;
+        badge.textContent = dayEvents.length + (holidayInfo ? 1 : 0);
 
         const listContainer = document.getElementById('sideEventsList');
         listContainer.innerHTML = '';
 
         if (dayEvents.length === 0) {
-            listContainer.innerHTML = `
-                <div class="text-center py-5">
-                    <i class="bi bi-calendar-check opacity-25" style="font-size: 3rem;"></i>
-                    <p class="text-muted fw-bold mt-2 mb-3" style="font-size: 0.95rem;">本日尚無排定行程</p>
-                    <button class="btn btn-primary-custom btn-sm" onclick="openModalForNew('${selectedDateStr}')">
-                        <i class="bi bi-plus-circle"></i> 新增當日行程
-                    </button>
-                </div>
-            `;
+            if (!holidayInfo) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="bi bi-calendar-check opacity-25" style="font-size: 3rem;"></i>
+                        <p class="text-muted fw-bold mt-2 mb-3" style="font-size: 0.95rem;">本日尚無排定行程</p>
+                        <button class="btn btn-primary-custom btn-sm" onclick="openModalForNew('${selectedDateStr}')">
+                            <i class="bi bi-plus-circle"></i> 新增當日行程
+                        </button>
+                    </div>
+                `;
+            } else {
+                listContainer.innerHTML = `
+                    <div class="text-center py-4">
+                        <p class="text-muted fw-bold m-0 opacity-75" style="font-size: 0.92rem;">本日除連假外無其他排定行程</p>
+                    </div>
+                `;
+            }
             return;
         }
 
@@ -1932,9 +2322,14 @@
             const isMultiDay = evt.end && evt.end !== evt.start;
             const rangeStr = isMultiDay ? `${evt.start} ~ ${evt.end}` : evt.start;
 
-            let iconHtml = evt.icon && evt.icon.startsWith('bi-') 
-                ? `<i class="bi ${evt.icon} me-1"></i>` 
-                : `<span class="me-1">${escapeHtml(evt.icon || '📌')}</span>`;
+            let iconHtml = '';
+            if (evt.icon && evt.icon.startsWith('bi-')) {
+                iconHtml = `<i class="bi ${evt.icon} me-1"></i>`;
+            } else if (evt.icon) {
+                iconHtml = `<span class="me-1">${escapeHtml(evt.icon)}</span>`;
+            } else if (evt.icon === undefined) {
+                iconHtml = `<span class="me-1">📌</span>`;
+            }
 
             card.innerHTML = `
                 <div class="d-flex justify-content-between align-items-start gap-2">
@@ -2106,13 +2501,33 @@
                     cell.classList.add('selected-day');
                 }
                 
+                const holidayInfo = getHolidayAndLongWeekendInfo(dateString);
+                if (holidayInfo) {
+                    cell.classList.add('holiday-cell');
+                    if (holidayInfo.isLongWeekend) {
+                        cell.classList.add('holiday-streak-cell');
+                    }
+                }
+
                 const topRow = document.createElement('div');
                 topRow.className = 'day-cell-top';
 
+                const dateLeftBox = document.createElement('div');
+                dateLeftBox.className = 'd-flex align-items-center gap-1';
+
                 const dateNum = document.createElement('div');
-                dateNum.className = 'date-number';
+                dateNum.className = 'date-number' + (holidayInfo ? ' text-holiday' : '');
                 dateNum.textContent = cDay;
-                topRow.appendChild(dateNum);
+                dateLeftBox.appendChild(dateNum);
+
+                if (holidayInfo && !isOtherMonth) {
+                    const holidayMiniBadge = document.createElement('span');
+                    holidayMiniBadge.className = 'holiday-mini-badge';
+                    holidayMiniBadge.textContent = holidayInfo.isLongWeekend ? '休' : '假';
+                    holidayMiniBadge.title = `${holidayInfo.isLongWeekend ? '【自訂連續假期】' : '【自訂假期】'}${holidayInfo.holidayName}`;
+                    dateLeftBox.appendChild(holidayMiniBadge);
+                }
+                topRow.appendChild(dateLeftBox);
 
                 if (showLunar) {
                     const lunarInfo = getLunarInfo(cYear, cMonth, cDay);
@@ -2126,7 +2541,34 @@
                 }
                 cell.appendChild(topRow);
 
-                const dayEvents = events.filter(evt => dateString >= evt.start && dateString <= (evt.end || evt.start));
+                if (holidayInfo && !isOtherMonth) {
+                    const streakBanner = document.createElement('div');
+                    streakBanner.className = 'holiday-streak-banner';
+                    if (holidayInfo.color) {
+                        streakBanner.style.borderLeft = `3.5px solid ${holidayInfo.color}`;
+                    }
+                    streakBanner.title = `${holidayInfo.isLongWeekend ? '【連續假期】' : '【自訂假期】'}${holidayInfo.streakName} (第 ${holidayInfo.dayIndex} 天 / 共 ${holidayInfo.totalDays} 天)`;
+                    
+                    const iconSpan = holidayInfo.icon ? `<span class="streak-icon">${holidayInfo.icon}</span>` : '';
+                    const nameSpan = `<span class="streak-title">${escapeHtml(holidayInfo.streakName)}</span>`;
+                    const countSpan = `<span class="streak-count">${holidayInfo.isLongWeekend ? `${holidayInfo.dayIndex}/${holidayInfo.totalDays}` : '連假'}</span>`;
+                    
+                    streakBanner.innerHTML = `${iconSpan}${nameSpan}${countSpan}`;
+
+                    streakBanner.onclick = (e) => {
+                        e.stopPropagation();
+                        selectDate(dateString, true);
+                    };
+                    streakBanner.ondblclick = (e) => {
+                        e.stopPropagation();
+                        selectDate(dateString, false);
+                        openModalForEdit(holidayInfo.id);
+                    };
+
+                    cell.appendChild(streakBanner);
+                }
+
+                const dayEvents = events.filter(evt => dateString >= evt.start && dateString <= (evt.end || evt.start) && !evt.isHoliday);
                 const isSingleEvent = dayEvents.length === 1;
                 const isMiniGrid = dayEvents.length >= 4;
 
@@ -2144,24 +2586,23 @@
                     let iconHtml = '';
                     if (evt.icon && evt.icon.startsWith('bi-')) {
                         iconHtml = `<i class="bi ${evt.icon} chip-icon"></i>`;
-                    } else {
-                        iconHtml = `<span class="chip-icon">${escapeHtml(evt.icon || '📌')}</span>`;
+                    } else if (evt.icon) {
+                        iconHtml = `<span class="chip-icon">${escapeHtml(evt.icon)}</span>`;
+                    } else if (evt.icon === undefined) {
+                        iconHtml = `<span class="chip-icon">📌</span>`;
                     }
                     
                     const rawLines = (evt.text || '').split('\n');
                     
                     if (isSingleEvent) {
-                        // 當天只有 1 個事件：全部文字完整顯示 (包含 Enter 換行與折行)
                         chip.classList.add('single-event-mode');
                         const safeText = escapeHtml(evt.text || '');
                         chip.innerHTML = `${iconHtml}<span class="full-text">${safeText}</span>`;
                     } else if (isMiniGrid) {
-                        // >= 4 個事件：縮圖九宮格模式
                         chip.classList.add('mini-grid-item');
                         const firstLineSafe = escapeHtml(rawLines[0] || '');
                         chip.innerHTML = `${iconHtml}<span class="line-text">${firstLineSafe}</span>`;
                     } else {
-                        // 2~3 個事件：單行節錄模式
                         chip.classList.add('multi-line-mode');
                         const firstLineSafe = escapeHtml(rawLines[0] || '');
                         chip.innerHTML = `<div class="event-line">${iconHtml}<span class="line-text">${firstLineSafe}</span></div>`;
@@ -2222,7 +2663,9 @@
         const dateToSet = dateString || selectedDateStr || flatpickr.formatDate(new Date(), "Y-m-d");
         dateRangePicker.setDate([dateToSet, dateToSet]);
         updateModalLunarInfo(dateRangePicker.selectedDates);
+        updateModalHolidayInfo(dateRangePicker.selectedDates);
         document.getElementById('noteTextarea').value = '';
+        document.getElementById('holidayCheckbox').checked = false;
         document.getElementById('highlightCheckbox').checked = false; 
         
         document.getElementById('colorBlue').checked = true;
@@ -2246,7 +2689,9 @@
         document.getElementById('currentEditId').value = evt.id; 
         dateRangePicker.setDate([evt.start, evt.end || evt.start]);
         updateModalLunarInfo(dateRangePicker.selectedDates);
+        updateModalHolidayInfo(dateRangePicker.selectedDates);
         document.getElementById('noteTextarea').value = evt.text;
+        document.getElementById('holidayCheckbox').checked = evt.isHoliday || false;
         document.getElementById('highlightCheckbox').checked = evt.isHighlighted || false; 
         
         const colorRadio = document.querySelector(`input[name="noteColor"][value="${evt.color}"]`);
@@ -2281,22 +2726,18 @@
         document.getElementById('appTitleBtn').onclick = promptEditTitle;
         document.getElementById('helpBtn').onclick = openHelpModal;
 
-        // 記事本 模式切換
         document.getElementById('memoToggleBtn').onclick = () => {
             toggleMemoMode();
         };
 
-        // 右側收合按鈕
         document.getElementById('memoCollapseBtn').onclick = () => {
             applyMemoCollapseState(true);
         };
 
-        // 展開側條點擊
         document.getElementById('memoCollapsedBar').onclick = () => {
             applyMemoCollapseState(false);
         };
 
-        // 當日事件分頁快捷新增按鈕
         document.getElementById('sideAddEventBtn').onclick = () => {
             openModalForNew(selectedDateStr);
         };
@@ -2370,7 +2811,6 @@
             const keyLower = e.key.toLowerCase();
             const isCtrlOrCmd = e.ctrlKey || e.metaKey;
 
-            // Help 說明快捷鍵 (F1 或 ? 或 Alt + H)
             if (e.key === 'F1' || e.key === '?' || (e.altKey && keyLower === 'h')) {
                 e.preventDefault();
                 openHelpModal();
@@ -2381,35 +2821,30 @@
                 return;
             }
 
-            // 備份匯出 (Ctrl + S 或 Alt + E)
             if ((isCtrlOrCmd && keyLower === 's') || (e.altKey && keyLower === 'e')) {
                 e.preventDefault();
                 triggerExport();
                 return;
             }
 
-            // 匯入資料 (Ctrl + O 或 Alt + I)
             if ((isCtrlOrCmd && keyLower === 'o') || (e.altKey && keyLower === 'i')) {
                 e.preventDefault();
                 triggerImport();
                 return;
             }
 
-            // 新增行程 (Alt + N 或 Ctrl + N)
             if ((e.altKey && keyLower === 'n') || (isCtrlOrCmd && keyLower === 'n')) {
                 e.preventDefault();
                 openModalForNew(selectedDateStr);
                 return;
             }
 
-            // 側邊面板收合/展開 (Ctrl + M 或 Cmd + M)
             if (isCtrlOrCmd && (keyLower === 'm' || e.code === 'KeyM')) {
                 e.preventDefault();
                 applyMemoCollapseState(!isMemoCollapsed);
                 return;
             }
 
-            // 切換右側 Tab 分頁 (Alt + 1: 當日事件, Alt + 2: 記事本)
             if (e.altKey && (e.key === '1' || e.code === 'Digit1')) {
                 e.preventDefault();
                 if (isMemoCollapsed) applyMemoCollapseState(false);
@@ -2423,35 +2858,30 @@
                 return;
             }
 
-            // 開啟/關閉農民曆 (Alt + L)
             if (e.altKey && keyLower === 'l') {
                 e.preventDefault();
                 toggleLunarDisplay();
                 return;
             }
 
-            // 刪除舊紀錄 (Alt + D)
             if (e.altKey && keyLower === 'd') {
                 e.preventDefault();
                 triggerDeleteOld();
                 return;
             }
 
-            // 清空所有資料 (Ctrl + Shift + Delete)
             if (isCtrlOrCmd && e.shiftKey && (e.key === 'Delete' || e.code === 'Delete')) {
                 e.preventDefault();
                 triggerClearAll();
                 return;
             }
 
-            // 切換深淺模式 (Alt + J)
             if (e.altKey && keyLower === 'j') {
                 e.preventDefault();
                 toggleDarkMode();
                 return;
             }
 
-            // 自訂行事曆名稱 (F2)
             if (e.key === 'F2') {
                 e.preventDefault();
                 promptEditTitle();
@@ -2462,7 +2892,6 @@
                 return;
             }
 
-            // 日曆導航 (PageUp: 上月, PageDown: 下月, Home: 回今日)
             let changed = false;
             if (e.key === 'PageDown') {
                 currentDate.setMonth(currentDate.getMonth() + 1);
@@ -2597,15 +3026,16 @@
                 icon = customVal ? customVal : '📌';
             }
 
+            const isHoliday = document.getElementById('holidayCheckbox').checked;
             const isHighlighted = document.getElementById('highlightCheckbox').checked;
             
             if (!text) return swalWithBootstrapButtons.fire({ icon: 'warning', text: '請輸入內容' });
             
             if (id) {
                 const index = events.findIndex(e => e.id === id);
-                events[index] = { id, start, end, text, color, icon, isHighlighted }; 
+                events[index] = { id, start, end, text, color, icon, isHighlighted, isHoliday }; 
             } else {
-                events.push({ id: generateId(), start, end, text, color, icon, isHighlighted }); 
+                events.push({ id: generateId(), start, end, text, color, icon, isHighlighted, isHoliday }); 
             }
             await saveNotesToDB(); 
             renderCalendar(); 
