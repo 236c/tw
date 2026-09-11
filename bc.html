@@ -50,22 +50,23 @@
             --modal-lunar-ji-text: #991b1b;
         }
 
+        /* 暗黑風格配色強化 (高清晰純白與亮色系) */
         body.theme-dark {
             --bg-body: #0f172a;
             --bg-surface: #1e293b;
             --bg-header: #0b1120;
-            --border-color: #334155;
-            --text-main: #f8fafc; 
-            --text-muted: #94a3b8;
-            --primary-color: #60a5fa;
+            --border-color: #475569;
+            --text-main: #ffffff; 
+            --text-muted: #e2e8f0; 
+            --primary-color: #38bdf8;
             --today-bg: #172554;
-            --weekend-sat: #34d399;
+            --weekend-sat: #4ade80;
             --weekend-sun: #f87171;
-            --weekend-sat-bg: rgba(52, 211, 153, 0.08);
+            --weekend-sat-bg: rgba(74, 222, 128, 0.08);
             --weekend-sun-bg: rgba(248, 113, 113, 0.08);
             --chip-shadow: rgba(0,0,0,0.4);
-            --lunar-highlight-bg: rgba(96, 165, 250, 0.2);
-            --lunar-highlight-text: #93c5fd;
+            --lunar-highlight-bg: rgba(56, 189, 248, 0.2);
+            --lunar-highlight-text: #bae6fd;
 
             --holiday-text: #f87171;
             --holiday-streak-border: #f87171;
@@ -75,15 +76,131 @@
 
             --modal-lunar-bg: #1e293b;
             --modal-lunar-border: #475569;
-            --modal-lunar-text: #f1f5f9;
+            --modal-lunar-text: #f8fafc;
             --modal-lunar-yi-title: #4ade80;
-            --modal-lunar-yi-text: #86efac;
+            --modal-lunar-yi-text: #bbf7d0;
             --modal-lunar-ji-title: #f87171;
-            --modal-lunar-ji-text: #fca5a5;
+            --modal-lunar-ji-text: #fecaca;
         }
 
-        body.theme-dark .text-primary {
-            color: #60a5fa !important;
+        body.theme-dark .app-title {
+            color: #ffffff !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        body.theme-dark .app-title i.bi-calendar3-range {
+            color: #38bdf8 !important;
+        }
+        body.theme-dark .app-title .edit-title-icon {
+            color: #94a3b8 !important;
+        }
+        body.theme-dark .app-title:hover {
+            background-color: #1e293b;
+        }
+
+        body.theme-dark .text-primary,
+        body.theme-dark #monthYearDisplay .text-primary {
+            color: #7dd3fc !important;
+            font-weight: 800;
+        }
+        body.theme-dark .month-title {
+            color: #ffffff !important;
+        }
+
+        body.theme-dark .nav-segmented-control {
+            background-color: #1e293b;
+            border-color: #475569;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+        body.theme-dark .btn-nav-seg {
+            color: #ffffff !important;
+        }
+        body.theme-dark .btn-nav-seg:hover {
+            background: #334155;
+            color: #ffffff !important;
+        }
+        body.theme-dark .btn-nav-seg.btn-nav-today {
+            background: #0f172a;
+            border: 1px solid #38bdf8;
+            color: #ffffff !important;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+        }
+        body.theme-dark .btn-nav-seg.btn-nav-today::before {
+            border-color: #38bdf8 !important;
+        }
+        body.theme-dark .btn-nav-seg.btn-nav-today:hover {
+            background: #172554;
+            color: #ffffff !important;
+            border-color: #7dd3fc;
+        }
+
+        body.theme-dark .btn-custom-outline {
+            color: #ffffff !important;
+            border-color: #475569;
+            background: #1e293b;
+        }
+        body.theme-dark .btn-custom-outline i,
+        body.theme-dark .btn-custom-outline span {
+            color: #ffffff !important;
+        }
+        body.theme-dark .btn-custom-outline:hover {
+            color: #ffffff !important;
+            background: #334155;
+            border-color: #64748b;
+        }
+        body.theme-dark .btn-custom-outline.active-tool {
+            background-color: #172554 !important;
+            border-color: #38bdf8 !important;
+            color: #38bdf8 !important;
+        }
+        body.theme-dark .btn-custom-outline.active-tool i,
+        body.theme-dark .btn-custom-outline.active-tool span {
+            color: #38bdf8 !important;
+        }
+
+        body.theme-dark #themeSelector {
+            background-color: #1e293b !important;
+            color: #ffffff !important;
+            border-color: #475569 !important;
+        }
+
+        body.theme-dark .side-tab-buttons {
+            background: #0b1120;
+            border-color: #475569;
+        }
+        body.theme-dark .side-tab-btn {
+            color: #ffffff !important;
+        }
+        body.theme-dark .side-tab-btn i {
+            color: #ffffff !important;
+        }
+        body.theme-dark .side-tab-btn:hover {
+            background: #334155;
+            color: #ffffff !important;
+        }
+        body.theme-dark .side-tab-btn.active {
+            background-color: #2563eb !important;
+            color: #ffffff !important;
+        }
+
+        body.theme-dark .text-muted {
+            color: #cbd5e1 !important;
+        }
+        body.theme-dark .side-event-meta {
+            color: #cbd5e1 !important;
+        }
+        body.theme-dark .day-header {
+            color: #f1f5f9;
+        }
+        body.theme-dark .lunar-tag {
+            color: #e2e8f0;
+        }
+        body.theme-dark .memo-collapsed-bar .collapsed-title {
+            color: #ffffff;
+        }
+        body.theme-dark kbd {
+            background-color: #1e293b;
+            color: #ffffff;
+            border-color: #475569;
         }
 
         body.theme-japanese {
@@ -203,7 +320,15 @@
 
         .nav-title { grid-area: title; margin: 0; }
         .nav-month { grid-area: month; display: flex; align-items: center; gap: 14px; }
-        .nav-tools { grid-area: tools; display: flex; align-items: center; gap: 8px; justify-self: center; }
+        
+        /* 關鍵修正：靠右固定對齊，徹底避免被左側長度牽動 */
+        .nav-tools { 
+            grid-area: tools; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            justify-self: end; 
+        }
         .nav-add   { grid-area: add; justify-self: end; }
 
         .app-title { 
@@ -236,9 +361,17 @@
             color: var(--primary-color);
         }
 
-        .month-title { font-weight: 800; font-size: 1.38rem; margin: 0; color: var(--text-main); white-space: nowrap; }
+        /* 關鍵修正：設定最小寬度，避免有無農曆年字串時造成按鈕晃動 */
+        .month-title { 
+            font-weight: 800; 
+            font-size: 1.38rem; 
+            margin: 0; 
+            color: var(--text-main); 
+            white-space: nowrap; 
+            min-width: 240px; 
+        }
 
-        /* ================= 商務分段控制器與 Raycast 儀表板微徽章「今日」按鍵 ================= */
+        /* 商務分段控制器 */
         .nav-segmented-control {
             display: inline-flex;
             align-items: center;
@@ -274,7 +407,6 @@
             transform: scale(0.95);
         }
 
-        /* 選項 C：Raycast / 儀表板微徽章風「今日」按鍵 */
         .btn-nav-seg.btn-nav-today {
             color: var(--text-main) !important;
             font-weight: 800;
@@ -291,7 +423,6 @@
             transition: all 0.18s ease;
         }
 
-        /* 迷你精工日曆幾何微徽章 */
         .btn-nav-seg.btn-nav-today::before {
             content: '';
             display: inline-block;
@@ -317,28 +448,6 @@
         }
         .btn-nav-seg.btn-nav-today:active {
             transform: translateY(0.5px) scale(0.97);
-        }
-
-        /* 深色模式適應 */
-        body.theme-dark .nav-segmented-control {
-            background-color: #0b1120;
-            border-color: #334155;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(0,0,0,0.4);
-        }
-        body.theme-dark .btn-nav-seg.btn-nav-today {
-            background: #1e293b;
-            border: 1px solid #334155;
-            color: #93c5fd !important;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-        }
-        body.theme-dark .btn-nav-seg.btn-nav-today::before {
-            border-color: #60a5fa;
-        }
-        body.theme-dark .btn-nav-seg.btn-nav-today:hover {
-            background: var(--today-bg);
-            color: #ffffff !important;
-            border-color: #60a5fa;
-            box-shadow: 0 2px 8px rgba(96, 165, 250, 0.25);
         }
 
         .btn-custom-outline {
@@ -381,14 +490,14 @@
         }
 
         body.theme-dark .btn-primary-custom {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
             color: #ffffff !important;
-            box-shadow: 0 2px 12px rgba(59, 130, 246, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            box-shadow: 0 2px 12px rgba(56, 189, 248, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
         }
         body.theme-dark .btn-primary-custom:hover {
-            background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%) !important;
-            box-shadow: 0 4px 18px rgba(96, 165, 250, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+            background: linear-gradient(135deg, #7dd3fc 0%, #0369a1 100%) !important;
+            box-shadow: 0 4px 18px rgba(56, 189, 248, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.55);
         }
 
         /* ================= 行事曆主佈局 ================= */
@@ -485,7 +594,7 @@
         .day-cell.other-month:hover { background-color: var(--bg-header); opacity: 0.85; }
         .day-cell.other-month .date-number { color: var(--text-muted); font-weight: 600; }
 
-        /* ================= 國定假日與連續假期視覺樣式 ================= */
+        /* 國定假日與連續假期視覺樣式 */
         .day-cell.holiday-cell,
         .day-cell.holiday-streak-cell {
             border-top: 3.5px solid var(--holiday-streak-border) !important;
@@ -513,7 +622,6 @@
             border-color: rgba(248, 113, 113, 0.4);
         }
 
-        /* 連假彩帶橫幅 (Streak Banner) - 統一配置色 */
         .holiday-streak-banner {
             display: flex;
             align-items: center;
@@ -558,7 +666,6 @@
             color: #fecaca; 
         }
 
-        /* 側欄國定假日詳細卡片 */
         .holiday-detail-box {
             background-color: #fff1f2;
             border: 1px solid #fecdd3;
@@ -572,7 +679,7 @@
             color: #fecdd3;
         }
 
-        /* ================= 「今日」專屬標記 ================= */
+        /* 「今日」專屬標記 */
         .day-cell.today .date-number { 
             color: #ffffff !important; 
             background-color: var(--primary-color) !important; 
@@ -590,9 +697,10 @@
         }
         body.theme-dark .day-cell.today .date-number {
             color: #0f172a !important;
+            background-color: #38bdf8 !important;
         }
 
-        /* ================= 360° 旋轉流光巡邊選取框 (Rotating Border Beam) ================= */
+        /* 360° 旋轉流光巡邊選取框 */
         .day-cell.selected-day {
             position: relative;
             background-color: var(--today-bg) !important;
@@ -603,13 +711,11 @@
             box-shadow: 0 0 16px rgba(37, 99, 235, 0.26) !important;
         }
 
-        /* 確保格子內部的標籤與內容浮於旋轉動畫層之上 */
         .day-cell.selected-day > * {
             position: relative;
             z-index: 4;
         }
 
-        /* 旋轉 360° 錐形激光流光 (Conic Rotating Light Beam) */
         .day-cell.selected-day::before {
             content: '';
             position: absolute;
@@ -631,7 +737,6 @@
             pointer-events: none;
         }
 
-        /* 內部遮罩層：精準內縮 2.5px，留出流動巡邊的外圍光環 */
         .day-cell.selected-day::after {
             content: '';
             position: absolute;
@@ -642,30 +747,24 @@
             pointer-events: none;
         }
 
-        /* 360 度無縫旋轉關鍵幀 */
         @keyframes rotateSelectedBorderBeam {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        /* 暗黑風格專屬高反差旋轉流光 */
         body.theme-dark .day-cell.selected-day::before {
             background: conic-gradient(
                 from 0deg,
                 transparent 0deg,
                 transparent 210deg,
-                rgba(96, 165, 250, 0.25) 250deg,
+                rgba(56, 189, 248, 0.25) 250deg,
                 var(--primary-color) 300deg,
-                #bfdbfe 340deg,
+                #bae6fd 340deg,
                 #ffffff 360deg
             );
         }
         body.theme-dark .day-cell.selected-day {
-            box-shadow: 0 0 20px rgba(96, 165, 250, 0.38) !important;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4) !important;
         }
 
         .day-cell-top {
@@ -988,7 +1087,6 @@
             gap: 12px;
         }
 
-        /* 整合後的當日標頭與農民曆資訊容器 */
         .side-date-header {
             flex-shrink: 0;
             padding: 12px 16px;
@@ -1006,7 +1104,6 @@
             width: 100%;
         }
 
-        /* 整合農民曆區塊樣式 */
         .side-lunar-integrated {
             background-color: var(--modal-lunar-bg);
             border: 1px dashed var(--modal-lunar-border);
@@ -1100,7 +1197,7 @@
             display: flex !important;
         }
 
-        /* ================= 彈窗與字體放大優化 (Modal Fonts & Layout) ================= */
+        /* ================= 彈窗與字體優化 ================= */
         #noteModal .modal-dialog {
             max-width: 580px;
             max-height: 94vh;
@@ -1137,14 +1234,12 @@
         #noteModal .modal-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 4px; }
         body.theme-dark #noteModal .modal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); }
 
-        /* 表單標籤字體加大 */
         #noteModal .form-label {
             font-size: 1.05rem !important;
             font-weight: 800 !important;
             margin-bottom: 6px;
         }
 
-        /* 日期輸入框字體加大 */
         #dateRange {
             font-size: 1.14rem !important;
             padding: 8px 12px !important;
@@ -1152,7 +1247,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* 農民曆資訊方塊字體加大 */
         .modal-lunar-box {
             background-color: var(--modal-lunar-bg) !important;
             border: 1px dashed var(--modal-lunar-border) !important;
@@ -1194,20 +1288,17 @@
             font-size: 0.98rem;
         }
 
-        /* 連假提示字體加大 */
         #modalHolidayInfo {
             font-size: 1.02rem !important;
             padding: 8px 12px !important;
         }
 
-        /* 自訂圖示輸入框加大 */
         #customIconInput {
             height: 32px !important;
             font-size: 0.95rem !important;
             border-radius: 6px;
         }
 
-        /* 圖示選擇器 */
         .icon-selector { 
             display: grid; 
             grid-template-columns: repeat(8, 1fr); 
@@ -1237,7 +1328,6 @@
             box-shadow: 0 3px 8px rgba(0,0,0,0.18); 
         }
         
-        /* ================= 選擇顏色：單行色塊選取條 (Single Strip) ================= */
         .color-selector { 
             display: flex; 
             align-items: center; 
@@ -1310,7 +1400,6 @@
             background-color: var(--base-color);
         }
 
-        /* 行程內容文字輸入框字體加大 */
         #noteTextarea {
             font-size: 1.12rem !important;
             line-height: 1.55 !important;
@@ -1318,7 +1407,6 @@
             border-radius: 8px;
         }
 
-        /* 功能開關 */
         .form-switch .form-check-input {
             width: 2.3em !important;
             height: 1.25em !important;
@@ -1330,7 +1418,6 @@
             user-select: none;
         }
 
-        /* 彈窗按鈕字體加大 */
         #noteModal .modal-footer .btn {
             font-size: 1.02rem !important;
             padding: 8px 22px !important;
@@ -1338,7 +1425,6 @@
             font-weight: 800 !important;
         }
 
-        /* 快捷鍵說明視窗樣式 */
         .shortcut-group-title {
             font-size: 0.95rem;
             font-weight: 800;
@@ -1451,7 +1537,7 @@
             .nav-tools { -ms-overflow-style: none; scrollbar-width: none; }
             
             .app-title { font-size: 1.15rem; }
-            .month-title { font-size: 1.2rem; }
+            .month-title { min-width: auto; font-size: 1.2rem; }
             #topAddEventBtn { padding: 6px 12px; font-size: 0.9rem; }
         }
 
@@ -1496,7 +1582,8 @@
     </div>
     
     <div class="nav-tools">
-        <select class="form-select form-select-sm shadow-none fw-bold" id="themeSelector" style="width: auto; font-size: 0.9rem; background-color: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);">
+        <!-- 風格下拉選單設定固定寬度 (136px)，右側按鍵群位置不再浮動 -->
+        <select class="form-select form-select-sm shadow-none fw-bold" id="themeSelector" style="width: 136px; flex-shrink: 0; font-size: 0.9rem; background-color: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);">
             <option value="theme-default">👔 商務預設</option>
             <option value="theme-fresh">🌿 綠意清新</option>
             <option value="theme-sakura">🌸 櫻花浪漫</option>
@@ -1567,20 +1654,20 @@
         <div class="calendar-grid" id="calendarBody"></div>
     </div>
 
-    <!-- 右側分頁面板 (事件列表 / 記事本) -->
+    <!-- 右側複合面板 (預設切換為當日事件) -->
     <div class="card-container memo-wrapper" id="sideMemoContainer">
         <div class="side-tab-header">
             <div class="side-tab-buttons">
-                <button class="side-tab-btn" id="tabBtnEvents" onclick="switchSideTab('events')" title="切換至當日事件 (快捷鍵: Alt+1)">
+                <button class="side-tab-btn active" id="tabBtnEvents" onclick="switchSideTab('events')" title="切換至當日事件 (快捷鍵: Alt+1)">
                     <i class="bi bi-calendar-event"></i> 當日事件 <span class="badge rounded-pill bg-primary ms-1" id="sideEventBadge">0</span>
                 </button>
-                <button class="side-tab-btn active" id="tabBtnMemo" onclick="switchSideTab('memo')" title="切換至記事本 (快捷鍵: Alt+2)">
+                <button class="side-tab-btn" id="tabBtnMemo" onclick="switchSideTab('memo')" title="切換至記事本 (快捷鍵: Alt+2)">
                     <i class="bi bi-journal-text"></i> 記事本
                 </button>
             </div>
             <div class="d-flex align-items-center gap-1">
-                <!-- 記事本專用工具 -->
-                <div id="memoToolsGroup" class="d-flex align-items-center gap-1">
+                <!-- 記事本專用工具 (預設隱藏) -->
+                <div id="memoToolsGroup" class="d-flex align-items-center gap-1 d-none">
                     <button class="btn btn-custom-outline btn-sm py-0 px-2 fw-bold" id="memoToggleBtn" title="切換 編輯 / 連結模式" style="font-size: 0.82rem; height: 28px;">
                         <i class="bi bi-link-45deg"></i> <span id="memoToggleText">連結</span>
                     </button>
@@ -1594,10 +1681,9 @@
             </div>
         </div>
         
-        <!-- 當日事件 Page (日期與農民曆整合設計) -->
-        <div class="side-pane d-none" id="paneEvents">
+        <!-- 當日事件 Page (預設顯示) -->
+        <div class="side-pane" id="paneEvents">
             <div class="side-date-header">
-                <!-- 上方：日期標題與新增按鈕 -->
                 <div class="side-date-header-top">
                     <div>
                         <h6 class="m-0 fw-bold text-main" id="sideSelectedDateTitle" style="font-size: 1.05rem;">--</h6>
@@ -1608,25 +1694,20 @@
                     </button>
                 </div>
 
-                <!-- 國定假日與連假通知區塊 (包含直接編輯/刪除按鈕) -->
                 <div id="sideHolidayBox" class="holiday-detail-box px-3 py-2 rounded d-none">
                     <div id="sideHolidayText"></div>
                 </div>
 
-                <!-- 農民曆即時資訊區塊 (整合在頂部卡片內) -->
                 <div id="sideLunarBox" class="side-lunar-integrated d-none">
                     <div id="sideLunarText"></div>
                 </div>
             </div>
 
-            <!-- 事件卡片滾動區 -->
-            <div class="side-events-scroll" id="sideEventsList">
-                <!-- 動態注入行程 -->
-            </div>
+            <div class="side-events-scroll" id="sideEventsList"></div>
         </div>
 
-        <!-- 記事本 Page -->
-        <div class="side-pane" id="paneMemo">
+        <!-- 記事本 Page (預設隱藏) -->
+        <div class="side-pane d-none" id="paneMemo">
             <textarea id="sideMemoArea" placeholder="在此記錄您的臨時想法、待辦事項或網址連結...內容會自動儲存。"></textarea>
             <div id="sideMemoPreview" class="memo-preview-area d-none"></div>
         </div>
@@ -1634,7 +1715,7 @@
         <!-- 收合條 (Ctrl + M) -->
         <div class="memo-collapsed-bar" id="memoCollapsedBar" title="點擊展開 (快捷鍵: Ctrl+M)">
             <i class="bi bi-layout-sidebar-inset-reverse text-primary fs-5"></i>
-            <span class="collapsed-title" id="collapsedTitle">側邊面板</span>
+            <span class="collapsed-title" id="collapsedTitle">當日事件</span>
             <i class="bi bi-chevron-bar-left text-muted mt-auto mb-2" style="font-size: 1.1rem;"></i>
         </div>
     </div>
@@ -1652,7 +1733,6 @@
             <div class="modal-body">
                 <input type="hidden" id="currentEditId">
                 
-                <!-- 選擇日期區間 -->
                 <div class="mb-3">
                     <label class="form-label fw-bold opacity-85">🗓️ 選擇日期區間：</label>
                     <input type="text" class="form-control fw-bold" id="dateRange" placeholder="選擇日期區間" readonly>
@@ -1668,7 +1748,6 @@
                     </div>
                 </div>
                 
-                <!-- 選擇圖示 (包含無圖示選項) -->
 				<div class="mb-3">
 					<div class="d-flex justify-content-between align-items-center mb-1">
                         <label class="form-label fw-bold opacity-85 m-0">選擇圖示：</label>
@@ -1693,7 +1772,6 @@
 					</div>
 				</div>
 
-                <!-- 選擇顏色：典雅酒紅排首位 -->
                 <div class="mb-3">
                     <label class="form-label fw-bold opacity-85 mb-1">選擇顏色：</label>
                     <div class="color-selector" id="colorPicker">
@@ -1741,13 +1819,11 @@
                     </div>
                 </div>
                 
-                <!-- 行程內容輸入框 -->
                 <div class="mb-3">
                     <label class="form-label fw-bold opacity-85">行程內容：</label>
                     <textarea class="form-control fw-bold" id="noteTextarea" rows="3" placeholder="請輸入行程內容..."></textarea>
                 </div>
                 
-                <!-- 功能開關 -->
                 <div class="d-flex flex-column gap-2 pt-1">
                     <div class="form-check form-switch m-0 d-flex align-items-center">
                         <input class="form-check-input mt-0" type="checkbox" role="switch" id="holidayCheckbox" style="cursor: pointer;">
@@ -1763,7 +1839,6 @@
                         </label>
                     </div>
                 </div>
-
             </div>
             
             <div class="modal-footer d-flex justify-content-between">
@@ -1777,7 +1852,7 @@
     </div>
 </div>
 
-<!-- 快捷鍵與功能說明 Help Modal -->
+<!-- 快捷鍵說明 Help Modal -->
 <div class="modal fade" id="helpModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="background-color: var(--bg-surface); border-color: var(--border-color); border-radius: 14px;">
@@ -1857,7 +1932,8 @@
 
     let currentDate = new Date();
     let selectedDateStr = flatpickr.formatDate(new Date(), "Y-m-d"); 
-    let currentSideTab = localStorage.getItem(ACTIVE_TAB_KEY) || 'memo';
+    // 預設第一次使用設為 "當日事件"
+    let currentSideTab = localStorage.getItem(ACTIVE_TAB_KEY) || 'events';
     let events = []; 
     let noteModal;
     let helpModal;
@@ -2470,7 +2546,6 @@
         switchSideTab(currentSideTab);
         setupEventListeners();
 
-        // 檢查是否設定了自動從雲端網址載入資料
         const remoteUrl = localStorage.getItem(REMOTE_URL_KEY);
         const autoLoad = localStorage.getItem(REMOTE_AUTOLOAD_KEY) === 'true';
         if (autoLoad && remoteUrl) {
@@ -2577,7 +2652,6 @@
         const isToday = flatpickr.formatDate(new Date(), "Y-m-d") === selectedDateStr;
         document.getElementById('sideSelectedDateSub').textContent = isToday ? '🌟 今天' : '已選擇日期';
 
-        // 檢查當日連假資訊
         const holidayBox = document.getElementById('sideHolidayBox');
         const holidayText = document.getElementById('sideHolidayText');
         const holidayInfo = getHolidayAndLongWeekendInfo(selectedDateStr);
@@ -2607,7 +2681,6 @@
             holidayBox.classList.add('d-none');
         }
 
-        // 農民曆整合資訊顯示
         const lunarBox = document.getElementById('sideLunarBox');
         const lunarText = document.getElementById('sideLunarText');
 
@@ -2633,7 +2706,6 @@
             lunarBox.classList.add('d-none');
         }
 
-        // 排除已在上方顯示的連假事件
         const dayEvents = events.filter(evt => selectedDateStr >= evt.start && selectedDateStr <= (evt.end || evt.start) && !evt.isHoliday);
         
         const badge = document.getElementById('sideEventBadge');
@@ -3149,7 +3221,7 @@
             e.target.blur(); 
         };
         
-        /* ================= 全局鍵盤快捷鍵系統 ================= */
+        /* 全局鍵盤快捷鍵系統 */
         document.addEventListener('keydown', (e) => {
             const activeTag = document.activeElement.tagName.toLowerCase();
             const isSwalOpen = document.body.classList.contains('swal2-shown');
