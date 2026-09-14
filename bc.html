@@ -321,7 +321,6 @@
         .nav-title { grid-area: title; margin: 0; }
         .nav-month { grid-area: month; display: flex; align-items: center; gap: 14px; }
         
-        /* 關鍵修正：靠右固定對齊，徹底避免被左側長度牽動 */
         .nav-tools { 
             grid-area: tools; 
             display: flex; 
@@ -361,7 +360,6 @@
             color: var(--primary-color);
         }
 
-        /* 關鍵修正：設定最小寬度，避免有無農曆年字串時造成按鈕晃動 */
         .month-title { 
             font-weight: 800; 
             font-size: 1.38rem; 
@@ -1582,7 +1580,6 @@
     </div>
     
     <div class="nav-tools">
-        <!-- 風格下拉選單設定固定寬度 (136px)，右側按鍵群位置不再浮動 -->
         <select class="form-select form-select-sm shadow-none fw-bold" id="themeSelector" style="width: 136px; flex-shrink: 0; font-size: 0.9rem; background-color: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);">
             <option value="theme-default">👔 商務預設</option>
             <option value="theme-fresh">🌿 綠意清新</option>
@@ -1630,7 +1627,7 @@
     </div>
 
     <div class="nav-add">
-        <button class="btn btn-primary-custom btn-sm" id="topAddEventBtn" title="新增行程 (快捷鍵: Alt+N 或 Ctrl+N)">
+        <button class="btn btn-primary-custom btn-sm" id="topAddEventBtn" title="新增行程 (快捷鍵: 空白鍵 或 Alt+N)">
             <i class="bi bi-calendar-plus fs-6"></i> 
             <span class="d-none d-sm-inline">新增行程</span>
             <span class="d-inline d-sm-none">新增</span>
@@ -1689,7 +1686,7 @@
                         <h6 class="m-0 fw-bold text-main" id="sideSelectedDateTitle" style="font-size: 1.05rem;">--</h6>
                         <small class="text-muted fw-bold" id="sideSelectedDateSub" style="font-size: 0.84rem;">點選日曆格子切換日期</small>
                     </div>
-                    <button class="btn btn-primary-custom btn-sm py-1 px-3" id="sideAddEventBtn" title="新增這天的行程 (快捷鍵: Alt+N)">
+                    <button class="btn btn-primary-custom btn-sm py-1 px-3" id="sideAddEventBtn" title="新增這天的行程 (快捷鍵: 空白鍵 或 Alt+N)">
                         <i class="bi bi-plus-lg"></i> 新增
                     </button>
                 </div>
@@ -1866,7 +1863,8 @@
                 <div class="row g-4">
                     <div class="col-md-6">
                         <div class="shortcut-group-title"><i class="bi bi-lightning-charge"></i> 核心常用</div>
-                        <div class="shortcut-item"><span>新增行程</span><span><kbd>Alt + N</kbd> 或 <kbd>Ctrl + N</kbd></span></div>
+                        <div class="shortcut-item"><span>切換選取日期</span><span><kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></span></div>
+                        <div class="shortcut-item"><span>新增行程</span><span><kbd>空白鍵</kbd> 或 <kbd>Alt + N</kbd></span></div>
                         <div class="shortcut-item"><span>切換至 當日事件</span><span><kbd>Alt + 1</kbd></span></div>
                         <div class="shortcut-item"><span>切換至 記事本</span><span><kbd>Alt + 2</kbd></span></div>
                         <div class="shortcut-item"><span>收合 / 展開側面板</span><span><kbd>Ctrl + M</kbd></span></div>
@@ -1932,7 +1930,6 @@
 
     let currentDate = new Date();
     let selectedDateStr = flatpickr.formatDate(new Date(), "Y-m-d"); 
-    // 預設第一次使用設為 "當日事件"
     let currentSideTab = localStorage.getItem(ACTIVE_TAB_KEY) || 'events';
     let events = []; 
     let noteModal;
@@ -2872,6 +2869,29 @@
         }
     }
 
+    /* 支援鍵盤上下左右鍵切換日期 */
+    function moveSelectedDate(dayDelta) {
+        let baseDate = selectedDateStr ? new Date(selectedDateStr + 'T00:00:00') : new Date();
+        if (isNaN(baseDate.getTime())) baseDate = new Date();
+
+        baseDate.setDate(baseDate.getDate() + dayDelta);
+        const newDateStr = flatpickr.formatDate(baseDate, "Y-m-d");
+
+        const curMonth = currentDate.getMonth();
+        const curYear = currentDate.getFullYear();
+        const newMonth = baseDate.getMonth();
+        const newYear = baseDate.getFullYear();
+
+        selectedDateStr = newDateStr;
+
+        if (newMonth !== curMonth || newYear !== curYear) {
+            currentDate = new Date(newYear, newMonth, 1);
+            renderCalendar();
+        } else {
+            selectDate(newDateStr, false);
+        }
+    }
+
     function renderCalendar() {
         const calendarBody = document.getElementById('calendarBody');
         calendarBody.classList.add('calendar-transitioning');
@@ -3223,7 +3243,8 @@
         
         /* 全局鍵盤快捷鍵系統 */
         document.addEventListener('keydown', (e) => {
-            const activeTag = document.activeElement.tagName.toLowerCase();
+            const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+            const isEditable = document.activeElement && (document.activeElement.isContentEditable || ['input', 'textarea', 'select'].includes(activeTag));
             const isSwalOpen = document.body.classList.contains('swal2-shown');
             const isNoteModalOpen = document.getElementById('noteModal').classList.contains('show');
             const isHelpModalOpen = document.getElementById('helpModal').classList.contains('show');
@@ -3258,7 +3279,7 @@
                 return;
             }
 
-            if ((e.altKey && keyLower === 'n') || (isCtrlOrCmd && keyLower === 'n')) {
+            if (e.altKey && keyLower === 'n') {
                 e.preventDefault();
                 openModalForNew(selectedDateStr);
                 return;
@@ -3313,7 +3334,29 @@
                 return;
             }
 
-            if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') {
+            if (isEditable) {
+                return;
+            }
+
+            /* 空白鍵快速新增行程 */
+            if (e.key === ' ' || e.code === 'Space') {
+                e.preventDefault();
+                openModalForNew(selectedDateStr);
+                return;
+            }
+
+            /* 方向鍵切換日期 */
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+                e.preventDefault();
+                if (e.key === 'ArrowLeft') {
+                    moveSelectedDate(-1);
+                } else if (e.key === 'ArrowRight') {
+                    moveSelectedDate(1);
+                } else if (e.key === 'ArrowUp') {
+                    moveSelectedDate(-7);
+                } else if (e.key === 'ArrowDown') {
+                    moveSelectedDate(7);
+                }
                 return;
             }
 
