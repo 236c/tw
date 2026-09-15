@@ -40,17 +40,17 @@
             --holiday-banner-border: #fca5a5;
             --holiday-banner-text: #b91c1c;
 
-            /* 行程視窗農民曆說明專用色 */
+            /* 農民曆說明專用色 (宜: 翠綠 / 忌: 醒目紅) */
             --modal-lunar-bg: #f8fafc;
             --modal-lunar-border: #cbd5e1;
-            --modal-lunar-text: #1e293b;
+            --modal-lunar-text: #0f172a;
             --modal-lunar-yi-title: #15803d;
             --modal-lunar-yi-text: #166534;
             --modal-lunar-ji-title: #b91c1c;
             --modal-lunar-ji-text: #991b1b;
         }
 
-        /* 暗黑風格配色強化 (高清晰純白與亮色系) */
+        /* 暗黑風格配色強化 (高清晰純白與高對比色系) */
         body.theme-dark {
             --bg-body: #0f172a;
             --bg-surface: #1e293b;
@@ -74,13 +74,14 @@
             --holiday-banner-border: rgba(248, 113, 113, 0.5);
             --holiday-banner-text: #fecaca;
 
+            /* 暗黑模式高對比發光清晰色 */
             --modal-lunar-bg: #1e293b;
             --modal-lunar-border: #475569;
-            --modal-lunar-text: #f8fafc;
+            --modal-lunar-text: #ffffff;
             --modal-lunar-yi-title: #4ade80;
-            --modal-lunar-yi-text: #bbf7d0;
-            --modal-lunar-ji-title: #f87171;
-            --modal-lunar-ji-text: #fecaca;
+            --modal-lunar-yi-text: #a7f3d0;
+            --modal-lunar-ji-title: #fb7185;
+            --modal-lunar-ji-text: #fecdd3;
         }
 
         body.theme-dark .app-title {
@@ -222,6 +223,10 @@
             --modal-lunar-bg: #f8f6f2;
             --modal-lunar-border: #d6d3cb;
             --modal-lunar-text: #2f3d31;
+            --modal-lunar-yi-title: #226426;
+            --modal-lunar-yi-text: #2b6c2f;
+            --modal-lunar-ji-title: #991b1b;
+            --modal-lunar-ji-text: #991b1b;
         }
 
         body.theme-sakura {
@@ -243,6 +248,10 @@
             --modal-lunar-bg: #fff5f8;
             --modal-lunar-border: #f7b2ce;
             --modal-lunar-text: #4c1d2e;
+            --modal-lunar-yi-title: #15803d;
+            --modal-lunar-yi-text: #166534;
+            --modal-lunar-ji-title: #be123c;
+            --modal-lunar-ji-text: #9f1239;
         }
 
         body.theme-fresh {
@@ -264,6 +273,10 @@
             --modal-lunar-bg: #f3faf5;
             --modal-lunar-border: #c1decb;
             --modal-lunar-text: #143823;
+            --modal-lunar-yi-title: #15803d;
+            --modal-lunar-yi-text: #166534;
+            --modal-lunar-ji-title: #b91c1c;
+            --modal-lunar-ji-text: #991b1b;
         }
 
         /* ================= 核心排版 (一屏自適應 100vh Fit) ================= */
@@ -272,6 +285,15 @@
             margin: 0;
             padding: 0;
             overflow: hidden; 
+        }
+
+        @media (min-width: 993px) {
+            html.swal2-shown, body.swal2-shown {
+                height: 100% !important;
+                min-height: 100% !important;
+                overflow: hidden !important;
+                padding-right: 0 !important;
+            }
         }
 
         body {
@@ -369,7 +391,6 @@
             min-width: 240px; 
         }
 
-        /* 商務分段控制器 */
         .nav-segmented-control {
             display: inline-flex;
             align-items: center;
@@ -592,7 +613,6 @@
         .day-cell.other-month:hover { background-color: var(--bg-header); opacity: 0.85; }
         .day-cell.other-month .date-number { color: var(--text-muted); font-weight: 600; }
 
-        /* 國定假日與連續假期視覺樣式 */
         .day-cell.holiday-cell,
         .day-cell.holiday-streak-cell {
             border-top: 3.5px solid var(--holiday-streak-border) !important;
@@ -677,7 +697,6 @@
             color: #fecdd3;
         }
 
-        /* 「今日」專屬標記 */
         .day-cell.today .date-number { 
             color: #ffffff !important; 
             background-color: var(--primary-color) !important; 
@@ -698,7 +717,6 @@
             background-color: #38bdf8 !important;
         }
 
-        /* 360° 旋轉流光巡邊選取框 */
         .day-cell.selected-day {
             position: relative;
             background-color: var(--today-bg) !important;
@@ -1102,14 +1120,15 @@
             width: 100%;
         }
 
+        /* 側欄農民曆資訊盒排版與高清晰文字樣式 */
         .side-lunar-integrated {
             background-color: var(--modal-lunar-bg);
             border: 1px dashed var(--modal-lunar-border);
             color: var(--modal-lunar-text);
             border-radius: 8px;
-            padding: 9px 13px;
-            font-size: 0.94rem;
-            line-height: 1.55;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            line-height: 1.6;
             transition: all 0.2s ease;
         }
 
@@ -1245,50 +1264,55 @@
             letter-spacing: 0.5px;
         }
 
+        /* 農民曆資訊盒排版與文字高清晰強化 */
         .modal-lunar-box {
             background-color: var(--modal-lunar-bg) !important;
             border: 1px dashed var(--modal-lunar-border) !important;
             color: var(--modal-lunar-text) !important;
             border-radius: 8px;
-            font-size: 1.02rem !important; 
-            line-height: 1.6;
-            padding: 10px 14px !important;
+            font-size: 0.94rem !important; 
+            line-height: 1.55;
+            padding: 8px 12px !important;
             transition: all 0.2s ease;
         }
+
         .modal-lunar-box .lunar-header-line,
         .side-lunar-integrated .lunar-header-line {
             color: var(--modal-lunar-text) !important;
             font-weight: 800;
-            font-size: 1.04rem !important;
+            font-size: 0.96rem !important;
+            letter-spacing: 0.02em;
         }
-        .modal-lunar-box .lunar-yi-title,
-        .side-lunar-integrated .lunar-yi-title {
+
+        /* 宜 / 忌 標題與說明文字清晰度樣式 (高字重、清晰字距與色彩) */
+        .lunar-yi-title {
             color: var(--modal-lunar-yi-title) !important;
-            font-weight: 900;
-            font-size: 1rem;
+            font-weight: 900 !important;
+            font-size: 0.96rem !important;
+            letter-spacing: 0.025em;
         }
-        .modal-lunar-box .lunar-yi-content,
-        .side-lunar-integrated .lunar-yi-content {
+        .lunar-yi-content {
             color: var(--modal-lunar-yi-text) !important;
-            font-weight: 700;
-            font-size: 0.98rem;
+            font-weight: 800 !important;
+            font-size: 0.95rem !important;
+            letter-spacing: 0.02em;
         }
-        .modal-lunar-box .lunar-ji-title,
-        .side-lunar-integrated .lunar-ji-title {
+        .lunar-ji-title {
             color: var(--modal-lunar-ji-title) !important;
-            font-weight: 900;
-            font-size: 1rem;
+            font-weight: 900 !important;
+            font-size: 0.96rem !important;
+            letter-spacing: 0.025em;
         }
-        .modal-lunar-box .lunar-ji-content,
-        .side-lunar-integrated .lunar-ji-content {
+        .lunar-ji-content {
             color: var(--modal-lunar-ji-text) !important;
-            font-weight: 700;
-            font-size: 0.98rem;
+            font-weight: 800 !important;
+            font-size: 0.95rem !important;
+            letter-spacing: 0.02em;
         }
 
         #modalHolidayInfo {
-            font-size: 1.02rem !important;
-            padding: 8px 12px !important;
+            font-size: 0.95rem !important;
+            padding: 7px 11px !important;
         }
 
         #customIconInput {
@@ -1297,40 +1321,61 @@
             border-radius: 6px;
         }
 
+        /* 選擇圖示：單排橫向放大設計 */
         .icon-selector { 
-            display: grid; 
-            grid-template-columns: repeat(8, 1fr); 
+            display: flex; 
+            align-items: center; 
+            justify-content: flex-start;
             gap: 8px; 
             margin-top: 4px;
+            padding: 5px 2px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
         }
+        .icon-selector::-webkit-scrollbar { display: none; }
+
+        @media (min-width: 540px) {
+            .icon-selector {
+                justify-content: space-between;
+                gap: 0;
+            }
+        }
+
         .icon-selector input[type="radio"], .color-selector input[type="radio"] { display: none; }
+        
         .icon-selector label { 
-            width: 100%; 
-            aspect-ratio: 1; 
-            max-width: 48px;
-            margin: 0 auto;
+            width: 35px; 
+            height: 35px;
+            flex: 0 0 35px;
+            border-radius: 50%; 
+            cursor: pointer; 
+            border: 1.5px solid var(--border-color); 
             display: inline-flex; 
             align-items: center; 
             justify-content: center; 
-            border: 1.5px solid var(--border-color); 
-            border-radius: 50%; 
-            cursor: pointer; 
-            font-size: 1.55rem !important; 
-            transition: all 0.16s ease; 
             background: var(--bg-surface); 
+            font-size: 1.25rem !important; 
+            transition: all 0.16s ease; 
+            position: relative;
+            box-sizing: border-box;
+            line-height: 1;
         }
+        .icon-selector label:hover { transform: scale(1.12); }
         .icon-selector input[type="radio"]:checked + label { 
-            border-color: var(--primary-color); 
+            border: 2px solid var(--primary-color); 
             background-color: var(--today-bg); 
-            transform: scale(1.12); 
-            box-shadow: 0 3px 8px rgba(0,0,0,0.18); 
+            transform: scale(1.18); 
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.28); 
+            z-index: 2;
         }
         
+        /* 選擇顏色：單排橫向放大設計 */
         .color-selector { 
             display: flex; 
             align-items: center; 
             justify-content: flex-start;
-            gap: 7px; 
+            gap: 8px; 
             margin-top: 4px;
             padding: 5px 2px;
             overflow-x: auto;
@@ -1347,9 +1392,9 @@
         }
 
         .color-selector label { 
-            width: 27px; 
-            height: 27px;
-            flex: 0 0 27px;
+            width: 33px; 
+            height: 33px;
+            flex: 0 0 33px;
             border-radius: 50%; 
             cursor: pointer; 
             border: 2px solid rgba(0,0,0,0.14); 
@@ -1368,12 +1413,20 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.25);
             z-index: 2;
         }
+
+        /* 打勾標記：採絕對定位於正中央精準置中 */
         .color-selector input[type="radio"]:checked + label::after { 
             content: '\2714'; 
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             color: #fff; 
-            font-size: 13px; 
+            font-size: 15px; 
             font-weight: 900; 
             text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+            line-height: 1;
+            pointer-events: none;
         }
 
         .color-selector input[type="radio"]#colorLightYellow:checked + label::after {
@@ -1382,27 +1435,43 @@
         }
 
         .custom-color-item {
-            flex: 0 0 27px;
-            width: 27px;
-            height: 27px;
+            flex: 0 0 33px;
+            width: 33px;
+            height: 33px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
         }
 
         .custom-color-item label {
-            width: 27px !important;
-            height: 27px !important;
+            width: 33px !important;
+            height: 33px !important;
             border: 2px dashed var(--border-color) !important;
-            font-size: 0.95rem !important;
+            font-size: 1.1rem !important;
             background-color: var(--base-color);
         }
 
+        .custom-color-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            pointer-events: none;
+            transition: opacity 0.16s ease;
+        }
+
+        /* 自訂顏色勾選時，底層調色盤圖示淡化，突顯正中央打勾 */
+        .color-selector input[type="radio"]:checked + label .custom-color-icon {
+            opacity: 0.35;
+        }
+
+        /* 行程內容比例放大 */
         #noteTextarea {
-            font-size: 1.12rem !important;
-            line-height: 1.55 !important;
-            padding: 10px 14px !important;
+            font-size: 1.15rem !important;
+            line-height: 1.6 !important;
+            padding: 12px 14px !important;
             border-radius: 8px;
+            min-height: 125px;
         }
 
         .form-switch .form-check-input {
@@ -1551,7 +1620,7 @@
             .streak-count { font-size: 0.65rem; padding: 0 2px; }
             .event-chip { padding: 2px 4px; font-size: 0.8rem; line-height: 1.25; }
             .events-wrapper.multi-items { grid-template-columns: 1fr; gap: 2px; }
-            .icon-selector { grid-template-columns: repeat(6, 1fr); gap: 6px; }
+            .icon-selector { gap: 6px; }
             .color-selector { gap: 6px; }
 
             .swal2-actions { flex-direction: column !important; width: 100% !important; }
@@ -1735,12 +1804,12 @@
                     <input type="text" class="form-control fw-bold" id="dateRange" placeholder="選擇日期區間" readonly>
                     
                     <div id="modalHolidayInfo" class="holiday-detail-box mt-2 px-3 py-2 rounded align-items-center gap-2 d-none">
-                        <i class="bi bi-flag-fill text-danger fs-5"></i>
+                        <i class="bi bi-flag-fill text-danger fs-6"></i>
                         <div id="modalHolidayText" class="fw-bold flex-1 w-100"></div>
                     </div>
 
                     <div id="modalLunarInfo" class="modal-lunar-box mt-2 px-3 py-2 rounded align-items-start gap-2 d-none">
-                        <i class="bi bi-compass text-primary mt-1 fs-5"></i>
+                        <i class="bi bi-compass text-primary mt-0.5 fs-6"></i>
                         <div id="modalLunarText" class="fw-semibold flex-1 w-100"></div>
                     </div>
                 </div>
@@ -1753,19 +1822,17 @@
                         </div>
                     </div>
 					<div class="icon-selector" id="iconPicker">
-                        <input type="radio" name="noteIcon" id="iconNone" value=""><label for="iconNone" title="無圖示" style="font-size: 1.18rem !important;"><i class="bi bi-slash-circle"></i></label>
+                        <input type="radio" name="noteIcon" id="iconNone" value=""><label for="iconNone" title="無圖示"><i class="bi bi-slash-circle" style="font-size: 1.05rem;"></i></label>
 						<input type="radio" name="noteIcon" id="iconPin" value="📌" checked><label for="iconPin" title="一般">📌</label>
 						<input type="radio" name="noteIcon" id="iconStar" value="⭐️"><label for="iconStar" title="重要">⭐️</label>
 						<input type="radio" name="noteIcon" id="iconVacation" value="🏖️"><label for="iconVacation" title="連假">🏖️</label>
-						<input type="radio" name="noteIcon" id="iconLantern" value="🏮"><label for="iconLantern" title="傳統節慶">🏮</label>
                         <input type="radio" name="noteIcon" id="iconBasketball" value="🏀"><label for="iconBasketball" title="運動">🏀</label>
 						<input type="radio" name="noteIcon" id="iconRun" value="🏃"><label for="iconRun" title="健身">🏃</label>						
 						<input type="radio" name="noteIcon" id="iconBook" value="📖"><label for="iconBook" title="閱讀">📖</label>
 						<input type="radio" name="noteIcon" id="iconFood" value="🍜"><label for="iconFood" title="聚餐">🍜</label>						
-						<input type="radio" name="noteIcon" id="iconMovie" value="🎬"><label for="iconMovie" title="娛樂">🎬</label>
 						<input type="radio" name="noteIcon" id="iconPlane" value="✈️"><label for="iconPlane" title="出差旅遊">✈️</label>						
                         
-                        <input type="radio" name="noteIcon" id="iconCustom" value="CUSTOM"><label for="iconCustom" id="iconCustomLabel" title="自訂圖示" style="border-style: dashed; font-size: 1.25rem !important;">➕</label>
+                        <input type="radio" name="noteIcon" id="iconCustom" value="CUSTOM"><label for="iconCustom" id="iconCustomLabel" title="自訂圖示" style="border-style: dashed;">➕</label>
 					</div>
 				</div>
 
@@ -1802,15 +1869,9 @@
                         <input type="radio" name="noteColor" id="colorBrown" value="#854d0e">
                         <label for="colorBrown" style="--base-color: #854d0e;" title="大地焦糖棕"></label>
 
-                        <input type="radio" name="noteColor" id="colorSlate" value="#64748b">
-                        <label for="colorSlate" style="--base-color: #64748b;" title="雅緻霧冷灰"></label>
-
-                        <input type="radio" name="noteColor" id="colorDark" value="#18181b">
-                        <label for="colorDark" style="--base-color: #18181b;" title="沉穩曜石黑"></label>
-
                         <div class="custom-color-item position-relative">
                             <input type="radio" name="noteColor" id="colorCustomRadio" value="#6366f1">
-                            <label for="colorCustomRadio" id="customColorLabel" style="--base-color: #6366f1;" title="自訂任意顏色">🎨</label>
+                            <label for="colorCustomRadio" id="customColorLabel" style="--base-color: #6366f1;" title="自訂任意顏色"><span class="custom-color-icon">🎨</span></label>
                             <input type="color" id="nativeColorInput" value="#6366f1" class="position-absolute opacity-0" style="width:0;height:0;pointer-events:none;">
                         </div>
                     </div>
@@ -1818,7 +1879,7 @@
                 
                 <div class="mb-3">
                     <label class="form-label fw-bold opacity-85">行程內容：</label>
-                    <textarea class="form-control fw-bold" id="noteTextarea" rows="3" placeholder="請輸入行程內容..."></textarea>
+                    <textarea class="form-control fw-bold" id="noteTextarea" rows="4" placeholder="請輸入行程內容..."></textarea>
                 </div>
                 
                 <div class="d-flex flex-column gap-2 pt-1">
@@ -1926,7 +1987,7 @@
     const REMOTE_URL_KEY = 'my_calendar_remote_url_v4';
     const REMOTE_AUTOLOAD_KEY = 'my_calendar_remote_autoload_v4';
 
-    const PRESET_ICONS = ['', '📌', '⭐️', '🏖️', '🏮', '🏀', '🏃', '📖', '🍜', '🎬', '✈️'];
+    const PRESET_ICONS = ['', '📌', '⭐️', '🏖️', '🏀', '🏃', '📖', '🍜', '✈️'];
 
     let currentDate = new Date();
     let selectedDateStr = flatpickr.formatDate(new Date(), "Y-m-d"); 
@@ -2301,6 +2362,7 @@
 
         '开市': '開市', '开光': '開光', '开仓': '開倉', '开工': '開工', '开业': '開業',
         '开渠': '開渠', '开池': '開池', '动土': '動土', '破土': '破土', '安葬': '安葬',
+        '置产': '置產', '产': '產',
         '修坟': '修墳', '启攒': '啟攢', '迁坟': '遷墳', '破屋': '破屋', '坏垣': '壞垣',
         '补垣': '補垣', '塞穴': '塞穴', '纳采': '納採', '纳财': '納財', '纳畜': '納畜',
         '纳婿': '納婿', '问名': '問名', '订盟': '訂盟', '订婚': '訂婚', '栽种': '栽種',
@@ -2595,13 +2657,13 @@
             container.classList.remove('d-none');
             container.classList.add('d-flex');
             let html = `<div class="lunar-header-line"><b>農曆：</b>${info.gzYear}(${info.shengXiao})年 ${info.lunarMonth}月${info.lunarDay}`;
-            if (info.jieQi) html += ` <span class="badge bg-primary ms-1 fs-6">${info.jieQi}</span>`;
-            if (info.twFestivals && info.twFestivals.length > 0) html += ` <span class="badge bg-danger ms-1 fs-6">${info.twFestivals.join('、')}</span>`;
+            if (info.jieQi) html += ` <span class="badge bg-primary ms-1" style="font-size: 0.78rem;">${info.jieQi}</span>`;
+            if (info.twFestivals && info.twFestivals.length > 0) html += ` <span class="badge bg-danger ms-1" style="font-size: 0.78rem;">${info.twFestivals.join('、')}</span>`;
             html += `</div>`;
             if (info.yi || info.ji) {
-                html += `<div class="mt-2" style="font-size: 1.02rem; line-height: 1.6;">`;
+                html += `<div class="mt-1" style="line-height: 1.6;">`;
                 if (info.yi) html += `<div class="d-block"><span class="lunar-yi-title">宜：</span><span class="lunar-yi-content">${info.yi}</span></div>`;
-                if (info.ji) html += `<div class="d-block mt-0.5"><span class="lunar-ji-title">忌：</span><span class="lunar-ji-content">${info.ji}</span></div>`;
+                if (info.ji) html += `<div class="d-block mt-1"><span class="lunar-ji-title">忌：</span><span class="lunar-ji-content">${info.ji}</span></div>`;
                 html += `</div>`;
             }
             el.innerHTML = html;
@@ -2689,7 +2751,7 @@
                 if (lInfo.twFestivals && lInfo.twFestivals.length > 0) html += ` <span class="badge bg-danger ms-1">${lInfo.twFestivals.join('、')}</span>`;
                 html += `</div>`;
                 if (lInfo.yi || lInfo.ji) {
-                    html += `<div class="mt-1" style="font-size: 0.9rem; line-height: 1.55;">`;
+                    html += `<div class="mt-1" style="line-height: 1.6;">`;
                     if (lInfo.yi) html += `<div class="mb-1"><span class="lunar-yi-title">宜：</span><span class="lunar-yi-content">${lInfo.yi}</span></div>`;
                     if (lInfo.ji) html += `<div><span class="lunar-ji-title">忌：</span><span class="lunar-ji-content">${lInfo.ji}</span></div>`;
                     html += `</div>`;
@@ -3132,9 +3194,16 @@
         document.getElementById('holidayCheckbox').checked = evt.isHoliday || false;
         document.getElementById('highlightCheckbox').checked = evt.isHighlighted || false; 
         
-        const colorRadio = document.querySelector(`input[name="noteColor"][value="${evt.color}"]`);
-        if (colorRadio && colorRadio.id !== 'colorCustomRadio') {
-            colorRadio.checked = true;
+        const evtColorLower = (evt.color || '').toLowerCase();
+        let matchedRadio = null;
+        document.querySelectorAll('input[name="noteColor"]').forEach(r => {
+            if (r.id !== 'colorCustomRadio' && r.value.toLowerCase() === evtColorLower) {
+                matchedRadio = r;
+            }
+        });
+
+        if (matchedRadio) {
+            matchedRadio.checked = true;
         } else {
             const customColor = evt.color || '#6366f1';
             document.getElementById('nativeColorInput').value = customColor;
@@ -3251,7 +3320,8 @@
             const keyLower = e.key.toLowerCase();
             const isCtrlOrCmd = e.ctrlKey || e.metaKey;
 
-            if (e.key === 'F1' || e.key === '?' || (e.altKey && keyLower === 'h')) {
+            /* 修正：問號必須在非輸入模式下才觸發說明，避免阻止記事本正常輸入 ? */
+            if (e.key === 'F1' || (!isEditable && e.key === '?') || (e.altKey && keyLower === 'h')) {
                 e.preventDefault();
                 openHelpModal();
                 return;
