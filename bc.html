@@ -158,6 +158,47 @@
             color: #38bdf8 !important;
         }
 
+        /* 經典立體漸層按鈕造型 (修復恢復) */
+        .btn-primary-custom { 
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1e40af 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.25) !important; 
+            color: #ffffff !important; 
+            font-weight: 700; 
+            padding: 6px 16px; 
+            font-size: 0.92rem;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary-custom:hover { 
+            background: linear-gradient(135deg, #3b82f6 0%, var(--primary-color) 100%) !important;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            transform: translateY(-1.5px);
+            color: #ffffff !important;
+        }
+        .btn-primary-custom:active { 
+            transform: translateY(0.5px) scale(0.98); 
+            box-shadow: 0 1px 4px rgba(37, 99, 235, 0.25), inset 0 1px 2px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        body.theme-dark .btn-primary-custom {
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 12px rgba(56, 189, 248, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+        body.theme-dark .btn-primary-custom:hover {
+            background: linear-gradient(135deg, #7dd3fc 0%, #0369a1 100%) !important;
+            box-shadow: 0 4px 18px rgba(56, 189, 248, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+        }
+
         body.theme-dark #themeSelector {
             background-color: #1e293b !important;
             color: #ffffff !important;
@@ -333,8 +374,8 @@
             border-bottom: 1px solid var(--border-color);
             padding: 10px 22px; 
             display: grid; 
-            grid-template-columns: auto auto 1fr auto;
-            grid-template-areas: "title month tools add";
+            grid-template-columns: auto auto 1fr;
+            grid-template-areas: "title month tools";
             gap: 12px 22px; 
             align-items: center;
             z-index: 10;
@@ -350,7 +391,6 @@
             gap: 8px; 
             justify-self: end; 
         }
-        .nav-add   { grid-area: add; justify-self: end; }
 
         .app-title { 
             color: var(--primary-color); 
@@ -480,45 +520,6 @@
             color: var(--primary-color) !important;
         }
         
-        .btn-primary-custom { 
-            background: linear-gradient(135deg, var(--primary-color) 0%, #1e40af 100%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important; 
-            color: #ffffff !important; 
-            font-weight: 700; 
-            padding: 7px 18px; 
-            font-size: 0.95rem;
-            border-radius: 8px;
-            letter-spacing: 0.5px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-primary-custom:hover { 
-            background: linear-gradient(135deg, #3b82f6 0%, var(--primary-color) 100%) !important;
-            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-            transform: translateY(-1.5px);
-            color: #ffffff !important;
-        }
-        .btn-primary-custom:active { 
-            transform: translateY(0.5px) scale(0.98); 
-            box-shadow: 0 1px 4px rgba(37, 99, 235, 0.25), inset 0 1px 2px rgba(0, 0, 0, 0.15) !important;
-        }
-
-        body.theme-dark .btn-primary-custom {
-            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.3) !important;
-            color: #ffffff !important;
-            box-shadow: 0 2px 12px rgba(56, 189, 248, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-        }
-        body.theme-dark .btn-primary-custom:hover {
-            background: linear-gradient(135deg, #7dd3fc 0%, #0369a1 100%) !important;
-            box-shadow: 0 4px 18px rgba(56, 189, 248, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.55);
-        }
-
         /* ================= 行事曆主佈局 ================= */
         .calendar-container {
             flex: 1;
@@ -622,6 +623,17 @@
             font-weight: 800;
         }
 
+        /* 煙火 Canvas 畫布：層級設定為前景 (z-index: 10)，並透過 pointer-events: none 確保所有點擊事件穿透無阻 */
+        .cell-firework-canvas {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            pointer-events: none !important;
+            z-index: 10 !important;
+        }
+
         .holiday-mini-badge {
             font-size: 0.72rem;
             font-weight: 800;
@@ -662,6 +674,8 @@
             flex-shrink: 0;
             box-shadow: 0 1px 2px rgba(0,0,0,0.04);
             transition: all 0.15s ease;
+            position: relative;
+            z-index: 4;
         }
         .holiday-streak-banner:hover {
             transform: translateY(-1px);
@@ -717,6 +731,7 @@
             background-color: #38bdf8 !important;
         }
 
+        /* 選取日期：精確階層劃分，即使選取當日，前景煙火亦能完美覆蓋並透顯 */
         .day-cell.selected-day {
             position: relative;
             background-color: var(--today-bg) !important;
@@ -727,7 +742,7 @@
             box-shadow: 0 0 16px rgba(37, 99, 235, 0.26) !important;
         }
 
-        .day-cell.selected-day > * {
+        .day-cell.selected-day > *:not(.cell-firework-canvas) {
             position: relative;
             z-index: 4;
         }
@@ -791,15 +806,28 @@
             min-height: 26px;
             line-height: 1;
             flex-shrink: 0;
+            position: relative;
+            z-index: 4;
         }
 
+        /* 格子數字樣式與點擊微反饋 */
         .date-number { 
             font-weight: 800; 
             color: var(--text-main); 
             font-size: 1.12rem; 
             text-align: left; 
-            padding-left: 2px; 
+            padding: 1px 4px;
+            border-radius: 6px;
             letter-spacing: -0.01em;
+            cursor: pointer;
+            transition: background-color 0.16s ease, transform 0.16s ease;
+        }
+        .date-number:hover {
+            background-color: rgba(37, 99, 235, 0.14);
+            transform: scale(1.1);
+        }
+        body.theme-dark .date-number:hover {
+            background-color: rgba(56, 189, 248, 0.22);
         }
 
         .lunar-tag {
@@ -838,6 +866,8 @@
             width: 100%;
             overflow-y: auto;
             scrollbar-width: none;
+            position: relative;
+            z-index: 4;
         }
         .events-wrapper::-webkit-scrollbar { display: none; }
 
@@ -1120,7 +1150,6 @@
             width: 100%;
         }
 
-        /* 側欄農民曆資訊盒排版與高清晰文字樣式 */
         .side-lunar-integrated {
             background-color: var(--modal-lunar-bg);
             border: 1px dashed var(--modal-lunar-border);
@@ -1264,7 +1293,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* 農民曆資訊盒排版與文字高清晰強化 */
         .modal-lunar-box {
             background-color: var(--modal-lunar-bg) !important;
             border: 1px dashed var(--modal-lunar-border) !important;
@@ -1284,7 +1312,6 @@
             letter-spacing: 0.02em;
         }
 
-        /* 宜 / 忌 標題與說明文字清晰度樣式 (高字重、清晰字距與色彩) */
         .lunar-yi-title {
             color: var(--modal-lunar-yi-title) !important;
             font-weight: 900 !important;
@@ -1414,7 +1441,6 @@
             z-index: 2;
         }
 
-        /* 打勾標記：採絕對定位於正中央精準置中 */
         .color-selector input[type="radio"]:checked + label::after { 
             content: '\2714'; 
             position: absolute;
@@ -1460,7 +1486,6 @@
             transition: opacity 0.16s ease;
         }
 
-        /* 自訂顏色勾選時，底層調色盤圖示淡化，突顯正中央打勾 */
         .color-selector input[type="radio"]:checked + label .custom-color-icon {
             opacity: 0.35;
         }
@@ -1694,14 +1719,6 @@
             </button>
         </div>
     </div>
-
-    <div class="nav-add">
-        <button class="btn btn-primary-custom btn-sm" id="topAddEventBtn" title="新增行程 (快捷鍵: 空白鍵 或 Alt+N)">
-            <i class="bi bi-calendar-plus fs-6"></i> 
-            <span class="d-none d-sm-inline">新增行程</span>
-            <span class="d-inline d-sm-none">新增</span>
-        </button>
-    </div>
     
     <input type="file" id="importFile" accept=".json,.txt" class="d-none">
 </nav>
@@ -1732,7 +1749,6 @@
                 </button>
             </div>
             <div class="d-flex align-items-center gap-1">
-                <!-- 記事本專用工具 (預設隱藏) -->
                 <div id="memoToolsGroup" class="d-flex align-items-center gap-1 d-none">
                     <button class="btn btn-custom-outline btn-sm py-0 px-2 fw-bold" id="memoToggleBtn" title="切換 編輯 / 連結模式" style="font-size: 0.82rem; height: 28px;">
                         <i class="bi bi-link-45deg"></i> <span id="memoToggleText">連結</span>
@@ -1740,7 +1756,6 @@
                     <span class="memo-badge" id="saveStatus">AUTO-SAVE</span>
                 </div>
                 
-                <!-- 收合按鈕 (Ctrl + M) -->
                 <button class="btn btn-custom-outline btn-sm py-0 px-2 fw-bold" id="memoCollapseBtn" title="收合成一條線 (快捷鍵: Ctrl+M)" style="font-size: 0.85rem; height: 28px;">
                     <i class="bi bi-chevron-bar-right"></i>
                 </button>
@@ -1787,7 +1802,7 @@
     </div>
 </div>
 
-<!-- 新增/編輯行程 Modal -->
+<!-- 新增/編輯行程 Modal (已移除花火選項) -->
 <div class="modal fade" id="noteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content" style="background-color: var(--bg-surface); border-color: var(--border-color); border-radius: 16px;">
@@ -1806,11 +1821,6 @@
                     <div id="modalHolidayInfo" class="holiday-detail-box mt-2 px-3 py-2 rounded align-items-center gap-2 d-none">
                         <i class="bi bi-flag-fill text-danger fs-6"></i>
                         <div id="modalHolidayText" class="fw-bold flex-1 w-100"></div>
-                    </div>
-
-                    <div id="modalLunarInfo" class="modal-lunar-box mt-2 px-3 py-2 rounded align-items-start gap-2 d-none">
-                        <i class="bi bi-compass text-primary mt-0.5 fs-6"></i>
-                        <div id="modalLunarText" class="fw-semibold flex-1 w-100"></div>
                     </div>
                 </div>
                 
@@ -1926,6 +1936,7 @@
                         <div class="shortcut-group-title"><i class="bi bi-lightning-charge"></i> 核心常用</div>
                         <div class="shortcut-item"><span>切換選取日期</span><span><kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></span></div>
                         <div class="shortcut-item"><span>新增行程</span><span><kbd>空白鍵</kbd> 或 <kbd>Alt + N</kbd></span></div>
+                        <div class="shortcut-item"><span>設定日曆花火</span><span class="text-muted fw-bold">點選格子的「日期數字」即可選擇造型啟用</span></div>
                         <div class="shortcut-item"><span>切換至 當日事件</span><span><kbd>Alt + 1</kbd></span></div>
                         <div class="shortcut-item"><span>切換至 記事本</span><span><kbd>Alt + 2</kbd></span></div>
                         <div class="shortcut-item"><span>收合 / 展開側面板</span><span><kbd>Ctrl + M</kbd></span></div>
@@ -1959,7 +1970,8 @@
 
                     <div class="col-12">
                         <div class="shortcut-group-title"><i class="bi bi-mouse"></i> 滑鼠與觸控操作</div>
-                        <div class="shortcut-item"><span>單擊日期格子 / 連假彩帶</span><span class="text-muted fw-bold">選取日期並切換查看「當日事件」</span></div>
+                        <div class="shortcut-item"><span>點選格子的日期數字</span><span class="text-primary fw-bold">彈出選單設定/切換此日的日本花火造型</span></div>
+                        <div class="shortcut-item"><span>單擊日期格子空白處 / 連假彩帶</span><span class="text-muted fw-bold">選取日期並切換查看「當日事件」</span></div>
                         <div class="shortcut-item"><span>連按兩下 (雙擊) 日期格空白處</span><span class="text-muted fw-bold">直接在該日期建立新行程</span></div>
                         <div class="shortcut-item"><span>連按兩下 (雙擊) 連假彩帶或行程</span><span class="text-muted fw-bold">直接開啟該行程的編輯視窗</span></div>
                     </div>
@@ -1986,6 +1998,7 @@
     const ACTIVE_TAB_KEY = 'my_calendar_active_tab_pref';
     const REMOTE_URL_KEY = 'my_calendar_remote_url_v4';
     const REMOTE_AUTOLOAD_KEY = 'my_calendar_remote_autoload_v4';
+    const FIREWORK_SETTINGS_KEY = 'my_calendar_firework_settings_v4';
 
     const PRESET_ICONS = ['', '📌', '⭐️', '🏖️', '🏀', '🏃', '📖', '🍜', '✈️'];
 
@@ -1993,6 +2006,7 @@
     let selectedDateStr = flatpickr.formatDate(new Date(), "Y-m-d"); 
     let currentSideTab = localStorage.getItem(ACTIVE_TAB_KEY) || 'events';
     let events = []; 
+    let fireworkSettings = {}; 
     let noteModal;
     let helpModal;
     let dateRangePicker;
@@ -2000,6 +2014,10 @@
     let appTitle = localStorage.getItem(TITLE_KEY) || '商務行事曆';
     let isMemoPreviewMode = false;
     let isMemoCollapsed = localStorage.getItem(MEMO_COLLAPSE_KEY) === 'true';
+
+    /* 日本花火動畫核心狀態 */
+    let fireworkAnimFrame = null;
+    let activeFireworkCanvases = [];
 
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: { 
@@ -2033,6 +2051,62 @@
             if (result.isConfirmed) {
                 updateAppTitle(result.value);
                 swalWithBootstrapButtons.fire({ icon: 'success', title: '已更新名稱', text: `已將標題更改為「${appTitle}」`, timer: 1500, showConfirmButton: false });
+            }
+        });
+    }
+
+    /* 點選格子的數字彈出花火啟用選項 */
+    function promptFireworkOption(dateString) {
+        const currentStyle = fireworkSettings[dateString] || '';
+        const isEnabled = !!currentStyle;
+
+        swalWithBootstrapButtons.fire({
+            title: `<i class="bi bi-stars text-warning"></i> ${dateString} 花火設定`,
+            html: `
+                <div class="text-start mt-2" style="font-size: 0.95rem;">
+                    <label class="form-label fw-bold mb-2">請選擇此日的花火施放選項：</label>
+                    <select id="swalFireworkSelect" class="form-select fw-bold py-2 shadow-none" style="background: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);">
+                        <option value="none" ${!isEnabled ? 'selected' : ''}>❌ 關閉花火動畫</option>
+                        <option value="all" ${currentStyle === 'all' ? 'selected' : ''}>🎆 啟用花火：全造型隨機輪播（推薦）</option>
+                        <option value="nidan_saki" ${currentStyle === 'nidan_saki' ? 'selected' : ''}>✨ 多段変化・二段咲き (外層擴散後中心二次爆開)</option>
+                        <option value="kamuro_lush" ${currentStyle === 'kamuro_lush' ? 'selected' : ''}>🌾 極上・錦冠大柳 (超茂盛密金流光垂絲)</option>
+                        <option value="yae_shin" ${currentStyle === 'yae_shin' ? 'selected' : ''}>🎯 伝統・三重芯割物 (同心圓多層密緻菊)</option>
+                        <option value="senrin_lush" ${currentStyle === 'senrin_lush' ? 'selected' : ''}>🎇 群咲・千輪百花 (多處微型子花火連環齊綻)</option>
+                        <option value="sakura_fubuki" ${currentStyle === 'sakura_fubuki' ? 'selected' : ''}>🌸 和風・桜吹雪 (五瓣櫻花瓣緩緩飄落)</option>
+                        <option value="spiral_galaxy" ${currentStyle === 'spiral_galaxy' ? 'selected' : ''}>🌌 銀河・天の川 (三臂旋渦銀河花火)</option>
+                        <option value="heart_strobe" ${currentStyle === 'heart_strobe' ? 'selected' : ''}>💖 型物・純愛金波ハート (立體愛心外環閃爍)</option>
+                        <option value="star_spark" ${currentStyle === 'star_spark' ? 'selected' : ''}>⭐️ 型物・五芒煌星 (璀璨五芒星耀眼金芒)</option>
+                        <option value="ring_saturn" ${currentStyle === 'ring_saturn' ? 'selected' : ''}>🪐 宇宙・土星雙環 (Saturn 核心帶光環)</option>
+                        <option value="palm_gold" ${currentStyle === 'palm_gold' ? 'selected' : ''}>🌴 和風・金椰冠 (七重弧形金椰下垂)</option>
+                    </select>
+                    <small class="text-muted d-block mt-3 fw-semibold">
+                        💡 啟用後，將以悠揚平緩的空氣阻力在格子前景優雅綻放。
+                    </small>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: '儲存設定',
+            cancelButtonText: '取消',
+            preConfirm: () => {
+                return document.getElementById('swalFireworkSelect').value;
+            }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const choice = result.value;
+                if (choice === 'none') {
+                    delete fireworkSettings[dateString];
+                } else {
+                    fireworkSettings[dateString] = choice;
+                }
+                await saveFireworkSettingsToDB();
+                renderCalendar();
+                swalWithBootstrapButtons.fire({
+                    icon: 'success',
+                    title: choice === 'none' ? '已關閉花火' : '花火已啟用',
+                    text: choice === 'none' ? `已關閉 ${dateString} 的花火動畫` : `已在 ${dateString} 啟用花火效果！`,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             }
         });
     }
@@ -2179,16 +2253,28 @@
                         await saveMemoToDB();
                     }
                     if (importedData.title) updateAppTitle(importedData.title);
+                    if (importedData.fireworkSettings) {
+                        fireworkSettings = Object.assign({}, fireworkSettings, importedData.fireworkSettings);
+                        await saveFireworkSettingsToDB();
+                    }
                 }
             } else {
                 events = newEvents;
+                fireworkSettings = {}; // 先完整清除舊花火資料再覆寫
                 if (!isArray) {
                     if (importedData.memo !== undefined) {
                         document.getElementById('sideMemoArea').value = importedData.memo;
                         await saveMemoToDB();
+                    } else {
+                        document.getElementById('sideMemoArea').value = '';
+                        await saveMemoToDB();
                     }
                     if (importedData.title) updateAppTitle(importedData.title);
+                    if (importedData.fireworkSettings) {
+                        fireworkSettings = JSON.parse(JSON.stringify(importedData.fireworkSettings));
+                    }
                 }
+                await saveFireworkSettingsToDB();
             }
 
             await saveNotesToDB();
@@ -2268,6 +2354,464 @@
             textarea.blur();
         }
         localStorage.setItem(MEMO_COLLAPSE_KEY, isMemoCollapsed);
+    }
+
+    /* ================= 雅緻日本花火 (Hanabi) 多元造型・自然平緩物理粒子引擎 ================= */
+    function stopFireworksAnimation() {
+        if (fireworkAnimFrame) {
+            cancelAnimationFrame(fireworkAnimFrame);
+            fireworkAnimFrame = null;
+        }
+        activeFireworkCanvases = [];
+    }
+
+    function initFireworksAnimation() {
+        stopFireworksAnimation();
+
+        const canvasElements = document.querySelectorAll('.cell-firework-canvas');
+        if (!canvasElements || canvasElements.length === 0) return;
+
+        const HANABI_STYLES = [
+            {
+                name: '多段変化・二段咲き',
+                shape: 'nidan_saki',
+                colors: ['#ff4d4d', '#ff7675', '#ff9f43', '#ffffff'],
+                coreColors: ['#00d2d3', '#54a0ff', '#feca57', '#ffffff'],
+                particles: 46,
+                baseSpeed: 1.8,
+                airDrag: 0.958,
+                gravity: 0.018,
+                decayRate: 0.0058
+            },
+            {
+                name: '極上・錦冠大柳',
+                shape: 'kamuro_lush',
+                colors: ['#ffeaa7', '#ffd32a', '#ff9f1a', '#fff200', '#ffffff'],
+                particles: 60,
+                baseSpeed: 1.6,
+                airDrag: 0.962,
+                gravity: 0.022,
+                decayRate: 0.0050
+            },
+            {
+                name: '伝統・三重芯割物',
+                shape: 'yae_shin',
+                colors: ['#9b59b6', '#8e44ad', '#e056fd'],
+                middleColors: ['#ff3838', '#ff6b81', '#ff4d4d'],
+                coreColors: ['#fff200', '#ffffff'],
+                particles: 52,
+                baseSpeed: 1.9,
+                airDrag: 0.955,
+                gravity: 0.018,
+                decayRate: 0.0058
+            },
+            {
+                name: '群咲・千輪百花',
+                shape: 'senrin_lush',
+                colors: ['#ff3838', '#2ed573', '#1e90ff', '#ffa502', '#9b59b6', '#ff6b81'],
+                particles: 50,
+                baseSpeed: 1.7,
+                airDrag: 0.956,
+                gravity: 0.018,
+                decayRate: 0.0060
+            },
+            {
+                name: '和風・桜吹雪',
+                shape: 'sakura_fubuki',
+                colors: ['#ff758c', '#ff7eb3', '#ff4d6d', '#ffffff'],
+                coreColor: '#ffffff',
+                particles: 45,
+                baseSpeed: 1.8,
+                airDrag: 0.955,
+                gravity: 0.016,
+                decayRate: 0.0055
+            },
+            {
+                name: '銀河・天の川',
+                shape: 'spiral_galaxy',
+                colors: ['#00cec9', '#0984e3', '#74b9ff', '#ffffff'],
+                coreColor: '#ffffff',
+                particles: 44,
+                baseSpeed: 1.9,
+                airDrag: 0.956,
+                gravity: 0.018,
+                decayRate: 0.0058
+            },
+            {
+                name: '型物・純愛金波ハート',
+                shape: 'heart_strobe',
+                colors: ['#ff4757', '#ff6b81', '#ff78cb', '#ffffff'],
+                particles: 42,
+                baseSpeed: 1.7,
+                airDrag: 0.958,
+                gravity: 0.016,
+                decayRate: 0.0058
+            },
+            {
+                name: '型物・五芒煌星',
+                shape: 'star_spark',
+                colors: ['#ffd32a', '#ff9f1a', '#fff200', '#ffffff'],
+                particles: 40,
+                baseSpeed: 1.8,
+                airDrag: 0.956,
+                gravity: 0.018,
+                decayRate: 0.0060
+            },
+            {
+                name: '宇宙・土星雙環',
+                shape: 'ring_saturn',
+                colors: ['#00cec9', '#54a0ff', '#74b9ff', '#ffffff'],
+                coreColor: '#ffffff',
+                particles: 44,
+                baseSpeed: 1.9,
+                airDrag: 0.955,
+                gravity: 0.018,
+                decayRate: 0.0060
+            },
+            {
+                name: '和風・金椰冠',
+                shape: 'palm_gold',
+                colors: ['#fbc531', '#e1b12c', '#ffa502', '#ffffff'],
+                particles: 40,
+                baseSpeed: 2.0,
+                airDrag: 0.960,
+                gravity: 0.024,
+                decayRate: 0.0055
+            }
+        ];
+
+        canvasElements.forEach(canvas => {
+            const rect = canvas.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return;
+
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = Math.round(rect.width * dpr);
+            canvas.height = Math.round(rect.height * dpr);
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            activeFireworkCanvases.push({
+                ctx,
+                w: rect.width,
+                h: rect.height,
+                stylePreference: canvas.dataset.fwStyle || 'all',
+                rockets: [],
+                stars: [],
+                timer: 30,
+                nextLaunch: 60
+            });
+        });
+
+        if (activeFireworkCanvases.length === 0) return;
+
+        function renderHanabiFrame() {
+            activeFireworkCanvases.forEach(system => {
+                const { ctx, w, h, rockets, stars, stylePreference } = system;
+                ctx.clearRect(0, 0, w, h);
+
+                system.timer++;
+                // 調整施放間隔：約 2.5 ~ 4.2 秒發射一次，節奏悠揚不緊湊
+                if (system.timer >= system.nextLaunch) {
+                    system.timer = 0;
+                    system.nextLaunch = Math.floor(Math.random() * 100) + 150;
+
+                    let style;
+                    if (stylePreference && stylePreference !== 'all') {
+                        style = HANABI_STYLES.find(s => s.shape === stylePreference) || HANABI_STYLES[0];
+                    } else {
+                        style = HANABI_STYLES[Math.floor(Math.random() * HANABI_STYLES.length)];
+                    }
+
+                    const startX = w * (0.3 + Math.random() * 0.4);
+                    const apexX = startX + (Math.random() - 0.5) * 8;
+                    const apexY = h * (0.28 + Math.random() * 0.2);
+                    
+                    const duration = 52 + Math.floor(Math.random() * 10); // 平緩平穩昇空
+                    const vy = (apexY - (h + 3)) / duration;
+                    const vx = (apexX - startX) / duration;
+
+                    rockets.push({
+                        x: startX,
+                        y: h + 3,
+                        vx,
+                        vy,
+                        targetY: apexY,
+                        style,
+                        stepsLeft: duration,
+                        trail: []
+                    });
+                }
+
+                // 1. 導火線昇空銀引
+                for (let i = rockets.length - 1; i >= 0; i--) {
+                    const r = rockets[i];
+                    r.trail.push({ x: r.x, y: r.y });
+                    if (r.trail.length > 7) r.trail.shift();
+
+                    r.x += r.vx;
+                    r.y += r.vy;
+                    r.stepsLeft--;
+
+                    if (r.trail.length >= 2) {
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(r.trail[0].x, r.trail[0].y);
+                        for (let t = 1; t < r.trail.length; t++) {
+                            ctx.lineTo(r.trail[t].x, r.trail[t].y);
+                        }
+                        ctx.strokeStyle = 'rgba(255, 238, 160, 0.85)';
+                        ctx.lineWidth = 1.3;
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.arc(r.x, r.y, 1.4, 0, Math.PI * 2);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.shadowColor = '#ffd060';
+                        ctx.shadowBlur = 5;
+                        ctx.fill();
+                        ctx.restore();
+                    }
+
+                    // 頂點開花：平緩自然的大半徑展開
+                    if (r.stepsLeft <= 0 || r.y <= r.targetY) {
+                        const s = r.style;
+                        const count = s.particles;
+                        const cellSize = Math.min(w, h);
+                        const speedMult = Math.max(0.85, (cellSize / 120));
+                        const baseSpeed = s.baseSpeed * speedMult;
+
+                        for (let k = 0; k < count; k++) {
+                            let vx = 0;
+                            let vy = 0;
+                            let color = s.colors[k % s.colors.length];
+                            let isSecondStageTrigger = false;
+                            let subBurstTime = 0;
+                            let radius = 1.7;
+
+                            if (s.shape === 'nidan_saki') {
+                                if (k < 10) {
+                                    isSecondStageTrigger = true;
+                                    subBurstTime = 28 + Math.floor(Math.random() * 6);
+                                    const a = Math.random() * Math.PI * 2;
+                                    const sp = baseSpeed * 0.25;
+                                    vx = Math.cos(a) * sp;
+                                    vy = Math.sin(a) * sp;
+                                    color = '#ffffff';
+                                    radius = 2.0;
+                                } else {
+                                    const angle = ((k - 10) / (count - 10)) * Math.PI * 2 + (Math.random() - 0.5) * 0.08;
+                                    const speed = baseSpeed * (0.9 + Math.random() * 0.2);
+                                    vx = Math.cos(angle) * speed;
+                                    vy = Math.sin(angle) * speed;
+                                }
+                            } else if (s.shape === 'yae_shin') {
+                                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.06;
+                                if (k % 3 === 0) {
+                                    vx = Math.cos(angle) * (baseSpeed * 0.42);
+                                    vy = Math.sin(angle) * (baseSpeed * 0.42);
+                                    color = s.coreColors[k % s.coreColors.length];
+                                } else if (k % 3 === 1) {
+                                    vx = Math.cos(angle) * (baseSpeed * 0.75);
+                                    vy = Math.sin(angle) * (baseSpeed * 0.75);
+                                    color = s.middleColors[k % s.middleColors.length];
+                                } else {
+                                    vx = Math.cos(angle) * (baseSpeed * 1.05);
+                                    vy = Math.sin(angle) * (baseSpeed * 1.05);
+                                    color = s.colors[k % s.colors.length];
+                                }
+                            } else if (s.shape === 'kamuro_lush') {
+                                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.12;
+                                const speed = baseSpeed * (0.7 + Math.random() * 0.55);
+                                vx = Math.cos(angle) * speed;
+                                vy = Math.sin(angle) * speed;
+                                radius = 1.9;
+                            } else if (s.shape === 'heart_strobe') {
+                                const t = (k / count) * Math.PI * 2;
+                                const hx = 16 * Math.pow(Math.sin(t), 3);
+                                const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                                const len = Math.sqrt(hx * hx + hy * hy) || 1;
+                                const speed = baseSpeed * (0.92 + Math.random() * 0.16);
+                                vx = (hx / len) * speed;
+                                vy = (hy / len) * speed;
+                            } else if (s.shape === 'star_spark') {
+                                const theta = (k / count) * Math.PI * 2;
+                                const starRadius = 1 + 0.55 * Math.cos(5 * theta);
+                                const speed = baseSpeed * starRadius * 0.9;
+                                vx = Math.cos(theta) * speed;
+                                vy = Math.sin(theta) * speed;
+                            } else if (s.shape === 'sakura_fubuki') {
+                                const theta = (k / count) * Math.PI * 2;
+                                const petalR = 1 + 0.42 * Math.cos(5 * theta);
+                                const speed = baseSpeed * petalR * 0.95;
+                                vx = Math.cos(theta) * speed;
+                                vy = Math.sin(theta) * speed;
+                            } else if (s.shape === 'spiral_galaxy') {
+                                const arms = 3;
+                                const theta = (k / count) * Math.PI * 2 * arms;
+                                const rDist = (k / count);
+                                const speed = baseSpeed * (0.6 + 0.7 * rDist);
+                                vx = Math.cos(theta + rDist * 1.8) * speed;
+                                vy = Math.sin(theta + rDist * 1.8) * speed;
+                            } else if (s.shape === 'senrin_lush') {
+                                const cluster = k % 5;
+                                const clusterAngles = [0, 1.25, 2.5, 3.75, 5.0];
+                                const cDist = baseSpeed * 0.42;
+                                const cx = Math.cos(clusterAngles[cluster]) * cDist;
+                                const cy = Math.sin(clusterAngles[cluster]) * cDist;
+                                const subAngle = Math.random() * Math.PI * 2;
+                                const subSpeed = baseSpeed * 0.55 * (0.75 + Math.random() * 0.4);
+                                vx = cx + Math.cos(subAngle) * subSpeed;
+                                vy = cy + Math.sin(subAngle) * subSpeed;
+                            } else if (s.shape === 'palm_gold') {
+                                const numBranches = 7;
+                                const branchIdx = k % numBranches;
+                                const branchAngle = -Math.PI * 0.82 + (branchIdx / (numBranches - 1)) * (Math.PI * 0.64);
+                                const branchSpeed = baseSpeed * (0.65 + Math.random() * 0.65);
+                                vx = Math.cos(branchAngle) * branchSpeed;
+                                vy = Math.sin(branchAngle) * branchSpeed;
+                                radius = 1.9;
+                            } else if (s.shape === 'ring_saturn') {
+                                if (k < 10) {
+                                    const a = Math.random() * Math.PI * 2;
+                                    const sp = baseSpeed * 0.35 * Math.random();
+                                    vx = Math.cos(a) * sp;
+                                    vy = Math.sin(a) * sp;
+                                    color = '#ffffff';
+                                } else {
+                                    const angle = ((k - 10) / (count - 10)) * Math.PI * 2;
+                                    const rawX = Math.cos(angle) * baseSpeed * 1.3;
+                                    const rawY = Math.sin(angle) * baseSpeed * 0.42;
+                                    const tilt = -0.32;
+                                    vx = rawX * Math.cos(tilt) - rawY * Math.sin(tilt);
+                                    vy = rawX * Math.sin(tilt) + rawY * Math.cos(tilt);
+                                }
+                            } else {
+                                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.08;
+                                const speed = baseSpeed * (0.85 + Math.random() * 0.25);
+                                vx = Math.cos(angle) * speed;
+                                vy = Math.sin(angle) * speed;
+                            }
+
+                            stars.push({
+                                x: r.x,
+                                y: r.y,
+                                vx,
+                                vy,
+                                alpha: 1.0,
+                                style: s,
+                                color,
+                                radius,
+                                trail: [{ x: r.x, y: r.y }],
+                                maxTrail: (s.shape === 'kamuro_lush' || s.shape === 'palm_gold') ? 9 : 6,
+                                isSecondStageTrigger,
+                                subBurstTime,
+                                hasSubBursted: false,
+                                twinkle: Math.random() > 0.3,
+                                twinkleFreq: 0.15 + Math.random() * 0.15,
+                                age: 0
+                            });
+                        }
+                        rockets.splice(i, 1);
+                    }
+                }
+
+                // 2. 光絲流線繪製與火花星核
+                for (let i = stars.length - 1; i >= 0; i--) {
+                    const st = stars[i];
+                    st.age++;
+
+                    st.x += st.vx;
+                    st.y += st.vy;
+                    st.vx *= st.style.airDrag;
+                    st.vy = st.vy * st.style.airDrag + st.style.gravity;
+                    st.alpha -= st.style.decayRate;
+
+                    st.trail.push({ x: st.x, y: st.y });
+                    if (st.trail.length > st.maxTrail) st.trail.shift();
+
+                    // 二段開花判定
+                    if (st.isSecondStageTrigger && !st.hasSubBursted && st.age >= st.subBurstTime) {
+                        st.hasSubBursted = true;
+                        const subCount = 7;
+                        for (let sc = 0; sc < subCount; sc++) {
+                            const sAngle = (sc / subCount) * Math.PI * 2 + Math.random() * 0.2;
+                            const sSpeed = 1.1 + Math.random() * 0.35;
+                            const sColor = st.style.coreColors[sc % st.style.coreColors.length];
+                            stars.push({
+                                x: st.x,
+                                y: st.y,
+                                vx: Math.cos(sAngle) * sSpeed,
+                                vy: Math.sin(sAngle) * sSpeed,
+                                alpha: 1.0,
+                                style: st.style,
+                                color: sColor,
+                                radius: 1.6,
+                                trail: [{ x: st.x, y: st.y }],
+                                maxTrail: 6,
+                                isSecondStageTrigger: false,
+                                hasSubBursted: true,
+                                twinkle: true,
+                                twinkleFreq: 0.22,
+                                age: 0
+                            });
+                        }
+                    }
+
+                    if (st.alpha <= 0) {
+                        stars.splice(i, 1);
+                        continue;
+                    }
+
+                    let currentAlpha = st.alpha;
+                    if (st.twinkle && st.alpha < 0.75) {
+                        currentAlpha *= (0.45 + 0.55 * Math.sin(st.age * st.twinkleFreq));
+                    }
+                    if (currentAlpha < 0) currentAlpha = 0;
+
+                    ctx.save();
+
+                    // A. 繪製連續高清晰拖尾光絲
+                    if (st.trail.length >= 2) {
+                        ctx.beginPath();
+                        ctx.moveTo(st.trail[0].x, st.trail[0].y);
+                        for (let t = 1; t < st.trail.length; t++) {
+                            ctx.lineTo(st.trail[t].x, st.trail[t].y);
+                        }
+                        ctx.strokeStyle = st.color;
+                        ctx.lineWidth = (st.style.shape === 'kamuro_lush' || st.style.shape === 'palm_gold') ? 1.6 : 1.3;
+                        ctx.lineCap = 'round';
+                        ctx.globalAlpha = Math.min(1, currentAlpha * 0.75);
+                        ctx.stroke();
+                    }
+
+                    // B. 繪製白熱發光粒子頭部 (清晰星核)
+                    if (st.alpha > 0.2) {
+                        ctx.beginPath();
+                        ctx.arc(st.x, st.y, st.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = st.color;
+                        ctx.shadowColor = st.color;
+                        ctx.shadowBlur = 6;
+                        ctx.globalAlpha = Math.min(1, currentAlpha);
+                        ctx.fill();
+
+                        // 內層純白高光
+                        ctx.beginPath();
+                        ctx.arc(st.x, st.y, st.radius * 0.55, 0, Math.PI * 2);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.shadowBlur = 0;
+                        ctx.globalAlpha = Math.min(1, currentAlpha);
+                        ctx.fill();
+                    }
+
+                    ctx.restore();
+                }
+            });
+
+            fireworkAnimFrame = requestAnimationFrame(renderHanabiFrame);
+        }
+
+        fireworkAnimFrame = requestAnimationFrame(renderHanabiFrame);
     }
 
     /* ================= 右側分頁切換邏輯 ================= */
@@ -2588,7 +3132,6 @@
             dateFormat: "Y-m-d",
             allowInput: true,
             onChange: function(selectedDates) {
-                updateModalLunarInfo(selectedDates);
                 updateModalHolidayInfo(selectedDates);
             }
         });
@@ -2600,6 +3143,7 @@
         
         await loadNotesFromDB();
         await loadMemoFromDB();
+        await loadFireworkSettingsFromDB();
         
         renderCalendar();
         switchSideTab(currentSideTab);
@@ -2637,40 +3181,6 @@
             btn.classList.add('active-tool');
         } else {
             btn.classList.remove('active-tool');
-        }
-    }
-
-    function updateModalLunarInfo(selectedDates) {
-        const container = document.getElementById('modalLunarInfo');
-        const el = document.getElementById('modalLunarText');
-        
-        if (!showLunar || !selectedDates || selectedDates.length === 0) {
-            container.classList.remove('d-flex');
-            container.classList.add('d-none');
-            el.innerHTML = '';
-            return;
-        }
-
-        const d = selectedDates[0];
-        const info = getLunarInfo(d.getFullYear(), d.getMonth(), d.getDate());
-        if (info) {
-            container.classList.remove('d-none');
-            container.classList.add('d-flex');
-            let html = `<div class="lunar-header-line"><b>農曆：</b>${info.gzYear}(${info.shengXiao})年 ${info.lunarMonth}月${info.lunarDay}`;
-            if (info.jieQi) html += ` <span class="badge bg-primary ms-1" style="font-size: 0.78rem;">${info.jieQi}</span>`;
-            if (info.twFestivals && info.twFestivals.length > 0) html += ` <span class="badge bg-danger ms-1" style="font-size: 0.78rem;">${info.twFestivals.join('、')}</span>`;
-            html += `</div>`;
-            if (info.yi || info.ji) {
-                html += `<div class="mt-1" style="line-height: 1.6;">`;
-                if (info.yi) html += `<div class="d-block"><span class="lunar-yi-title">宜：</span><span class="lunar-yi-content">${info.yi}</span></div>`;
-                if (info.ji) html += `<div class="d-block mt-1"><span class="lunar-ji-title">忌：</span><span class="lunar-ji-content">${info.ji}</span></div>`;
-                html += `</div>`;
-            }
-            el.innerHTML = html;
-        } else {
-            container.classList.remove('d-flex');
-            container.classList.add('d-none');
-            el.innerHTML = '';
         }
     }
 
@@ -2866,6 +3376,28 @@
         await dbSet(STORAGE_KEY, events); 
     }
 
+    async function loadFireworkSettingsFromDB() {
+        try {
+            let stored = await dbGet(FIREWORK_SETTINGS_KEY);
+            if (!stored) {
+                const oldLocal = localStorage.getItem(FIREWORK_SETTINGS_KEY);
+                if (oldLocal) {
+                    stored = JSON.parse(oldLocal);
+                    await dbSet(FIREWORK_SETTINGS_KEY, stored);
+                    localStorage.removeItem(FIREWORK_SETTINGS_KEY);
+                }
+            }
+            fireworkSettings = stored ? stored : {};
+        } catch (e) {
+            console.error(e);
+            fireworkSettings = {};
+        }
+    }
+
+    async function saveFireworkSettingsToDB() {
+        await dbSet(FIREWORK_SETTINGS_KEY, fireworkSettings);
+    }
+
     async function loadMemoFromDB() {
         try {
             let memo = await dbGet(MEMO_KEY);
@@ -2931,7 +3463,6 @@
         }
     }
 
-    /* 支援鍵盤上下左右鍵切換日期 */
     function moveSelectedDate(dayDelta) {
         let baseDate = selectedDateStr ? new Date(selectedDateStr + 'T00:00:00') : new Date();
         if (isNaN(baseDate.getTime())) baseDate = new Date();
@@ -2955,6 +3486,7 @@
     }
 
     function renderCalendar() {
+        stopFireworksAnimation();
         const calendarBody = document.getElementById('calendarBody');
         calendarBody.classList.add('calendar-transitioning');
 
@@ -3012,6 +3544,16 @@
                     }
                 }
 
+                // 判斷該日期是否啟用花火動畫
+                const fwStyle = fireworkSettings[dateString];
+                const hasFireworks = !isOtherMonth && !!fwStyle;
+                if (hasFireworks) {
+                    const fwCanvas = document.createElement('canvas');
+                    fwCanvas.className = 'cell-firework-canvas';
+                    fwCanvas.dataset.fwStyle = fwStyle;
+                    cell.appendChild(fwCanvas);
+                }
+
                 const topRow = document.createElement('div');
                 topRow.className = 'day-cell-top';
 
@@ -3021,6 +3563,17 @@
                 const dateNum = document.createElement('div');
                 dateNum.className = 'date-number' + (holidayInfo ? ' text-holiday' : '');
                 dateNum.textContent = cDay;
+                dateNum.title = '點擊設定/啟用此日日本花火動畫';
+                
+                // 點選日期數字開啟花火設定選單
+                dateNum.onclick = (e) => {
+                    e.stopPropagation();
+                    promptFireworkOption(dateString);
+                };
+                dateNum.ondblclick = (e) => {
+                    e.stopPropagation();
+                };
+
                 dateLeftBox.appendChild(dateNum);
 
                 if (holidayInfo && !isOtherMonth) {
@@ -3091,13 +3644,12 @@
                     } else if (evt.icon === undefined) {
                         iconHtml = `<span class="chip-icon">📌</span>`;
                     }
-                    
+
                     const rawLines = (evt.text || '').split('\n');
                     
                     if (isSingleEvent) {
                         chip.classList.add('single-event-mode');
-                        const safeText = escapeHtml(evt.text || '');
-                        chip.innerHTML = `${iconHtml}<span class="full-text">${safeText}</span>`;
+                        chip.innerHTML = `${iconHtml}<span class="full-text">${escapeHtml(evt.text || '')}</span>`;
                     } else if (isMiniGrid) {
                         chip.classList.add('mini-grid-item');
                         const firstLineSafe = escapeHtml(rawLines[0] || '');
@@ -3154,6 +3706,7 @@
 
             calendarBody.classList.remove('calendar-transitioning');
             renderSideEventsList();
+            initFireworksAnimation();
         }, 100);
     }
 
@@ -3162,7 +3715,6 @@
         document.getElementById('currentEditId').value = ''; 
         const dateToSet = dateString || selectedDateStr || flatpickr.formatDate(new Date(), "Y-m-d");
         dateRangePicker.setDate([dateToSet, dateToSet]);
-        updateModalLunarInfo(dateRangePicker.selectedDates);
         updateModalHolidayInfo(dateRangePicker.selectedDates);
         document.getElementById('noteTextarea').value = '';
         document.getElementById('holidayCheckbox').checked = false;
@@ -3188,7 +3740,6 @@
         document.getElementById('modalTitle').textContent = '編輯行程';
         document.getElementById('currentEditId').value = evt.id; 
         dateRangePicker.setDate([evt.start, evt.end || evt.start]);
-        updateModalLunarInfo(dateRangePicker.selectedDates);
         updateModalHolidayInfo(dateRangePicker.selectedDates);
         document.getElementById('noteTextarea').value = evt.text;
         document.getElementById('holidayCheckbox').checked = evt.isHoliday || false;
@@ -3296,10 +3847,6 @@
             colorCustomRadio.checked = true;
         });
 
-        document.getElementById('topAddEventBtn').onclick = () => {
-            openModalForNew(selectedDateStr || flatpickr.formatDate(new Date(), "Y-m-d"));
-        };
-
         document.getElementById('prevMonth').onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); };
         document.getElementById('nextMonth').onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
         
@@ -3310,6 +3857,10 @@
             e.target.blur(); 
         };
         
+        window.addEventListener('resize', () => {
+            initFireworksAnimation();
+        });
+
         /* 全局鍵盤快捷鍵系統 */
         document.addEventListener('keydown', (e) => {
             const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
@@ -3320,7 +3871,6 @@
             const keyLower = e.key.toLowerCase();
             const isCtrlOrCmd = e.ctrlKey || e.metaKey;
 
-            /* 修正：問號必須在非輸入模式下才觸發說明，避免阻止記事本正常輸入 ? */
             if (e.key === 'F1' || (!isEditable && e.key === '?') || (e.altKey && keyLower === 'h')) {
                 e.preventDefault();
                 openHelpModal();
@@ -3408,14 +3958,12 @@
                 return;
             }
 
-            /* 空白鍵快速新增行程 */
             if (e.key === ' ' || e.code === 'Space') {
                 e.preventDefault();
                 openModalForNew(selectedDateStr);
                 return;
             }
 
-            /* 方向鍵切換日期 */
             if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
                 e.preventDefault();
                 if (e.key === 'ArrowLeft') {
@@ -3484,7 +4032,12 @@
 
         document.getElementById('exportBtn').onclick = async () => {
             const memo = await dbGet(MEMO_KEY);
-            const dataStr = JSON.stringify({ title: appTitle, events, memo: memo || "" }, null, 2);
+            const dataStr = JSON.stringify({
+                title: appTitle,
+                events,
+                memo: memo || "",
+                fireworkSettings: fireworkSettings || {}
+            }, null, 2);
             const blob = new Blob([dataStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -3522,22 +4075,40 @@
                                 events = events.concat(newEvents);
                                 if (!isArray) {
                                     if (importedData.memo) { 
-                                        document.getElementById('sideMemoArea').value = importedData.memo; 
+                                        const curMemo = document.getElementById('sideMemoArea').value;
+                                        const mergedMemo = curMemo ? (curMemo + "\n\n" + importedData.memo) : importedData.memo;
+                                        document.getElementById('sideMemoArea').value = mergedMemo; 
                                         await saveMemoToDB(); 
                                     }
                                     if (importedData.title) updateAppTitle(importedData.title);
+                                    if (importedData.fireworkSettings) {
+                                        fireworkSettings = Object.assign({}, fireworkSettings, importedData.fireworkSettings);
+                                        await saveFireworkSettingsToDB();
+                                    }
                                 }
-                                await saveNotesToDB(); renderCalendar(); renderSideEventsList();
+                                await saveNotesToDB(); 
+                                renderCalendar(); 
+                                renderSideEventsList();
                             } else if (result.isDenied) {
                                 events = newEvents;
+                                fireworkSettings = {}; // 先徹底清空舊花火設定再重新載入
                                 if (!isArray) {
                                     if (importedData.memo !== undefined) { 
                                         document.getElementById('sideMemoArea').value = importedData.memo; 
                                         await saveMemoToDB(); 
+                                    } else {
+                                        document.getElementById('sideMemoArea').value = ''; 
+                                        await saveMemoToDB();
                                     }
                                     if (importedData.title) updateAppTitle(importedData.title);
+                                    if (importedData.fireworkSettings) {
+                                        fireworkSettings = JSON.parse(JSON.stringify(importedData.fireworkSettings));
+                                    }
                                 }
-                                await saveNotesToDB(); renderCalendar(); renderSideEventsList();
+                                await saveFireworkSettingsToDB();
+                                await saveNotesToDB(); 
+                                renderCalendar(); 
+                                renderSideEventsList();
                             }
                         });
                     } else swalWithBootstrapButtons.fire({ icon: 'error', title: '錯誤', text: '無效的檔案格式！內容必須符合 JSON 結構。', confirmButtonText: '了解' });
@@ -3622,7 +4193,7 @@
         });
 
         document.getElementById('clearAllBtn').addEventListener('click', () => {
-            if (events.length === 0 && !document.getElementById('sideMemoArea').value) {
+            if (events.length === 0 && !document.getElementById('sideMemoArea').value && Object.keys(fireworkSettings).length === 0) {
                 return swalWithBootstrapButtons.fire({ icon: 'info', title: '提示', text: '沒有資料可清除。', confirmButtonText: '了解' });
             }
             swalWithBootstrapButtons.fire({
@@ -3638,7 +4209,10 @@
                         customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-secondary' }, reverseButtons: true
                     }).then(async (finalResult) => {
                         if (finalResult.isConfirmed) {
-                            events = []; await dbRemove(MEMO_KEY);
+                            events = []; 
+                            fireworkSettings = {};
+                            await dbRemove(MEMO_KEY);
+                            await dbRemove(FIREWORK_SETTINGS_KEY);
                             document.getElementById('sideMemoArea').value = "";
                             document.getElementById('sideMemoPreview').innerHTML = "";
                             await saveNotesToDB(); 
