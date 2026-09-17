@@ -33,14 +33,12 @@
             --lunar-highlight-bg: #eff6ff;
             --lunar-highlight-text: #1d4ed8;
 
-            /* 使用者自訂國定假日與連假色彩 */
             --holiday-text: #dc2626;
             --holiday-streak-border: #ef4444;
             --holiday-banner-bg: linear-gradient(135deg, #fee2e2 0%, #ffedd5 100%);
             --holiday-banner-border: #fca5a5;
             --holiday-banner-text: #b91c1c;
 
-            /* 農民曆說明專用色 (宜: 翠綠 / 忌: 醒目紅) */
             --modal-lunar-bg: #f8fafc;
             --modal-lunar-border: #cbd5e1;
             --modal-lunar-text: #0f172a;
@@ -50,7 +48,6 @@
             --modal-lunar-ji-text: #991b1b;
         }
 
-        /* 暗黑風格配色強化 (高清晰純白與高對比色系) */
         body.theme-dark {
             --bg-body: #0f172a;
             --bg-surface: #1e293b;
@@ -74,7 +71,6 @@
             --holiday-banner-border: rgba(248, 113, 113, 0.5);
             --holiday-banner-text: #fecaca;
 
-            /* 暗黑模式高對比發光清晰色 */
             --modal-lunar-bg: #1e293b;
             --modal-lunar-border: #475569;
             --modal-lunar-text: #ffffff;
@@ -84,81 +80,47 @@
             --modal-lunar-ji-text: #fecdd3;
         }
 
-        body.theme-dark .app-title {
-            color: #ffffff !important;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-        body.theme-dark .app-title i.bi-calendar3-range {
-            color: #38bdf8 !important;
-        }
-        body.theme-dark .app-title .edit-title-icon {
-            color: #94a3b8 !important;
-        }
-        body.theme-dark .app-title:hover {
-            background-color: #1e293b;
-        }
+        body.theme-dark .app-title { color: #ffffff !important; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        body.theme-dark .app-title i.bi-calendar3-range { color: #38bdf8 !important; }
+        body.theme-dark .app-title .edit-title-icon { color: #94a3b8 !important; }
+        body.theme-dark .app-title:hover { background-color: #1e293b; }
 
         body.theme-dark .text-primary,
-        body.theme-dark #monthYearDisplay .text-primary {
-            color: #7dd3fc !important;
-            font-weight: 800;
-        }
-        body.theme-dark .month-title {
-            color: #ffffff !important;
-        }
+        body.theme-dark #monthYearDisplay .text-primary { color: #7dd3fc !important; font-weight: 800; }
+        body.theme-dark .month-title { color: #ffffff !important; }
 
         body.theme-dark .nav-segmented-control {
             background-color: #1e293b;
             border-color: #475569;
             box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         }
-        body.theme-dark .btn-nav-seg {
-            color: #ffffff !important;
-        }
-        body.theme-dark .btn-nav-seg:hover {
-            background: #334155;
-            color: #ffffff !important;
-        }
+        body.theme-dark .btn-nav-seg { color: #ffffff !important; }
+        body.theme-dark .btn-nav-seg:hover { background: #334155; color: #ffffff !important; }
         body.theme-dark .btn-nav-seg.btn-nav-today {
             background: #0f172a;
             border: 1px solid #38bdf8;
             color: #ffffff !important;
             box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
         }
-        body.theme-dark .btn-nav-seg.btn-nav-today::before {
-            border-color: #38bdf8 !important;
-        }
+        body.theme-dark .btn-nav-seg.btn-nav-today::before { border-color: #38bdf8 !important; }
         body.theme-dark .btn-nav-seg.btn-nav-today:hover {
             background: #172554;
             color: #ffffff !important;
             border-color: #7dd3fc;
         }
 
-        body.theme-dark .btn-custom-outline {
-            color: #ffffff !important;
-            border-color: #475569;
-            background: #1e293b;
-        }
+        body.theme-dark .btn-custom-outline { color: #ffffff !important; border-color: #475569; background: #1e293b; }
         body.theme-dark .btn-custom-outline i,
-        body.theme-dark .btn-custom-outline span {
-            color: #ffffff !important;
-        }
-        body.theme-dark .btn-custom-outline:hover {
-            color: #ffffff !important;
-            background: #334155;
-            border-color: #64748b;
-        }
+        body.theme-dark .btn-custom-outline span { color: #ffffff !important; }
+        body.theme-dark .btn-custom-outline:hover { color: #ffffff !important; background: #334155; border-color: #64748b; }
         body.theme-dark .btn-custom-outline.active-tool {
-            background-color: #172554 !important;
-            border-color: #38bdf8 !important;
-            color: #38bdf8 !important;
+            background-color: var(--today-bg);
+            border-color: var(--primary-color) !important;
+            color: var(--primary-color) !important;
         }
         body.theme-dark .btn-custom-outline.active-tool i,
-        body.theme-dark .btn-custom-outline.active-tool span {
-            color: #38bdf8 !important;
-        }
+        body.theme-dark .btn-custom-outline.active-tool span { color: #38bdf8 !important; }
 
-        /* 經典立體漸層按鈕造型 (修復恢復) */
         .btn-primary-custom { 
             background: linear-gradient(135deg, var(--primary-color) 0%, #1e40af 100%) !important;
             border: 1px solid rgba(255, 255, 255, 0.25) !important; 
@@ -173,7 +135,7 @@
             justify-content: center;
             gap: 6px;
             box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
             position: relative;
             overflow: hidden;
         }
@@ -199,51 +161,18 @@
             box-shadow: 0 4px 18px rgba(56, 189, 248, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.55);
         }
 
-        body.theme-dark #themeSelector {
-            background-color: #1e293b !important;
-            color: #ffffff !important;
-            border-color: #475569 !important;
-        }
+        body.theme-dark #themeSelector { background-color: #1e293b !important; color: #ffffff !important; border-color: #475569 !important; }
+        body.theme-dark .side-tab-buttons { background: #0b1120; border-color: #475569; }
+        body.theme-dark .side-tab-btn { color: #ffffff !important; }
+        body.theme-dark .side-tab-btn i { color: #ffffff !important; }
+        body.theme-dark .side-tab-btn:hover { background: #334155; color: #ffffff !important; }
+        body.theme-dark .side-tab-btn.active { background-color: #2563eb !important; color: #ffffff !important; }
 
-        body.theme-dark .side-tab-buttons {
-            background: #0b1120;
-            border-color: #475569;
-        }
-        body.theme-dark .side-tab-btn {
-            color: #ffffff !important;
-        }
-        body.theme-dark .side-tab-btn i {
-            color: #ffffff !important;
-        }
-        body.theme-dark .side-tab-btn:hover {
-            background: #334155;
-            color: #ffffff !important;
-        }
-        body.theme-dark .side-tab-btn.active {
-            background-color: #2563eb !important;
-            color: #ffffff !important;
-        }
-
-        body.theme-dark .text-muted {
-            color: #cbd5e1 !important;
-        }
-        body.theme-dark .side-event-meta {
-            color: #cbd5e1 !important;
-        }
-        body.theme-dark .day-header {
-            color: #f1f5f9;
-        }
-        body.theme-dark .lunar-tag {
-            color: #e2e8f0;
-        }
-        body.theme-dark .memo-collapsed-bar .collapsed-title {
-            color: #ffffff;
-        }
-        body.theme-dark kbd {
-            background-color: #1e293b;
-            color: #ffffff;
-            border-color: #475569;
-        }
+        body.theme-dark .text-muted, body.theme-dark .side-event-meta { color: #cbd5e1 !important; }
+        body.theme-dark .day-header { color: #f1f5f9; }
+        body.theme-dark .lunar-tag { color: #e2e8f0; }
+        body.theme-dark .memo-collapsed-bar .collapsed-title { color: #ffffff; }
+        body.theme-dark kbd { background-color: #1e293b; color: #ffffff; border-color: #475569; }
 
         body.theme-japanese {
             --bg-body: #f4f1eb;
@@ -320,7 +249,7 @@
             --modal-lunar-ji-text: #991b1b;
         }
 
-        /* ================= 核心排版 (一屏自適應 100vh Fit) ================= */
+        /* ================= 核心排版 ================= */
         html, body {
             height: 100%;
             margin: 0;
@@ -341,11 +270,7 @@
             background-color: var(--bg-body);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
             color: var(--text-main);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            text-rendering: optimizeLegibility;
             letter-spacing: 0.015em; 
-            transition: background-color 0.3s ease, color 0.3s ease;
             display: flex;
             flex-direction: column;
         }
@@ -383,14 +308,7 @@
 
         .nav-title { grid-area: title; margin: 0; }
         .nav-month { grid-area: month; display: flex; align-items: center; gap: 14px; }
-        
-        .nav-tools { 
-            grid-area: tools; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            justify-self: end; 
-        }
+        .nav-tools { grid-area: tools; display: flex; align-items: center; gap: 8px; justify-self: end; }
 
         .app-title { 
             color: var(--primary-color); 
@@ -406,21 +324,11 @@
             user-select: none;
             padding: 4px 8px;
             border-radius: 8px;
-            transition: all 0.2s ease;
+            transition: background-color 0.15s ease;
         }
-        .app-title:hover {
-            background-color: var(--today-bg);
-        }
-        .app-title .edit-title-icon {
-            opacity: 0.45;
-            transition: all 0.2s ease;
-            font-size: 0.95rem;
-        }
-        .app-title:hover .edit-title-icon {
-            opacity: 1;
-            transform: scale(1.15);
-            color: var(--primary-color);
-        }
+        .app-title:hover { background-color: var(--today-bg); }
+        .app-title .edit-title-icon { opacity: 0.45; font-size: 0.95rem; }
+        .app-title:hover .edit-title-icon { opacity: 1; color: var(--primary-color); }
 
         .month-title { 
             font-weight: 800; 
@@ -438,7 +346,7 @@
             border: 1px solid var(--border-color);
             border-radius: 9px;
             padding: 3px;
-            box-shadow: 0 1px 3px var(--chip-shadow), inset 0 1px 2px rgba(0,0,0,0.03);
+            box-shadow: 0 1px 3px var(--chip-shadow);
             gap: 3px;
             user-select: none;
         }
@@ -450,21 +358,14 @@
             padding: 4px 10px;
             border-radius: 6px;
             font-size: 0.92rem;
-            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             line-height: 1.2;
             cursor: pointer;
         }
-        .btn-nav-seg:hover {
-            background: var(--bg-surface);
-            color: var(--text-main);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-        }
-        .btn-nav-seg:active {
-            transform: scale(0.95);
-        }
+        .btn-nav-seg:hover { background: var(--bg-surface); color: var(--text-main); }
+        .btn-nav-seg:active { transform: scale(0.95); }
 
         .btn-nav-seg.btn-nav-today {
             color: var(--text-main) !important;
@@ -473,15 +374,12 @@
             padding: 4px 14px;
             border-radius: 7px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             letter-spacing: 0.8px;
             font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.18s ease;
         }
-
         .btn-nav-seg.btn-nav-today::before {
             content: '';
             display: inline-block;
@@ -491,27 +389,17 @@
             border: 1.5px solid var(--primary-color);
             border-top-width: 3px;
             background: transparent;
-            margin: 0;
-            box-shadow: none;
-            animation: none;
             flex-shrink: 0;
-            transition: border-color 0.18s ease;
         }
-
         .btn-nav-seg.btn-nav-today:hover {
             color: var(--primary-color) !important;
             border-color: var(--primary-color);
             background: var(--today-bg);
-            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
-            transform: translateY(-1px);
-        }
-        .btn-nav-seg.btn-nav-today:active {
-            transform: translateY(0.5px) scale(0.97);
         }
 
         .btn-custom-outline {
             border: 1px solid var(--border-color); color: var(--text-main); background: var(--bg-surface);
-            box-shadow: 0 1px 2px var(--chip-shadow); transition: all 0.2s; font-weight: 700; padding: 5px 12px; font-size: 0.92rem;
+            box-shadow: 0 1px 2px var(--chip-shadow); font-weight: 700; padding: 5px 12px; font-size: 0.92rem;
         }
         .btn-custom-outline:hover { background: var(--bg-header); border-color: var(--text-muted); color: var(--text-main); }
         .btn-custom-outline.active-tool {
@@ -533,13 +421,10 @@
             width: 100%;
             margin: 0 auto;
             align-items: stretch;
-            transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: grid-template-columns 0.25s ease;
             box-sizing: border-box;
         }
-
-        .calendar-container.memo-collapsed {
-            grid-template-columns: 1fr 48px;
-        }
+        .calendar-container.memo-collapsed { grid-template-columns: 1fr 48px; }
 
         .card-container {
             background-color: var(--bg-surface); 
@@ -553,15 +438,8 @@
             min-height: 0;
         }
 
-        .calendar-grid { 
-            display: grid; 
-            grid-template-columns: repeat(7, 1fr); 
-            align-content: start;
-        }
-
-        #calendarHeader {
-            flex-shrink: 0;
-        }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); align-content: start; }
+        #calendarHeader { flex-shrink: 0; }
 
         #calendarBody { 
             flex: 1;
@@ -570,11 +448,11 @@
             grid-template-columns: repeat(7, 1fr);
             grid-auto-rows: 1fr; 
             height: 100%;
-            transition: opacity 0.2s ease, transform 0.2s ease; 
             opacity: 1; 
             transform: translateY(0); 
+            transition: opacity 0.12s ease;
         }
-        .calendar-transitioning { opacity: 0 !important; transform: translateY(6px) !important; }
+        .calendar-transitioning { opacity: 0.3 !important; }
 
         .day-header {
 			font-size: 0.96rem; font-weight: 800; color: var(--text-muted); text-align: center; padding: 8px 0;
@@ -600,9 +478,7 @@
             gap: 2px; 
             min-width: 0; 
             box-sizing: border-box;
-            transition: background-color 0.2s;
         }
-
         .day-cell.weekend-sat-cell { background-color: var(--weekend-sat-bg); }
         .day-cell.weekend-sun-cell { background-color: var(--weekend-sun-bg); }
         .day-cell:nth-child(7n) { border-right: none; }
@@ -618,12 +494,8 @@
         .day-cell.holiday-streak-cell {
             border-top: 3.5px solid var(--holiday-streak-border) !important;
         }
-        .date-number.text-holiday {
-            color: var(--holiday-text) !important;
-            font-weight: 800;
-        }
+        .date-number.text-holiday { color: var(--holiday-text) !important; font-weight: 800; }
 
-        /* 煙火 Canvas 畫布：層級設定為前景 (z-index: 10)，並透過 pointer-events: none 確保所有點擊事件穿透無阻 */
         .cell-firework-canvas {
             position: absolute !important;
             top: 0 !important;
@@ -672,14 +544,8 @@
             cursor: pointer;
             line-height: 1.25;
             flex-shrink: 0;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-            transition: all 0.15s ease;
             position: relative;
             z-index: 4;
-        }
-        .holiday-streak-banner:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(220, 38, 38, 0.2);
         }
         .streak-icon { margin-right: 3px; font-size: 0.85rem; flex-shrink: 0; }
         .streak-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
@@ -731,7 +597,6 @@
             background-color: #38bdf8 !important;
         }
 
-        /* 選取日期：精確階層劃分，即使選取當日，前景煙火亦能完美覆蓋並透顯 */
         .day-cell.selected-day {
             position: relative;
             background-color: var(--today-bg) !important;
@@ -810,7 +675,6 @@
             z-index: 4;
         }
 
-        /* 格子數字樣式與點擊微反饋 */
         .date-number { 
             font-weight: 800; 
             color: var(--text-main); 
@@ -820,11 +684,10 @@
             border-radius: 6px;
             letter-spacing: -0.01em;
             cursor: pointer;
-            transition: background-color 0.16s ease, transform 0.16s ease;
         }
         .date-number:hover {
             background-color: rgba(37, 99, 235, 0.14);
-            transform: scale(1.1);
+            transform: scale(1.08);
         }
         body.theme-dark .date-number:hover {
             background-color: rgba(56, 189, 248, 0.22);
@@ -842,7 +705,6 @@
             text-overflow: ellipsis;
             max-width: 68%;
             letter-spacing: 0.01em;
-            transition: all 0.2s;
             cursor: help;
         }
 
@@ -856,7 +718,6 @@
 
         .day-cell.other-month .lunar-tag { opacity: 0.5; }
 
-        /* 事件容器與標籤 */
         .events-wrapper {
             display: flex;
             flex-direction: column;
@@ -888,7 +749,6 @@
             letter-spacing: 0.01em; 
             line-height: 1.34;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-            transition: all 0.15s ease;
             text-align: left;
             min-width: 0;
             user-select: none;
@@ -997,7 +857,7 @@
             height: 100%; 
             min-height: 0;
             position: relative;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.25s ease;
         }
         
         .side-tab-header { 
@@ -1030,17 +890,13 @@
             padding: 5px 12px;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.18s;
             display: inline-flex;
             align-items: center;
             gap: 5px;
             line-height: 1.2;
             white-space: nowrap;
         }
-        .side-tab-btn:hover {
-            color: var(--text-main);
-            background: var(--bg-header);
-        }
+        .side-tab-btn:hover { color: var(--text-main); background: var(--bg-header); }
         .side-tab-btn.active {
             background-color: var(--primary-color) !important;
             color: #ffffff !important;
@@ -1059,7 +915,6 @@
             overflow: hidden;
         }
 
-        /* 記事本區域 */
         .memo-badge { background-color: var(--today-bg); color: var(--primary-color); font-size: 0.74rem; font-weight: 800; padding: 3px 7px; border-radius: 12px; border: 1px solid rgba(96, 165, 250, 0.25); letter-spacing: 0.5px; }
         
         #sideMemoArea { 
@@ -1098,9 +953,7 @@
 
         #sideMemoArea::-webkit-scrollbar,
         .memo-preview-area::-webkit-scrollbar,
-        .side-events-scroll::-webkit-scrollbar { 
-            width: 6px; 
-        }
+        .side-events-scroll::-webkit-scrollbar { width: 6px; }
         #sideMemoArea::-webkit-scrollbar-thumb,
         .memo-preview-area::-webkit-scrollbar-thumb,
         .side-events-scroll::-webkit-scrollbar-thumb { 
@@ -1109,9 +962,7 @@
         }
         body.theme-dark #sideMemoArea::-webkit-scrollbar-thumb,
         body.theme-dark .memo-preview-area::-webkit-scrollbar-thumb,
-        body.theme-dark .side-events-scroll::-webkit-scrollbar-thumb { 
-            background: rgba(255,255,255,0.25); 
-        }
+        body.theme-dark .side-events-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); }
 
         .memo-clickable-link {
             color: var(--primary-color) !important;
@@ -1119,10 +970,8 @@
             font-weight: 700;
             cursor: pointer;
             word-break: break-all;
-            transition: opacity 0.15s;
         }
 
-        /* 當日事件清單分頁樣式 */
         .side-events-scroll {
             flex: 1;
             min-height: 0;
@@ -1158,7 +1007,6 @@
             padding: 10px 14px;
             font-size: 0.95rem;
             line-height: 1.6;
-            transition: all 0.2s ease;
         }
 
         .side-event-card {
@@ -1168,7 +1016,6 @@
             border-radius: 8px;
             padding: 10px 14px;
             box-shadow: 0 1px 4px var(--chip-shadow);
-            transition: all 0.2s ease;
             position: relative;
             flex-shrink: 0;
         }
@@ -1196,17 +1043,9 @@
             align-items: center;
         }
 
-        .side-event-actions {
-            display: flex;
-            gap: 6px;
-            opacity: 0.9;
-        }
-        .side-event-actions button {
-            padding: 2px 7px;
-            font-size: 0.78rem;
-        }
+        .side-event-actions { display: flex; gap: 6px; opacity: 0.9; }
+        .side-event-actions button { padding: 2px 7px; font-size: 0.78rem; }
 
-        /* 側條收合 */
         .memo-collapsed-bar {
             display: none;
             flex-direction: column;
@@ -1218,11 +1057,8 @@
             user-select: none;
             gap: 14px;
             background-color: var(--bg-surface);
-            transition: background-color 0.2s ease;
         }
-        .memo-collapsed-bar:hover {
-            background-color: var(--bg-header);
-        }
+        .memo-collapsed-bar:hover { background-color: var(--bg-header); }
 
         .memo-collapsed-bar .collapsed-title {
             writing-mode: vertical-rl;
@@ -1238,17 +1074,142 @@
         .calendar-container.memo-collapsed .side-pane {
             display: none !important;
         }
+        .calendar-container.memo-collapsed .memo-collapsed-bar { display: flex !important; }
 
-        .calendar-container.memo-collapsed .memo-collapsed-bar {
-            display: flex !important;
+        /* ================= 花火表格選擇器與 Demo 預覽樣式 ================= */
+        .fw-demo-box {
+            position: relative;
+            width: 100%;
+            height: 155px;
+            background: radial-gradient(circle at bottom, #111827 0%, #030712 100%);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .fw-demo-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .fw-demo-badge {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: #f8fafc;
+            border: 1px solid rgba(255,255,255,0.15);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .fw-demo-current-title {
+            position: absolute;
+            bottom: 8px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            pointer-events: none;
+            z-index: 2;
         }
 
-        /* ================= 彈窗與字體優化 ================= */
-        #noteModal .modal-dialog {
-            max-width: 580px;
-            max-height: 94vh;
-            margin: 1.75rem auto;
+        .fw-picker-scroll {
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
         }
+        .fw-picker-scroll::-webkit-scrollbar { width: 6px; }
+        .fw-picker-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 4px; }
+        body.theme-dark .fw-picker-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); }
+
+        .fw-grid-category-title {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 10px 0 6px 0;
+            padding-bottom: 2px;
+            border-bottom: 1px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .fw-tiles-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+        @media (max-width: 500px) {
+            .fw-tiles-grid { grid-template-columns: 1fr; }
+        }
+
+        .fw-tile-card {
+            background-color: var(--bg-surface);
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            padding: 7px 9px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.16s ease;
+            text-align: left;
+            user-select: none;
+        }
+        .fw-tile-card:hover {
+            border-color: var(--primary-color);
+            background-color: var(--today-bg);
+            transform: translateY(-1px);
+        }
+        .fw-tile-card.active {
+            border-color: var(--primary-color) !important;
+            background-color: var(--today-bg) !important;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.28);
+        }
+        .fw-tile-icon {
+            font-size: 1.25rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .fw-tile-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .fw-tile-name {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+        }
+        .fw-tile-desc {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.25;
+            margin-top: 2px;
+        }
+
+        /* ================= 彈窗樣式 ================= */
+        #noteModal .modal-dialog { max-width: 580px; max-height: 94vh; margin: 1.75rem auto; }
         #noteModal .modal-content {
             max-height: 94vh;
             display: flex;
@@ -1256,42 +1217,17 @@
             overflow: hidden;
             box-shadow: 0 12px 36px rgba(0,0,0,0.35);
         }
-        #noteModal .modal-header {
-            padding: 14px 22px;
-            flex-shrink: 0;
-        }
-        #noteModal .modal-title {
-            font-size: 1.42rem !important;
-            letter-spacing: 0.5px;
-        }
-        #noteModal .modal-body {
-            padding: 16px 22px;
-            overflow-y: auto;
-            flex: 1 1 auto;
-            min-height: 0;
-        }
-        #noteModal .modal-footer {
-            padding: 14px 22px;
-            flex-shrink: 0;
-            background-color: var(--bg-header);
-        }
+        #noteModal .modal-header { padding: 14px 22px; flex-shrink: 0; }
+        #noteModal .modal-title { font-size: 1.42rem !important; letter-spacing: 0.5px; }
+        #noteModal .modal-body { padding: 16px 22px; overflow-y: auto; flex: 1 1 auto; min-height: 0; }
+        #noteModal .modal-footer { padding: 14px 22px; flex-shrink: 0; background-color: var(--bg-header); }
 
         #noteModal .modal-body::-webkit-scrollbar { width: 6px; }
         #noteModal .modal-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 4px; }
         body.theme-dark #noteModal .modal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); }
 
-        #noteModal .form-label {
-            font-size: 1.05rem !important;
-            font-weight: 800 !important;
-            margin-bottom: 6px;
-        }
-
-        #dateRange {
-            font-size: 1.14rem !important;
-            padding: 8px 12px !important;
-            border-radius: 8px;
-            letter-spacing: 0.5px;
-        }
+        #noteModal .form-label { font-size: 1.05rem !important; font-weight: 800 !important; margin-bottom: 6px; }
+        #dateRange { font-size: 1.14rem !important; padding: 8px 12px !important; border-radius: 8px; letter-spacing: 0.5px; }
 
         .modal-lunar-box {
             background-color: var(--modal-lunar-bg) !important;
@@ -1301,7 +1237,6 @@
             font-size: 0.94rem !important; 
             line-height: 1.55;
             padding: 8px 12px !important;
-            transition: all 0.2s ease;
         }
 
         .modal-lunar-box .lunar-header-line,
@@ -1312,44 +1247,15 @@
             letter-spacing: 0.02em;
         }
 
-        .lunar-yi-title {
-            color: var(--modal-lunar-yi-title) !important;
-            font-weight: 900 !important;
-            font-size: 0.96rem !important;
-            letter-spacing: 0.025em;
-        }
-        .lunar-yi-content {
-            color: var(--modal-lunar-yi-text) !important;
-            font-weight: 800 !important;
-            font-size: 0.95rem !important;
-            letter-spacing: 0.02em;
-        }
-        .lunar-ji-title {
-            color: var(--modal-lunar-ji-title) !important;
-            font-weight: 900 !important;
-            font-size: 0.96rem !important;
-            letter-spacing: 0.025em;
-        }
-        .lunar-ji-content {
-            color: var(--modal-lunar-ji-text) !important;
-            font-weight: 800 !important;
-            font-size: 0.95rem !important;
-            letter-spacing: 0.02em;
-        }
+        .lunar-yi-title { color: var(--modal-lunar-yi-title) !important; font-weight: 900 !important; font-size: 0.96rem !important; }
+        .lunar-yi-content { color: var(--modal-lunar-yi-text) !important; font-weight: 800 !important; font-size: 0.95rem !important; }
+        .lunar-ji-title { color: var(--modal-lunar-ji-title) !important; font-weight: 900 !important; font-size: 0.96rem !important; }
+        .lunar-ji-content { color: var(--modal-lunar-ji-text) !important; font-weight: 800 !important; font-size: 0.95rem !important; }
 
-        #modalHolidayInfo {
-            font-size: 0.95rem !important;
-            padding: 7px 11px !important;
-        }
+        #modalHolidayInfo { font-size: 0.95rem !important; padding: 7px 11px !important; }
+        #customIconInput { height: 32px !important; font-size: 0.95rem !important; border-radius: 6px; }
 
-        #customIconInput {
-            height: 32px !important;
-            font-size: 0.95rem !important;
-            border-radius: 6px;
-        }
-
-        /* 選擇圖示：單排橫向放大設計 */
-        .icon-selector { 
+        .icon-selector, .color-selector { 
             display: flex; 
             align-items: center; 
             justify-content: flex-start;
@@ -1360,13 +1266,10 @@
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
         }
-        .icon-selector::-webkit-scrollbar { display: none; }
+        .icon-selector::-webkit-scrollbar, .color-selector::-webkit-scrollbar { display: none; }
 
         @media (min-width: 540px) {
-            .icon-selector {
-                justify-content: space-between;
-                gap: 0;
-            }
+            .icon-selector, .color-selector { justify-content: space-between; gap: 0; }
         }
 
         .icon-selector input[type="radio"], .color-selector input[type="radio"] { display: none; }
@@ -1383,7 +1286,6 @@
             justify-content: center; 
             background: var(--bg-surface); 
             font-size: 1.25rem !important; 
-            transition: all 0.16s ease; 
             position: relative;
             box-sizing: border-box;
             line-height: 1;
@@ -1397,27 +1299,6 @@
             z-index: 2;
         }
         
-        /* 選擇顏色：單排橫向放大設計 */
-        .color-selector { 
-            display: flex; 
-            align-items: center; 
-            justify-content: flex-start;
-            gap: 8px; 
-            margin-top: 4px;
-            padding: 5px 2px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
-        }
-        .color-selector::-webkit-scrollbar { display: none; }
-
-        @media (min-width: 540px) {
-            .color-selector {
-                justify-content: space-between;
-                gap: 0;
-            }
-        }
-
         .color-selector label { 
             width: 33px; 
             height: 33px;
@@ -1429,7 +1310,6 @@
             align-items: center; 
             justify-content: center; 
             background-color: var(--base-color); 
-            transition: all 0.16s ease;
             position: relative;
             box-sizing: border-box;
         }
@@ -1468,7 +1348,6 @@
             align-items: center;
             justify-content: center;
         }
-
         .custom-color-item label {
             width: 33px !important;
             height: 33px !important;
@@ -1476,21 +1355,15 @@
             font-size: 1.1rem !important;
             background-color: var(--base-color);
         }
-
         .custom-color-icon {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             line-height: 1;
             pointer-events: none;
-            transition: opacity 0.16s ease;
         }
+        .color-selector input[type="radio"]:checked + label .custom-color-icon { opacity: 0.35; }
 
-        .color-selector input[type="radio"]:checked + label .custom-color-icon {
-            opacity: 0.35;
-        }
-
-        /* 行程內容比例放大 */
         #noteTextarea {
             font-size: 1.15rem !important;
             line-height: 1.6 !important;
@@ -1504,11 +1377,7 @@
             height: 1.25em !important;
             margin-right: 8px;
         }
-        .form-check-label {
-            font-size: 1.02rem !important;
-            line-height: 1.45;
-            user-select: none;
-        }
+        .form-check-label { font-size: 1.02rem !important; line-height: 1.45; user-select: none; }
 
         #noteModal .modal-footer .btn {
             font-size: 1.02rem !important;
@@ -1535,9 +1404,7 @@
             font-size: 0.92rem;
             font-weight: 600;
         }
-        .shortcut-item:last-child {
-            border-bottom: none;
-        }
+        .shortcut-item:last-child { border-bottom: none; }
 
         .swal2-popup { background-color: var(--bg-surface) !important; color: var(--text-main) !important; border-radius: 16px !important; border: 1px solid var(--border-color); padding: 1.8em 1.4em !important; }
         .swal2-title { color: var(--text-main) !important; font-weight: 800 !important; padding-bottom: 8px; font-size: 1.35rem !important; }
@@ -1554,10 +1421,7 @@
                     "tools tools tools";
                 padding: 10px 16px;
             }
-            .calendar-container {
-                padding: 10px 16px;
-                gap: 12px;
-            }
+            .calendar-container { padding: 10px 16px; gap: 12px; }
             .nav-month { justify-self: center; }
             .nav-tools {
                 justify-self: stretch;
@@ -1570,17 +1434,8 @@
         }
 
         @media (max-width: 992px) {
-            html, body {
-                overflow: auto; 
-                height: auto;
-                min-height: 100%;
-            }
-            .calendar-container { 
-                grid-template-columns: 1fr; 
-                padding: 12px 14px; 
-                height: auto;
-                min-height: auto;
-            }
+            html, body { overflow: auto; height: auto; min-height: 100%; }
+            .calendar-container { grid-template-columns: 1fr; padding: 12px 14px; height: auto; min-height: auto; }
             .calendar-container.memo-collapsed { grid-template-columns: 1fr; }
             .day-cell { height: 128px; } 
             .memo-wrapper { min-height: 480px; }
@@ -1591,11 +1446,7 @@
                 padding: 10px 16px;
                 justify-content: space-between;
             }
-            .memo-collapsed-bar .collapsed-title {
-                writing-mode: horizontal-tb;
-                letter-spacing: 2px;
-                margin: 0;
-            }
+            .memo-collapsed-bar .collapsed-title { writing-mode: horizontal-tb; letter-spacing: 2px; margin: 0; }
         }
 
         @media (max-width: 850px) {
@@ -1615,7 +1466,6 @@
                 padding: 6px 10px;
                 border-radius: 8px;
             }
-            
             .nav-tools {
                 flex-direction: row;
                 align-items: center;
@@ -1624,13 +1474,11 @@
                 padding: 6px 10px;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
+                -ms-overflow-style: none; scrollbar-width: none;
             }
             .nav-tools::-webkit-scrollbar { display: none; }
-            .nav-tools { -ms-overflow-style: none; scrollbar-width: none; }
-            
             .app-title { font-size: 1.15rem; }
             .month-title { min-width: auto; font-size: 1.2rem; }
-            #topAddEventBtn { padding: 6px 12px; font-size: 0.9rem; }
         }
 
         @media (max-width: 576px) {
@@ -1645,9 +1493,7 @@
             .streak-count { font-size: 0.65rem; padding: 0 2px; }
             .event-chip { padding: 2px 4px; font-size: 0.8rem; line-height: 1.25; }
             .events-wrapper.multi-items { grid-template-columns: 1fr; gap: 2px; }
-            .icon-selector { gap: 6px; }
-            .color-selector { gap: 6px; }
-
+            .icon-selector, .color-selector { gap: 6px; }
             .swal2-actions { flex-direction: column !important; width: 100% !important; }
             .swal2-actions button { width: 100% !important; }
         }
@@ -1687,7 +1533,6 @@
                 <i class="bi bi-moon-stars"></i><span class="d-none d-xl-inline">農民曆</span>
             </button>
 
-            <!-- 雲端固定網址同步功能按鈕 -->
             <button class="btn btn-custom-outline btn-sm d-flex align-items-center gap-1 px-2" id="cloudSyncBtn" title="設定固定網址載入 / 雲端同步 (快捷鍵: Alt+U)">
                 <i class="bi bi-cloud-arrow-down"></i><span class="d-none d-xl-inline">雲端載入</span>
             </button>
@@ -1737,7 +1582,7 @@
         <div class="calendar-grid" id="calendarBody"></div>
     </div>
 
-    <!-- 右側複合面板 (預設切換為當日事件) -->
+    <!-- 右側複合面板 -->
     <div class="card-container memo-wrapper" id="sideMemoContainer">
         <div class="side-tab-header">
             <div class="side-tab-buttons">
@@ -1762,7 +1607,7 @@
             </div>
         </div>
         
-        <!-- 當日事件 Page (預設顯示) -->
+        <!-- 當日事件 Page -->
         <div class="side-pane" id="paneEvents">
             <div class="side-date-header">
                 <div class="side-date-header-top">
@@ -1787,13 +1632,13 @@
             <div class="side-events-scroll" id="sideEventsList"></div>
         </div>
 
-        <!-- 記事本 Page (預設隱藏) -->
+        <!-- 記事本 Page -->
         <div class="side-pane d-none" id="paneMemo">
             <textarea id="sideMemoArea" placeholder="在此記錄您的臨時想法、待辦事項或網址連結...內容會自動儲存。"></textarea>
             <div id="sideMemoPreview" class="memo-preview-area d-none"></div>
         </div>
 
-        <!-- 收合條 (Ctrl + M) -->
+        <!-- 收合條 -->
         <div class="memo-collapsed-bar" id="memoCollapsedBar" title="點擊展開 (快捷鍵: Ctrl+M)">
             <i class="bi bi-layout-sidebar-inset-reverse text-primary fs-5"></i>
             <span class="collapsed-title" id="collapsedTitle">當日事件</span>
@@ -1802,7 +1647,7 @@
     </div>
 </div>
 
-<!-- 新增/編輯行程 Modal (已移除花火選項) -->
+<!-- 新增/編輯行程 Modal -->
 <div class="modal fade" id="noteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content" style="background-color: var(--bg-surface); border-color: var(--border-color); border-radius: 16px;">
@@ -1828,7 +1673,7 @@
 					<div class="d-flex justify-content-between align-items-center mb-1">
                         <label class="form-label fw-bold opacity-85 m-0">選擇圖示：</label>
                         <div class="d-flex align-items-center gap-1" style="max-width: 160px;">
-                            <input type="text" class="form-control form-control-sm text-center fw-bold px-2" id="customIconInput" placeholder="自訂圖示" maxlength="4" style="background: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);" title="輸入 Emoji 或文字 (快捷鍵: Win + . 或 Mac Cmd+Ctrl+Space)">
+                            <input type="text" class="form-control form-control-sm text-center fw-bold px-2" id="customIconInput" placeholder="自訂圖示" maxlength="4" style="background: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);" title="輸入 Emoji 或文字">
                         </div>
                     </div>
 					<div class="icon-selector" id="iconPicker">
@@ -1841,7 +1686,6 @@
 						<input type="radio" name="noteIcon" id="iconBook" value="📖"><label for="iconBook" title="閱讀">📖</label>
 						<input type="radio" name="noteIcon" id="iconFood" value="🍜"><label for="iconFood" title="聚餐">🍜</label>						
 						<input type="radio" name="noteIcon" id="iconPlane" value="✈️"><label for="iconPlane" title="出差旅遊">✈️</label>						
-                        
                         <input type="radio" name="noteIcon" id="iconCustom" value="CUSTOM"><label for="iconCustom" id="iconCustomLabel" title="自訂圖示" style="border-style: dashed;">➕</label>
 					</div>
 				</div>
@@ -1936,7 +1780,7 @@
                         <div class="shortcut-group-title"><i class="bi bi-lightning-charge"></i> 核心常用</div>
                         <div class="shortcut-item"><span>切換選取日期</span><span><kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></span></div>
                         <div class="shortcut-item"><span>新增行程</span><span><kbd>空白鍵</kbd> 或 <kbd>Alt + N</kbd></span></div>
-                        <div class="shortcut-item"><span>設定日曆花火</span><span class="text-muted fw-bold">點選格子的「日期數字」即可選擇造型啟用</span></div>
+                        <div class="shortcut-item"><span>設定日曆花火</span><span><kbd>Alt + F</kbd> 或點選日期數字</span></div>
                         <div class="shortcut-item"><span>切換至 當日事件</span><span><kbd>Alt + 1</kbd></span></div>
                         <div class="shortcut-item"><span>切換至 記事本</span><span><kbd>Alt + 2</kbd></span></div>
                         <div class="shortcut-item"><span>收合 / 展開側面板</span><span><kbd>Ctrl + M</kbd></span></div>
@@ -1970,7 +1814,7 @@
 
                     <div class="col-12">
                         <div class="shortcut-group-title"><i class="bi bi-mouse"></i> 滑鼠與觸控操作</div>
-                        <div class="shortcut-item"><span>點選格子的日期數字</span><span class="text-primary fw-bold">彈出選單設定/切換此日的日本花火造型</span></div>
+                        <div class="shortcut-item"><span>點選格子的日期數字</span><span class="text-primary fw-bold">彈出網格選單與即時 Demo 預覽設定花火</span></div>
                         <div class="shortcut-item"><span>單擊日期格子空白處 / 連假彩帶</span><span class="text-muted fw-bold">選取日期並切換查看「當日事件」</span></div>
                         <div class="shortcut-item"><span>連按兩下 (雙擊) 日期格空白處</span><span class="text-muted fw-bold">直接在該日期建立新行程</span></div>
                         <div class="shortcut-item"><span>連按兩下 (雙擊) 連假彩帶或行程</span><span class="text-muted fw-bold">直接開啟該行程的編輯視窗</span></div>
@@ -2029,9 +1873,7 @@
     });
 
     function openHelpModal() {
-        if (helpModal) {
-            helpModal.show();
-        }
+        if (helpModal) helpModal.show();
     }
 
     function promptEditTitle() {
@@ -2055,55 +1897,667 @@
         });
     }
 
-    /* 點選格子的數字彈出花火啟用選項 */
+    /* 16 大職人樣式資料庫 */
+    const ALL_FIREWORK_DEFINITIONS = [
+        {
+            category: '基礎控制',
+            items: [
+                { id: 'none', icon: '❌', name: '關閉花火動畫', desc: '取消此日期的花火動畫施放' },
+                { id: 'all', icon: '🎆', name: '全造型隨機輪播', desc: '大會競技規格，每發隨機展示不同職人技藝' }
+            ]
+        },
+        {
+            category: '經典競技割物・芯物',
+            items: [
+                { id: 'yonsin_kiku', icon: '👑', name: '四重芯菊花割物', desc: '四重同心色彩層疊展開' },
+                { id: 'yae_shin', icon: '🎯', name: '伝統・三重芯割物', desc: '經典同心圓多層密緻菊' },
+                { id: 'nidan_saki', icon: '✨', name: '多段変化・二段咲き', desc: '外層展開後芯部二次爆開' },
+                { id: 'henshoku_botan', icon: '🌺', name: '現代職人・変色牡丹', desc: '綻放途中由天青轉為洋紅' }
+            ]
+        },
+        {
+            category: '流光垂絲・瀑布大柳',
+            items: [
+                { id: 'kamuro_lush', icon: '🌾', name: '極上・錦冠大柳', desc: '超茂盛密金流光垂絲' },
+                { id: 'kamuro_saki', icon: '💫', name: '錦冠先変化・星屑しだれ', desc: '垂金柳末端點化寶石閃芒' },
+                { id: 'kiku_taki', icon: '🌊', name: '白銀菊花滝', desc: '如萬道白銀瀑布震撼傾瀉' },
+                { id: 'wabi_edo', icon: '🏮', name: '江戸古法・和火炭火', desc: '沉著古樸溫潤餘燼炭火' }
+            ]
+        },
+        {
+            category: '動き物・変り物',
+            items: [
+                { id: 'kurui_hachi', icon: '🐝', name: '乱舞奇想・狂い蜂', desc: '迴旋急拐金色蜂群光束' },
+                { id: 'senrin_lush', icon: '🎇', name: '群咲・千輪百花', desc: '多處微型子花火連環齊綻' },
+                { id: 'palm_gold', icon: '🌴', name: '和風・金椰冠', desc: '七重弧形金椰雄渾下垂' }
+            ]
+        },
+        {
+            category: '和風雅緻・型物造型',
+            items: [
+                { id: 'sakura_fubuki', icon: '🌸', name: '和風・桜吹雪', desc: '五瓣粉櫻優雅緩緩飄落' },
+                { id: 'spiral_galaxy', icon: '🌌', name: '銀河・天の川', desc: '三臂旋渦璀璨旋轉銀河' },
+                { id: 'heart_strobe', icon: '💖', name: '純愛金波ハート', desc: '立體愛心外環閃爍' },
+                { id: 'star_spark', icon: '⭐️', name: '型物・五芒煌星', desc: '璀璨五芒星耀眼金芒' },
+                { id: 'ring_saturn', icon: '🪐', name: '宇宙・土星雙環', desc: 'Saturn 核心帶光環' }
+            ]
+        }
+    ];
+
+    function getHanabiStylesDefinitions() {
+        return [
+            { name: '職人極致・四重芯菊花割物', shape: 'yonsin_kiku', colors: ['#38bdf8', '#0284c7'], ring3Colors: ['#ef4444', '#f87171'], ring2Colors: ['#10b981', '#34d399'], coreColors: ['#fbbf24', '#ffffff'], particles: 52, baseSpeed: 1.95, airDrag: 0.957, gravity: 0.018, decayRate: 0.0056 },
+            { name: '伝統・三重芯割物', shape: 'yae_shin', colors: ['#a855f7', '#c084fc'], middleColors: ['#ff3838', '#ff6b81'], coreColors: ['#fff200', '#ffffff'], particles: 44, baseSpeed: 1.9, airDrag: 0.955, gravity: 0.018, decayRate: 0.0062 },
+            { name: '多段変化・二段咲き', shape: 'nidan_saki', colors: ['#ff4d4d', '#ff7675', '#ff9f43', '#ffffff'], coreColors: ['#00d2d3', '#54a0ff', '#feca57', '#ffffff'], particles: 40, baseSpeed: 1.8, airDrag: 0.958, gravity: 0.018, decayRate: 0.0062 },
+            { name: '現代職人・変色牡丹', shape: 'henshoku_botan', colors: ['#3b82f6', '#60a5fa', '#93c5fd'], shiftColor: '#ff2a85', particles: 38, baseSpeed: 1.75, airDrag: 0.954, gravity: 0.017, decayRate: 0.0060 },
+            { name: '極上・錦冠大柳', shape: 'kamuro_lush', colors: ['#ffeaa7', '#ffd32a', '#ff9f1a', '#fff200', '#ffffff'], particles: 48, baseSpeed: 1.6, airDrag: 0.962, gravity: 0.022, decayRate: 0.0052 },
+            { name: '錦冠先変化・星屑しだれ', shape: 'kamuro_saki', colors: ['#fef08a', '#facc15', '#eab308'], particles: 44, baseSpeed: 1.65, airDrag: 0.961, gravity: 0.021, decayRate: 0.0053 },
+            { name: '白銀瀑布・大輪菊花滝', shape: 'kiku_taki', colors: ['#ffffff', '#e0f2fe', '#bae6fd', '#f8fafc'], particles: 42, baseSpeed: 1.85, airDrag: 0.958, gravity: 0.032, decayRate: 0.0058 },
+            { name: '江戸古法・和火炭火', shape: 'wabi_edo', colors: ['#ff4500', '#ff6a00', '#ff8c00', '#ffaa00', '#b43403'], particles: 36, baseSpeed: 1.45, airDrag: 0.952, gravity: 0.026, decayRate: 0.0048 },
+            { name: '乱舞奇想・狂い蜂', shape: 'kurui_hachi', colors: ['#fde047', '#facc15', '#f59e0b', '#ffffff'], particles: 36, baseSpeed: 1.65, airDrag: 0.965, gravity: 0.014, decayRate: 0.0058 },
+            { name: '群咲・千輪百花', shape: 'senrin_lush', colors: ['#ff3838', '#2ed573', '#1e90ff', '#ffa502', '#9b59b6', '#ff6b81'], particles: 40, baseSpeed: 1.7, airDrag: 0.956, gravity: 0.018, decayRate: 0.0065 },
+            { name: '和風・金椰冠', shape: 'palm_gold', colors: ['#fbc531', '#e1b12c', '#ffa502', '#ffffff'], particles: 34, baseSpeed: 2.0, airDrag: 0.960, gravity: 0.024, decayRate: 0.0058 },
+            { name: '和風・桜吹雪', shape: 'sakura_fubuki', colors: ['#ff758c', '#ff7eb3', '#ff4d6d', '#ffffff'], particles: 38, baseSpeed: 1.8, airDrag: 0.955, gravity: 0.016, decayRate: 0.0060 },
+            { name: '銀河・天の川', shape: 'spiral_galaxy', colors: ['#00cec9', '#0984e3', '#74b9ff', '#ffffff'], particles: 36, baseSpeed: 1.9, airDrag: 0.956, gravity: 0.018, decayRate: 0.0062 },
+            { name: '型物・純愛金波ハート', shape: 'heart_strobe', colors: ['#ff4757', '#ff6b81', '#ff78cb', '#ffffff'], particles: 36, baseSpeed: 1.7, airDrag: 0.958, gravity: 0.016, decayRate: 0.0062 },
+            { name: '型物・五芒煌星', shape: 'star_spark', colors: ['#ffd32a', '#ff9f1a', '#fff200', '#ffffff'], particles: 34, baseSpeed: 1.8, airDrag: 0.956, gravity: 0.018, decayRate: 0.0065 },
+            { name: '宇宙・土星雙環', shape: 'ring_saturn', colors: ['#00cec9', '#54a0ff', '#74b9ff', '#ffffff'], particles: 36, baseSpeed: 1.9, airDrag: 0.955, gravity: 0.018, decayRate: 0.0065 }
+        ];
+    }
+
+    function spawnStarsFromRocket(r, starsArray, cellSize) {
+        const s = r.style;
+        const count = s.particles;
+        const speedMult = Math.max(0.85, (cellSize / 120));
+        const baseSpeed = s.baseSpeed * speedMult;
+
+        for (let k = 0; k < count; k++) {
+            let vx = 0, vy = 0;
+            let color = s.colors[k % s.colors.length];
+            let isSecondStageTrigger = false;
+            let subBurstTime = 0;
+            let radius = 1.6;
+            let wobblePhase = Math.random() * Math.PI * 2;
+            let wobbleSpeed = 0.25 + Math.random() * 0.2;
+
+            if (s.shape === 'yonsin_kiku') {
+                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.05;
+                const layer = k % 4;
+                if (layer === 0) {
+                    vx = Math.cos(angle) * (baseSpeed * 0.32);
+                    vy = Math.sin(angle) * (baseSpeed * 0.32);
+                    color = s.coreColors[k % s.coreColors.length];
+                    radius = 1.8;
+                } else if (layer === 1) {
+                    vx = Math.cos(angle) * (baseSpeed * 0.58);
+                    vy = Math.sin(angle) * (baseSpeed * 0.58);
+                    color = s.ring2Colors[k % s.ring2Colors.length];
+                } else if (layer === 2) {
+                    vx = Math.cos(angle) * (baseSpeed * 0.82);
+                    vy = Math.sin(angle) * (baseSpeed * 0.82);
+                    color = s.ring3Colors[k % s.ring3Colors.length];
+                } else {
+                    vx = Math.cos(angle) * (baseSpeed * 1.08);
+                    vy = Math.sin(angle) * (baseSpeed * 1.08);
+                    color = s.colors[k % s.colors.length];
+                }
+            } else if (s.shape === 'wabi_edo') {
+                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.18;
+                const speed = baseSpeed * (0.65 + Math.random() * 0.45);
+                vx = Math.cos(angle) * speed;
+                vy = Math.sin(angle) * speed * 0.85;
+                radius = 1.75;
+            } else if (s.shape === 'kurui_hachi') {
+                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+                const speed = baseSpeed * (0.8 + Math.random() * 0.45);
+                vx = Math.cos(angle) * speed;
+                vy = Math.sin(angle) * speed;
+                radius = 1.5;
+            } else if (s.shape === 'kiku_taki') {
+                const angle = -Math.PI * 0.5 + (Math.random() - 0.5) * Math.PI * 0.75;
+                const speed = baseSpeed * (0.7 + Math.random() * 0.6);
+                vx = Math.cos(angle) * speed * 0.65;
+                vy = Math.sin(angle) * speed;
+                radius = 1.7;
+            } else if (s.shape === 'henshoku_botan') {
+                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.06;
+                const speed = baseSpeed * (0.92 + Math.random() * 0.15);
+                vx = Math.cos(angle) * speed;
+                vy = Math.sin(angle) * speed;
+                radius = 1.7;
+            } else if (s.shape === 'nidan_saki') {
+                if (k < 8) {
+                    isSecondStageTrigger = true;
+                    subBurstTime = 26 + Math.floor(Math.random() * 6);
+                    const a = Math.random() * Math.PI * 2;
+                    const sp = baseSpeed * 0.25;
+                    vx = Math.cos(a) * sp;
+                    vy = Math.sin(a) * sp;
+                    color = '#ffffff';
+                    radius = 1.9;
+                } else {
+                    const angle = ((k - 8) / (count - 8)) * Math.PI * 2 + (Math.random() - 0.5) * 0.08;
+                    const speed = baseSpeed * (0.9 + Math.random() * 0.2);
+                    vx = Math.cos(angle) * speed;
+                    vy = Math.sin(angle) * speed;
+                }
+            } else if (s.shape === 'yae_shin') {
+                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.06;
+                if (k % 3 === 0) {
+                    vx = Math.cos(angle) * (baseSpeed * 0.42);
+                    vy = Math.sin(angle) * (baseSpeed * 0.42);
+                    color = s.coreColors[k % s.coreColors.length];
+                } else if (k % 3 === 1) {
+                    vx = Math.cos(angle) * (baseSpeed * 0.75);
+                    vy = Math.sin(angle) * (baseSpeed * 0.75);
+                    color = s.middleColors[k % s.middleColors.length];
+                } else {
+                    vx = Math.cos(angle) * (baseSpeed * 1.05);
+                    vy = Math.sin(angle) * (baseSpeed * 1.05);
+                    color = s.colors[k % s.colors.length];
+                }
+            } else if (s.shape === 'kamuro_lush' || s.shape === 'kamuro_saki') {
+                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.12;
+                const speed = baseSpeed * (0.7 + Math.random() * 0.55);
+                vx = Math.cos(angle) * speed;
+                vy = Math.sin(angle) * speed;
+                radius = 1.8;
+            } else if (s.shape === 'heart_strobe') {
+                const t = (k / count) * Math.PI * 2;
+                const hx = 16 * Math.pow(Math.sin(t), 3);
+                const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                const len = Math.sqrt(hx * hx + hy * hy) || 1;
+                const speed = baseSpeed * (0.92 + Math.random() * 0.16);
+                vx = (hx / len) * speed;
+                vy = (hy / len) * speed;
+            } else if (s.shape === 'star_spark') {
+                const theta = (k / count) * Math.PI * 2;
+                const starRadius = 1 + 0.55 * Math.cos(5 * theta);
+                const speed = baseSpeed * starRadius * 0.9;
+                vx = Math.cos(theta) * speed;
+                vy = Math.sin(theta) * speed;
+            } else if (s.shape === 'sakura_fubuki') {
+                const theta = (k / count) * Math.PI * 2;
+                const petalR = 1 + 0.42 * Math.cos(5 * theta);
+                const speed = baseSpeed * petalR * 0.95;
+                vx = Math.cos(theta) * speed;
+                vy = Math.sin(theta) * speed;
+            } else if (s.shape === 'spiral_galaxy') {
+                const arms = 3;
+                const theta = (k / count) * Math.PI * 2 * arms;
+                const rDist = (k / count);
+                const speed = baseSpeed * (0.6 + 0.7 * rDist);
+                vx = Math.cos(theta + rDist * 1.8) * speed;
+                vy = Math.sin(theta + rDist * 1.8) * speed;
+            } else if (s.shape === 'senrin_lush') {
+                const cluster = k % 5;
+                const clusterAngles = [0, 1.25, 2.5, 3.75, 5.0];
+                const cDist = baseSpeed * 0.42;
+                const cx = Math.cos(clusterAngles[cluster]) * cDist;
+                const cy = Math.sin(clusterAngles[cluster]) * cDist;
+                const subAngle = Math.random() * Math.PI * 2;
+                const subSpeed = baseSpeed * 0.55 * (0.75 + Math.random() * 0.4);
+                vx = cx + Math.cos(subAngle) * subSpeed;
+                vy = cy + Math.sin(subAngle) * subSpeed;
+            } else if (s.shape === 'palm_gold') {
+                const numBranches = 7;
+                const branchIdx = k % numBranches;
+                const branchAngle = -Math.PI * 0.82 + (branchIdx / (numBranches - 1)) * (Math.PI * 0.64);
+                const branchSpeed = baseSpeed * (0.65 + Math.random() * 0.65);
+                vx = Math.cos(branchAngle) * branchSpeed;
+                vy = Math.sin(branchAngle) * branchSpeed;
+                radius = 1.8;
+            } else if (s.shape === 'ring_saturn') {
+                if (k < 8) {
+                    const a = Math.random() * Math.PI * 2;
+                    const sp = baseSpeed * 0.35 * Math.random();
+                    vx = Math.cos(a) * sp;
+                    vy = Math.sin(a) * sp;
+                    color = '#ffffff';
+                } else {
+                    const angle = ((k - 8) / (count - 8)) * Math.PI * 2;
+                    const rawX = Math.cos(angle) * baseSpeed * 1.3;
+                    const rawY = Math.sin(angle) * baseSpeed * 0.42;
+                    const tilt = -0.32;
+                    vx = rawX * Math.cos(tilt) - rawY * Math.sin(tilt);
+                    vy = rawX * Math.sin(tilt) + rawY * Math.cos(tilt);
+                }
+            } else {
+                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.08;
+                const speed = baseSpeed * (0.85 + Math.random() * 0.25);
+                vx = Math.cos(angle) * speed;
+                vy = Math.sin(angle) * speed;
+            }
+
+            starsArray.push({
+                x: r.x, y: r.y, vx, vy,
+                alpha: 1.0,
+                style: s,
+                color,
+                radius,
+                trail: [{ x: r.x, y: r.y }],
+                maxTrail: (s.shape === 'kamuro_lush' || s.shape === 'kamuro_saki' || s.shape === 'palm_gold' || s.shape === 'kiku_taki') ? 8 : (s.shape === 'henshoku_botan' ? 3 : 5),
+                isSecondStageTrigger,
+                subBurstTime,
+                hasSubBursted: false,
+                twinkle: Math.random() > 0.4,
+                twinkleFreq: 0.16 + Math.random() * 0.15,
+                age: 0,
+                wobblePhase,
+                wobbleSpeed,
+                colorShifted: false
+            });
+        }
+    }
+
+    function renderAndSimulateStars(ctx, starsArray) {
+        for (let i = starsArray.length - 1; i >= 0; i--) {
+            const st = starsArray[i];
+            st.age++;
+
+            if (st.style.shape === 'kurui_hachi') {
+                const wobble = Math.sin(st.age * st.wobbleSpeed + st.wobblePhase) * 0.55;
+                st.vx += -st.vy * wobble * 0.18;
+                st.vy += st.vx * wobble * 0.18;
+            } else if (st.style.shape === 'kamuro_saki' && st.age > 26 && !st.colorShifted) {
+                st.colorShifted = true;
+                st.color = (Math.random() > 0.5) ? '#ff2a85' : '#00f5d4';
+                st.radius = 1.9;
+                st.twinkle = true;
+                st.twinkleFreq = 0.35;
+            } else if (st.style.shape === 'henshoku_botan' && st.age > 24 && !st.colorShifted) {
+                st.colorShifted = true;
+                st.color = st.style.shiftColor || '#ff2a85';
+            }
+
+            st.x += st.vx;
+            st.y += st.vy;
+            st.vx *= st.style.airDrag;
+            st.vy = st.vy * st.style.airDrag + st.style.gravity;
+            st.alpha -= st.style.decayRate;
+
+            st.trail.push({ x: st.x, y: st.y });
+            if (st.trail.length > st.maxTrail) st.trail.shift();
+
+            if (st.isSecondStageTrigger && !st.hasSubBursted && st.age >= st.subBurstTime) {
+                st.hasSubBursted = true;
+                const subCount = 6;
+                for (let sc = 0; sc < subCount; sc++) {
+                    const sAngle = (sc / subCount) * Math.PI * 2 + Math.random() * 0.2;
+                    const sSpeed = 1.1 + Math.random() * 0.35;
+                    const sColor = st.style.coreColors[sc % st.style.coreColors.length];
+                    starsArray.push({
+                        x: st.x, y: st.y,
+                        vx: Math.cos(sAngle) * sSpeed,
+                        vy: Math.sin(sAngle) * sSpeed,
+                        alpha: 1.0,
+                        style: st.style,
+                        color: sColor,
+                        radius: 1.5,
+                        trail: [{ x: st.x, y: st.y }],
+                        maxTrail: 5,
+                        isSecondStageTrigger: false,
+                        hasSubBursted: true,
+                        twinkle: true,
+                        twinkleFreq: 0.22,
+                        age: 0,
+                        wobblePhase: 0,
+                        wobbleSpeed: 0,
+                        colorShifted: false
+                    });
+                }
+            }
+
+            if (st.alpha <= 0) {
+                starsArray.splice(i, 1);
+                continue;
+            }
+
+            let currentAlpha = st.alpha;
+            if (st.twinkle && st.alpha < 0.75) {
+                currentAlpha *= (0.45 + 0.55 * Math.sin(st.age * st.twinkleFreq));
+            }
+            if (currentAlpha <= 0) continue;
+
+            if (st.trail.length >= 2) {
+                ctx.beginPath();
+                ctx.moveTo(st.trail[0].x, st.trail[0].y);
+                for (let t = 1; t < st.trail.length; t++) ctx.lineTo(st.trail[t].x, st.trail[t].y);
+                ctx.strokeStyle = st.color;
+                ctx.lineWidth = (st.style.shape === 'kamuro_lush' || st.style.shape === 'palm_gold' || st.style.shape === 'kiku_taki') ? 1.5 : 1.15;
+                ctx.lineCap = 'round';
+                ctx.globalAlpha = Math.min(1, currentAlpha * 0.85);
+                ctx.stroke();
+            }
+
+            if (st.alpha > 0.15) {
+                ctx.fillStyle = st.color;
+                ctx.globalAlpha = Math.min(1, currentAlpha);
+                ctx.beginPath();
+                ctx.arc(st.x, st.y, st.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.globalAlpha = Math.min(1, currentAlpha * 0.95);
+                ctx.beginPath();
+                ctx.arc(st.x, st.y, st.radius * 0.65, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+
+    function stopFireworksAnimation() {
+        if (fireworkAnimFrame) {
+            cancelAnimationFrame(fireworkAnimFrame);
+            fireworkAnimFrame = null;
+        }
+        activeFireworkCanvases = [];
+    }
+
+    function initFireworksAnimation() {
+        stopFireworksAnimation();
+        if (document.hidden) return; 
+
+        const canvasElements = document.querySelectorAll('.cell-firework-canvas');
+        if (!canvasElements || canvasElements.length === 0) return;
+
+        const HANABI_STYLES = getHanabiStylesDefinitions();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2.0);
+
+        canvasElements.forEach(canvas => {
+            const rect = canvas.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return;
+
+            canvas.width = Math.round(rect.width * dpr);
+            canvas.height = Math.round(rect.height * dpr);
+
+            const ctx = canvas.getContext('2d', { alpha: true });
+            ctx.scale(dpr, dpr);
+
+            activeFireworkCanvases.push({
+                ctx,
+                w: rect.width,
+                h: rect.height,
+                stylePreference: canvas.dataset.fwStyle || 'all',
+                rockets: [],
+                stars: [],
+                timer: 30,
+                nextLaunch: 60
+            });
+        });
+
+        if (activeFireworkCanvases.length === 0) return;
+
+        function renderHanabiFrame() {
+            if (document.hidden) {
+                fireworkAnimFrame = null;
+                return;
+            }
+
+            for (let sysIdx = 0; sysIdx < activeFireworkCanvases.length; sysIdx++) {
+                const system = activeFireworkCanvases[sysIdx];
+                const { ctx, w, h, rockets, stars, stylePreference } = system;
+                ctx.clearRect(0, 0, w, h);
+
+                system.timer++;
+                if (system.timer >= system.nextLaunch) {
+                    system.timer = 0;
+                    system.nextLaunch = Math.floor(Math.random() * 90) + 140;
+
+                    let style;
+                    if (stylePreference && stylePreference !== 'all') {
+                        style = HANABI_STYLES.find(s => s.shape === stylePreference) || HANABI_STYLES[0];
+                    } else {
+                        style = HANABI_STYLES[Math.floor(Math.random() * HANABI_STYLES.length)];
+                    }
+
+                    const startX = w * (0.3 + Math.random() * 0.4);
+                    const apexX = startX + (Math.random() - 0.5) * 8;
+                    const apexY = h * (0.28 + Math.random() * 0.2);
+                    const duration = 50 + Math.floor(Math.random() * 8);
+                    const vy = (apexY - (h + 3)) / duration;
+                    const vx = (apexX - startX) / duration;
+
+                    rockets.push({
+                        x: startX,
+                        y: h + 3,
+                        vx,
+                        vy,
+                        targetY: apexY,
+                        style,
+                        stepsLeft: duration,
+                        trail: []
+                    });
+                }
+
+                ctx.globalCompositeOperation = 'lighter';
+
+                for (let i = rockets.length - 1; i >= 0; i--) {
+                    const r = rockets[i];
+                    r.trail.push({ x: r.x, y: r.y });
+                    if (r.trail.length > 5) r.trail.shift();
+
+                    r.x += r.vx;
+                    r.y += r.vy;
+                    r.stepsLeft--;
+
+                    if (r.trail.length >= 2) {
+                        ctx.beginPath();
+                        ctx.moveTo(r.trail[0].x, r.trail[0].y);
+                        for (let t = 1; t < r.trail.length; t++) ctx.lineTo(r.trail[t].x, r.trail[t].y);
+                        ctx.strokeStyle = 'rgba(255, 238, 160, 0.9)';
+                        ctx.lineWidth = 1.3;
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.arc(r.x, r.y, 1.4, 0, Math.PI * 2);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fill();
+                    }
+
+                    if (r.stepsLeft <= 0 || r.y <= r.targetY) {
+                        spawnStarsFromRocket(r, stars, Math.min(w, h));
+                        rockets.splice(i, 1);
+                    }
+                }
+
+                renderAndSimulateStars(ctx, stars);
+                ctx.globalCompositeOperation = 'source-over';
+            }
+
+            fireworkAnimFrame = requestAnimationFrame(renderHanabiFrame);
+        }
+
+        fireworkAnimFrame = requestAnimationFrame(renderHanabiFrame);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopFireworksAnimation();
+        } else {
+            initFireworksAnimation();
+        }
+    });
+
+    /* ================= 彈窗網格選擇器 + 即時動態 Demo 畫布 ================= */
     function promptFireworkOption(dateString) {
-        const currentStyle = fireworkSettings[dateString] || '';
-        const isEnabled = !!currentStyle;
+        const targetDate = dateString || selectedDateStr || flatpickr.formatDate(new Date(), "Y-m-d");
+        let currentChoice = fireworkSettings[targetDate] || 'none';
+
+        let gridHtml = '';
+        ALL_FIREWORK_DEFINITIONS.forEach(cat => {
+            gridHtml += `<div class="fw-grid-category-title">${cat.category}</div><div class="fw-tiles-grid">`;
+            cat.items.forEach(it => {
+                const isActive = (it.id === currentChoice) ? 'active' : '';
+                gridHtml += `
+                    <div class="fw-tile-card ${isActive}" data-style-id="${it.id}">
+                        <div class="fw-tile-icon">${it.icon}</div>
+                        <div class="fw-tile-info">
+                            <div class="fw-tile-name">${it.name}</div>
+                            <div class="fw-tile-desc">${it.desc}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            gridHtml += `</div>`;
+        });
+
+        let demoRAF = null;
 
         swalWithBootstrapButtons.fire({
-            title: `<i class="bi bi-stars text-warning"></i> ${dateString} 花火設定`,
+            title: `<i class="bi bi-stars text-warning"></i> ${targetDate} 花火設定`,
             html: `
-                <div class="text-start mt-2" style="font-size: 0.95rem;">
-                    <label class="form-label fw-bold mb-2">請選擇此日的花火施放選項：</label>
-                    <select id="swalFireworkSelect" class="form-select fw-bold py-2 shadow-none" style="background: var(--bg-surface); color: var(--text-main); border-color: var(--border-color);">
-                        <option value="none" ${!isEnabled ? 'selected' : ''}>❌ 關閉花火動畫</option>
-                        <option value="all" ${currentStyle === 'all' ? 'selected' : ''}>🎆 啟用花火：全造型隨機輪播（推薦）</option>
-                        <option value="nidan_saki" ${currentStyle === 'nidan_saki' ? 'selected' : ''}>✨ 多段変化・二段咲き (外層擴散後中心二次爆開)</option>
-                        <option value="kamuro_lush" ${currentStyle === 'kamuro_lush' ? 'selected' : ''}>🌾 極上・錦冠大柳 (超茂盛密金流光垂絲)</option>
-                        <option value="yae_shin" ${currentStyle === 'yae_shin' ? 'selected' : ''}>🎯 伝統・三重芯割物 (同心圓多層密緻菊)</option>
-                        <option value="senrin_lush" ${currentStyle === 'senrin_lush' ? 'selected' : ''}>🎇 群咲・千輪百花 (多處微型子花火連環齊綻)</option>
-                        <option value="sakura_fubuki" ${currentStyle === 'sakura_fubuki' ? 'selected' : ''}>🌸 和風・桜吹雪 (五瓣櫻花瓣緩緩飄落)</option>
-                        <option value="spiral_galaxy" ${currentStyle === 'spiral_galaxy' ? 'selected' : ''}>🌌 銀河・天の川 (三臂旋渦銀河花火)</option>
-                        <option value="heart_strobe" ${currentStyle === 'heart_strobe' ? 'selected' : ''}>💖 型物・純愛金波ハート (立體愛心外環閃爍)</option>
-                        <option value="star_spark" ${currentStyle === 'star_spark' ? 'selected' : ''}>⭐️ 型物・五芒煌星 (璀璨五芒星耀眼金芒)</option>
-                        <option value="ring_saturn" ${currentStyle === 'ring_saturn' ? 'selected' : ''}>🪐 宇宙・土星雙環 (Saturn 核心帶光環)</option>
-                        <option value="palm_gold" ${currentStyle === 'palm_gold' ? 'selected' : ''}>🌴 和風・金椰冠 (七重弧形金椰下垂)</option>
-                    </select>
-                    <small class="text-muted d-block mt-3 fw-semibold">
-                        💡 啟用後，將以悠揚平緩的空氣阻力在格子前景優雅綻放。
+                <div class="text-start">
+                    <div class="fw-demo-box">
+                        <span class="fw-demo-badge"><i class="bi bi-play-circle me-1"></i>即時實況預覽</span>
+                        <span class="fw-demo-current-title" id="swalDemoTitle">--</span>
+                        <canvas id="swalDemoCanvas" class="fw-demo-canvas"></canvas>
+                    </div>
+
+                    <div class="fw-picker-scroll" id="swalTilesContainer">
+                        ${gridHtml}
+                    </div>
+
+                    <input type="hidden" id="swalSelectedFwId" value="${currentChoice}">
+                    <small class="text-muted d-block mt-2 fw-semibold">
+                        💡 點選任一卡片可即時於上方預覽；連按兩下 (雙擊) 可直接儲存。
                     </small>
                 </div>
             `,
+            width: '640px',
             showCancelButton: true,
             confirmButtonText: '儲存設定',
             cancelButtonText: '取消',
+            didOpen: () => {
+                const canvas = document.getElementById('swalDemoCanvas');
+                const titleSpan = document.getElementById('swalDemoTitle');
+                const rect = canvas.getBoundingClientRect();
+                const dpr = Math.min(window.devicePixelRatio || 1, 2.0);
+                canvas.width = Math.round(rect.width * dpr);
+                canvas.height = Math.round(rect.height * dpr);
+                const ctx = canvas.getContext('2d', { alpha: true });
+                ctx.scale(dpr, dpr);
+
+                let previewStyleId = currentChoice === 'none' ? 'all' : currentChoice;
+                let rockets = [];
+                let stars = [];
+                let timer = 35;
+                let nextLaunch = 10;
+
+                const updateDemoTitle = (id) => {
+                    let foundName = '關閉花火';
+                    ALL_FIREWORK_DEFINITIONS.forEach(c => c.items.forEach(i => { if (i.id === id) foundName = i.name; }));
+                    titleSpan.textContent = foundName;
+                };
+                updateDemoTitle(currentChoice);
+
+                function runDemoLoop() {
+                    ctx.clearRect(0, 0, rect.width, rect.height);
+
+                    if (previewStyleId !== 'none') {
+                        timer++;
+                        if (timer >= nextLaunch) {
+                            timer = 0;
+                            nextLaunch = 90;
+
+                            let chosenStyle = null;
+                            const HANABI_STYLES = getHanabiStylesDefinitions();
+                            if (previewStyleId === 'all') {
+                                chosenStyle = HANABI_STYLES[Math.floor(Math.random() * HANABI_STYLES.length)];
+                            } else {
+                                chosenStyle = HANABI_STYLES.find(s => s.shape === previewStyleId) || HANABI_STYLES[0];
+                            }
+
+                            const startX = rect.width * 0.5;
+                            const apexX = startX + (Math.random() - 0.5) * 6;
+                            const apexY = rect.height * 0.42;
+                            const duration = 40;
+                            rockets.push({
+                                x: startX,
+                                y: rect.height + 2,
+                                vx: (apexX - startX) / duration,
+                                vy: (apexY - (rect.height + 2)) / duration,
+                                targetY: apexY,
+                                style: chosenStyle,
+                                stepsLeft: duration,
+                                trail: []
+                            });
+                        }
+
+                        ctx.globalCompositeOperation = 'lighter';
+
+                        for (let i = rockets.length - 1; i >= 0; i--) {
+                            const r = rockets[i];
+                            r.trail.push({ x: r.x, y: r.y });
+                            if (r.trail.length > 5) r.trail.shift();
+                            r.x += r.vx;
+                            r.y += r.vy;
+                            r.stepsLeft--;
+
+                            if (r.trail.length >= 2) {
+                                ctx.beginPath();
+                                ctx.moveTo(r.trail[0].x, r.trail[0].y);
+                                for (let t = 1; t < r.trail.length; t++) ctx.lineTo(r.trail[t].x, r.trail[t].y);
+                                ctx.strokeStyle = 'rgba(255, 238, 160, 0.9)';
+                                ctx.lineWidth = 1.3;
+                                ctx.stroke();
+                            }
+
+                            if (r.stepsLeft <= 0 || r.y <= r.targetY) {
+                                spawnStarsFromRocket(r, stars, Math.min(rect.width, rect.height));
+                                rockets.splice(i, 1);
+                            }
+                        }
+
+                        renderAndSimulateStars(ctx, stars);
+                        ctx.globalCompositeOperation = 'source-over';
+                    }
+
+                    demoRAF = requestAnimationFrame(runDemoLoop);
+                }
+
+                demoRAF = requestAnimationFrame(runDemoLoop);
+
+                const container = document.getElementById('swalTilesContainer');
+                container.querySelectorAll('.fw-tile-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        container.querySelectorAll('.fw-tile-card').forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+                        const sid = card.dataset.styleId;
+                        document.getElementById('swalSelectedFwId').value = sid;
+                        previewStyleId = sid;
+                        updateDemoTitle(sid);
+                        stars = [];
+                        rockets = [];
+                        timer = 30;
+                        nextLaunch = 2;
+                    });
+
+                    card.addEventListener('dblclick', () => {
+                        Swal.clickConfirm();
+                    });
+                });
+            },
+            willClose: () => {
+                if (demoRAF) cancelAnimationFrame(demoRAF);
+            },
             preConfirm: () => {
-                return document.getElementById('swalFireworkSelect').value;
+                return document.getElementById('swalSelectedFwId').value;
             }
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const choice = result.value;
                 if (choice === 'none') {
-                    delete fireworkSettings[dateString];
+                    delete fireworkSettings[targetDate];
                 } else {
-                    fireworkSettings[dateString] = choice;
+                    fireworkSettings[targetDate] = choice;
                 }
                 await saveFireworkSettingsToDB();
                 renderCalendar();
                 swalWithBootstrapButtons.fire({
                     icon: 'success',
                     title: choice === 'none' ? '已關閉花火' : '花火已啟用',
-                    text: choice === 'none' ? `已關閉 ${dateString} 的花火動畫` : `已在 ${dateString} 啟用花火效果！`,
+                    text: choice === 'none' ? `已關閉 ${targetDate} 的花火動畫` : `已在 ${targetDate} 啟用花火效果！`,
                     timer: 1500,
                     showConfirmButton: false
                 });
@@ -2111,7 +2565,7 @@
         });
     }
 
-    /* ================= 雲端固定網址設定與載入核心 ================= */
+    /* ================= 雲端固定網址設定與載入 ================= */
     function promptCloudSyncSettings() {
         const currentUrl = localStorage.getItem(REMOTE_URL_KEY) || '';
         const isAutoLoad = localStorage.getItem(REMOTE_AUTOLOAD_KEY) === 'true';
@@ -2148,9 +2602,7 @@
                     Swal.showValidationMessage('請輸入有效的 JSON 檔案網址才能載入！若要清空網址請點選「僅儲存設定」');
                     return false;
                 }
-                try {
-                    new URL(url);
-                } catch (_) {
+                try { new URL(url); } catch (_) {
                     Swal.showValidationMessage('網址格式不正確，請包含 http:// 或 https://');
                     return false;
                 }
@@ -2160,9 +2612,7 @@
                 const url = document.getElementById('swalRemoteUrlInput').value.trim();
                 const auto = document.getElementById('swalAutoLoadCheck').checked;
                 if (url) {
-                    try {
-                        new URL(url);
-                    } catch (_) {
+                    try { new URL(url); } catch (_) {
                         Swal.showValidationMessage('網址格式不正確，請包含 http:// 或 https://');
                         return false;
                     }
@@ -2260,7 +2710,7 @@
                 }
             } else {
                 events = newEvents;
-                fireworkSettings = {}; // 先完整清除舊花火資料再覆寫
+                fireworkSettings = {}; 
                 if (!isArray) {
                     if (importedData.memo !== undefined) {
                         document.getElementById('sideMemoArea').value = importedData.memo;
@@ -2318,21 +2768,10 @@
         renderSideEventsList();
     }
 
-    function triggerExport() {
-        document.getElementById('exportBtn').click();
-    }
-
-    function triggerImport() {
-        document.getElementById('importFile').click();
-    }
-
-    function triggerDeleteOld() {
-        document.getElementById('deleteOldBtn').click();
-    }
-
-    function triggerClearAll() {
-        document.getElementById('clearAllBtn').click();
-    }
+    function triggerExport() { document.getElementById('exportBtn').click(); }
+    function triggerImport() { document.getElementById('importFile').click(); }
+    function triggerDeleteOld() { document.getElementById('deleteOldBtn').click(); }
+    function triggerClearAll() { document.getElementById('clearAllBtn').click(); }
 
     function updateAppTitle(newTitle) {
         appTitle = (newTitle && newTitle.trim()) ? newTitle.trim() : '商務行事曆';
@@ -2345,7 +2784,6 @@
         isMemoCollapsed = collapsed;
         const mainContainer = document.getElementById('mainCalendarContainer');
         const textarea = document.getElementById('sideMemoArea');
-
         if (isMemoCollapsed) {
             mainContainer.classList.add('memo-collapsed');
             textarea.blur();
@@ -2356,529 +2794,69 @@
         localStorage.setItem(MEMO_COLLAPSE_KEY, isMemoCollapsed);
     }
 
-    /* ================= 雅緻日本花火 (Hanabi) 多元造型・自然平緩物理粒子引擎 ================= */
-    function stopFireworksAnimation() {
-        if (fireworkAnimFrame) {
-            cancelAnimationFrame(fireworkAnimFrame);
-            fireworkAnimFrame = null;
-        }
-        activeFireworkCanvases = [];
-    }
-
-    function initFireworksAnimation() {
-        stopFireworksAnimation();
-
-        const canvasElements = document.querySelectorAll('.cell-firework-canvas');
-        if (!canvasElements || canvasElements.length === 0) return;
-
-        const HANABI_STYLES = [
-            {
-                name: '多段変化・二段咲き',
-                shape: 'nidan_saki',
-                colors: ['#ff4d4d', '#ff7675', '#ff9f43', '#ffffff'],
-                coreColors: ['#00d2d3', '#54a0ff', '#feca57', '#ffffff'],
-                particles: 46,
-                baseSpeed: 1.8,
-                airDrag: 0.958,
-                gravity: 0.018,
-                decayRate: 0.0058
-            },
-            {
-                name: '極上・錦冠大柳',
-                shape: 'kamuro_lush',
-                colors: ['#ffeaa7', '#ffd32a', '#ff9f1a', '#fff200', '#ffffff'],
-                particles: 60,
-                baseSpeed: 1.6,
-                airDrag: 0.962,
-                gravity: 0.022,
-                decayRate: 0.0050
-            },
-            {
-                name: '伝統・三重芯割物',
-                shape: 'yae_shin',
-                colors: ['#9b59b6', '#8e44ad', '#e056fd'],
-                middleColors: ['#ff3838', '#ff6b81', '#ff4d4d'],
-                coreColors: ['#fff200', '#ffffff'],
-                particles: 52,
-                baseSpeed: 1.9,
-                airDrag: 0.955,
-                gravity: 0.018,
-                decayRate: 0.0058
-            },
-            {
-                name: '群咲・千輪百花',
-                shape: 'senrin_lush',
-                colors: ['#ff3838', '#2ed573', '#1e90ff', '#ffa502', '#9b59b6', '#ff6b81'],
-                particles: 50,
-                baseSpeed: 1.7,
-                airDrag: 0.956,
-                gravity: 0.018,
-                decayRate: 0.0060
-            },
-            {
-                name: '和風・桜吹雪',
-                shape: 'sakura_fubuki',
-                colors: ['#ff758c', '#ff7eb3', '#ff4d6d', '#ffffff'],
-                coreColor: '#ffffff',
-                particles: 45,
-                baseSpeed: 1.8,
-                airDrag: 0.955,
-                gravity: 0.016,
-                decayRate: 0.0055
-            },
-            {
-                name: '銀河・天の川',
-                shape: 'spiral_galaxy',
-                colors: ['#00cec9', '#0984e3', '#74b9ff', '#ffffff'],
-                coreColor: '#ffffff',
-                particles: 44,
-                baseSpeed: 1.9,
-                airDrag: 0.956,
-                gravity: 0.018,
-                decayRate: 0.0058
-            },
-            {
-                name: '型物・純愛金波ハート',
-                shape: 'heart_strobe',
-                colors: ['#ff4757', '#ff6b81', '#ff78cb', '#ffffff'],
-                particles: 42,
-                baseSpeed: 1.7,
-                airDrag: 0.958,
-                gravity: 0.016,
-                decayRate: 0.0058
-            },
-            {
-                name: '型物・五芒煌星',
-                shape: 'star_spark',
-                colors: ['#ffd32a', '#ff9f1a', '#fff200', '#ffffff'],
-                particles: 40,
-                baseSpeed: 1.8,
-                airDrag: 0.956,
-                gravity: 0.018,
-                decayRate: 0.0060
-            },
-            {
-                name: '宇宙・土星雙環',
-                shape: 'ring_saturn',
-                colors: ['#00cec9', '#54a0ff', '#74b9ff', '#ffffff'],
-                coreColor: '#ffffff',
-                particles: 44,
-                baseSpeed: 1.9,
-                airDrag: 0.955,
-                gravity: 0.018,
-                decayRate: 0.0060
-            },
-            {
-                name: '和風・金椰冠',
-                shape: 'palm_gold',
-                colors: ['#fbc531', '#e1b12c', '#ffa502', '#ffffff'],
-                particles: 40,
-                baseSpeed: 2.0,
-                airDrag: 0.960,
-                gravity: 0.024,
-                decayRate: 0.0055
-            }
-        ];
-
-        canvasElements.forEach(canvas => {
-            const rect = canvas.getBoundingClientRect();
-            if (rect.width === 0 || rect.height === 0) return;
-
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            canvas.width = Math.round(rect.width * dpr);
-            canvas.height = Math.round(rect.height * dpr);
-
-            const ctx = canvas.getContext('2d');
-            ctx.scale(dpr, dpr);
-
-            activeFireworkCanvases.push({
-                ctx,
-                w: rect.width,
-                h: rect.height,
-                stylePreference: canvas.dataset.fwStyle || 'all',
-                rockets: [],
-                stars: [],
-                timer: 30,
-                nextLaunch: 60
-            });
-        });
-
-        if (activeFireworkCanvases.length === 0) return;
-
-        function renderHanabiFrame() {
-            activeFireworkCanvases.forEach(system => {
-                const { ctx, w, h, rockets, stars, stylePreference } = system;
-                ctx.clearRect(0, 0, w, h);
-
-                system.timer++;
-                // 調整施放間隔：約 2.5 ~ 4.2 秒發射一次，節奏悠揚不緊湊
-                if (system.timer >= system.nextLaunch) {
-                    system.timer = 0;
-                    system.nextLaunch = Math.floor(Math.random() * 100) + 150;
-
-                    let style;
-                    if (stylePreference && stylePreference !== 'all') {
-                        style = HANABI_STYLES.find(s => s.shape === stylePreference) || HANABI_STYLES[0];
-                    } else {
-                        style = HANABI_STYLES[Math.floor(Math.random() * HANABI_STYLES.length)];
-                    }
-
-                    const startX = w * (0.3 + Math.random() * 0.4);
-                    const apexX = startX + (Math.random() - 0.5) * 8;
-                    const apexY = h * (0.28 + Math.random() * 0.2);
-                    
-                    const duration = 52 + Math.floor(Math.random() * 10); // 平緩平穩昇空
-                    const vy = (apexY - (h + 3)) / duration;
-                    const vx = (apexX - startX) / duration;
-
-                    rockets.push({
-                        x: startX,
-                        y: h + 3,
-                        vx,
-                        vy,
-                        targetY: apexY,
-                        style,
-                        stepsLeft: duration,
-                        trail: []
-                    });
-                }
-
-                // 1. 導火線昇空銀引
-                for (let i = rockets.length - 1; i >= 0; i--) {
-                    const r = rockets[i];
-                    r.trail.push({ x: r.x, y: r.y });
-                    if (r.trail.length > 7) r.trail.shift();
-
-                    r.x += r.vx;
-                    r.y += r.vy;
-                    r.stepsLeft--;
-
-                    if (r.trail.length >= 2) {
-                        ctx.save();
-                        ctx.beginPath();
-                        ctx.moveTo(r.trail[0].x, r.trail[0].y);
-                        for (let t = 1; t < r.trail.length; t++) {
-                            ctx.lineTo(r.trail[t].x, r.trail[t].y);
-                        }
-                        ctx.strokeStyle = 'rgba(255, 238, 160, 0.85)';
-                        ctx.lineWidth = 1.3;
-                        ctx.stroke();
-
-                        ctx.beginPath();
-                        ctx.arc(r.x, r.y, 1.4, 0, Math.PI * 2);
-                        ctx.fillStyle = '#ffffff';
-                        ctx.shadowColor = '#ffd060';
-                        ctx.shadowBlur = 5;
-                        ctx.fill();
-                        ctx.restore();
-                    }
-
-                    // 頂點開花：平緩自然的大半徑展開
-                    if (r.stepsLeft <= 0 || r.y <= r.targetY) {
-                        const s = r.style;
-                        const count = s.particles;
-                        const cellSize = Math.min(w, h);
-                        const speedMult = Math.max(0.85, (cellSize / 120));
-                        const baseSpeed = s.baseSpeed * speedMult;
-
-                        for (let k = 0; k < count; k++) {
-                            let vx = 0;
-                            let vy = 0;
-                            let color = s.colors[k % s.colors.length];
-                            let isSecondStageTrigger = false;
-                            let subBurstTime = 0;
-                            let radius = 1.7;
-
-                            if (s.shape === 'nidan_saki') {
-                                if (k < 10) {
-                                    isSecondStageTrigger = true;
-                                    subBurstTime = 28 + Math.floor(Math.random() * 6);
-                                    const a = Math.random() * Math.PI * 2;
-                                    const sp = baseSpeed * 0.25;
-                                    vx = Math.cos(a) * sp;
-                                    vy = Math.sin(a) * sp;
-                                    color = '#ffffff';
-                                    radius = 2.0;
-                                } else {
-                                    const angle = ((k - 10) / (count - 10)) * Math.PI * 2 + (Math.random() - 0.5) * 0.08;
-                                    const speed = baseSpeed * (0.9 + Math.random() * 0.2);
-                                    vx = Math.cos(angle) * speed;
-                                    vy = Math.sin(angle) * speed;
-                                }
-                            } else if (s.shape === 'yae_shin') {
-                                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.06;
-                                if (k % 3 === 0) {
-                                    vx = Math.cos(angle) * (baseSpeed * 0.42);
-                                    vy = Math.sin(angle) * (baseSpeed * 0.42);
-                                    color = s.coreColors[k % s.coreColors.length];
-                                } else if (k % 3 === 1) {
-                                    vx = Math.cos(angle) * (baseSpeed * 0.75);
-                                    vy = Math.sin(angle) * (baseSpeed * 0.75);
-                                    color = s.middleColors[k % s.middleColors.length];
-                                } else {
-                                    vx = Math.cos(angle) * (baseSpeed * 1.05);
-                                    vy = Math.sin(angle) * (baseSpeed * 1.05);
-                                    color = s.colors[k % s.colors.length];
-                                }
-                            } else if (s.shape === 'kamuro_lush') {
-                                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.12;
-                                const speed = baseSpeed * (0.7 + Math.random() * 0.55);
-                                vx = Math.cos(angle) * speed;
-                                vy = Math.sin(angle) * speed;
-                                radius = 1.9;
-                            } else if (s.shape === 'heart_strobe') {
-                                const t = (k / count) * Math.PI * 2;
-                                const hx = 16 * Math.pow(Math.sin(t), 3);
-                                const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-                                const len = Math.sqrt(hx * hx + hy * hy) || 1;
-                                const speed = baseSpeed * (0.92 + Math.random() * 0.16);
-                                vx = (hx / len) * speed;
-                                vy = (hy / len) * speed;
-                            } else if (s.shape === 'star_spark') {
-                                const theta = (k / count) * Math.PI * 2;
-                                const starRadius = 1 + 0.55 * Math.cos(5 * theta);
-                                const speed = baseSpeed * starRadius * 0.9;
-                                vx = Math.cos(theta) * speed;
-                                vy = Math.sin(theta) * speed;
-                            } else if (s.shape === 'sakura_fubuki') {
-                                const theta = (k / count) * Math.PI * 2;
-                                const petalR = 1 + 0.42 * Math.cos(5 * theta);
-                                const speed = baseSpeed * petalR * 0.95;
-                                vx = Math.cos(theta) * speed;
-                                vy = Math.sin(theta) * speed;
-                            } else if (s.shape === 'spiral_galaxy') {
-                                const arms = 3;
-                                const theta = (k / count) * Math.PI * 2 * arms;
-                                const rDist = (k / count);
-                                const speed = baseSpeed * (0.6 + 0.7 * rDist);
-                                vx = Math.cos(theta + rDist * 1.8) * speed;
-                                vy = Math.sin(theta + rDist * 1.8) * speed;
-                            } else if (s.shape === 'senrin_lush') {
-                                const cluster = k % 5;
-                                const clusterAngles = [0, 1.25, 2.5, 3.75, 5.0];
-                                const cDist = baseSpeed * 0.42;
-                                const cx = Math.cos(clusterAngles[cluster]) * cDist;
-                                const cy = Math.sin(clusterAngles[cluster]) * cDist;
-                                const subAngle = Math.random() * Math.PI * 2;
-                                const subSpeed = baseSpeed * 0.55 * (0.75 + Math.random() * 0.4);
-                                vx = cx + Math.cos(subAngle) * subSpeed;
-                                vy = cy + Math.sin(subAngle) * subSpeed;
-                            } else if (s.shape === 'palm_gold') {
-                                const numBranches = 7;
-                                const branchIdx = k % numBranches;
-                                const branchAngle = -Math.PI * 0.82 + (branchIdx / (numBranches - 1)) * (Math.PI * 0.64);
-                                const branchSpeed = baseSpeed * (0.65 + Math.random() * 0.65);
-                                vx = Math.cos(branchAngle) * branchSpeed;
-                                vy = Math.sin(branchAngle) * branchSpeed;
-                                radius = 1.9;
-                            } else if (s.shape === 'ring_saturn') {
-                                if (k < 10) {
-                                    const a = Math.random() * Math.PI * 2;
-                                    const sp = baseSpeed * 0.35 * Math.random();
-                                    vx = Math.cos(a) * sp;
-                                    vy = Math.sin(a) * sp;
-                                    color = '#ffffff';
-                                } else {
-                                    const angle = ((k - 10) / (count - 10)) * Math.PI * 2;
-                                    const rawX = Math.cos(angle) * baseSpeed * 1.3;
-                                    const rawY = Math.sin(angle) * baseSpeed * 0.42;
-                                    const tilt = -0.32;
-                                    vx = rawX * Math.cos(tilt) - rawY * Math.sin(tilt);
-                                    vy = rawX * Math.sin(tilt) + rawY * Math.cos(tilt);
-                                }
-                            } else {
-                                const angle = (k / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.08;
-                                const speed = baseSpeed * (0.85 + Math.random() * 0.25);
-                                vx = Math.cos(angle) * speed;
-                                vy = Math.sin(angle) * speed;
-                            }
-
-                            stars.push({
-                                x: r.x,
-                                y: r.y,
-                                vx,
-                                vy,
-                                alpha: 1.0,
-                                style: s,
-                                color,
-                                radius,
-                                trail: [{ x: r.x, y: r.y }],
-                                maxTrail: (s.shape === 'kamuro_lush' || s.shape === 'palm_gold') ? 9 : 6,
-                                isSecondStageTrigger,
-                                subBurstTime,
-                                hasSubBursted: false,
-                                twinkle: Math.random() > 0.3,
-                                twinkleFreq: 0.15 + Math.random() * 0.15,
-                                age: 0
-                            });
-                        }
-                        rockets.splice(i, 1);
-                    }
-                }
-
-                // 2. 光絲流線繪製與火花星核
-                for (let i = stars.length - 1; i >= 0; i--) {
-                    const st = stars[i];
-                    st.age++;
-
-                    st.x += st.vx;
-                    st.y += st.vy;
-                    st.vx *= st.style.airDrag;
-                    st.vy = st.vy * st.style.airDrag + st.style.gravity;
-                    st.alpha -= st.style.decayRate;
-
-                    st.trail.push({ x: st.x, y: st.y });
-                    if (st.trail.length > st.maxTrail) st.trail.shift();
-
-                    // 二段開花判定
-                    if (st.isSecondStageTrigger && !st.hasSubBursted && st.age >= st.subBurstTime) {
-                        st.hasSubBursted = true;
-                        const subCount = 7;
-                        for (let sc = 0; sc < subCount; sc++) {
-                            const sAngle = (sc / subCount) * Math.PI * 2 + Math.random() * 0.2;
-                            const sSpeed = 1.1 + Math.random() * 0.35;
-                            const sColor = st.style.coreColors[sc % st.style.coreColors.length];
-                            stars.push({
-                                x: st.x,
-                                y: st.y,
-                                vx: Math.cos(sAngle) * sSpeed,
-                                vy: Math.sin(sAngle) * sSpeed,
-                                alpha: 1.0,
-                                style: st.style,
-                                color: sColor,
-                                radius: 1.6,
-                                trail: [{ x: st.x, y: st.y }],
-                                maxTrail: 6,
-                                isSecondStageTrigger: false,
-                                hasSubBursted: true,
-                                twinkle: true,
-                                twinkleFreq: 0.22,
-                                age: 0
-                            });
-                        }
-                    }
-
-                    if (st.alpha <= 0) {
-                        stars.splice(i, 1);
-                        continue;
-                    }
-
-                    let currentAlpha = st.alpha;
-                    if (st.twinkle && st.alpha < 0.75) {
-                        currentAlpha *= (0.45 + 0.55 * Math.sin(st.age * st.twinkleFreq));
-                    }
-                    if (currentAlpha < 0) currentAlpha = 0;
-
-                    ctx.save();
-
-                    // A. 繪製連續高清晰拖尾光絲
-                    if (st.trail.length >= 2) {
-                        ctx.beginPath();
-                        ctx.moveTo(st.trail[0].x, st.trail[0].y);
-                        for (let t = 1; t < st.trail.length; t++) {
-                            ctx.lineTo(st.trail[t].x, st.trail[t].y);
-                        }
-                        ctx.strokeStyle = st.color;
-                        ctx.lineWidth = (st.style.shape === 'kamuro_lush' || st.style.shape === 'palm_gold') ? 1.6 : 1.3;
-                        ctx.lineCap = 'round';
-                        ctx.globalAlpha = Math.min(1, currentAlpha * 0.75);
-                        ctx.stroke();
-                    }
-
-                    // B. 繪製白熱發光粒子頭部 (清晰星核)
-                    if (st.alpha > 0.2) {
-                        ctx.beginPath();
-                        ctx.arc(st.x, st.y, st.radius, 0, Math.PI * 2);
-                        ctx.fillStyle = st.color;
-                        ctx.shadowColor = st.color;
-                        ctx.shadowBlur = 6;
-                        ctx.globalAlpha = Math.min(1, currentAlpha);
-                        ctx.fill();
-
-                        // 內層純白高光
-                        ctx.beginPath();
-                        ctx.arc(st.x, st.y, st.radius * 0.55, 0, Math.PI * 2);
-                        ctx.fillStyle = '#ffffff';
-                        ctx.shadowBlur = 0;
-                        ctx.globalAlpha = Math.min(1, currentAlpha);
-                        ctx.fill();
-                    }
-
-                    ctx.restore();
-                }
-            });
-
-            fireworkAnimFrame = requestAnimationFrame(renderHanabiFrame);
-        }
-
-        fireworkAnimFrame = requestAnimationFrame(renderHanabiFrame);
-    }
-
-    /* ================= 右側分頁切換邏輯 ================= */
+    /* ================= 側邊面板頁籤與記事本功能支援 ================= */
     function switchSideTab(tabName) {
         currentSideTab = tabName;
         localStorage.setItem(ACTIVE_TAB_KEY, tabName);
 
-        const tabBtnEvents = document.getElementById('tabBtnEvents');
-        const tabBtnMemo = document.getElementById('tabBtnMemo');
+        const tabEvents = document.getElementById('tabBtnEvents');
+        const tabMemo = document.getElementById('tabBtnMemo');
         const paneEvents = document.getElementById('paneEvents');
         const paneMemo = document.getElementById('paneMemo');
-        const memoTools = document.getElementById('memoToolsGroup');
+        const memoToolsGroup = document.getElementById('memoToolsGroup');
         const collapsedTitle = document.getElementById('collapsedTitle');
 
         if (tabName === 'events') {
-            tabBtnEvents.classList.add('active');
-            tabBtnMemo.classList.remove('active');
-            paneEvents.classList.remove('d-none');
-            paneMemo.classList.add('d-none');
-            memoTools.classList.add('d-none');
-            collapsedTitle.textContent = "當日事件";
+            if (tabEvents) tabEvents.classList.add('active');
+            if (tabMemo) tabMemo.classList.remove('active');
+            if (paneEvents) paneEvents.classList.remove('d-none');
+            if (paneMemo) paneMemo.classList.add('d-none');
+            if (memoToolsGroup) memoToolsGroup.classList.add('d-none');
+            if (collapsedTitle) collapsedTitle.textContent = '當日事件';
             renderSideEventsList();
         } else {
-            tabBtnMemo.classList.add('active');
-            tabBtnEvents.classList.remove('active');
-            paneMemo.classList.remove('d-none');
-            paneEvents.classList.add('d-none');
-            memoTools.classList.remove('d-none');
-            collapsedTitle.textContent = "記事本";
+            if (tabMemo) tabMemo.classList.add('active');
+            if (tabEvents) tabEvents.classList.remove('active');
+            if (paneMemo) paneMemo.classList.remove('d-none');
+            if (paneEvents) paneEvents.classList.add('d-none');
+            if (memoToolsGroup) memoToolsGroup.classList.remove('d-none');
+            if (collapsedTitle) collapsedTitle.textContent = '記事本';
+            if (isMemoPreviewMode) {
+                document.getElementById('sideMemoPreview').innerHTML = formatMemoTextWithLinks(document.getElementById('sideMemoArea').value);
+            }
+        }
+    }
+
+    function toggleMemoMode() {
+        isMemoPreviewMode = !isMemoPreviewMode;
+        const memoArea = document.getElementById('sideMemoArea');
+        const memoPreview = document.getElementById('sideMemoPreview');
+        const toggleBtn = document.getElementById('memoToggleBtn');
+
+        if (isMemoPreviewMode) {
+            memoPreview.innerHTML = formatMemoTextWithLinks(memoArea.value);
+            memoArea.classList.add('d-none');
+            memoPreview.classList.remove('d-none');
+            toggleBtn.innerHTML = '<i class="bi bi-pencil-square"></i> <span id="memoToggleText">編輯</span>';
+            toggleBtn.title = '切換至 編輯模式';
+        } else {
+            memoPreview.classList.add('d-none');
+            memoArea.classList.remove('d-none');
+            toggleBtn.innerHTML = '<i class="bi bi-link-45deg"></i> <span id="memoToggleText">連結</span>';
+            toggleBtn.title = '切換至 連結模式';
+            memoArea.focus();
         }
     }
 
     function formatMemoTextWithLinks(text) {
-        if (!text || !text.trim()) return '<span class="text-muted opacity-50 fst-italic">（目前記事本無內容，請切換回編輯模式輸入文字）</span>';
-        let safe = escapeHtml(text);
-        
-        const urlRegex = /(https?:\/\/[^\s<]+[^<.,:;"')\]\s]|www\.[^\s<]+[^<.,:;"')\]\s])/g;
-        safe = safe.replace(urlRegex, (url) => {
-            const href = url.startsWith('http') ? url : 'https://' + url;
-            return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="memo-clickable-link" title="在新分頁開啟：${href}"><i class="bi bi-box-arrow-up-right me-1" style="font-size: 0.8em;"></i>${url}</a>`;
-        });
-        return safe.replace(/\n/g, '<br>');
-    }
-
-    function toggleMemoMode(toPreview = !isMemoPreviewMode) {
-        isMemoPreviewMode = toPreview;
-        const textarea = document.getElementById('sideMemoArea');
-        const preview = document.getElementById('sideMemoPreview');
-        const toggleBtn = document.getElementById('memoToggleBtn');
-
-        if (isMemoPreviewMode) {
-            preview.innerHTML = formatMemoTextWithLinks(textarea.value);
-            textarea.classList.add('d-none');
-            preview.classList.remove('d-none');
-            toggleBtn.classList.add('active-tool');
-            toggleBtn.innerHTML = '<i class="bi bi-pencil-square"></i> <span>編輯</span>';
-            toggleBtn.title = "切換回文字編輯模式";
-        } else {
-            textarea.classList.remove('d-none');
-            preview.classList.add('d-none');
-            toggleBtn.classList.remove('active-tool');
-            toggleBtn.innerHTML = '<i class="bi bi-link-45deg"></i> <span>連結</span>';
-            toggleBtn.title = "切換至連結模式 (可點擊網址)";
+        if (!text || !text.trim()) {
+            return '<span class="text-muted fw-bold opacity-50">暫無記事內容...點擊上方切換為編輯模式即可輸入。</span>';
         }
+        const escaped = escapeHtml(text);
+        const urlPattern = /(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g;
+        return escaped.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer" class="memo-clickable-link">$1</a>');
     }
 
-    /* ================= 台灣節日與農民曆繁體字典 ================= */
     const TW_SOLAR_FESTIVALS = {
         '01-01': '元旦', '02-14': '情人節', '02-28': '和平紀念日', '03-08': '婦女節',
         '03-14': '白色情人節', '03-29': '青年節', '04-04': '兒童節', '05-01': '勞動節',
@@ -2897,13 +2875,11 @@
         '腊月': '臘月', '正月': '正月', '腊': '臘',
         '惊蛰': '驚蟄', '谷雨': '穀雨', '小满': '小滿', '芒种': '芒種', '处暑': '處暑',
         '龙': '龍', '马': '馬', '鸡': '雞', '猪': '豬',
-
         '平治道涂': '平治道塗', '修饰垣墙': '修飾垣牆', '补垣塞穴': '補垣塞穴',
         '余事勿取': '餘事勿取', '馀事勿取': '餘事勿取', '诸事不宜': '諸事不宜', '诸事皆宜': '諸事皆宜',
         '诸事不利': '諸事不利', '出货财': '出貨財', '开生坟': '開生墳', '合寿木': '合壽木',
         '整手足甲': '整手足甲', '会亲友': '會親友', '进人口': '進人口', '造车器': '造車器',
         '造畜稠': '造畜稠', '修仓库': '修倉庫',
-
         '开市': '開市', '开光': '開光', '开仓': '開倉', '开工': '開工', '开业': '開業',
         '开渠': '開渠', '开池': '開池', '动土': '動土', '破土': '破土', '安葬': '安葬',
         '置产': '置產', '产': '產',
@@ -2917,7 +2893,6 @@
         '捕鱼': '捕魚', '畋猎': '畋獵', '结网': '結網', '牧养': '牧養', '塑绘': '塑繪',
         '斋醮': '齋醮', '设醮': '設醮', '酬神': '酬神', '入殓': '入殮', '移柩': '移柩',
         '合帐': '合帳', '断蚁': '斷蟻', '乘船': '乘船', '渡水': '渡水', '习艺': '習藝',
-
         '开': '開', '关': '關', '门': '門', '进': '進', '纳': '納', '财': '財',
         '订': '訂', '结': '結', '网': '網', '竖': '豎', '梁': '樑', '经': '經',
         '络': '絡', '织': '織', '医': '醫', '药': '藥', '疗': '療', '针': '針',
@@ -2946,14 +2921,16 @@
         '齐': '齊', '齿': '齒'
     };
 
-    const ZH_KEYS = Object.keys(ZH_MAP).sort((a, b) => b.length - a.length);
+    const ZH_KEYS_SORTED = Object.keys(ZH_MAP).sort((a, b) => b.length - a.length);
+    const ZH_REGEX = new RegExp(ZH_KEYS_SORTED.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g');
+    const tradCache = new Map();
 
     function toTrad(str) {
         if (!str) return '';
-        let res = String(str);
-        for (const s of ZH_KEYS) {
-            res = res.replaceAll(s, ZH_MAP[s]);
-        }
+        const cached = tradCache.get(str);
+        if (cached !== undefined) return cached;
+        const res = String(str).replace(ZH_REGEX, match => ZH_MAP[match] || match);
+        if (tradCache.size < 1500) tradCache.set(str, res);
         return res;
     }
 
@@ -2963,9 +2940,7 @@
         const dayPad = String(cDay).padStart(2, '0');
         const solarKey = `${monthPad}-${dayPad}`;
 
-        if (TW_SOLAR_FESTIVALS[solarKey]) {
-            festivals.push(TW_SOLAR_FESTIVALS[solarKey]);
-        }
+        if (TW_SOLAR_FESTIVALS[solarKey]) festivals.push(TW_SOLAR_FESTIVALS[solarKey]);
 
         const dateObj = new Date(cYear, cMonth, cDay);
         if (cMonth === 4 && dateObj.getDay() === 0 && cDay >= 8 && cDay <= 14) {
@@ -2986,8 +2961,13 @@
         return festivals;
     }
 
+    const lunarInfoCache = new Map();
+
     function getLunarInfo(year, monthIndex, day) {
         if (typeof Solar === 'undefined') return null;
+        const cacheKey = `${year}-${monthIndex}-${day}`;
+        if (lunarInfoCache.has(cacheKey)) return lunarInfoCache.get(cacheKey);
+
         try {
             const solar = Solar.fromYmd(year, monthIndex + 1, day);
             const lunar = solar.getLunar();
@@ -2995,8 +2975,8 @@
             const jieQi = toTrad(lunar.getJieQi());
             const twFestivals = getTaiwanFestivals(year, monthIndex, day, lunar);
             
-            let lunarDay = toTrad(lunar.getDayInChinese());
-            let lunarMonth = toTrad(lunar.getMonthInChinese());
+            const lunarDay = toTrad(lunar.getDayInChinese());
+            const lunarMonth = toTrad(lunar.getMonthInChinese());
             
             let label = '';
             let isSpecial = false;
@@ -3027,28 +3007,34 @@
             if (yi) tooltip += `\n宜：${yi}`;
             if (ji) tooltip += `\n忌：${ji}`;
 
-            return {
-                label, isSpecial, tooltip, lunarDay, lunarMonth, gzYear, shengXiao, jieQi, twFestivals, yi, ji
-            };
+            const result = { label, isSpecial, tooltip, lunarDay, lunarMonth, gzYear, shengXiao, jieQi, twFestivals, yi, ji };
+            if (lunarInfoCache.size < 600) lunarInfoCache.set(cacheKey, result);
+            return result;
         } catch (e) {
             console.error("農民曆解析錯誤:", e);
             return null;
         }
     }
 
-    /* ================= 使用者自訂連續假期與國定假日解析 ================= */
     function getHolidayAndLongWeekendInfo(dateStr) {
         if (!dateStr || !events) return null;
         
-        const match = events.find(e => e.isHoliday && dateStr >= e.start && dateStr <= (e.end || e.start));
+        let match = null;
+        for (let i = 0; i < events.length; i++) {
+            const e = events[i];
+            if (e.isHoliday && dateStr >= e.start && dateStr <= (e.end || e.start)) {
+                match = e;
+                break;
+            }
+        }
         if (!match) return null;
 
         const startObj = new Date(match.start + 'T00:00:00');
         const endObj = new Date((match.end || match.start) + 'T00:00:00');
         const curObj = new Date(dateStr + 'T00:00:00');
 
-        const totalDays = Math.round((endObj - startObj) / (1000 * 60 * 60 * 24)) + 1;
-        const dayIndex = Math.round((curObj - startObj) / (1000 * 60 * 60 * 24)) + 1;
+        const totalDays = Math.round((endObj - startObj) / 86400000) + 1;
+        const dayIndex = Math.round((curObj - startObj) / 86400000) + 1;
         const isLongWeekend = totalDays >= 2;
         const holidayTitle = (match.text || '').split('\n')[0] || '連續假期';
 
@@ -3068,16 +3054,20 @@
         };
     }
 
-    /* ================= IndexedDB 核心封裝 ================= */
     const DB_NAME = 'BusinessCalendarDB';
     const DB_VERSION = 1;
     const STORE_NAME = 'app_data';
+    let dbInstance = null;
 
     function openDB() {
+        if (dbInstance) return Promise.resolve(dbInstance);
         return new Promise((resolve, reject) => {
             const request = indexedDB.open(DB_NAME, DB_VERSION);
             request.onerror = (e) => reject("IndexedDB 連線錯誤: " + e.target.error);
-            request.onsuccess = (e) => resolve(e.target.result);
+            request.onsuccess = (e) => {
+                dbInstance = e.target.result;
+                resolve(dbInstance);
+            };
             request.onupgradeneeded = (e) => {
                 const db = e.target.result;
                 if (!db.objectStoreNames.contains(STORE_NAME)) {
@@ -3091,10 +3081,9 @@
         const db = await openDB();
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STORE_NAME, "readwrite");
-            const store = tx.objectStore(STORE_NAME);
-            const request = store.put(value, key);
-            request.onsuccess = () => resolve();
-            request.onerror = (e) => reject(e.target.error);
+            tx.objectStore(STORE_NAME).put(value, key);
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e.target.error);
         });
     }
 
@@ -3102,8 +3091,7 @@
         const db = await openDB();
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STORE_NAME, "readonly");
-            const store = tx.objectStore(STORE_NAME);
-            const request = store.get(key);
+            const request = tx.objectStore(STORE_NAME).get(key);
             request.onsuccess = () => resolve(request.result);
             request.onerror = (e) => reject(e.target.error);
         });
@@ -3113,10 +3101,9 @@
         const db = await openDB();
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STORE_NAME, "readwrite");
-            const store = tx.objectStore(STORE_NAME);
-            const request = store.delete(key);
-            request.onsuccess = () => resolve();
-            request.onerror = (e) => reject(e.target.error);
+            tx.objectStore(STORE_NAME).delete(key);
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e.target.error);
         });
     }
 
@@ -3228,7 +3215,7 @@
         if (holidayInfo) {
             holidayBox.classList.remove('d-none');
             const iconSpan = holidayInfo.icon ? `<span class="me-1">${holidayInfo.icon}</span>` : '';
-            let hHtml = `
+            holidayText.innerHTML = `
                 <div class="d-flex align-items-center justify-content-between">
                     <span class="fw-bold fs-6">${iconSpan}${escapeHtml(holidayInfo.holidayName)}</span>
                     <div class="d-flex align-items-center gap-2">
@@ -3245,7 +3232,6 @@
                 </div>
                 ${holidayInfo.isLongWeekend ? `<div class="mt-1 small fw-bold opacity-85"><i class="bi bi-calendar2-range me-1"></i>連假進度：第 ${holidayInfo.dayIndex} 天 / 共 ${holidayInfo.totalDays} 天（${holidayInfo.start} ~ ${holidayInfo.end}）</div>` : ''}
             `;
-            holidayText.innerHTML = hHtml;
         } else {
             holidayBox.classList.add('d-none');
         }
@@ -3275,35 +3261,35 @@
             lunarBox.classList.add('d-none');
         }
 
-        const dayEvents = events.filter(evt => selectedDateStr >= evt.start && selectedDateStr <= (evt.end || evt.start) && !evt.isHoliday);
+        const dayEvents = [];
+        for (let i = 0; i < events.length; i++) {
+            const evt = events[i];
+            if (!evt.isHoliday && selectedDateStr >= evt.start && selectedDateStr <= (evt.end || evt.start)) {
+                dayEvents.push(evt);
+            }
+        }
         
-        const badge = document.getElementById('sideEventBadge');
-        badge.textContent = dayEvents.length + (holidayInfo ? 1 : 0);
-
+        document.getElementById('sideEventBadge').textContent = dayEvents.length + (holidayInfo ? 1 : 0);
         const listContainer = document.getElementById('sideEventsList');
-        listContainer.innerHTML = '';
 
         if (dayEvents.length === 0) {
-            if (!holidayInfo) {
-                listContainer.innerHTML = `
-                    <div class="text-center py-5">
-                        <i class="bi bi-calendar-check opacity-25" style="font-size: 3rem;"></i>
-                        <p class="text-muted fw-bold mt-2 mb-3" style="font-size: 0.95rem;">本日尚無排定行程</p>
-                        <button class="btn btn-primary-custom btn-sm" onclick="openModalForNew('${selectedDateStr}')">
-                            <i class="bi bi-plus-circle"></i> 新增當日行程
-                        </button>
-                    </div>
-                `;
-            } else {
-                listContainer.innerHTML = `
-                    <div class="text-center py-4">
-                        <p class="text-muted fw-bold m-0 opacity-75" style="font-size: 0.92rem;">本日除連假外無其他排定行程</p>
-                    </div>
-                `;
-            }
+            listContainer.innerHTML = !holidayInfo ? `
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-check opacity-25" style="font-size: 3rem;"></i>
+                    <p class="text-muted fw-bold mt-2 mb-3" style="font-size: 0.95rem;">本日尚無排定行程</p>
+                    <button class="btn btn-primary-custom btn-sm" onclick="openModalForNew('${selectedDateStr}')">
+                        <i class="bi bi-plus-circle"></i> 新增當日行程
+                    </button>
+                </div>
+            ` : `
+                <div class="text-center py-4">
+                    <p class="text-muted fw-bold m-0 opacity-75" style="font-size: 0.92rem;">本日除連假外無其他排定行程</p>
+                </div>
+            `;
             return;
         }
 
+        const frag = document.createDocumentFragment();
         dayEvents.forEach(evt => {
             const card = document.createElement('div');
             card.className = 'side-event-card';
@@ -3337,8 +3323,9 @@
                     </div>
                 </div>
             `;
-            listContainer.appendChild(card);
+            frag.appendChild(card);
         });
+        listContainer.replaceChildren(frag);
     }
 
     function quickDeleteEvent(eventId) {
@@ -3365,16 +3352,14 @@
                     localStorage.removeItem(STORAGE_KEY);
                 }
             }
-            events = stored ? stored : [];
+            events = stored || [];
         } catch (e) {
             console.error(e);
             events = []; 
         }
     }
 
-    async function saveNotesToDB() { 
-        await dbSet(STORAGE_KEY, events); 
-    }
+    async function saveNotesToDB() { await dbSet(STORAGE_KEY, events); }
 
     async function loadFireworkSettingsFromDB() {
         try {
@@ -3387,16 +3372,14 @@
                     localStorage.removeItem(FIREWORK_SETTINGS_KEY);
                 }
             }
-            fireworkSettings = stored ? stored : {};
+            fireworkSettings = stored || {};
         } catch (e) {
             console.error(e);
             fireworkSettings = {};
         }
     }
 
-    async function saveFireworkSettingsToDB() {
-        await dbSet(FIREWORK_SETTINGS_KEY, fireworkSettings);
-    }
+    async function saveFireworkSettingsToDB() { await dbSet(FIREWORK_SETTINGS_KEY, fireworkSettings); }
 
     async function loadMemoFromDB() {
         try {
@@ -3428,16 +3411,20 @@
 
     function generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2, 7); }
 
+    const contrastColorCache = Object.create(null);
     function getContrastTextColor(hexcolor) {
         if (!hexcolor) return '#09090b'; 
-        hexcolor = hexcolor.trim().replace("#", "");
-        if (hexcolor.length === 3) hexcolor = hexcolor[0] + hexcolor[0] + hexcolor[1] + hexcolor[1] + hexcolor[2] + hexcolor[2];
-        if (hexcolor.length !== 6) return '#09090b';
-        const r = parseInt(hexcolor.substr(0,2),16);
-        const g = parseInt(hexcolor.substr(2,2),16);
-        const b = parseInt(hexcolor.substr(4,2),16);
+        if (contrastColorCache[hexcolor]) return contrastColorCache[hexcolor];
+        let clean = hexcolor.trim().replace("#", "");
+        if (clean.length === 3) clean = clean[0] + clean[0] + clean[1] + clean[1] + clean[2] + clean[2];
+        if (clean.length !== 6) return '#09090b';
+        const r = parseInt(clean.substr(0,2),16);
+        const g = parseInt(clean.substr(2,2),16);
+        const b = parseInt(clean.substr(4,2),16);
         const yiq = ((r*299) + (g*587) + (b*114)) / 1000;
-        return (yiq >= 155) ? '#09090b' : '#ffffff'; 
+        const res = (yiq >= 155) ? '#09090b' : '#ffffff';
+        contrastColorCache[hexcolor] = res;
+        return res;
     }
 
     function escapeHtml(text) {
@@ -3449,12 +3436,11 @@
     function selectDate(dateString, shouldSwitchTab = true) {
         selectedDateStr = dateString;
         
-        document.querySelectorAll('.day-cell').forEach(cell => cell.classList.remove('selected-day'));
+        const prevSelected = document.querySelector('.day-cell.selected-day');
+        if (prevSelected) prevSelected.classList.remove('selected-day');
         
         const targetCell = document.querySelector(`.day-cell[data-date="${dateString}"]`);
-        if (targetCell) {
-            targetCell.classList.add('selected-day');
-        }
+        if (targetCell) targetCell.classList.add('selected-day');
 
         if (shouldSwitchTab) {
             switchSideTab('events');
@@ -3485,12 +3471,13 @@
         }
     }
 
+    /* ================= 日曆主渲染核心 ================= */
     function renderCalendar() {
         stopFireworksAnimation();
         const calendarBody = document.getElementById('calendarBody');
         calendarBody.classList.add('calendar-transitioning');
 
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
             const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
@@ -3510,7 +3497,18 @@
             let nextMonth = month + 1; let nextYear = year;
             if (nextMonth > 11) { nextMonth = 0; nextYear++; }
 
-            calendarBody.innerHTML = '';
+            const holidayEvents = [];
+            const normalEvents = [];
+            for (let i = 0; i < events.length; i++) {
+                if (events[i].isHoliday) holidayEvents.push(events[i]);
+                else normalEvents.push(events[i]);
+            }
+
+            const fragment = document.createDocumentFragment();
+            const today = new Date();
+            const todayYear = today.getFullYear();
+            const todayMonth = today.getMonth();
+            const todayDate = today.getDate();
 
             const createCell = (cYear, cMonth, cDay, isOtherMonth) => {
                 const cell = document.createElement('div');
@@ -3524,8 +3522,7 @@
                     cell.classList.add('weekend-sun-cell');
                 }
 
-                const today = new Date();
-                if (!isOtherMonth && today.getFullYear() === cYear && today.getMonth() === cMonth && today.getDate() === cDay) {
+                if (!isOtherMonth && todayYear === cYear && todayMonth === cMonth && todayDate === cDay) {
                     cell.classList.add('today');
                 }
 
@@ -3536,18 +3533,36 @@
                     cell.classList.add('selected-day');
                 }
                 
-                const holidayInfo = getHolidayAndLongWeekendInfo(dateString);
-                if (holidayInfo) {
-                    cell.classList.add('holiday-cell');
-                    if (holidayInfo.isLongWeekend) {
-                        cell.classList.add('holiday-streak-cell');
+                let holidayInfo = null;
+                for (let i = 0; i < holidayEvents.length; i++) {
+                    const h = holidayEvents[i];
+                    if (dateString >= h.start && dateString <= (h.end || h.start)) {
+                        const startObj = new Date(h.start + 'T00:00:00');
+                        const endObj = new Date((h.end || h.start) + 'T00:00:00');
+                        const curObj = new Date(dateString + 'T00:00:00');
+                        const totalDays = Math.round((endObj - startObj) / 86400000) + 1;
+                        const dayIndex = Math.round((curObj - startObj) / 86400000) + 1;
+                        const holidayTitle = (h.text || '').split('\n')[0] || '連續假期';
+                        holidayInfo = {
+                            id: h.id,
+                            holidayName: holidayTitle,
+                            streakName: holidayTitle,
+                            totalDays,
+                            dayIndex,
+                            isLongWeekend: totalDays >= 2,
+                            icon: (h.icon !== undefined && h.icon !== null) ? h.icon : '🏖️'
+                        };
+                        break;
                     }
                 }
 
-                // 判斷該日期是否啟用花火動畫
+                if (holidayInfo) {
+                    cell.classList.add('holiday-cell');
+                    if (holidayInfo.isLongWeekend) cell.classList.add('holiday-streak-cell');
+                }
+
                 const fwStyle = fireworkSettings[dateString];
-                const hasFireworks = !isOtherMonth && !!fwStyle;
-                if (hasFireworks) {
+                if (!isOtherMonth && fwStyle) {
                     const fwCanvas = document.createElement('canvas');
                     fwCanvas.className = 'cell-firework-canvas';
                     fwCanvas.dataset.fwStyle = fwStyle;
@@ -3563,16 +3578,14 @@
                 const dateNum = document.createElement('div');
                 dateNum.className = 'date-number' + (holidayInfo ? ' text-holiday' : '');
                 dateNum.textContent = cDay;
-                dateNum.title = '點擊設定/啟用此日日本花火動畫';
+                dateNum.title = '點擊或按 Alt+F 設定/啟用此日日本花火動畫';
                 
-                // 點選日期數字開啟花火設定選單
                 dateNum.onclick = (e) => {
                     e.stopPropagation();
+                    selectDate(dateString, false);
                     promptFireworkOption(dateString);
                 };
-                dateNum.ondblclick = (e) => {
-                    e.stopPropagation();
-                };
+                dateNum.ondblclick = (e) => e.stopPropagation();
 
                 dateLeftBox.appendChild(dateNum);
 
@@ -3621,7 +3634,14 @@
                     cell.appendChild(streakBanner);
                 }
 
-                const dayEvents = events.filter(evt => dateString >= evt.start && dateString <= (evt.end || evt.start) && !evt.isHoliday);
+                const dayEvents = [];
+                for (let i = 0; i < normalEvents.length; i++) {
+                    const evt = normalEvents[i];
+                    if (dateString >= evt.start && dateString <= (evt.end || evt.start)) {
+                        dayEvents.push(evt);
+                    }
+                }
+
                 const isSingleEvent = dayEvents.length === 1;
                 const isMiniGrid = dayEvents.length >= 4;
 
@@ -3678,36 +3698,32 @@
 
                 cell.appendChild(eventsWrapper);
                 
-                cell.onclick = () => {
-                    selectDate(dateString, true);
-                };
-
-                cell.ondblclick = () => {
-                    openModalForNew(dateString);
-                };
+                cell.onclick = () => selectDate(dateString, true);
+                cell.ondblclick = () => openModalForNew(dateString);
 
                 return cell;
             };
 
             for (let i = 0; i < firstDayOfMonth; i++) {
                 const day = prevMonthDays - firstDayOfMonth + 1 + i;
-                calendarBody.appendChild(createCell(prevYear, prevMonth, day, true));
+                fragment.appendChild(createCell(prevYear, prevMonth, day, true));
             }
 
             for (let day = 1; day <= daysInMonth; day++) {
-                calendarBody.appendChild(createCell(year, month, day, false));
+                fragment.appendChild(createCell(year, month, day, false));
             }
             
             const totalCells = firstDayOfMonth + daysInMonth;
             const remainingCells = (7 - (totalCells % 7)) % 7;
             for (let day = 1; day <= remainingCells; day++) {
-                calendarBody.appendChild(createCell(nextYear, nextMonth, day, true));
+                fragment.appendChild(createCell(nextYear, nextMonth, day, true));
             }
 
+            calendarBody.replaceChildren(fragment);
             calendarBody.classList.remove('calendar-transitioning');
             renderSideEventsList();
             initFireworksAnimation();
-        }, 100);
+        });
     }
 
     function openModalForNew(dateString) {
@@ -3784,22 +3800,10 @@
         document.getElementById('appTitleBtn').onclick = promptEditTitle;
         document.getElementById('helpBtn').onclick = openHelpModal;
         document.getElementById('cloudSyncBtn').onclick = promptCloudSyncSettings;
-
-        document.getElementById('memoToggleBtn').onclick = () => {
-            toggleMemoMode();
-        };
-
-        document.getElementById('memoCollapseBtn').onclick = () => {
-            applyMemoCollapseState(true);
-        };
-
-        document.getElementById('memoCollapsedBar').onclick = () => {
-            applyMemoCollapseState(false);
-        };
-
-        document.getElementById('sideAddEventBtn').onclick = () => {
-            openModalForNew(selectedDateStr);
-        };
+        document.getElementById('memoToggleBtn').onclick = () => toggleMemoMode();
+        document.getElementById('memoCollapseBtn').onclick = () => applyMemoCollapseState(true);
+        document.getElementById('memoCollapsedBar').onclick = () => applyMemoCollapseState(false);
+        document.getElementById('sideAddEventBtn').onclick = () => openModalForNew(selectedDateStr);
 
         let memoDebounceTimer;
         document.getElementById('sideMemoArea').oninput = () => {
@@ -3836,9 +3840,7 @@
         const nativeColorInput = document.getElementById('nativeColorInput');
         const colorCustomRadio = document.getElementById('colorCustomRadio');
 
-        customColorLabel.addEventListener('click', () => {
-            nativeColorInput.click();
-        });
+        customColorLabel.addEventListener('click', () => nativeColorInput.click());
 
         nativeColorInput.addEventListener('input', (e) => {
             const chosenColor = e.target.value;
@@ -3857,8 +3859,10 @@
             e.target.blur(); 
         };
         
+        let resizeDebounce;
         window.addEventListener('resize', () => {
-            initFireworksAnimation();
+            clearTimeout(resizeDebounce);
+            resizeDebounce = setTimeout(initFireworksAnimation, 200);
         });
 
         /* 全局鍵盤快捷鍵系統 */
@@ -3877,7 +3881,12 @@
                 return;
             }
 
-            if (isSwalOpen || isNoteModalOpen || isHelpModalOpen) {
+            if (isSwalOpen || isNoteModalOpen || isHelpModalOpen) return;
+
+            /* 花火設定快捷鍵：Alt + F */
+            if (e.altKey && keyLower === 'f') {
+                e.preventDefault();
+                promptFireworkOption(selectedDateStr);
                 return;
             }
 
@@ -3954,9 +3963,7 @@
                 return;
             }
 
-            if (isEditable) {
-                return;
-            }
+            if (isEditable) return;
 
             if (e.key === ' ' || e.code === 'Space') {
                 e.preventDefault();
@@ -3966,15 +3973,10 @@
 
             if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
                 e.preventDefault();
-                if (e.key === 'ArrowLeft') {
-                    moveSelectedDate(-1);
-                } else if (e.key === 'ArrowRight') {
-                    moveSelectedDate(1);
-                } else if (e.key === 'ArrowUp') {
-                    moveSelectedDate(-7);
-                } else if (e.key === 'ArrowDown') {
-                    moveSelectedDate(7);
-                }
+                if (e.key === 'ArrowLeft') moveSelectedDate(-1);
+                else if (e.key === 'ArrowRight') moveSelectedDate(1);
+                else if (e.key === 'ArrowUp') moveSelectedDate(-7);
+                else if (e.key === 'ArrowDown') moveSelectedDate(7);
                 return;
             }
 
@@ -4091,7 +4093,7 @@
                                 renderSideEventsList();
                             } else if (result.isDenied) {
                                 events = newEvents;
-                                fireworkSettings = {}; // 先徹底清空舊花火設定再重新載入
+                                fireworkSettings = {}; 
                                 if (!isArray) {
                                     if (importedData.memo !== undefined) { 
                                         document.getElementById('sideMemoArea').value = importedData.memo; 
@@ -4183,7 +4185,7 @@
                 if (result.isConfirmed) {
                     const cutoffDate = result.value;
                     const originalCount = events.length;
-                    events = events.filter(e => { const eventEnd = e.end || e.start; return eventEnd >= cutoffDate; });
+                    events = events.filter(e => (e.end || e.start) >= cutoffDate);
                     await saveNotesToDB(); 
                     renderCalendar(); 
                     renderSideEventsList();
