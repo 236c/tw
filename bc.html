@@ -3562,7 +3562,7 @@
                 }
 
                 const fwStyle = fireworkSettings[dateString];
-                if (!isOtherMonth && fwStyle) {
+                if (fwStyle) {
                     const fwCanvas = document.createElement('canvas');
                     fwCanvas.className = 'cell-firework-canvas';
                     fwCanvas.dataset.fwStyle = fwStyle;
@@ -3589,7 +3589,7 @@
 
                 dateLeftBox.appendChild(dateNum);
 
-                if (holidayInfo && !isOtherMonth) {
+                if (holidayInfo) {
                     const holidayMiniBadge = document.createElement('span');
                     holidayMiniBadge.className = 'holiday-mini-badge';
                     holidayMiniBadge.textContent = holidayInfo.isLongWeekend ? '休' : '假';
@@ -3610,7 +3610,7 @@
                 }
                 cell.appendChild(topRow);
 
-                if (holidayInfo && !isOtherMonth) {
+                if (holidayInfo) {
                     const streakBanner = document.createElement('div');
                     streakBanner.className = 'holiday-streak-banner';
                     streakBanner.title = `${holidayInfo.isLongWeekend ? '【連續假期】' : '【自訂假期】'}${holidayInfo.streakName} (第 ${holidayInfo.dayIndex} 天 / 共 ${holidayInfo.totalDays} 天)`;
