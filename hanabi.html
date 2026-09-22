@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>日本職人競技花火大會 - 隅田川 Star Mine 連射特等席 (極致流暢版)</title>
+    <title>日本職人競技花火大會 - 隅田川 Star Mine 連射特等席 (12大Combo旗艦版)</title>
     <style>
         * {
             margin: 0;
@@ -139,16 +139,16 @@
             top: 70px;
             right: 18px;
             z-index: 30;
-            width: 335px;
+            width: 360px;
             max-height: calc(100vh - 90px);
-            background: rgba(10, 16, 32, 0.95);
+            background: rgba(10, 16, 32, 0.96);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
             border: 1px solid rgba(255, 255, 255, 0.16);
             border-radius: 16px;
             padding: 18px;
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
-            transform: translateX(380px);
+            transform: translateX(400px);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             overflow-y: auto;
             scrollbar-width: thin;
@@ -208,6 +208,15 @@
             font-size: 0.85rem;
             outline: none;
         }
+        .control-input optgroup {
+            background: #0d1527;
+            color: #38bdf8;
+            font-weight: 700;
+        }
+        .control-input option {
+            background: #090e1a;
+            color: #f1f5f9;
+        }
 
         .range-slider {
             width: 100%;
@@ -262,7 +271,7 @@
             .btn-ui { padding: 4px 8px; font-size: 0.74rem; }
             .title-badge { font-size: 0.8rem; }
             .fps-badge { display: none; }
-            .drawer-panel { width: 90vw; right: 5vw; }
+            .drawer-panel { width: 92vw; right: 4vw; }
         }
     </style>
 </head>
@@ -311,22 +320,29 @@
 
         <div class="control-section">
             <div class="control-label">
-                <span>指定發動的 Combo 組合技</span>
+                <span>指定發動的 Combo 組合技 (12大名作)</span>
                 <span id="comboSelectText" style="color:#38bdf8;">隨機輪播</span>
             </div>
             <select class="control-input" id="comboStyleSelect">
-                <option value="random">🎲 5大 Combo 隨機輪播</option>
-                <option value="fan_wide">🦚 扇状ワイド・千輪扇型スターマイン (7發扇型)</option>
-                <option value="rainbow_cascade">🌈 七色連段・虹彩レインボー (7色漸層)</option>
+                <option value="random">🎲 12大 Combo 隨機輪播</option>
+                <option value="fan_wide">🦚 扇状ワイド・千輪扇型 (7發扇型展開)</option>
+                <option value="rainbow_cascade">🌈 七色連段・虹彩レインボー (7色漸層光譜)</option>
                 <option value="tiger_tail">🐅 虎の尾・黄金昇天連射 (金火柱連環)</option>
                 <option value="crossfire_dragons">⚔️ 交差連発・双龍錦冠 (左右交錯對射)</option>
                 <option value="ghost_rush">👻 時差百花・幽霊変色ラッシュ (潛行骨牌復燃)</option>
+                <option value="v_shape_wings">🦅 翼翔乱舞・V字ツインウィング (雙翼V型展翅)</option>
+                <option value="kamuro_waterfall">🌊 天河大瀑布・超ワイド黄金ナイアガラ (全江面5砲台金瀑)</option>
+                <option value="fuji_sunrise">🌅 霊峰黎明・紅富士ご来光 (富士旭日昇天)</option>
+                <option value="meteor_shower">🌠 流れ星群・彗星銀河シャワー (超密集銀龍流星雨)</option>
+                <option value="thousand_strobe">💎 銀河乱点滅・百花ダイヤモンド (極限閃爍鑽石群)</option>
+                <option value="spiral_dna">🧬 昇龍螺旋・DNAダブルヘリックス (交織雙螺旋梯)</option>
+                <option value="sakura_blizzard">🌸 満開桜嵐・隅田川花吹雪 (急速櫻花風暴)</option>
             </select>
         </div>
 
         <div class="control-section">
             <div class="control-label">
-                <span>單發職人花火樣式 (含茂盛名品)</span>
+                <span>單發職人花火樣式 (40+ 款名物)</span>
                 <span id="styleCountText" style="color:#38bdf8;">隨機輪播</span>
             </div>
             <select class="control-input" id="fireworkStyleSelect"></select>
@@ -383,142 +399,306 @@
 
     <script>
 /**
- * 30+ 款頂級競技花火資料庫
+ * 40+ 款日本頂級競技花火資料庫 (依專業流派分組)
  */
 const HANABI_STYLES_CATALOG = [
-    { id: 'all', icon: '🌌', name: '全造型隨機輪播', desc: '日本大會最高榮譽綜合競技' },
+    { id: 'all', group: '綜合', icon: '🌌', name: '全造型隨機輪播', desc: '日本大會最高榮譽綜合競技' },
 
-    // ===== 🌟【極致茂盛系列】 =====
+    // ===== 🌟【極致茂盛・天幕大輪】 =====
     { 
-        id: 'lush_kamuro_curtain', icon: '👑', name: '【極致茂盛】千重極上・錦冠大垂幕', desc: '天幕級金瀑，流絲繁密蔽日，自然向江面沉垂良久',
+        id: 'lush_kamuro_curtain', group: '極致茂盛・天幕大輪', icon: '👑', name: '千重極上・錦冠大垂幕', desc: '天幕級金瀑流絲繁密蔽日，自然向江面沉垂良久',
         colors: ['#ffeaa7', '#ffd32a', '#ffbe76', '#fff200', '#ffffff'],
         particles: 320, baseSpeed: 3.1, airDrag: 0.972, gravity: 0.046, decayRate: 0.0028,
         decayProfile: 'willow_long', cutoffLifetime: 175, isLush: true
     },
     { 
-        id: 'lush_shidare_sakura', icon: '🌸', name: '【極致茂盛】爛漫・枝垂れ夜桜大輪', desc: '枝葉繁茂的粉櫻與玫瑰金絲漫天披覆，隨夜風翻飛散華',
+        id: 'lush_shidare_sakura', group: '極致茂盛・天幕大輪', icon: '🌸', name: '爛漫・枝垂れ夜桜大輪', desc: '繁茂粉櫻與玫瑰金絲漫天披覆，隨夜風翻飛散華',
         colors: ['#ff758c', '#ff7eb3', '#ffa4b6', '#fed7aa', '#ffffff'],
         particles: 290, baseSpeed: 3.2, airDrag: 0.965, gravity: 0.035, decayRate: 0.0034,
         decayProfile: 'flutter', cutoffLifetime: 160, isLush: true
     },
     { 
-        id: 'lush_senrin_hyakka', icon: '🎇', name: '【極致茂盛】百花繚乱・密集超千輪', desc: '同心大範圍放射，隨後同心群爆密集重疊微花，塞滿夜空',
+        id: 'lush_senrin_hyakka', group: '極致茂盛・天幕大輪', icon: '🎇', name: '百花繚乱・密集超千輪', desc: '向9個方位大範圍放射，隨後同心群爆重疊微花塞滿夜空',
         colors: ['#ff3838', '#2ed573', '#1e90ff', '#ffa502', '#9b59b6', '#ff6b81', '#00f5d4'],
         particles: 280, baseSpeed: 3.4, airDrag: 0.962, gravity: 0.038, decayRate: 0.0044,
         decayProfile: 'instant_cutoff', isSenrin: true, cutoffLifetime: 130, isLush: true
     },
     { 
-        id: 'lush_mangekyo_hanabi', icon: '🔮', name: '【極致茂盛】万紫千紅・八重芯万華鏡', desc: '同心八層極密五彩花瓣，外層包裹濃密光圈，平緩優雅消口',
+        id: 'lush_mangekyo_hanabi', group: '極致茂盛・天幕大輪', icon: '🔮', name: '万紫千紅・八重芯万華鏡', desc: '同心八層極密五彩花瓣，外層包裹濃密光圈，平緩優雅消口',
         colors: ['#f43f5e', '#3b82f6', '#10b981', '#facc15', '#a855f7'],
         particles: 270, baseSpeed: 3.3, airDrag: 0.961, gravity: 0.036, decayRate: 0.0042,
         decayProfile: 'instant_cutoff', cutoffLifetime: 125, isLush: true
     },
     { 
-        id: 'lush_ogon_niagara', icon: '🌊', name: '【極致茂盛】白銀黄金・二重瀑布', desc: '白銀浪潮伴隨金色濃密重力流瀉，如同天河倒灌江面',
+        id: 'lush_ogon_niagara', group: '極致茂盛・天幕大輪', icon: '🌊', name: '白銀黄金・二重瀑布', desc: '白銀浪潮伴隨金色濃密重力流瀉，如同天河倒灌江面',
         colors: ['#ffffff', '#f8fafc', '#ffd32a', '#ffedd5'],
         particles: 290, baseSpeed: 3.2, airDrag: 0.966, gravity: 0.058, decayRate: 0.0032,
         decayProfile: 'willow_long', cutoffLifetime: 165, isLush: true
     },
-
-    // ===== 經典職人割物名物 =====
     { 
-        id: 'gosin_kiku', icon: '🏆', name: '神技・五重芯割物', desc: '極致同心五層五色同開，齊整一斉消口',
+        id: 'kiku_taki_niagara', group: '極致茂盛・天幕大輪', icon: '🌊', name: '白銀・菊花大瀑布', desc: '萬道銀輝如尼加拉大瀑布傾瀉，沉降尾羽細緻收窄',
+        colors: ['#ffffff', '#e0f2fe', '#bae6fd', '#f8fafc'],
+        particles: 240, baseSpeed: 3.2, airDrag: 0.962, gravity: 0.064, decayRate: 0.0046,
+        decayProfile: 'willow_long', cutoffLifetime: 140
+    },
+
+    // ===== 🏆【競技大會・多重芯割物】 =====
+    { 
+        id: 'gosin_kiku', group: '競技大會・多重芯割物', icon: '🏆', name: '神技・五重芯割物', desc: '內閣總理大臣賞規格，同心五層五色同開，齊整一斉消口',
         colors: ['#38bdf8', '#0284c7'], core5: ['#ffffff'], core4: ['#fbbf24'], core3: ['#f43f5e'], core2: ['#10b981'],
         particles: 240, baseSpeed: 3.5, airDrag: 0.963, gravity: 0.038, decayRate: 0.0048,
         decayProfile: 'instant_cutoff', cutoffLifetime: 118
     },
     { 
-        id: 'yonsin_kiku', icon: '💎', name: '四重芯菊花割物', desc: '金芯->翠綠->朱紅->天青 四層結構齊消',
+        id: 'yonsin_kiku', group: '競技大會・多重芯割物', icon: '💎', name: '四重芯菊花割物', desc: '金芯->翠綠->朱紅->天青 四層結構完美對稱齊消',
         colors: ['#38bdf8', '#0284c7'], ring3Colors: ['#ef4444', '#f87171'], ring2Colors: ['#10b981', '#34d399'], coreColors: ['#fbbf24', '#ffffff'],
         particles: 210, baseSpeed: 3.3, airDrag: 0.962, gravity: 0.038, decayRate: 0.0050,
         decayProfile: 'instant_cutoff', cutoffLifetime: 112
     },
     { 
-        id: 'yurei_ghost', icon: '👻', name: '幻影・幽霊時差花火', desc: '爆開後全黑隱形潛行，虛無中突然二度復燃！',
-        colors: ['#e0f2fe', '#bae6fd'], reigniteColors: ['#00f5d4', '#f43f5e', '#a855f7', '#fbbf24'],
-        particles: 200, baseSpeed: 3.2, airDrag: 0.961, gravity: 0.036, decayRate: 0.0046,
-        decayProfile: 'ghost', darkAgeStart: 18, darkAgeEnd: 48, cutoffLifetime: 130
+        id: 'yae_shin', group: '競技大會・多重芯割物', icon: '🎯', name: '伝統・三重芯割物', desc: '檸檬黃->玫瑰粉->皇家紫 三重同心割物',
+        colors: ['#a855f7', '#c084fc'], middleColors: ['#ff3838', '#ff6b81'], coreColors: ['#fff200', '#ffffff'],
+        particles: 190, baseSpeed: 3.2, airDrag: 0.960, gravity: 0.038, decayRate: 0.0052,
+        decayProfile: 'instant_cutoff', cutoffLifetime: 105
     },
     { 
-        id: 'kamuro_tenmetsu', icon: '✨', name: '錦冠先点滅・蛍火', desc: '金色柳絲末端轉為劇烈閃爍微光，如夏夜螢火熄滅',
-        colors: ['#fef08a', '#facc15', '#eab308'],
-        particles: 220, baseSpeed: 2.9, airDrag: 0.966, gravity: 0.042, decayRate: 0.0036,
-        decayProfile: 'strobe_fade', strobeStartAge: 65, cutoffLifetime: 140
-    },
-    { 
-        id: 'kamuro_saki_wari', icon: '💫', name: '錦冠先割・千輪星屑', desc: '金色柳絲末端點化微爆，劈啪裂開出細碎微花',
-        colors: ['#fef08a', '#facc15', '#fbbf24'],
-        particles: 210, baseSpeed: 2.9, airDrag: 0.966, gravity: 0.042, decayRate: 0.0038,
-        decayProfile: 'saki_wari', sakiWariAge: 75, cutoffLifetime: 130
-    },
-    { 
-        id: 'wabi_edo_charcoal', icon: '🏮', name: '江戸古法・和火炭火', desc: '純木炭黑藥火，冷卻色溫遞減：白亮->金燦->暗橘->赤紅餘燼',
-        colors: ['#fff7ed', '#ffedd5', '#fed7aa'],
-        particles: 170, baseSpeed: 2.3, airDrag: 0.954, gravity: 0.052, decayRate: 0.0036,
-        decayProfile: 'color_cool', cutoffLifetime: 150
-    },
-    { 
-        id: 'ginpa_saki_wari', icon: '⚡', name: '白銀・銀波先割', desc: '萬道銀白光線，燃盡前夕一齊劈啪爆炸出銀芒微花',
-        colors: ['#ffffff', '#e0f2fe', '#bae6fd'],
-        particles: 200, baseSpeed: 3.3, airDrag: 0.962, gravity: 0.044, decayRate: 0.0048,
-        decayProfile: 'saki_wari', sakiWariAge: 70, cutoffLifetime: 118
-    },
-    { 
-        id: 'yashi_ginpa', icon: '🌴', name: '南國・巨木椰子銀波', desc: '粗壯銀幹筆直升騰，頂點張開繁茂銀白椰子樹冠沉落',
-        colors: ['#ffffff', '#e2e8f0', '#cbd5e1'],
-        particles: 190, baseSpeed: 3.4, airDrag: 0.964, gravity: 0.048, decayRate: 0.0042,
-        decayProfile: 'willow_long', cutoffLifetime: 138
-    },
-    { 
-        id: 'kurenai_sakiwari', icon: '🍁', name: '黄金柳・紅先割', desc: '金色柳絲流瀉如瀑，尾端一齊炸開鮮豔朱紅碎星',
-        colors: ['#fef08a', '#facc15'],
-        particles: 220, baseSpeed: 2.9, airDrag: 0.967, gravity: 0.045, decayRate: 0.0038,
-        decayProfile: 'saki_wari', sakiWariAge: 76, cutoffLifetime: 132, sakiColor: '#ef4444'
-    },
-    { 
-        id: 'shikon_ogon_shin', icon: '🍇', name: '紫紺・黄金芯牡丹', desc: '純金色核芯被深邃莊嚴的紫紺花瓣環抱，極其華貴',
+        id: 'shikon_ogon_shin', group: '競技大會・多重芯割物', icon: '🍇', name: '紫紺・黄金芯牡丹', desc: '純金核芯被深邃莊嚴的紫紺花瓣環抱，端莊華貴',
         colors: ['#7c3aed', '#6d28d9', '#8b5cf6'], coreColors: ['#fbbf24', '#ffffff'],
         particles: 190, baseSpeed: 3.1, airDrag: 0.960, gravity: 0.036, decayRate: 0.0050,
         decayProfile: 'instant_cutoff', cutoffLifetime: 110
     },
     { 
-        id: 'senko_shiranami', icon: '💡', name: '閃光白波・冠菊', desc: '耀眼白鎂劇烈爆閃後，化為千萬條細膩白色浪花銀波',
+        id: 'suisei_kurena', group: '競技大會・多重芯割物', icon: '☄️', name: '昇彗星・紅蓮菊花', desc: '金色彗尾直線衝頂，爆裂為深沉熾熱的紅蓮真火菊花',
+        colors: ['#dc2626', '#b91c1c', '#f87171'],
+        particles: 190, baseSpeed: 3.2, airDrag: 0.961, gravity: 0.038, decayRate: 0.0050,
+        decayProfile: 'instant_cutoff', cutoffLifetime: 110
+    },
+    { 
+        id: 'kamui_rainbow', group: '競技大會・多重芯割物', icon: '🌈', name: '神威・極彩色昇華菊', desc: '七彩光譜依角度放射，如神祇降臨般的壯麗彩虹圓環',
+        colors: ['#ef4444', '#f97316', '#facc15', '#10b981', '#06b6d4', '#3b82f6', '#a855f7'],
+        particles: 220, baseSpeed: 3.3, airDrag: 0.962, gravity: 0.036, decayRate: 0.0048,
+        decayProfile: 'instant_cutoff', cutoffLifetime: 115
+    },
+
+    // ===== 🎆【小割物・千輪百花・先割】 =====
+    { 
+        id: 'senrin_hyakka', group: '小割物・千輪百花・先割', icon: '🎇', name: '群咲・千輪百花', desc: '小子玉延遲向四方擴散，同心群爆齊開百花',
+        colors: ['#ff3838', '#2ed573', '#1e90ff', '#ffa502', '#9b59b6', '#ff6b81'],
+        particles: 200, baseSpeed: 3.1, airDrag: 0.960, gravity: 0.038, decayRate: 0.0052,
+        decayProfile: 'instant_cutoff', isSenrin: true, cutoffLifetime: 110
+    },
+    { 
+        id: 'yukiwariso_pastel', group: '小割物・千輪百花・先割', icon: '🌱', name: '小割浮模様・千輪雪割草', desc: '春日早開野花般的粉彩小花（粉櫻、薄荷綠、嫩黃、淡紫）輕柔浮游',
+        colors: ['#fbcfe8', '#a7f3d0', '#fed7aa', '#ddd6fe', '#bae6fd'],
+        particles: 210, baseSpeed: 3.1, airDrag: 0.958, gravity: 0.034, decayRate: 0.0044,
+        decayProfile: 'flutter', isSenrin: true, cutoffLifetime: 125
+    },
+    { 
+        id: 'kamuro_saki_wari', group: '小割物・千輪百花・先割', icon: '💫', name: '錦冠先割・千輪星屑', desc: '金色柳絲末端點化微爆，劈啪裂開出細碎微花',
+        colors: ['#fef08a', '#facc15', '#fbbf24'],
+        particles: 210, baseSpeed: 2.9, airDrag: 0.966, gravity: 0.042, decayRate: 0.0038,
+        decayProfile: 'saki_wari', sakiWariAge: 75, cutoffLifetime: 130
+    },
+    { 
+        id: 'kurenai_sakiwari', group: '小割物・千輪百花・先割', icon: '🍁', name: '黄金柳・紅先割', desc: '金色柳絲流瀉如瀑，尾端一齊炸開鮮豔朱紅碎星',
+        colors: ['#fef08a', '#facc15'],
+        particles: 220, baseSpeed: 2.9, airDrag: 0.967, gravity: 0.045, decayRate: 0.0038,
+        decayProfile: 'saki_wari', sakiWariAge: 76, cutoffLifetime: 132, sakiColor: '#ef4444'
+    },
+    { 
+        id: 'midori_sakiwari', group: '小割物・千輪百花・先割', icon: '🍃', name: '黄金柳・緑先割', desc: '金色柳絲流淌垂落，熄滅前剎那迸發明亮翡翠碎綠',
+        colors: ['#fef08a', '#facc15'],
+        particles: 220, baseSpeed: 2.9, airDrag: 0.967, gravity: 0.045, decayRate: 0.0038,
+        decayProfile: 'saki_wari', sakiWariAge: 75, cutoffLifetime: 130, sakiColor: '#10b981'
+    },
+    { 
+        id: 'ginpa_saki_wari', group: '小割物・千輪百花・先割', icon: '⚡', name: '白銀・銀波先割', desc: '萬道銀白光線，燃盡前夕一齊劈啪爆炸出銀芒微花',
+        colors: ['#ffffff', '#e0f2fe', '#bae6fd'],
+        particles: 200, baseSpeed: 3.3, airDrag: 0.962, gravity: 0.044, decayRate: 0.0048,
+        decayProfile: 'saki_wari', sakiWariAge: 70, cutoffLifetime: 118
+    },
+    { 
+        id: 'hyakka_kiku_core', group: '小割物・千輪百花・先割', icon: '🎇', name: '百花繚乱・錦先割三段', desc: '金柳、綠芯、紅芒三段式次序開花，最後一齊微爆',
+        colors: ['#fbbf24', '#10b981', '#ef4444', '#ffffff'],
+        particles: 215, baseSpeed: 3.2, airDrag: 0.963, gravity: 0.040, decayRate: 0.0044,
+        decayProfile: 'saki_wari', sakiWariAge: 70, cutoffLifetime: 120
+    },
+
+    // ===== 🪐【型物・幾何學輪型】 =====
+    { 
+        id: 'saturn_ring', group: '型物・幾何學輪型', icon: '🪐', name: '宇宙創生・土星環輪', desc: '中央懸浮一顆朱紅行星核心，外圍環繞斜向發光的璀璨金色土星環',
+        colors: ['#facc15', '#fde047'], coreColors: ['#ef4444', '#f87171'],
+        particles: 190, baseSpeed: 3.1, airDrag: 0.960, gravity: 0.032, decayRate: 0.0048,
+        decayProfile: 'instant_cutoff', isRing: true, cutoffLifetime: 110
+    },
+    { 
+        id: 'peacock_feather', group: '型物・幾何學輪型', icon: '🦚', name: '孔雀開屏・七彩尾羽', desc: '扇形向兩翼展開的青翠與鈷藍孔雀屏風，末端鑲嵌金眼微星',
+        colors: ['#06b6d4', '#0284c7', '#10b981', '#facc15'],
+        particles: 200, baseSpeed: 3.3, airDrag: 0.962, gravity: 0.038, decayRate: 0.0046,
+        decayProfile: 'instant_cutoff', cutoffLifetime: 115
+    },
+
+    // ===== ⏳【時差・段咲き・變色】 =====
+    { 
+        id: 'yurei_ghost', group: '時差・段咲き・變色', icon: '👻', name: '幻影・幽霊時差花火', desc: '爆開後全黑隱形潛行，虛無中突然二度復燃！',
+        colors: ['#e0f2fe', '#bae6fd'], reigniteColors: ['#00f5d4', '#f43f5e', '#a855f7', '#fbbf24'],
+        particles: 200, baseSpeed: 3.2, airDrag: 0.961, gravity: 0.036, decayRate: 0.0046,
+        decayProfile: 'ghost', darkAgeStart: 18, darkAgeEnd: 48, cutoffLifetime: 130
+    },
+    { 
+        id: 'danzaki_tri_burst', group: '時差・段咲き・變色', icon: '🪜', name: '階梯段咲き・三層波紋', desc: '內芯先爆開，0.3秒後中層綻放，0.6秒後外層巨環方才開花，波浪式延展',
+        colors: ['#38bdf8', '#0284c7'], middleColors: ['#facc15'], coreColors: ['#ef4444'],
+        particles: 220, baseSpeed: 3.2, airDrag: 0.961, gravity: 0.036, decayRate: 0.0046,
+        decayProfile: 'danzaki', cutoffLifetime: 125
+    },
+    { 
+        id: 'henshoku_botan', group: '時差・段咲き・變色', icon: '🌺', name: '現代職人・変色牡丹', desc: '冰川蔚藍平滑漸變為濃郁洋紅，隨後瞬間冷卻凝縮',
+        colors: ['#38bdf8', '#60a5fa', '#93c5fd'], shiftColor: '#ff2a85',
+        particles: 180, baseSpeed: 3.0, airDrag: 0.958, gravity: 0.035, decayRate: 0.0052,
+        decayProfile: 'instant_cutoff', cutoffLifetime: 105
+    },
+    { 
+        id: 'aoarashi_cyan', group: '時差・段咲き・變色', icon: '🌀', name: '青嵐・碧海深藍牡丹', desc: '深海鈷藍向邊緣逐漸過渡為透亮天青石色，清涼寧靜',
+        colors: ['#0284c7', '#0369a1', '#06b6d4', '#38bdf8'],
+        particles: 190, baseSpeed: 3.1, airDrag: 0.960, gravity: 0.036, decayRate: 0.0050,
+        decayProfile: 'instant_cutoff', cutoffLifetime: 108
+    },
+
+    // ===== 🏮【傳統和火・金波銀波】 =====
+    { 
+        id: 'wabi_edo_charcoal', group: '傳統和火・金波銀波', icon: '🏮', name: '江戸古法・和火炭火', desc: '純木炭黑藥火，冷卻色溫遞減：白亮->金燦->暗橘->赤紅餘燼',
+        colors: ['#fff7ed', '#ffedd5', '#fed7aa'],
+        particles: 170, baseSpeed: 2.3, airDrag: 0.954, gravity: 0.052, decayRate: 0.0036,
+        decayProfile: 'color_cool', cutoffLifetime: 150
+    },
+    { 
+        id: 'suifu_wabi_willow', group: '傳統和火・金波銀波', icon: '🔥', name: '水府流・和火煙柳', desc: '江戶水府流密傳重火藥，粗獷赤橙柳絲緩緩垂向水面，餘熱長存',
+        colors: ['#fed7aa', '#fb923c', '#ea580c'],
+        particles: 180, baseSpeed: 2.4, airDrag: 0.958, gravity: 0.056, decayRate: 0.0032,
+        decayProfile: 'willow_long', cutoffLifetime: 155
+    },
+    { 
+        id: 'tosa_wabi_cascade', group: '傳統和火・金波銀波', icon: '🔥', name: '土佐・和火赤橙瀑', desc: '傳統土佐黑火藥慢燃，赤橙餘燼如鐵水瀑布緩緩滴落',
+        colors: ['#ffedd5', '#fed7aa', '#fb923c', '#ea580c'],
+        particles: 160, baseSpeed: 2.2, airDrag: 0.950, gravity: 0.055, decayRate: 0.0035,
+        decayProfile: 'color_cool', cutoffLifetime: 155
+    },
+    { 
+        id: 'kamuro_lush', group: '傳統和火・金波銀波', icon: '🌾', name: '極上・錦冠大柳', desc: '金光流絲如瀑，長久重力垂地，久久不散',
+        colors: ['#ffeaa7', '#ffd32a', '#ff9f1a', '#fff200', '#ffffff'],
+        particles: 240, baseSpeed: 2.8, airDrag: 0.968, gravity: 0.046, decayRate: 0.0034,
+        decayProfile: 'willow_long', cutoffLifetime: 160
+    },
+    { 
+        id: 'gold_willow_dragon', group: '傳統和火・金波銀波', icon: '⚜️', name: '昇天銀龍・黄金冠', desc: '銀光衝天隨後化為沉降金柳，長垂至水面',
+        colors: ['#f6e58d', '#ffbe76', '#f9ca24', '#ffffff'],
+        particles: 200, baseSpeed: 3.0, airDrag: 0.966, gravity: 0.044, decayRate: 0.0036,
+        decayProfile: 'willow_long', cutoffLifetime: 155
+    },
+    { 
+        id: 'yashi_ginpa', group: '傳統和火・金波銀波', icon: '🌴', name: '南國・巨木椰子銀波', desc: '粗壯銀幹筆直升騰，頂點張開繁茂銀白椰子樹冠沉落',
+        colors: ['#ffffff', '#e2e8f0', '#cbd5e1'],
+        particles: 190, baseSpeed: 3.4, airDrag: 0.964, gravity: 0.048, decayRate: 0.0042,
+        decayProfile: 'willow_long', cutoffLifetime: 138
+    },
+    { 
+        id: 'senko_shiranami', group: '傳統和火・金波銀波', icon: '💡', name: '閃光白波・冠菊', desc: '耀眼白鎂劇烈爆閃後，化為千萬條細膩白色浪花銀波',
         colors: ['#ffffff', '#f8fafc', '#e2e8f0'],
         particles: 220, baseSpeed: 3.3, airDrag: 0.965, gravity: 0.042, decayRate: 0.0038,
         decayProfile: 'willow_long', cutoffLifetime: 148
     },
     { 
-        id: 'midori_botan_strobe', icon: '🟢', name: '翠玉・翡翠点滅牡丹', desc: '鮮明翡翠綠星花，外緣如繁星閃爍點滅不停',
+        id: 'shio_sai_cyan', group: '傳統和火・金波銀波', icon: '🌊', name: '潮騒・碧海青銀菊花', desc: '宛如隅田川波浪的碧藍與亮銀交錯，寧靜純美',
+        colors: ['#06b6d4', '#22d3ee', '#ffffff', '#e0f2fe'],
+        particles: 185, baseSpeed: 3.1, airDrag: 0.960, gravity: 0.037, decayRate: 0.0048,
+        decayProfile: 'instant_cutoff', cutoffLifetime: 108
+    },
+
+    // ===== ✨【閃光・點滅・亂舞奇想】 =====
+    { 
+        id: 'diamond_strobe', group: '閃光・點滅・亂舞奇想', icon: '💎', name: '天空之鑽・白光群點滅', desc: '白金鑽石般的高頻劇烈閃爍微星，刺破夜幕如繁星閃耀',
+        colors: ['#ffffff', '#f0f9ff', '#e0f2fe'],
+        particles: 210, baseSpeed: 3.2, airDrag: 0.962, gravity: 0.036, decayRate: 0.0042,
+        decayProfile: 'strobe_fade', strobeStartAge: 20, cutoffLifetime: 130
+    },
+    { 
+        id: 'kamuro_tenmetsu', group: '閃光・點滅・亂舞奇想', icon: '✨', name: '錦冠先点滅・蛍火', desc: '金色柳絲末端轉為劇烈閃爍微光，如夏夜螢火熄滅',
+        colors: ['#fef08a', '#facc15', '#eab308'],
+        particles: 220, baseSpeed: 2.9, airDrag: 0.966, gravity: 0.042, decayRate: 0.0036,
+        decayProfile: 'strobe_fade', strobeStartAge: 65, cutoffLifetime: 140
+    },
+    { 
+        id: 'midori_botan_strobe', group: '閃光・點滅・亂舞奇想', icon: '🟢', name: '翠玉・翡翠点滅牡丹', desc: '鮮明翡翠綠星花，外緣如繁星閃爍點滅不停',
         colors: ['#10b981', '#059669', '#34d399'],
         particles: 180, baseSpeed: 3.0, airDrag: 0.960, gravity: 0.036, decayRate: 0.0046,
         decayProfile: 'strobe_fade', strobeStartAge: 45, cutoffLifetime: 124
     },
     { 
-        id: 'akane_zora', icon: '🌇', name: '茜空・夕映え錦冠', desc: '晚霞暮色般的橙紅漸層，隨後如熔金垂落江畔',
+        id: 'kurui_hachi_mad', group: '閃光・點滅・亂舞奇想', icon: '🐝', name: '乱舞奇想・狂い蜂', desc: '劇烈震顫急拐迴旋的金色群蜂，最後劈啪消失',
+        colors: ['#fde047', '#facc15', '#f59e0b', '#ffffff'],
+        particles: 150, baseSpeed: 2.9, airDrag: 0.970, gravity: 0.024, decayRate: 0.0048,
+        decayProfile: 'saki_wari', sakiWariAge: 68, cutoffLifetime: 110
+    },
+    { 
+        id: 'sakura_fubuki_sanka', group: '閃光・點滅・亂舞奇想', icon: '🌸', name: '和風・桜吹雪散華', desc: '五瓣粉櫻造型飄逸翻飛，受微風擾動左右盤旋',
+        colors: ['#ff758c', '#ff7eb3', '#ff4d6d', '#ffffff'],
+        particles: 170, baseSpeed: 3.0, airDrag: 0.958, gravity: 0.032, decayRate: 0.0046,
+        decayProfile: 'flutter', cutoffLifetime: 130
+    },
+    { 
+        id: 'nanohana_field', group: '閃光・點滅・亂舞奇想', icon: '🌼', name: '黄金花野・菜の花畑', desc: '油菜花田般的金黃與嫩綠雙色交織，清新溫暖地飄舞消融',
+        colors: ['#facc15', '#fde047', '#a3e635', '#4ade80'],
+        particles: 190, baseSpeed: 3.0, airDrag: 0.958, gravity: 0.034, decayRate: 0.0046,
+        decayProfile: 'flutter', cutoffLifetime: 126
+    },
+    { 
+        id: 'momiji_autumn', group: '閃光・點滅・亂舞奇想', icon: '🍁', name: '落葉・錦秋もみじ狩り', desc: '深紅楓葉與焦橙琥珀落葉漫天飄零，受氣流吹拂搖曳下落',
+        colors: ['#dc2626', '#b91c1c', '#ea580c', '#fbbf24'],
+        particles: 180, baseSpeed: 2.9, airDrag: 0.956, gravity: 0.038, decayRate: 0.0042,
+        decayProfile: 'flutter', cutoffLifetime: 135
+    },
+    { 
+        id: 'blue_sapphire_pure', group: '閃光・點滅・亂舞奇想', icon: '🔷', name: '純粋・青一色', desc: '極度純淨深邃的職人薩菲爾鈷藍，一齊整齊斷火消口',
+        colors: ['#00a8ff', '#0097e6', '#70a1ff', '#ffffff'],
+        particles: 180, baseSpeed: 3.1, airDrag: 0.960, gravity: 0.036, decayRate: 0.0052,
+        decayProfile: 'instant_cutoff', cutoffLifetime: 102
+    },
+    { 
+        id: 'akane_zora', group: '閃光・點滅・亂舞奇想', icon: '🌇', name: '茜空・夕映え錦冠', desc: '晚霞暮色般的橙紅漸層，隨後如熔金垂落江畔',
         colors: ['#f97316', '#ea580c', '#fbbf24', '#ffd32a'],
         particles: 220, baseSpeed: 2.9, airDrag: 0.966, gravity: 0.044, decayRate: 0.0036,
         decayProfile: 'willow_long', cutoffLifetime: 155
     },
     { 
-        id: 'romantic_sumida_love', icon: '💖', name: '隅田川・夜空戀華', desc: '紫羅蘭與淺玫瑰金交織浪漫雙環，櫻瓣微光散落',
+        id: 'romantic_sumida_love', group: '閃光・點滅・亂舞奇想', icon: '💖', name: '隅田川・夜空戀華', desc: '紫羅蘭與淺玫瑰金交織浪漫雙環，櫻瓣微光散落',
         colors: ['#e056fd', '#be2edd', '#f8a5c2', '#f78fb3', '#ffffff'],
         particles: 200, baseSpeed: 3.2, airDrag: 0.961, gravity: 0.036, decayRate: 0.0046,
         decayProfile: 'flutter', cutoffLifetime: 128
     },
     { 
-        id: 'fuji_snow_crown', icon: '🏔️', name: '霊峰・富士白雪冠', desc: '銀白與水藍放射冠，宛若富士山頂皚皚白雪，先割熄滅',
+        id: 'fuji_snow_crown', group: '閃光・點滅・亂舞奇想', icon: '🏔️', name: '霊峰・富士白雪冠', desc: '銀白與水藍放射冠，宛若富士山頂皚皚白雪，先割熄滅',
         colors: ['#ffffff', '#f0f9ff', '#e0f2fe', '#bae6fd'],
         particles: 200, baseSpeed: 3.2, airDrag: 0.961, gravity: 0.040, decayRate: 0.0048,
         decayProfile: 'saki_wari', sakiWariAge: 72, cutoffLifetime: 120
     }
 ];
 
+/**
+ * 12 大正統競技連射組合 (スターマイン / Star Mine 專屬編排)
+ */
 const STARMINE_COMBOS = [
-    { id: 'fan_wide', name: '🦚 扇状ワイド・千輪扇型スターマイン', desc: '7發扇型齊放，孔雀開屏展開彩色花壁', shotCount: 7 },
+    { id: 'fan_wide', name: '🦚 扇状ワイド・千輪扇型スターマイン', desc: '7發扇型齊放，孔雀開屏展開百花天幕', shotCount: 7 },
     { id: 'rainbow_cascade', name: '🌈 七色連段・虹彩レインボー', desc: '7發緊密升空，依序綻放紅橙黃綠青藍紫', shotCount: 7 },
     { id: 'tiger_tail', name: '🐅 虎の尾・黄金昇天連射', desc: '地面高速噴射厚實金色虎尾火柱，連環爆發', shotCount: 6 },
     { id: 'crossfire_dragons', name: '⚔️ 交差連発・双龍錦冠', desc: '左右岸交錯對射，空中劃出X型光軌連環爆發', shotCount: 6 },
-    { id: 'ghost_rush', name: '👻 時差百花・幽霊変色ラッシュ', desc: '母玉潛行虛無中，骨牌般依序復燃爆亮', shotCount: 6 }
+    { id: 'ghost_rush', name: '👻 時差百花・幽霊変色ラッシュ', desc: '母玉潛行虛無中，骨牌般依序復燃爆亮', shotCount: 6 },
+    { id: 'v_shape_wings', name: '🦅 翼翔乱舞・V字ツインウィング', desc: '中央向兩側雙翼V型漸高展開，如大鵬展翅', shotCount: 8 },
+    { id: 'kamuro_waterfall', name: '🌊 天河大瀑布・超ワイド黄金ナイアガラ', desc: '全江面5砲台超廣角齊射極上錦冠，覆蓋天際', shotCount: 5 },
+    { id: 'fuji_sunrise', name: '🌅 霊峰黎明・紅富士ご来光', desc: '以富士山為背景，左右金火柱升起，中央綻放旭日', shotCount: 7 },
+    { id: 'meteor_shower', name: '🌠 流れ星群・彗星銀河シャワー', desc: '超密集銀龍衝頂，爆散為流星雨銀波長垂江面', shotCount: 8 },
+    { id: 'thousand_strobe', name: '💎 銀河乱点滅・百花ダイヤモンド', desc: '白鑽與翡翠點滅交錯，超新星群連續引爆', shotCount: 8 },
+    { id: 'spiral_dna', name: '🧬 昇龍螺旋・DNAダブルヘリックス', desc: '左右交織雙螺旋升天梯，爆出土星環與萬華鏡', shotCount: 8 },
+    { id: 'sakura_blizzard', name: '🌸 満開桜嵐・隅田川花吹雪', desc: '粉櫻、玫瑰金急速波浪推移，天幕櫻花暴風雨', shotCount: 8 }
 ];
 
 /* 狀態管理 */
@@ -539,7 +719,7 @@ let trailAlphaScale = 0.75;
 let autoComboFrequencyLevel = 2;
 let consecutiveSingleLaunches = 0;
 
-/* 【優化 1】：離線預烘焙爆閃貼圖 (GPU 硬體貼圖，徹底消除即時 createRadialGradient 卡頓) */
+/* 離線預烘焙爆閃貼圖 (GPU 硬體貼圖，徹底消除即時 createRadialGradient 卡頓) */
 const FLASH_TEXTURE = document.createElement('canvas');
 FLASH_TEXTURE.width = 256;
 FLASH_TEXTURE.height = 256;
@@ -561,7 +741,7 @@ class HanabiSoundEngine {
         this.noiseBuffer = null;
         this.crackleBuffer = null;
         this.activeVoices = 0;
-        this.maxVoices = 8; // 限制並發通道，減輕音訊執行緒負荷
+        this.maxVoices = 8;
         this.lastCrackleTime = 0;
     }
 
@@ -671,7 +851,7 @@ class HanabiSoundEngine {
         if (!soundEnabled || !this.crackleBuffer) return;
         this.init();
         const now = this.ctx.currentTime;
-        if (now - this.lastCrackleTime < 0.045) return; // 45ms 節流閥門
+        if (now - this.lastCrackleTime < 0.045) return;
         this.lastCrackleTime = now;
 
         const src = this.ctx.createBufferSource();
@@ -936,6 +1116,9 @@ function showComboToast(title) {
     toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 2800);
 }
 
+/**
+ * 12 大正統競技 Star Mine 連射組合演出引擎
+ */
 function triggerStarmineCombo(forcedComboId = null) {
     if (isFinaleActive || isComboActive) return;
     isComboActive = true;
@@ -949,6 +1132,9 @@ function triggerStarmineCombo(forcedComboId = null) {
     const comboInfo = STARMINE_COMBOS.find(c => c.id === comboKey) || STARMINE_COMBOS[0];
     showComboToast(comboInfo.name);
 
+    const horizonY = height * 0.82;
+
+    // 1. 【扇状ワイド・千輪扇型スターマイン (7發扇型展開)】
     if (comboKey === 'fan_wide') {
         const count = 7;
         const centerX = width * 0.5;
@@ -958,19 +1144,21 @@ function triggerStarmineCombo(forcedComboId = null) {
                 const tx = width * 0.12 + spreadRatio * (width * 0.76);
                 const arcHeight = Math.sin(spreadRatio * Math.PI) * (height * 0.12);
                 const ty = height * 0.28 - arcHeight;
-                const fanStyles = ['lush_senrin_hyakka', 'lush_mangekyo_hanabi', 'romantic_sumida_love', 'gosin_kiku'];
+                const fanStyles = ['lush_senrin_hyakka', 'lush_mangekyo_hanabi', 'yukiwariso_pastel', 'gosin_kiku'];
                 const st = fanStyles[i % fanStyles.length];
 
                 launchRocket(tx, ty, st, false, {
                     startX: centerX + (spreadRatio - 0.5) * 80,
                     durationMult: 0.95,
-                    densityMult: 0.72 // 智慧減負
+                    densityMult: 0.72
                 });
 
                 if (i === count - 1) setTimeout(() => { isComboActive = false; }, 2600);
             }, i * 90);
         }
-    } else if (comboKey === 'rainbow_cascade') {
+    } 
+    // 2. 【七色連段・虹彩レインボー (7色漸層光譜)】
+    else if (comboKey === 'rainbow_cascade') {
         const rainbowColors = [
             { col: '#ef4444' }, { col: '#f97316' }, { col: '#facc15' },
             { col: '#10b981' }, { col: '#06b6d4' }, { col: '#3b82f6' }, { col: '#a855f7' }
@@ -991,7 +1179,9 @@ function triggerStarmineCombo(forcedComboId = null) {
                 if (i === count - 1) setTimeout(() => { isComboActive = false; }, 2600);
             }, i * 130);
         });
-    } else if (comboKey === 'tiger_tail') {
+    } 
+    // 3. 【虎の尾・黄金昇天連射 (金火柱連環)】
+    else if (comboKey === 'tiger_tail') {
         const count = 6;
         for (let i = 0; i < count; i++) {
             setTimeout(() => {
@@ -1009,7 +1199,9 @@ function triggerStarmineCombo(forcedComboId = null) {
                 if (i === count - 1) setTimeout(() => { isComboActive = false; }, 3000);
             }, i * 110);
         }
-    } else if (comboKey === 'crossfire_dragons') {
+    } 
+    // 4. 【交差連発・双龍錦冠 (左右交錯對射)】
+    else if (comboKey === 'crossfire_dragons') {
         const pairs = 3;
         let shot = 0;
         for (let p = 0; p < pairs; p++) {
@@ -1032,7 +1224,9 @@ function triggerStarmineCombo(forcedComboId = null) {
                 if (shot >= pairs * 2) setTimeout(() => { isComboActive = false; }, 3200);
             }, p * 340);
         }
-    } else if (comboKey === 'ghost_rush') {
+    } 
+    // 5. 【時差百花・幽霊変色ラッシュ (潛行骨牌復燃)】
+    else if (comboKey === 'ghost_rush') {
         const count = 6;
         for (let i = 0; i < count; i++) {
             setTimeout(() => {
@@ -1048,13 +1242,122 @@ function triggerStarmineCombo(forcedComboId = null) {
             }, i * 140);
         }
     }
+    // 6. 【翼翔乱舞・V字ツインウィング (雙翼V型展翅)】
+    else if (comboKey === 'v_shape_wings') {
+        const pairs = 4;
+        let done = 0;
+        for (let k = 0; k < pairs; k++) {
+            setTimeout(() => {
+                const ratio = (k + 1) / pairs;
+                const lx = width * 0.5 - (ratio * width * 0.38);
+                const rx = width * 0.5 + (ratio * width * 0.38);
+                const ty = height * 0.40 - (ratio * height * 0.25); // 越兩側越高
+
+                launchRocket(lx, ty, 'yonsin_kiku', false, { startX: width * 0.46, durationMult: 0.9 + ratio * 0.15, densityMult: 0.70 });
+                launchRocket(rx, ty, 'gosin_kiku', false, { startX: width * 0.54, durationMult: 0.9 + ratio * 0.15, densityMult: 0.70 });
+
+                done += 2;
+                if (done >= pairs * 2) setTimeout(() => { isComboActive = false; }, 2800);
+            }, k * 180);
+        }
+    }
+    // 7. 【天河大瀑布・超ワイド黄金ナイアガラ (全江面5砲台金瀑)】
+    else if (comboKey === 'kamuro_waterfall') {
+        const spots = [0.15, 0.32, 0.50, 0.68, 0.85];
+        spots.forEach((pos, idx) => {
+            setTimeout(() => {
+                launchRocket(width * pos, height * 0.20, 'lush_kamuro_curtain', false, {
+                    startX: width * pos,
+                    durationMult: 0.95,
+                    densityMult: 0.65,
+                    isTigerTail: true
+                });
+                if (idx === spots.length - 1) setTimeout(() => { isComboActive = false; }, 3400);
+            }, idx * 70);
+        });
+    }
+    // 8. 【霊峰黎明・紅富士ご来光 (富士旭日昇天)】
+    else if (comboKey === 'fuji_sunrise') {
+        const fujiX = width * 0.28;
+        // 兩側金柱連射
+        launchRocket(fujiX - width * 0.14, height * 0.28, 'gold_willow_dragon', false, { startX: fujiX - width * 0.14, isTigerTail: true, densityMult: 0.7 });
+        launchRocket(fujiX + width * 0.14, height * 0.28, 'gold_willow_dragon', false, { startX: fujiX + width * 0.14, isTigerTail: true, densityMult: 0.7 });
+
+        // 頂點富士紅日三段昇華
+        [0, 1, 2].forEach(stg => {
+            setTimeout(() => {
+                const targetY = height * (0.24 - stg * 0.06);
+                const style = stg === 2 ? 'fuji_snow_crown' : 'suisei_kurena';
+                launchRocket(fujiX, targetY, style, false, { startX: fujiX, durationMult: 0.9 + stg * 0.1, densityMult: 0.75 });
+                if (stg === 2) setTimeout(() => { isComboActive = false; }, 3000);
+            }, 260 + stg * 240);
+        });
+    }
+    // 9. 【流れ星群・彗星銀河シャワー (超密集銀龍流星雨)】
+    else if (comboKey === 'meteor_shower') {
+        const count = 8;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const tx = width * 0.18 + (i / (count - 1)) * (width * 0.64);
+                const ty = height * (0.14 + (i % 3) * 0.06);
+                launchRocket(tx, ty, 'senko_shiranami', false, {
+                    startX: tx + (Math.random() - 0.5) * 50,
+                    durationMult: 0.82,
+                    densityMult: 0.68
+                });
+                if (i === count - 1) setTimeout(() => { isComboActive = false; }, 2900);
+            }, i * 90);
+        }
+    }
+    // 10. 【銀河乱点滅・百花ダイヤモンド (極限閃爍鑽石群)】
+    else if (comboKey === 'thousand_strobe') {
+        const count = 8;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const tx = width * 0.15 + Math.random() * (width * 0.70);
+                const ty = height * 0.14 + Math.random() * (height * 0.22);
+                const strobeStyle = (i % 2 === 0) ? 'diamond_strobe' : 'midori_botan_strobe';
+                launchRocket(tx, ty, strobeStyle, false, { durationMult: 0.88, densityMult: 0.70 });
+                if (i === count - 1) setTimeout(() => { isComboActive = false; }, 3000);
+            }, i * 110);
+        }
+    }
+    // 11. 【昇龍螺旋・DNAダブルヘリックス (交織雙螺旋梯)】
+    else if (comboKey === 'spiral_dna') {
+        const steps = 4;
+        let shots = 0;
+        for (let s = 0; s < steps; s++) {
+            setTimeout(() => {
+                const ty = height * 0.34 - s * (height * 0.05);
+                // 左旋
+                launchRocket(width * 0.42, ty, 'saturn_ring', false, { startX: width * 0.36, durationMult: 0.85 + s * 0.08, densityMult: 0.68 });
+                // 右旋
+                launchRocket(width * 0.58, ty, 'lush_mangekyo_hanabi', false, { startX: width * 0.64, durationMult: 0.85 + s * 0.08, densityMult: 0.68 });
+
+                shots += 2;
+                if (shots >= steps * 2) setTimeout(() => { isComboActive = false; }, 2800);
+            }, s * 220);
+        }
+    }
+    // 12. 【満開桜嵐・隅田川花吹雪 (急速櫻花風暴)】
+    else if (comboKey === 'sakura_blizzard') {
+        const count = 8;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const tx = width * 0.12 + (i / (count - 1)) * (width * 0.76);
+                const ty = height * (0.16 + (Math.sin(i * 1.2) * 0.08));
+                const st = (i % 2 === 0) ? 'lush_shidare_sakura' : 'sakura_fubuki_sanka';
+                launchRocket(tx, ty, st, false, { durationMult: 0.86, densityMult: 0.72 });
+                if (i === count - 1) setTimeout(() => { isComboActive = false; }, 3100);
+            }, i * 100);
+        }
+    }
 }
 
 /**
- * 【優化 2】：頂點爆破 (內建動態負載平衡 Dynamic Load Balancer)
- * 當多發同時爆破時，依當前畫面粒子負荷動態調節，杜絕暴衝卡頓
+ * 頂點爆破 (支援型物輪型、段咲き階梯、以及動態自適應負載平衡)
  */
-const MAX_GLOBAL_STARS = 1200; // 全局粒子流暢上限
+const MAX_GLOBAL_STARS = 1250;
 
 function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, colorOverride = null) {
     ambientFlashes.push({
@@ -1068,7 +1371,6 @@ function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, 
     const panRatio = (x / width) * 2 - 1;
     soundEngine.playBurst(caliberMultiplier, panRatio, isSudden, !!style.isLush);
 
-    // 動態平衡因子：當畫面粒子過多時，自動微幅自適應調整
     let loadFactor = 1.0;
     if (stars.length > 400) {
         loadFactor = Math.max(0.38, (MAX_GLOBAL_STARS - stars.length) / (MAX_GLOBAL_STARS - 400));
@@ -1084,6 +1386,7 @@ function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, 
         let vx = 0, vy = 0;
         let color = colorOverride || (style.colors ? style.colors[k % style.colors.length] : '#ffffff');
         let radius = style.isLush ? 2.1 : 1.9;
+        let bloomDelay = 0;
 
         if (style.id === 'gosin_kiku' && !colorOverride) {
             const angle = (k / totalCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.03;
@@ -1093,6 +1396,45 @@ function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, 
             else if (layer === 2) { vx = Math.cos(angle) * (baseSpeed * 0.64); vy = Math.sin(angle) * (baseSpeed * 0.64); color = style.core3[0]; }
             else if (layer === 3) { vx = Math.cos(angle) * (baseSpeed * 0.88); vy = Math.sin(angle) * (baseSpeed * 0.88); color = style.core2[0]; }
             else { vx = Math.cos(angle) * (baseSpeed * 1.12); vy = Math.sin(angle) * (baseSpeed * 1.12); color = style.colors[k % style.colors.length]; }
+        } else if (style.isRing && !colorOverride) {
+            const isCore = (k < totalCount * 0.25);
+            if (isCore) {
+                const angle = Math.random() * Math.PI * 2;
+                const sp = baseSpeed * 0.35 * Math.random();
+                vx = Math.cos(angle) * sp;
+                vy = Math.sin(angle) * sp;
+                color = style.coreColors[0];
+            } else {
+                const angle = (k / (totalCount * 0.75)) * Math.PI * 2;
+                const ringTilt = 0.38;
+                vx = Math.cos(angle) * (baseSpeed * 1.15);
+                vy = Math.sin(angle) * (baseSpeed * 1.15 * ringTilt) - (vx * 0.25);
+                color = style.colors[k % style.colors.length];
+            }
+        } else if (style.decayProfile === 'danzaki' && !colorOverride) {
+            const angle = (k / totalCount) * Math.PI * 2;
+            const layer = k % 3;
+            if (layer === 0) {
+                vx = Math.cos(angle) * (baseSpeed * 0.38);
+                vy = Math.sin(angle) * (baseSpeed * 0.38);
+                color = style.coreColors[0];
+                bloomDelay = 0;
+            } else if (layer === 1) {
+                vx = Math.cos(angle) * (baseSpeed * 0.75);
+                vy = Math.sin(angle) * (baseSpeed * 0.75);
+                color = style.middleColors[0];
+                bloomDelay = 14;
+            } else {
+                vx = Math.cos(angle) * (baseSpeed * 1.12);
+                vy = Math.sin(angle) * (baseSpeed * 1.12);
+                color = style.colors[0];
+                bloomDelay = 28;
+            }
+        } else if (style.id === 'peacock_feather') {
+            const fanAngle = -Math.PI * 0.95 + (k / totalCount) * Math.PI * 0.9;
+            const sp = baseSpeed * (0.85 + Math.random() * 0.3);
+            vx = Math.cos(fanAngle) * sp * 1.2;
+            vy = Math.sin(fanAngle) * sp;
         } else if (style.id === 'lush_mangekyo_hanabi' && !colorOverride) {
             const angle = (k / totalCount) * Math.PI * 2;
             const layer = k % 6;
@@ -1101,7 +1443,7 @@ function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, 
             vx = Math.cos(angle) * sp;
             vy = Math.sin(angle) * sp;
             color = style.colors[layer % style.colors.length];
-        } else if (style.id === 'lush_senrin_hyakka' || style.id === 'senrin_hyakka') {
+        } else if (style.isSenrin) {
             const clusters = style.isLush ? 8 : 6;
             const cIdx = k % clusters;
             const cAngle = (cIdx / clusters) * Math.PI * 2;
@@ -1123,7 +1465,6 @@ function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, 
             vy = Math.sin(angle) * sp;
         }
 
-        // 隨機時差，避免同一幀幾百顆粒子集體暴斃
         const lifetimeJitter = (Math.random() - 0.5) * (baseLifetime * 0.26);
         const individualLifetime = Math.max(48, Math.round(baseLifetime + lifetimeJitter));
 
@@ -1131,7 +1472,7 @@ function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, 
             x, y,
             x1: x, y1: y,
             x2: x, y2: y,
-            x3: x, y3: y, // 【優化 3】：微型純量流線 (取代重度陣列分配，零 GC)
+            x3: x, y3: y,
             vx, vy,
             alpha: 1.0,
             style,
@@ -1145,7 +1486,8 @@ function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, 
             sakiWariAge: Math.round((style.sakiWariAge || 72) + (Math.random() - 0.5) * 12),
             sakiWariTriggered: false,
             ghostReignited: false,
-            isEven: (k & 1) === 0 // 水面鏡像視差降頻取樣標記
+            bloomDelay,
+            isEven: (k & 1) === 0
         });
     }
 }
@@ -1202,7 +1544,7 @@ function renderDynamicBoats(now) {
     }
 }
 
-/* 主動畫渲染迴圈 (已進行徹底無卡頓硬體直通優化) */
+/* 主動畫渲染迴圈 */
 function animate(now) {
     requestAnimationFrame(animate);
 
@@ -1222,7 +1564,7 @@ function animate(now) {
 
     const horizonY = height * 0.82;
 
-    // 【優化 4】：爆閃貼圖直接硬體 Blit (瞬間消弭多重漸變卡頓)
+    // 爆閃貼圖直接硬體 Blit
     for (let i = ambientFlashes.length - 1; i >= 0; i--) {
         const fl = ambientFlashes[i];
         ctx.globalAlpha = fl.alpha;
@@ -1249,7 +1591,6 @@ function animate(now) {
         r.x = r.startX + (r.targetX - r.startX) * prog;
         r.y = r.startY - (r.startY - r.targetY) * ease;
 
-        // 虎之尾昇空火柱
         if (r.isTigerTail) {
             if (ascentSparks.length < 90) {
                 ascentSparks.push({
@@ -1270,7 +1611,6 @@ function animate(now) {
             });
         }
 
-        // 昇空直線
         ctx.beginPath();
         ctx.moveTo(r.ppx, r.ppy);
         ctx.lineTo(r.x, r.y);
@@ -1303,11 +1643,16 @@ function animate(now) {
         ctx.fillRect(sp.x, sp.y, sp.isTiger ? 2.0 : 1.3, sp.isTiger ? 2.0 : 1.3);
     }
 
-    // 【優化 5】：花火星光粒子 (GPU 矩形光斑硬體直通 + 純量流線)
+    // 花火星光粒子
     for (let i = stars.length - 1; i >= 0; i--) {
         const st = stars[i];
-        st.age++;
 
+        if (st.bloomDelay > 0) {
+            st.bloomDelay--;
+            continue;
+        }
+
+        st.age++;
         const profile = st.style.decayProfile || 'instant_cutoff';
         let displayRadius = st.radius;
 
@@ -1320,7 +1665,6 @@ function animate(now) {
             st.vx += wind * 0.25;
         }
 
-        // 純量位移傳遞 (零記憶體存取)
         st.x3 = st.x2; st.y3 = st.y2;
         st.x2 = st.x1; st.y2 = st.y1;
         st.x1 = st.x;  st.y1 = st.y;
@@ -1329,12 +1673,10 @@ function animate(now) {
         st.vx *= st.style.airDrag;
         st.vy = st.vy * st.style.airDrag + st.style.gravity;
 
-        // 平滑退場演算法 (Smooth-step 消口)
         let alphaFactor = 1.0;
         const remainingTicks = st.cutoffLifetime - st.age;
         if (remainingTicks <= st.fadeDuration) {
             if (remainingTicks <= 0) {
-                // O(1) 快速置換移除
                 stars[i] = stars[stars.length - 1];
                 stars.pop();
                 continue;
@@ -1353,7 +1695,7 @@ function animate(now) {
         } else if (profile === 'strobe_fade') {
             const strobeStart = st.style.strobeStartAge || 60;
             if (st.age > strobeStart) {
-                const freq = Math.sin(st.age * 0.55 + st.phase);
+                const freq = Math.sin(st.age * 0.65 + st.phase);
                 alphaFactor *= (freq > 0.1) ? 1.0 : 0.08;
             } else {
                 st.alpha -= st.style.decayRate;
@@ -1405,7 +1747,6 @@ function animate(now) {
         const renderAlpha = Math.max(0, Math.min(1, st.alpha * alphaFactor));
         if (renderAlpha <= 0.02) continue;
 
-        // 繪製微型流線 (極低開銷)
         ctx.beginPath();
         ctx.moveTo(st.x3, st.y3);
         ctx.lineTo(st.x2, st.y2);
@@ -1417,7 +1758,6 @@ function animate(now) {
         ctx.globalAlpha = renderAlpha * 0.85;
         ctx.stroke();
 
-        // 繪製頭部星斑 (採用 GPU 硬體 blit 矩形，速度比 arc 提升 5-8 倍)
         if (renderAlpha > 0.06) {
             const sz = displayRadius * 1.8;
             ctx.fillStyle = st.color;
@@ -1431,7 +1771,6 @@ function animate(now) {
             }
         }
 
-        // 水面鏡像視差倒影 (降頻取樣優化：僅對偶數粒子計算，大幅節省 50% 倒影 Draw Call)
         if (showReflection && st.isEven && st.y < horizonY && renderAlpha > 0.2) {
             const dy = horizonY - st.y;
             const refY = horizonY + dy * 0.62;
@@ -1443,7 +1782,7 @@ function animate(now) {
         }
     }
 
-    // 先割微星裂爆更新
+    // 先割微星
     for (let i = microSparks.length - 1; i >= 0; i--) {
         const m = microSparks[i];
         m.x += m.vx;
@@ -1461,7 +1800,6 @@ function animate(now) {
 
     ctx.globalCompositeOperation = 'source-over';
 
-    // 自動巡航施放邏輯
     if (autoLaunch && !isFinaleActive && !isComboActive) {
         if (now - lastAutoTime > autoInterval) {
             lastAutoTime = now;
@@ -1484,12 +1822,27 @@ requestAnimationFrame(animate);
 
 function initSelectOptions() {
     const sel = document.getElementById('fireworkStyleSelect');
+    sel.innerHTML = '';
+
+    const groups = {};
     HANABI_STYLES_CATALOG.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.id;
-        opt.textContent = `${s.icon} ${s.name}`;
-        sel.appendChild(opt);
+        const grpName = s.group || '其他名品';
+        if (!groups[grpName]) groups[grpName] = [];
+        groups[grpName].push(s);
     });
+
+    for (const [grpName, items] of Object.entries(groups)) {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = `─── ${grpName} ───`;
+        items.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = `${s.icon} ${s.name}`;
+            optgroup.appendChild(opt);
+        });
+        sel.appendChild(optgroup);
+    }
+
     sel.onchange = (e) => {
         currentStyleId = e.target.value;
         const found = HANABI_STYLES_CATALOG.find(s => s.id === currentStyleId);
@@ -1544,7 +1897,7 @@ finaleBtn.onclick = () => {
         count++;
         const targetX = width * (0.15 + Math.random() * 0.7);
         const targetY = height * (0.12 + Math.random() * 0.38);
-        const styles = ['lush_kamuro_curtain', 'lush_shidare_sakura', 'lush_senrin_hyakka', 'gosin_kiku', 'yurei_ghost', 'ginpa_saki_wari'];
+        const styles = ['lush_kamuro_curtain', 'lush_shidare_sakura', 'lush_senrin_hyakka', 'gosin_kiku', 'yurei_ghost', 'ginpa_saki_wari', 'diamond_strobe'];
         const chosen = styles[Math.floor(Math.random() * styles.length)];
         launchRocket(targetX, targetY, chosen, false, { densityMult: 0.65 });
 
