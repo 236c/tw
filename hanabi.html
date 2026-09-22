@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>日本職人競技花火大會 - 隅田川 Star Mine 連射特等席 (極致流暢版)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #010207;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+            color: #f1f5f9;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 1;
+        }
+
+        /* 頂部極簡玻璃擬態懸浮導覽列 */
+        .top-nav {
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(10, 16, 32, 0.82);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            padding: 6px 16px;
+            border-radius: 40px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            white-space: nowrap;
+            max-width: 96vw;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .top-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .title-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: #facc15;
+            letter-spacing: 0.8px;
+            text-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+        }
+
+        .fps-badge {
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 12px;
+            background: rgba(16, 185, 129, 0.18);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #34d399;
+            font-family: monospace;
+        }
+
+        .btn-ui {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: #f8fafc;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-ui:hover {
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-ui.active {
+            background: #2563eb;
+            border-color: #60a5fa;
+            box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
+            color: #ffffff;
+        }
+
+        .btn-combo {
+            background: linear-gradient(135deg, #0284c7 0%, #3b82f6 50%, #8b5cf6 100%);
+            border-color: #93c5fd;
+            color: #fff;
+            box-shadow: 0 0 14px rgba(59, 130, 246, 0.5);
+            animation: pulse-combo 2.5s infinite;
+        }
+        @keyframes pulse-combo {
+            0%, 100% { box-shadow: 0 0 12px rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.7); transform: scale(1.02); }
+        }
+
+        .btn-surprise {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            border-color: #d8b4fe;
+            color: #fff;
+        }
+
+        .btn-finale {
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+            border-color: #fca5a5;
+            color: #fff;
+            box-shadow: 0 0 14px rgba(239, 68, 68, 0.45);
+        }
+
+        /* 側邊設定面板 */
+        .drawer-panel {
+            position: absolute;
+            top: 70px;
+            right: 18px;
+            z-index: 30;
+            width: 335px;
+            max-height: calc(100vh - 90px);
+            background: rgba(10, 16, 32, 0.95);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+            transform: translateX(380px);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .drawer-panel.open {
+            transform: translateX(0);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 14px;
+        }
+
+        .panel-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 2px 6px;
+        }
+
+        .control-section {
+            margin-bottom: 14px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #cbd5e1;
+            margin-bottom: 5px;
+        }
+
+        .control-input {
+            width: 100%;
+            padding: 7px 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .range-slider {
+            width: 100%;
+            accent-color: #38bdf8;
+            cursor: pointer;
+        }
+
+        .combo-toast {
+            position: absolute;
+            top: 72px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 25;
+            font-size: 0.88rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #facc15;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(250, 204, 21, 0.4);
+            padding: 6px 18px;
+            border-radius: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .combo-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(4px);
+        }
+
+        .info-toast {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 8;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.55);
+            pointer-events: none;
+            letter-spacing: 0.8px;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+            background: rgba(8, 12, 24, 0.5);
+            padding: 4px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        @media (max-width: 640px) {
+            .top-nav { padding: 5px 10px; gap: 5px; top: 10px; }
+            .btn-ui { padding: 4px 8px; font-size: 0.74rem; }
+            .title-badge { font-size: 0.8rem; }
+            .fps-badge { display: none; }
+            .drawer-panel { width: 90vw; right: 5vw; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-nav">
+        <div class="title-badge">🎆 隅田川競技花火</div>
+        <div class="fps-badge" id="fpsDisplay">60 FPS</div>
+        
+        <button class="btn-ui active" id="autoLaunchBtn" title="自動巡航施放">
+            <span>✨ 自動巡航</span>
+        </button>
+
+        <button class="btn-ui btn-combo" id="comboLaunchBtn" title="點擊發動日本正統 Star Mine 連續組合煙火">
+            <span>🌟 連續 Combo</span>
+        </button>
+
+        <button class="btn-ui btn-surprise" id="manualSuddenBtn" title="手動引爆一枚無預警暗玉">
+            <span>⚡ 突發暗玉</span>
+        </button>
+
+        <button class="btn-ui btn-finale" id="finaleBtn" title="壓軸壯闊連發">
+            <span>💥 錦冠終曲</span>
+        </button>
+
+        <button class="btn-ui" id="soundToggleBtn" title="立體聲爆轟與呼嘯聲">
+            <span id="soundText">🔊 音效: 開</span>
+        </button>
+
+        <button class="btn-ui" id="settingsToggleBtn" title="規格設定與花火品項挑選">
+            <span>⚙️ 設定</span>
+        </button>
+
+        <button class="btn-ui" id="fullscreenBtn" title="全螢幕模式">
+            <span>⛶ 全螢幕</span>
+        </button>
+    </div>
+
+    <div class="combo-toast" id="comboToast">🦚 扇状ワイド・千輪扇型スターマイン</div>
+
+    <div class="drawer-panel" id="settingsDrawer">
+        <div class="panel-header">
+            <div class="panel-title">⚙️ 職人花火與 Combo 設定</div>
+            <button class="close-btn" id="closeDrawerBtn">&times;</button>
+        </div>
+
+        <div class="control-section">
+            <div class="control-label">
+                <span>指定發動的 Combo 組合技</span>
+                <span id="comboSelectText" style="color:#38bdf8;">隨機輪播</span>
+            </div>
+            <select class="control-input" id="comboStyleSelect">
+                <option value="random">🎲 5大 Combo 隨機輪播</option>
+                <option value="fan_wide">🦚 扇状ワイド・千輪扇型スターマイン (7發扇型)</option>
+                <option value="rainbow_cascade">🌈 七色連段・虹彩レインボー (7色漸層)</option>
+                <option value="tiger_tail">🐅 虎の尾・黄金昇天連射 (金火柱連環)</option>
+                <option value="crossfire_dragons">⚔️ 交差連発・双龍錦冠 (左右交錯對射)</option>
+                <option value="ghost_rush">👻 時差百花・幽霊変色ラッシュ (潛行骨牌復燃)</option>
+            </select>
+        </div>
+
+        <div class="control-section">
+            <div class="control-label">
+                <span>單發職人花火樣式 (含茂盛名品)</span>
+                <span id="styleCountText" style="color:#38bdf8;">隨機輪播</span>
+            </div>
+            <select class="control-input" id="fireworkStyleSelect"></select>
+        </div>
+
+        <div class="control-section">
+            <div class="control-label">
+                <span>花火繁茂度 (粒子密度基準)</span>
+                <span id="densityText" style="color:#facc15;">極致茂盛 (1.25x)</span>
+            </div>
+            <input type="range" class="range-slider" id="densitySlider" min="0.8" max="1.6" value="1.25" step="0.05">
+        </div>
+
+        <div class="control-section">
+            <div class="control-label">
+                <span>巡航自動穿插 Combo 機率</span>
+                <span id="autoComboProbText" style="color:#60a5fa;">每 6~8 發穿插 1 次</span>
+            </div>
+            <input type="range" class="range-slider" id="autoComboProbRange" min="0" max="4" value="2" step="1">
+        </div>
+
+        <div class="control-section">
+            <div class="control-label">
+                <span>昇空開花節奏</span>
+                <span id="speedText" style="color:#38bdf8;">1.8 秒 (頂點減速)</span>
+            </div>
+            <input type="range" class="range-slider" id="speedFactorRange" min="80" max="140" value="110" step="5">
+        </div>
+
+        <div class="control-section">
+            <div class="control-label">
+                <span>花火口徑規格</span>
+                <span id="calText">10號尺玉 (標準大輪)</span>
+            </div>
+            <input type="range" class="range-slider" id="caliberRange" min="1" max="4" value="2" step="1">
+        </div>
+
+        <div class="control-section">
+            <div class="control-label">
+                <span>隅田川動態倒影</span>
+                <span id="reflText">開啟 (高效取樣)</span>
+            </div>
+            <input type="checkbox" id="waterReflectionCheck" checked style="accent-color: #38bdf8; cursor: pointer; transform: scale(1.2);">
+        </div>
+
+        <button class="btn-ui w-100" id="applyAndCloseBtn" style="width: 100%; justify-content: center; padding: 8px; margin-top: 6px;">
+            確認並關閉設定
+        </button>
+    </div>
+
+    <div class="info-toast" id="touchHint">點擊夜空發射單發，或點上方「🌟 連續 Combo」感受正統 Star Mine 震撼！</div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+/**
+ * 30+ 款頂級競技花火資料庫
+ */
+const HANABI_STYLES_CATALOG = [
+    { id: 'all', icon: '🌌', name: '全造型隨機輪播', desc: '日本大會最高榮譽綜合競技' },
+
+    // ===== 🌟【極致茂盛系列】 =====
+    { 
+        id: 'lush_kamuro_curtain', icon: '👑', name: '【極致茂盛】千重極上・錦冠大垂幕', desc: '天幕級金瀑，流絲繁密蔽日，自然向江面沉垂良久',
+        colors: ['#ffeaa7', '#ffd32a', '#ffbe76', '#fff200', '#ffffff'],
+        particles: 320, baseSpeed: 3.1, airDrag: 0.972, gravity: 0.046, decayRate: 0.0028,
+        decayProfile: 'willow_long', cutoffLifetime: 175, isLush: true
+    },
+    { 
+        id: 'lush_shidare_sakura', icon: '🌸', name: '【極致茂盛】爛漫・枝垂れ夜桜大輪', desc: '枝葉繁茂的粉櫻與玫瑰金絲漫天披覆，隨夜風翻飛散華',
+        colors: ['#ff758c', '#ff7eb3', '#ffa4b6', '#fed7aa', '#ffffff'],
+        particles: 290, baseSpeed: 3.2, airDrag: 0.965, gravity: 0.035, decayRate: 0.0034,
+        decayProfile: 'flutter', cutoffLifetime: 160, isLush: true
+    },
+    { 
+        id: 'lush_senrin_hyakka', icon: '🎇', name: '【極致茂盛】百花繚乱・密集超千輪', desc: '同心大範圍放射，隨後同心群爆密集重疊微花，塞滿夜空',
+        colors: ['#ff3838', '#2ed573', '#1e90ff', '#ffa502', '#9b59b6', '#ff6b81', '#00f5d4'],
+        particles: 280, baseSpeed: 3.4, airDrag: 0.962, gravity: 0.038, decayRate: 0.0044,
+        decayProfile: 'instant_cutoff', isSenrin: true, cutoffLifetime: 130, isLush: true
+    },
+    { 
+        id: 'lush_mangekyo_hanabi', icon: '🔮', name: '【極致茂盛】万紫千紅・八重芯万華鏡', desc: '同心八層極密五彩花瓣，外層包裹濃密光圈，平緩優雅消口',
+        colors: ['#f43f5e', '#3b82f6', '#10b981', '#facc15', '#a855f7'],
+        particles: 270, baseSpeed: 3.3, airDrag: 0.961, gravity: 0.036, decayRate: 0.0042,
+        decayProfile: 'instant_cutoff', cutoffLifetime: 125, isLush: true
+    },
+    { 
+        id: 'lush_ogon_niagara', icon: '🌊', name: '【極致茂盛】白銀黄金・二重瀑布', desc: '白銀浪潮伴隨金色濃密重力流瀉，如同天河倒灌江面',
+        colors: ['#ffffff', '#f8fafc', '#ffd32a', '#ffedd5'],
+        particles: 290, baseSpeed: 3.2, airDrag: 0.966, gravity: 0.058, decayRate: 0.0032,
+        decayProfile: 'willow_long', cutoffLifetime: 165, isLush: true
+    },
+
+    // ===== 經典職人割物名物 =====
+    { 
+        id: 'gosin_kiku', icon: '🏆', name: '神技・五重芯割物', desc: '極致同心五層五色同開，齊整一斉消口',
+        colors: ['#38bdf8', '#0284c7'], core5: ['#ffffff'], core4: ['#fbbf24'], core3: ['#f43f5e'], core2: ['#10b981'],
+        particles: 240, baseSpeed: 3.5, airDrag: 0.963, gravity: 0.038, decayRate: 0.0048,
+        decayProfile: 'instant_cutoff', cutoffLifetime: 118
+    },
+    { 
+        id: 'yonsin_kiku', icon: '💎', name: '四重芯菊花割物', desc: '金芯->翠綠->朱紅->天青 四層結構齊消',
+        colors: ['#38bdf8', '#0284c7'], ring3Colors: ['#ef4444', '#f87171'], ring2Colors: ['#10b981', '#34d399'], coreColors: ['#fbbf24', '#ffffff'],
+        particles: 210, baseSpeed: 3.3, airDrag: 0.962, gravity: 0.038, decayRate: 0.0050,
+        decayProfile: 'instant_cutoff', cutoffLifetime: 112
+    },
+    { 
+        id: 'yurei_ghost', icon: '👻', name: '幻影・幽霊時差花火', desc: '爆開後全黑隱形潛行，虛無中突然二度復燃！',
+        colors: ['#e0f2fe', '#bae6fd'], reigniteColors: ['#00f5d4', '#f43f5e', '#a855f7', '#fbbf24'],
+        particles: 200, baseSpeed: 3.2, airDrag: 0.961, gravity: 0.036, decayRate: 0.0046,
+        decayProfile: 'ghost', darkAgeStart: 18, darkAgeEnd: 48, cutoffLifetime: 130
+    },
+    { 
+        id: 'kamuro_tenmetsu', icon: '✨', name: '錦冠先点滅・蛍火', desc: '金色柳絲末端轉為劇烈閃爍微光，如夏夜螢火熄滅',
+        colors: ['#fef08a', '#facc15', '#eab308'],
+        particles: 220, baseSpeed: 2.9, airDrag: 0.966, gravity: 0.042, decayRate: 0.0036,
+        decayProfile: 'strobe_fade', strobeStartAge: 65, cutoffLifetime: 140
+    },
+    { 
+        id: 'kamuro_saki_wari', icon: '💫', name: '錦冠先割・千輪星屑', desc: '金色柳絲末端點化微爆，劈啪裂開出細碎微花',
+        colors: ['#fef08a', '#facc15', '#fbbf24'],
+        particles: 210, baseSpeed: 2.9, airDrag: 0.966, gravity: 0.042, decayRate: 0.0038,
+        decayProfile: 'saki_wari', sakiWariAge: 75, cutoffLifetime: 130
+    },
+    { 
+        id: 'wabi_edo_charcoal', icon: '🏮', name: '江戸古法・和火炭火', desc: '純木炭黑藥火，冷卻色溫遞減：白亮->金燦->暗橘->赤紅餘燼',
+        colors: ['#fff7ed', '#ffedd5', '#fed7aa'],
+        particles: 170, baseSpeed: 2.3, airDrag: 0.954, gravity: 0.052, decayRate: 0.0036,
+        decayProfile: 'color_cool', cutoffLifetime: 150
+    },
+    { 
+        id: 'ginpa_saki_wari', icon: '⚡', name: '白銀・銀波先割', desc: '萬道銀白光線，燃盡前夕一齊劈啪爆炸出銀芒微花',
+        colors: ['#ffffff', '#e0f2fe', '#bae6fd'],
+        particles: 200, baseSpeed: 3.3, airDrag: 0.962, gravity: 0.044, decayRate: 0.0048,
+        decayProfile: 'saki_wari', sakiWariAge: 70, cutoffLifetime: 118
+    },
+    { 
+        id: 'yashi_ginpa', icon: '🌴', name: '南國・巨木椰子銀波', desc: '粗壯銀幹筆直升騰，頂點張開繁茂銀白椰子樹冠沉落',
+        colors: ['#ffffff', '#e2e8f0', '#cbd5e1'],
+        particles: 190, baseSpeed: 3.4, airDrag: 0.964, gravity: 0.048, decayRate: 0.0042,
+        decayProfile: 'willow_long', cutoffLifetime: 138
+    },
+    { 
+        id: 'kurenai_sakiwari', icon: '🍁', name: '黄金柳・紅先割', desc: '金色柳絲流瀉如瀑，尾端一齊炸開鮮豔朱紅碎星',
+        colors: ['#fef08a', '#facc15'],
+        particles: 220, baseSpeed: 2.9, airDrag: 0.967, gravity: 0.045, decayRate: 0.0038,
+        decayProfile: 'saki_wari', sakiWariAge: 76, cutoffLifetime: 132, sakiColor: '#ef4444'
+    },
+    { 
+        id: 'shikon_ogon_shin', icon: '🍇', name: '紫紺・黄金芯牡丹', desc: '純金色核芯被深邃莊嚴的紫紺花瓣環抱，極其華貴',
+        colors: ['#7c3aed', '#6d28d9', '#8b5cf6'], coreColors: ['#fbbf24', '#ffffff'],
+        particles: 190, baseSpeed: 3.1, airDrag: 0.960, gravity: 0.036, decayRate: 0.0050,
+        decayProfile: 'instant_cutoff', cutoffLifetime: 110
+    },
+    { 
+        id: 'senko_shiranami', icon: '💡', name: '閃光白波・冠菊', desc: '耀眼白鎂劇烈爆閃後，化為千萬條細膩白色浪花銀波',
+        colors: ['#ffffff', '#f8fafc', '#e2e8f0'],
+        particles: 220, baseSpeed: 3.3, airDrag: 0.965, gravity: 0.042, decayRate: 0.0038,
+        decayProfile: 'willow_long', cutoffLifetime: 148
+    },
+    { 
+        id: 'midori_botan_strobe', icon: '🟢', name: '翠玉・翡翠点滅牡丹', desc: '鮮明翡翠綠星花，外緣如繁星閃爍點滅不停',
+        colors: ['#10b981', '#059669', '#34d399'],
+        particles: 180, baseSpeed: 3.0, airDrag: 0.960, gravity: 0.036, decayRate: 0.0046,
+        decayProfile: 'strobe_fade', strobeStartAge: 45, cutoffLifetime: 124
+    },
+    { 
+        id: 'akane_zora', icon: '🌇', name: '茜空・夕映え錦冠', desc: '晚霞暮色般的橙紅漸層，隨後如熔金垂落江畔',
+        colors: ['#f97316', '#ea580c', '#fbbf24', '#ffd32a'],
+        particles: 220, baseSpeed: 2.9, airDrag: 0.966, gravity: 0.044, decayRate: 0.0036,
+        decayProfile: 'willow_long', cutoffLifetime: 155
+    },
+    { 
+        id: 'romantic_sumida_love', icon: '💖', name: '隅田川・夜空戀華', desc: '紫羅蘭與淺玫瑰金交織浪漫雙環，櫻瓣微光散落',
+        colors: ['#e056fd', '#be2edd', '#f8a5c2', '#f78fb3', '#ffffff'],
+        particles: 200, baseSpeed: 3.2, airDrag: 0.961, gravity: 0.036, decayRate: 0.0046,
+        decayProfile: 'flutter', cutoffLifetime: 128
+    },
+    { 
+        id: 'fuji_snow_crown', icon: '🏔️', name: '霊峰・富士白雪冠', desc: '銀白與水藍放射冠，宛若富士山頂皚皚白雪，先割熄滅',
+        colors: ['#ffffff', '#f0f9ff', '#e0f2fe', '#bae6fd'],
+        particles: 200, baseSpeed: 3.2, airDrag: 0.961, gravity: 0.040, decayRate: 0.0048,
+        decayProfile: 'saki_wari', sakiWariAge: 72, cutoffLifetime: 120
+    }
+];
+
+const STARMINE_COMBOS = [
+    { id: 'fan_wide', name: '🦚 扇状ワイド・千輪扇型スターマイン', desc: '7發扇型齊放，孔雀開屏展開彩色花壁', shotCount: 7 },
+    { id: 'rainbow_cascade', name: '🌈 七色連段・虹彩レインボー', desc: '7發緊密升空，依序綻放紅橙黃綠青藍紫', shotCount: 7 },
+    { id: 'tiger_tail', name: '🐅 虎の尾・黄金昇天連射', desc: '地面高速噴射厚實金色虎尾火柱，連環爆發', shotCount: 6 },
+    { id: 'crossfire_dragons', name: '⚔️ 交差連発・双龍錦冠', desc: '左右岸交錯對射，空中劃出X型光軌連環爆發', shotCount: 6 },
+    { id: 'ghost_rush', name: '👻 時差百花・幽霊変色ラッシュ', desc: '母玉潛行虛無中，骨牌般依序復燃爆亮', shotCount: 6 }
+];
+
+/* 狀態管理 */
+let currentStyleId = 'all';
+let selectedComboId = 'random';
+let autoLaunch = true;
+let soundEnabled = true;
+let showReflection = true;
+let caliberMultiplier = 1.0;
+let particleMult = 1.25;
+let autoInterval = 2300;
+let lastAutoTime = 0;
+let isFinaleActive = false;
+let isComboActive = false;
+let suddenBurstProb = 0.04;
+let ascentBaseSteps = 110;
+let trailAlphaScale = 0.75;
+let autoComboFrequencyLevel = 2;
+let consecutiveSingleLaunches = 0;
+
+/* 【優化 1】：離線預烘焙爆閃貼圖 (GPU 硬體貼圖，徹底消除即時 createRadialGradient 卡頓) */
+const FLASH_TEXTURE = document.createElement('canvas');
+FLASH_TEXTURE.width = 256;
+FLASH_TEXTURE.height = 256;
+const ftCtx = FLASH_TEXTURE.getContext('2d');
+const ftGrad = ftCtx.createRadialGradient(128, 128, 0, 128, 128, 128);
+ftGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+ftGrad.addColorStop(0.35, 'rgba(255, 255, 255, 0.35)');
+ftGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+ftCtx.fillStyle = ftGrad;
+ftCtx.fillRect(0, 0, 256, 256);
+
+/**
+ * Web Audio 物理音效合成引擎 (含防暴衝與防掉幀閥門)
+ */
+class HanabiSoundEngine {
+    constructor() {
+        this.ctx = null;
+        this.masterGain = null;
+        this.noiseBuffer = null;
+        this.crackleBuffer = null;
+        this.activeVoices = 0;
+        this.maxVoices = 8; // 限制並發通道，減輕音訊執行緒負荷
+        this.lastCrackleTime = 0;
+    }
+
+    init() {
+        if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioCtx();
+            this.masterGain = this.ctx.createGain();
+            this.masterGain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+            this.masterGain.connect(this.ctx.destination);
+
+            const bufferSize = Math.floor(this.ctx.sampleRate * 0.38);
+            this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const output = this.noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+
+            const crackleSize = Math.floor(this.ctx.sampleRate * 0.2);
+            this.crackleBuffer = this.ctx.createBuffer(1, crackleSize, this.ctx.sampleRate);
+            const cOut = this.crackleBuffer.getChannelData(0);
+            for (let i = 0; i < crackleSize; i++) cOut[i] = (Math.random() > 0.95) ? (Math.random() * 2 - 1) : 0;
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+    }
+
+    playLaunch(panRatio = 0, durationSec = 1.8, isTigerTail = false) {
+        if (!soundEnabled) return;
+        this.init();
+        if (this.activeVoices >= this.maxVoices) return;
+        this.activeVoices++;
+
+        const now = this.ctx.currentTime;
+        const dur = Math.max(0.8, durationSec * 0.95);
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
+
+        osc.type = isTigerTail ? 'sawtooth' : 'sine';
+        osc.frequency.setValueAtTime(isTigerTail ? 260 : 320, now);
+        osc.frequency.exponentialRampToValueAtTime(isTigerTail ? 1100 : 840, now + dur);
+
+        gain.gain.setValueAtTime(0.005, now);
+        gain.gain.linearRampToValueAtTime(isTigerTail ? 0.07 : 0.05, now + dur * 0.4);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+        if (panner) {
+            panner.pan.value = Math.max(-0.9, Math.min(0.9, panRatio));
+            osc.connect(gain);
+            gain.connect(panner);
+            panner.connect(this.masterGain);
+        } else {
+            osc.connect(gain);
+            gain.connect(this.masterGain);
+        }
+
+        osc.start(now);
+        osc.stop(now + dur + 0.05);
+        setTimeout(() => { this.activeVoices = Math.max(0, this.activeVoices - 1); }, (dur + 0.1) * 1000);
+    }
+
+    playBurst(caliberScale = 1.0, panRatio = 0, isSudden = false, isLush = false) {
+        if (!soundEnabled) return;
+        this.init();
+        if (this.activeVoices >= this.maxVoices) return;
+
+        const now = this.ctx.currentTime;
+        const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
+        if (panner) panner.pan.value = Math.max(-0.95, Math.min(0.95, panRatio));
+
+        const subOsc = this.ctx.createOscillator();
+        const subGain = this.ctx.createGain();
+        subOsc.type = 'triangle';
+        const startFreq = (isSudden ? 120 : (isLush ? 82 : 92)) * Math.min(1.2, 1 / caliberScale);
+        subOsc.frequency.setValueAtTime(startFreq, now);
+        subOsc.frequency.exponentialRampToValueAtTime(20, now + (isSudden ? 0.42 : 0.58));
+
+        const vol = (isSudden ? 0.95 : (isLush ? 0.88 : 0.72)) * Math.min(1.35, caliberScale);
+        subGain.gain.setValueAtTime(vol, now);
+        subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.62);
+
+        subOsc.connect(subGain);
+        if (panner) subGain.connect(panner);
+        else subGain.connect(this.masterGain);
+        subOsc.start(now);
+        subOsc.stop(now + 0.65);
+
+        if (this.noiseBuffer) {
+            const noise = this.ctx.createBufferSource();
+            noise.buffer = this.noiseBuffer;
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(isSudden ? 900 : 720, now);
+            filter.frequency.exponentialRampToValueAtTime(100, now + 0.38);
+
+            const noiseGain = this.ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.46 * caliberScale, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.40);
+
+            noise.connect(filter);
+            filter.connect(noiseGain);
+            if (panner) noiseGain.connect(panner);
+            else noiseGain.connect(this.masterGain);
+            noise.start(now);
+        }
+    }
+
+    playCrackle(panRatio = 0) {
+        if (!soundEnabled || !this.crackleBuffer) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        if (now - this.lastCrackleTime < 0.045) return; // 45ms 節流閥門
+        this.lastCrackleTime = now;
+
+        const src = this.ctx.createBufferSource();
+        src.buffer = this.crackleBuffer;
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
+        if (panner) {
+            panner.pan.value = Math.max(-0.9, Math.min(0.9, panRatio));
+            src.connect(gain);
+            gain.connect(panner);
+            panner.connect(this.masterGain);
+        } else {
+            src.connect(gain);
+            gain.connect(this.masterGain);
+        }
+        src.start(now);
+    }
+
+    playGhostReignite(panRatio = 0) {
+        if (!soundEnabled) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(340, now);
+        osc.frequency.exponentialRampToValueAtTime(680, now + 0.18);
+        gain.gain.setValueAtTime(0.26, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.20);
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        osc.start(now);
+        osc.stop(now + 0.22);
+    }
+}
+const soundEngine = new HanabiSoundEngine();
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+let sceneryCanvas = document.createElement('canvas');
+let sceneryCtx = sceneryCanvas.getContext('2d');
+
+let dpr = 1.0;
+let width = 0;
+let height = 0;
+
+let rockets = [];
+let stars = [];
+let microSparks = [];
+let ascentSparks = [];
+let ambientFlashes = [];
+
+let frameCount = 0;
+let lastFpsUpdateTime = performance.now();
+const fpsDisplay = document.getElementById('fpsDisplay');
+
+/**
+ * 繪製隅田川浪漫夜景 (維持前一個版本經典簡約東京晴空塔)
+ */
+function buildRomanticScenery() {
+    sceneryCanvas.width = canvas.width;
+    sceneryCanvas.height = canvas.height;
+    const sctx = sceneryCtx;
+    sctx.save();
+    sctx.scale(dpr, dpr);
+
+    const horizonY = height * 0.82;
+
+    // 1. 深邃遠景天際
+    const skyGrad = sctx.createLinearGradient(0, 0, 0, horizonY);
+    skyGrad.addColorStop(0, '#010207');
+    skyGrad.addColorStop(0.7, '#040714');
+    skyGrad.addColorStop(1, '#091024');
+    sctx.fillStyle = skyGrad;
+    sctx.fillRect(0, 0, width, horizonY);
+
+    // 2. 遠方富士山剪影
+    const fujiX = width * 0.28;
+    const fujiPeakY = horizonY - height * 0.16;
+    const fujiBaseW = width * 0.32;
+    sctx.fillStyle = '#060a16';
+    sctx.beginPath();
+    sctx.moveTo(fujiX - fujiBaseW * 0.5, horizonY);
+    sctx.quadraticCurveTo(fujiX - fujiBaseW * 0.22, horizonY - height * 0.08, fujiX - 16, fujiPeakY);
+    sctx.lineTo(fujiX + 16, fujiPeakY);
+    sctx.quadraticCurveTo(fujiX + fujiBaseW * 0.22, horizonY - height * 0.08, fujiX + fujiBaseW * 0.5, horizonY);
+    sctx.closePath();
+    sctx.fill();
+
+    // 3. 遠方東京天際線建築剪影
+    sctx.fillStyle = '#050814';
+    const bCount = Math.floor(width / 34);
+    for (let i = 0; i < bCount; i++) {
+        const bx = i * 36;
+        const bw = 24 + ((i * 17) % 18);
+        const bh = 14 + ((i * 31) % 45);
+        sctx.fillRect(bx, horizonY - bh, bw, bh);
+
+        if (i % 2 === 0) {
+            sctx.fillStyle = (i % 4 === 0) ? 'rgba(56, 189, 248, 0.24)' : 'rgba(253, 224, 71, 0.26)';
+            for (let wy = horizonY - bh + 4; wy < horizonY - 4; wy += 7) {
+                sctx.fillRect(bx + 4, wy, 2.5, 3);
+                if (bw > 26) sctx.fillRect(bx + 11, wy, 2.5, 3);
+            }
+            sctx.fillStyle = '#050814';
+        }
+    }
+
+    // 4. 【東京晴空塔 - 前一個版本經典剪影】
+    const treeX = width * 0.72;
+    const treeTopY = horizonY - height * 0.24;
+    sctx.strokeStyle = '#091226';
+    sctx.lineWidth = 4;
+    sctx.beginPath();
+    sctx.moveTo(treeX - 14, horizonY);
+    sctx.lineTo(treeX, treeTopY);
+    sctx.lineTo(treeX + 14, horizonY);
+    sctx.stroke();
+
+    sctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+    sctx.lineWidth = 2.2;
+    sctx.beginPath();
+    sctx.ellipse(treeX, horizonY - height * 0.13, 10, 2.5, 0, 0, Math.PI * 2);
+    sctx.ellipse(treeX, horizonY - height * 0.17, 7, 2, 0, 0, Math.PI * 2);
+    sctx.stroke();
+
+    // 5. 隅田川水面底色
+    const waterGrad = sctx.createLinearGradient(0, horizonY, 0, height);
+    waterGrad.addColorStop(0, '#040713');
+    waterGrad.addColorStop(0.5, '#02040b');
+    waterGrad.addColorStop(1, '#010206');
+    sctx.fillStyle = waterGrad;
+    sctx.fillRect(0, horizonY, width, height - horizonY);
+
+    sctx.strokeStyle = 'rgba(56, 189, 248, 0.16)';
+    sctx.lineWidth = 1;
+    sctx.beginPath();
+    sctx.moveTo(0, horizonY);
+    sctx.lineTo(width, horizonY);
+    sctx.stroke();
+
+    // 6. 江畔近景堤防
+    sctx.fillStyle = '#03050c';
+    sctx.beginPath();
+    sctx.moveTo(width * 0.58, height);
+    sctx.quadraticCurveTo(width * 0.78, horizonY + (height - horizonY) * 0.35, width, horizonY + (height - horizonY) * 0.18);
+    sctx.lineTo(width, height);
+    sctx.closePath();
+    sctx.fill();
+
+    // 7. 堤防長椅與戀人剪影
+    const benchX = width * 0.88;
+    const benchY = height - 34;
+
+    sctx.strokeStyle = '#080d1e';
+    sctx.lineWidth = 3.5;
+    sctx.beginPath();
+    sctx.moveTo(benchX - 22, benchY);
+    sctx.lineTo(benchX + 22, benchY);
+    sctx.moveTo(benchX - 16, benchY);
+    sctx.lineTo(benchX - 16, benchY + 12);
+    sctx.moveTo(benchX + 16, benchY);
+    sctx.lineTo(benchX + 16, benchY + 12);
+    sctx.stroke();
+
+    sctx.fillStyle = '#060a17';
+    sctx.beginPath();
+    sctx.arc(benchX - 5, benchY - 18, 5, 0, Math.PI * 2);
+    sctx.fill();
+    sctx.fillRect(benchX - 9, benchY - 13, 9, 13);
+    sctx.beginPath();
+    sctx.arc(benchX + 4, benchY - 16, 4.5, 0, Math.PI * 2);
+    sctx.fill();
+    sctx.beginPath();
+    sctx.moveTo(benchX - 1, benchY - 12);
+    sctx.lineTo(benchX + 8, benchY - 1);
+    sctx.lineTo(benchX, benchY - 1);
+    sctx.closePath();
+    sctx.fill();
+
+    // 8. 右上角枝垂柳剪影
+    sctx.strokeStyle = '#05070f';
+    sctx.lineWidth = 1.8;
+    for (let k = 0; k < 6; k++) {
+        const rootX = width - (k * 22);
+        sctx.beginPath();
+        sctx.moveTo(rootX, 0);
+        sctx.bezierCurveTo(rootX - 15, 40 + k * 8, rootX - 35, 70 + k * 12, rootX - 22, 110 + k * 14);
+        sctx.stroke();
+    }
+
+    sctx.restore();
+}
+
+function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildRomanticScenery();
+}
+window.addEventListener('resize', resize);
+resize();
+
+/**
+ * 發射火箭主函式
+ */
+function launchRocket(targetX = null, targetY = null, customStyleId = null, forceSudden = false, options = {}) {
+    const horizonY = height * 0.82;
+    const destX = targetX !== null ? targetX : (width * 0.15 + Math.random() * width * 0.7);
+    const destY = targetY !== null ? targetY : (height * 0.12 + Math.random() * height * 0.38);
+
+    let styleId = customStyleId || currentStyleId;
+    if (styleId === 'all') {
+        const available = HANABI_STYLES_CATALOG.filter(s => s.id !== 'all');
+        styleId = available[Math.floor(Math.random() * available.length)].id;
+    }
+    const style = HANABI_STYLES_CATALOG.find(s => s.id === styleId) || HANABI_STYLES_CATALOG[1];
+
+    if (forceSudden) {
+        explodeRocketDirect(destX, destY, style, true, options.densityMult || 1.0);
+        return;
+    }
+
+    const startX = options.startX !== undefined ? options.startX : (width * (0.2 + Math.random() * 0.6));
+    const startY = horizonY + 8;
+    const durationMultiplier = options.durationMult || 1.0;
+    const totalDuration = Math.round(ascentBaseSteps * durationMultiplier * (0.94 + Math.random() * 0.12));
+
+    const panRatio = (destX / width) * 2 - 1;
+    soundEngine.playLaunch(panRatio, (totalDuration / 60), options.isTigerTail);
+
+    rockets.push({
+        startX,
+        startY,
+        targetX: destX,
+        targetY: destY,
+        x: startX,
+        y: startY,
+        px: startX,
+        py: startY,
+        ppx: startX,
+        ppy: startY,
+        style,
+        t: 0,
+        totalDuration,
+        isTigerTail: !!options.isTigerTail,
+        densityMult: options.densityMult || 1.0,
+        colorOverride: options.colorOverride || null
+    });
+}
+
+function showComboToast(title) {
+    const toast = document.getElementById('comboToast');
+    toast.textContent = title;
+    toast.classList.add('show');
+    clearTimeout(toast._hideTimer);
+    toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+function triggerStarmineCombo(forcedComboId = null) {
+    if (isFinaleActive || isComboActive) return;
+    isComboActive = true;
+    soundEngine.init();
+
+    let comboKey = forcedComboId || selectedComboId;
+    if (comboKey === 'random') {
+        const pick = STARMINE_COMBOS[Math.floor(Math.random() * STARMINE_COMBOS.length)];
+        comboKey = pick.id;
+    }
+    const comboInfo = STARMINE_COMBOS.find(c => c.id === comboKey) || STARMINE_COMBOS[0];
+    showComboToast(comboInfo.name);
+
+    if (comboKey === 'fan_wide') {
+        const count = 7;
+        const centerX = width * 0.5;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const spreadRatio = (i / (count - 1));
+                const tx = width * 0.12 + spreadRatio * (width * 0.76);
+                const arcHeight = Math.sin(spreadRatio * Math.PI) * (height * 0.12);
+                const ty = height * 0.28 - arcHeight;
+                const fanStyles = ['lush_senrin_hyakka', 'lush_mangekyo_hanabi', 'romantic_sumida_love', 'gosin_kiku'];
+                const st = fanStyles[i % fanStyles.length];
+
+                launchRocket(tx, ty, st, false, {
+                    startX: centerX + (spreadRatio - 0.5) * 80,
+                    durationMult: 0.95,
+                    densityMult: 0.72 // 智慧減負
+                });
+
+                if (i === count - 1) setTimeout(() => { isComboActive = false; }, 2600);
+            }, i * 90);
+        }
+    } else if (comboKey === 'rainbow_cascade') {
+        const rainbowColors = [
+            { col: '#ef4444' }, { col: '#f97316' }, { col: '#facc15' },
+            { col: '#10b981' }, { col: '#06b6d4' }, { col: '#3b82f6' }, { col: '#a855f7' }
+        ];
+        const count = rainbowColors.length;
+        rainbowColors.forEach((rc, i) => {
+            setTimeout(() => {
+                const tx = width * 0.15 + (i / (count - 1)) * (width * 0.7);
+                const ty = height * (0.16 + (i % 2) * 0.08);
+
+                launchRocket(tx, ty, 'gosin_kiku', false, {
+                    startX: width * 0.2 + (i / count) * (width * 0.6),
+                    durationMult: 0.9,
+                    densityMult: 0.70,
+                    colorOverride: rc.col
+                });
+
+                if (i === count - 1) setTimeout(() => { isComboActive = false; }, 2600);
+            }, i * 130);
+        });
+    } else if (comboKey === 'tiger_tail') {
+        const count = 6;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const sx = width * 0.22 + (i / (count - 1)) * (width * 0.56);
+                const tx = sx + (Math.random() - 0.5) * 40;
+                const ty = height * 0.18 + Math.random() * (height * 0.1);
+
+                launchRocket(tx, ty, 'lush_kamuro_curtain', false, {
+                    startX: sx,
+                    durationMult: 0.85,
+                    densityMult: 0.75,
+                    isTigerTail: true
+                });
+
+                if (i === count - 1) setTimeout(() => { isComboActive = false; }, 3000);
+            }, i * 110);
+        }
+    } else if (comboKey === 'crossfire_dragons') {
+        const pairs = 3;
+        let shot = 0;
+        for (let p = 0; p < pairs; p++) {
+            setTimeout(() => {
+                launchRocket(width * 0.75, height * 0.20 + p * 20, 'lush_kamuro_curtain', false, {
+                    startX: width * 0.22,
+                    durationMult: 1.05,
+                    densityMult: 0.72
+                });
+
+                setTimeout(() => {
+                    launchRocket(width * 0.25, height * 0.20 + p * 20, 'lush_ogon_niagara', false, {
+                        startX: width * 0.78,
+                        durationMult: 1.05,
+                        densityMult: 0.72
+                    });
+                }, 90);
+
+                shot += 2;
+                if (shot >= pairs * 2) setTimeout(() => { isComboActive = false; }, 3200);
+            }, p * 340);
+        }
+    } else if (comboKey === 'ghost_rush') {
+        const count = 6;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const tx = width * 0.18 + (i / (count - 1)) * (width * 0.64);
+                const ty = height * (0.15 + (i % 3) * 0.07);
+
+                launchRocket(tx, ty, 'yurei_ghost', false, {
+                    durationMult: 0.92,
+                    densityMult: 0.72
+                });
+
+                if (i === count - 1) setTimeout(() => { isComboActive = false; }, 3200);
+            }, i * 140);
+        }
+    }
+}
+
+/**
+ * 【優化 2】：頂點爆破 (內建動態負載平衡 Dynamic Load Balancer)
+ * 當多發同時爆破時，依當前畫面粒子負荷動態調節，杜絕暴衝卡頓
+ */
+const MAX_GLOBAL_STARS = 1200; // 全局粒子流暢上限
+
+function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, colorOverride = null) {
+    ambientFlashes.push({
+        x,
+        y,
+        radius: Math.min(width, height) * (style.isLush ? 0.7 : 0.55) * caliberMultiplier,
+        color: isSudden ? '#ffffff' : (colorOverride || (style.colors ? style.colors[0] : '#ffffff')),
+        alpha: isSudden ? 0.45 : (style.isLush ? 0.35 : 0.26)
+    });
+
+    const panRatio = (x / width) * 2 - 1;
+    soundEngine.playBurst(caliberMultiplier, panRatio, isSudden, !!style.isLush);
+
+    // 動態平衡因子：當畫面粒子過多時，自動微幅自適應調整
+    let loadFactor = 1.0;
+    if (stars.length > 400) {
+        loadFactor = Math.max(0.38, (MAX_GLOBAL_STARS - stars.length) / (MAX_GLOBAL_STARS - 400));
+    }
+
+    const baseCount = Math.round(style.particles * particleMult * caliberMultiplier * densityScale * loadFactor);
+    const totalCount = Math.max(45, baseCount);
+    const speedMult = Math.max(1.0, (height / 850)) * caliberMultiplier;
+    const baseSpeed = style.baseSpeed * speedMult;
+    const baseLifetime = style.cutoffLifetime || 110;
+
+    for (let k = 0; k < totalCount; k++) {
+        let vx = 0, vy = 0;
+        let color = colorOverride || (style.colors ? style.colors[k % style.colors.length] : '#ffffff');
+        let radius = style.isLush ? 2.1 : 1.9;
+
+        if (style.id === 'gosin_kiku' && !colorOverride) {
+            const angle = (k / totalCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.03;
+            const layer = k % 5;
+            if (layer === 0) { vx = Math.cos(angle) * (baseSpeed * 0.22); vy = Math.sin(angle) * (baseSpeed * 0.22); color = style.core5[0]; }
+            else if (layer === 1) { vx = Math.cos(angle) * (baseSpeed * 0.42); vy = Math.sin(angle) * (baseSpeed * 0.42); color = style.core4[0]; }
+            else if (layer === 2) { vx = Math.cos(angle) * (baseSpeed * 0.64); vy = Math.sin(angle) * (baseSpeed * 0.64); color = style.core3[0]; }
+            else if (layer === 3) { vx = Math.cos(angle) * (baseSpeed * 0.88); vy = Math.sin(angle) * (baseSpeed * 0.88); color = style.core2[0]; }
+            else { vx = Math.cos(angle) * (baseSpeed * 1.12); vy = Math.sin(angle) * (baseSpeed * 1.12); color = style.colors[k % style.colors.length]; }
+        } else if (style.id === 'lush_mangekyo_hanabi' && !colorOverride) {
+            const angle = (k / totalCount) * Math.PI * 2;
+            const layer = k % 6;
+            const ringSpeeds = [0.25, 0.45, 0.65, 0.85, 1.05, 1.25];
+            const sp = baseSpeed * ringSpeeds[layer] * (0.95 + Math.random() * 0.1);
+            vx = Math.cos(angle) * sp;
+            vy = Math.sin(angle) * sp;
+            color = style.colors[layer % style.colors.length];
+        } else if (style.id === 'lush_senrin_hyakka' || style.id === 'senrin_hyakka') {
+            const clusters = style.isLush ? 8 : 6;
+            const cIdx = k % clusters;
+            const cAngle = (cIdx / clusters) * Math.PI * 2;
+            const cx = Math.cos(cAngle) * (baseSpeed * 0.52);
+            const cy = Math.sin(cAngle) * (baseSpeed * 0.52);
+            const subA = Math.random() * Math.PI * 2;
+            const subSp = baseSpeed * 0.54 * (0.65 + Math.random() * 0.5);
+            vx = cx + Math.cos(subA) * subSp;
+            vy = cy + Math.sin(subA) * subSp;
+        } else if (style.id === 'yashi_ginpa') {
+            const angle = -Math.PI * 0.85 + (k / totalCount) * Math.PI * 1.7;
+            const sp = baseSpeed * (0.9 + Math.random() * 0.4);
+            vx = Math.cos(angle) * sp * 1.1;
+            vy = Math.sin(angle) * sp * 0.9;
+        } else {
+            const angle = (k / totalCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.08;
+            const sp = baseSpeed * (0.86 + Math.random() * 0.28);
+            vx = Math.cos(angle) * sp;
+            vy = Math.sin(angle) * sp;
+        }
+
+        // 隨機時差，避免同一幀幾百顆粒子集體暴斃
+        const lifetimeJitter = (Math.random() - 0.5) * (baseLifetime * 0.26);
+        const individualLifetime = Math.max(48, Math.round(baseLifetime + lifetimeJitter));
+
+        stars.push({
+            x, y,
+            x1: x, y1: y,
+            x2: x, y2: y,
+            x3: x, y3: y, // 【優化 3】：微型純量流線 (取代重度陣列分配，零 GC)
+            vx, vy,
+            alpha: 1.0,
+            style,
+            color,
+            radius,
+            age: 0,
+            cutoffLifetime: individualLifetime,
+            fadeDuration: Math.round(individualLifetime * 0.22),
+            phase: Math.random() * Math.PI * 2,
+            wobbleSpeed: 0.25 + Math.random() * 0.2,
+            sakiWariAge: Math.round((style.sakiWariAge || 72) + (Math.random() - 0.5) * 12),
+            sakiWariTriggered: false,
+            ghostReignited: false,
+            isEven: (k & 1) === 0 // 水面鏡像視差降頻取樣標記
+        });
+    }
+}
+
+function renderDynamicBoats(now) {
+    const horizonY = height * 0.82;
+    const boats = [
+        { x: width * 0.36, y: horizonY + 22, size: 28, lanternColor: '#f59e0b' },
+        { x: width * 0.52, y: horizonY + 44, size: 38, lanternColor: '#ef4444' }
+    ];
+
+    boats.forEach((b, idx) => {
+        const bob = Math.sin(now * 0.002 + idx * 2.2) * 1.5;
+        const by = b.y + bob;
+
+        ctx.fillStyle = '#060a16';
+        ctx.beginPath();
+        ctx.moveTo(b.x - b.size, by + 4);
+        ctx.lineTo(b.x + b.size, by + 4);
+        ctx.lineTo(b.x + b.size * 0.75, by + 12);
+        ctx.lineTo(b.x - b.size * 0.75, by + 12);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillRect(b.x - b.size * 0.5, by - 6, b.size, 8);
+
+        const lCount = 3;
+        for (let li = 0; li < lCount; li++) {
+            const lx = b.x - b.size * 0.35 + (li / (lCount - 1)) * (b.size * 0.7);
+            const ly = by - 1;
+            const flicker = 0.75 + Math.sin(now * 0.008 + li + idx) * 0.25;
+
+            ctx.fillStyle = b.lanternColor;
+            ctx.globalAlpha = flicker;
+            ctx.fillRect(lx - 2, ly - 2, 4, 4);
+
+            if (showReflection) {
+                const refH = 24 + idx * 8;
+                ctx.fillStyle = b.lanternColor;
+                ctx.globalAlpha = flicker * 0.25;
+                ctx.fillRect(lx - 1.5, by + 12, 3, refH);
+            }
+        }
+    });
+
+    // 晴空塔頂部紅航空信號燈 (前一版本經典呼吸頻率)
+    const treeX = width * 0.72;
+    const treeTopY = horizonY - height * 0.24 - 22;
+    const beaconPulse = Math.pow(Math.max(0, Math.sin(now * 0.002)), 3);
+    if (beaconPulse > 0.05) {
+        ctx.fillStyle = '#ef4444';
+        ctx.globalAlpha = beaconPulse * 0.85;
+        ctx.fillRect(treeX - 2, treeTopY - 2, 4, 4);
+    }
+}
+
+/* 主動畫渲染迴圈 (已進行徹底無卡頓硬體直通優化) */
+function animate(now) {
+    requestAnimationFrame(animate);
+
+    frameCount++;
+    if (now - lastFpsUpdateTime >= 500) {
+        const fps = Math.round((frameCount * 1000) / (now - lastFpsUpdateTime));
+        frameCount = 0;
+        lastFpsUpdateTime = now;
+        fpsDisplay.textContent = `${fps} FPS`;
+    }
+
+    ctx.fillStyle = 'rgba(1, 2, 7, 0.22)';
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.drawImage(sceneryCanvas, 0, 0, width, height);
+    renderDynamicBoats(now);
+
+    const horizonY = height * 0.82;
+
+    // 【優化 4】：爆閃貼圖直接硬體 Blit (瞬間消弭多重漸變卡頓)
+    for (let i = ambientFlashes.length - 1; i >= 0; i--) {
+        const fl = ambientFlashes[i];
+        ctx.globalAlpha = fl.alpha;
+        ctx.drawImage(FLASH_TEXTURE, fl.x - fl.radius, fl.y - fl.radius, fl.radius * 2, fl.radius * 2);
+
+        fl.alpha -= 0.035;
+        if (fl.alpha <= 0) {
+            ambientFlashes[i] = ambientFlashes[ambientFlashes.length - 1];
+            ambientFlashes.pop();
+        }
+    }
+
+    ctx.globalCompositeOperation = 'lighter';
+
+    // 昇空火箭
+    for (let i = rockets.length - 1; i >= 0; i--) {
+        const r = rockets[i];
+        r.t++;
+        const prog = Math.min(1.0, r.t / r.totalDuration);
+        const ease = 1 - Math.pow(1 - prog, 2.0);
+
+        r.ppx = r.px; r.ppy = r.py;
+        r.px = r.x; r.py = r.y;
+        r.x = r.startX + (r.targetX - r.startX) * prog;
+        r.y = r.startY - (r.startY - r.targetY) * ease;
+
+        // 虎之尾昇空火柱
+        if (r.isTigerTail) {
+            if (ascentSparks.length < 90) {
+                ascentSparks.push({
+                    x: r.x + (Math.random() - 0.5) * 6,
+                    y: r.y + Math.random() * 4,
+                    vx: (Math.random() - 0.5) * 0.8,
+                    vy: 0.6 + Math.random() * 0.9,
+                    alpha: 0.9, decay: 0.035, isTiger: true
+                });
+            }
+        } else if (ascentSparks.length < 50 && Math.random() > 0.45) {
+            ascentSparks.push({
+                x: r.x + (Math.random() - 0.5) * 3,
+                y: r.y,
+                vx: (Math.random() - 0.5) * 0.35,
+                vy: 0.3 + Math.random() * 0.5,
+                alpha: 0.75 * trailAlphaScale, decay: 0.026, isTiger: false
+            });
+        }
+
+        // 昇空直線
+        ctx.beginPath();
+        ctx.moveTo(r.ppx, r.ppy);
+        ctx.lineTo(r.x, r.y);
+        ctx.strokeStyle = r.isTigerTail ? 'rgba(251, 191, 36, 0.85)' : `rgba(255, 250, 235, ${0.95 * trailAlphaScale})`;
+        ctx.lineWidth = r.isTigerTail ? 3.0 : 1.2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(r.x - 1.2, r.y - 1.2, 2.4, 2.4);
+
+        if (r.t >= r.totalDuration) {
+            explodeRocketDirect(r.targetX, r.targetY, r.style, false, r.densityMult, r.colorOverride);
+            rockets[i] = rockets[rockets.length - 1];
+            rockets.pop();
+        }
+    }
+
+    // 昇空微粒
+    for (let i = ascentSparks.length - 1; i >= 0; i--) {
+        const sp = ascentSparks[i];
+        sp.x += sp.vx;
+        sp.y += sp.vy;
+        sp.alpha -= sp.decay;
+        if (sp.alpha <= 0) {
+            ascentSparks[i] = ascentSparks[ascentSparks.length - 1];
+            ascentSparks.pop();
+            continue;
+        }
+        ctx.fillStyle = sp.isTiger ? `rgba(251, 191, 36, ${sp.alpha})` : `rgba(254, 215, 170, ${sp.alpha})`;
+        ctx.fillRect(sp.x, sp.y, sp.isTiger ? 2.0 : 1.3, sp.isTiger ? 2.0 : 1.3);
+    }
+
+    // 【優化 5】：花火星光粒子 (GPU 矩形光斑硬體直通 + 純量流線)
+    for (let i = stars.length - 1; i >= 0; i--) {
+        const st = stars[i];
+        st.age++;
+
+        const profile = st.style.decayProfile || 'instant_cutoff';
+        let displayRadius = st.radius;
+
+        if (st.style.id === 'kurui_hachi_mad') {
+            const wobble = Math.sin(st.age * st.wobbleSpeed) * 0.7;
+            st.vx += -st.vy * wobble * 0.22;
+            st.vy += st.vx * wobble * 0.22;
+        } else if (profile === 'flutter') {
+            const wind = Math.sin(st.age * 0.12 + st.phase) * 0.22;
+            st.vx += wind * 0.25;
+        }
+
+        // 純量位移傳遞 (零記憶體存取)
+        st.x3 = st.x2; st.y3 = st.y2;
+        st.x2 = st.x1; st.y2 = st.y1;
+        st.x1 = st.x;  st.y1 = st.y;
+        st.x += st.vx;
+        st.y += st.vy;
+        st.vx *= st.style.airDrag;
+        st.vy = st.vy * st.style.airDrag + st.style.gravity;
+
+        // 平滑退場演算法 (Smooth-step 消口)
+        let alphaFactor = 1.0;
+        const remainingTicks = st.cutoffLifetime - st.age;
+        if (remainingTicks <= st.fadeDuration) {
+            if (remainingTicks <= 0) {
+                // O(1) 快速置換移除
+                stars[i] = stars[stars.length - 1];
+                stars.pop();
+                continue;
+            }
+            const p = remainingTicks / st.fadeDuration;
+            alphaFactor = p * p * (3 - 2 * p);
+        }
+
+        if (profile === 'color_cool') {
+            const lifeRatio = st.age / st.cutoffLifetime;
+            if (lifeRatio < 0.25) st.color = '#fffbe6';
+            else if (lifeRatio < 0.55) st.color = '#f59e0b';
+            else if (lifeRatio < 0.8) { st.color = '#ea580c'; displayRadius = st.radius * 0.85; }
+            else { st.color = '#b91c1c'; displayRadius = st.radius * 0.65; }
+            st.alpha -= st.style.decayRate * 0.7;
+        } else if (profile === 'strobe_fade') {
+            const strobeStart = st.style.strobeStartAge || 60;
+            if (st.age > strobeStart) {
+                const freq = Math.sin(st.age * 0.55 + st.phase);
+                alphaFactor *= (freq > 0.1) ? 1.0 : 0.08;
+            } else {
+                st.alpha -= st.style.decayRate;
+            }
+        } else if (profile === 'saki_wari') {
+            if (st.age >= st.sakiWariAge && !st.sakiWariTriggered) {
+                st.sakiWariTriggered = true;
+                const pan = (st.x / width) * 2 - 1;
+                soundEngine.playCrackle(pan);
+
+                if (microSparks.length < 80) {
+                    for (let s = 0; s < 2; s++) {
+                        const ma = Math.random() * Math.PI * 2;
+                        const msp = 1.2 + Math.random() * 0.8;
+                        microSparks.push({
+                            x: st.x, y: st.y,
+                            vx: Math.cos(ma) * msp, vy: Math.sin(ma) * msp,
+                            alpha: 1.0,
+                            color: st.style.sakiColor || ((Math.random() > 0.5) ? '#ffffff' : '#fde047'),
+                            decay: 0.052
+                        });
+                    }
+                }
+                st.age = st.cutoffLifetime - 5;
+            } else {
+                st.alpha -= st.style.decayRate;
+            }
+        } else if (profile === 'ghost') {
+            const darkStart = st.style.darkAgeStart || 18;
+            const darkEnd = st.style.darkAgeEnd || 48;
+            if (st.age >= darkStart && st.age < darkEnd) {
+                alphaFactor = 0;
+            } else if (st.age >= darkEnd) {
+                if (!st.ghostReignited) {
+                    st.ghostReignited = true;
+                    const reignitePalette = st.style.reigniteColors || ['#00f5d4'];
+                    st.color = reignitePalette[Math.floor(Math.random() * reignitePalette.length)];
+                    st.radius = 2.3;
+                    if (Math.random() < 0.25) soundEngine.playGhostReignite((st.x / width) * 2 - 1);
+                }
+                st.alpha -= 0.008;
+            } else {
+                st.alpha -= 0.004;
+            }
+        } else {
+            st.alpha -= st.style.decayRate;
+        }
+
+        const renderAlpha = Math.max(0, Math.min(1, st.alpha * alphaFactor));
+        if (renderAlpha <= 0.02) continue;
+
+        // 繪製微型流線 (極低開銷)
+        ctx.beginPath();
+        ctx.moveTo(st.x3, st.y3);
+        ctx.lineTo(st.x2, st.y2);
+        ctx.lineTo(st.x1, st.y1);
+        ctx.lineTo(st.x, st.y);
+        ctx.strokeStyle = st.color;
+        ctx.lineWidth = (profile === 'willow_long' || st.style.isLush) ? Math.max(0.85, displayRadius * 0.95) : 1.15;
+        ctx.lineCap = 'round';
+        ctx.globalAlpha = renderAlpha * 0.85;
+        ctx.stroke();
+
+        // 繪製頭部星斑 (採用 GPU 硬體 blit 矩形，速度比 arc 提升 5-8 倍)
+        if (renderAlpha > 0.06) {
+            const sz = displayRadius * 1.8;
+            ctx.fillStyle = st.color;
+            ctx.globalAlpha = renderAlpha;
+            ctx.fillRect(st.x - displayRadius, st.y - displayRadius, sz, sz);
+
+            if (renderAlpha > 0.35) {
+                ctx.fillStyle = '#ffffff';
+                ctx.globalAlpha = renderAlpha * 0.9;
+                ctx.fillRect(st.x - 0.75, st.y - 0.75, 1.5, 1.5);
+            }
+        }
+
+        // 水面鏡像視差倒影 (降頻取樣優化：僅對偶數粒子計算，大幅節省 50% 倒影 Draw Call)
+        if (showReflection && st.isEven && st.y < horizonY && renderAlpha > 0.2) {
+            const dy = horizonY - st.y;
+            const refY = horizonY + dy * 0.62;
+            if (refY < height) {
+                ctx.fillStyle = st.color;
+                ctx.globalAlpha = renderAlpha * 0.2;
+                ctx.fillRect(st.x - displayRadius, refY, displayRadius * 2.2, 1.4);
+            }
+        }
+    }
+
+    // 先割微星裂爆更新
+    for (let i = microSparks.length - 1; i >= 0; i--) {
+        const m = microSparks[i];
+        m.x += m.vx;
+        m.y += m.vy;
+        m.alpha -= m.decay;
+        if (m.alpha <= 0) {
+            microSparks[i] = microSparks[microSparks.length - 1];
+            microSparks.pop();
+            continue;
+        }
+        ctx.fillStyle = m.color;
+        ctx.globalAlpha = m.alpha;
+        ctx.fillRect(m.x, m.y, 1.4, 1.4);
+    }
+
+    ctx.globalCompositeOperation = 'source-over';
+
+    // 自動巡航施放邏輯
+    if (autoLaunch && !isFinaleActive && !isComboActive) {
+        if (now - lastAutoTime > autoInterval) {
+            lastAutoTime = now;
+            consecutiveSingleLaunches++;
+
+            const comboThresholds = [9999, 10, 7, 4, 2];
+            const threshold = comboThresholds[autoComboFrequencyLevel];
+
+            if (autoComboFrequencyLevel > 0 && consecutiveSingleLaunches >= threshold) {
+                consecutiveSingleLaunches = 0;
+                triggerStarmineCombo();
+            } else {
+                const isSudden = Math.random() < suddenBurstProb;
+                launchRocket(null, null, null, isSudden);
+            }
+        }
+    }
+}
+requestAnimationFrame(animate);
+
+function initSelectOptions() {
+    const sel = document.getElementById('fireworkStyleSelect');
+    HANABI_STYLES_CATALOG.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.icon} ${s.name}`;
+        sel.appendChild(opt);
+    });
+    sel.onchange = (e) => {
+        currentStyleId = e.target.value;
+        const found = HANABI_STYLES_CATALOG.find(s => s.id === currentStyleId);
+        document.getElementById('styleCountText').textContent = found ? found.name.split(' ')[0] : '隨機';
+        launchRocket(null, null, currentStyleId, false);
+    };
+
+    const comboSel = document.getElementById('comboStyleSelect');
+    comboSel.onchange = (e) => {
+        selectedComboId = e.target.value;
+        const found = STARMINE_COMBOS.find(c => c.id === selectedComboId);
+        document.getElementById('comboSelectText').textContent = found ? found.name.split(' ')[0] : '隨機輪播';
+    };
+}
+initSelectOptions();
+
+canvas.addEventListener('pointerdown', (e) => {
+    soundEngine.init();
+    launchRocket(e.clientX, e.clientY, null, false);
+
+    const hint = document.getElementById('touchHint');
+    if (hint) {
+        hint.style.opacity = '0';
+        setTimeout(() => hint.remove(), 1200);
+    }
+});
+
+document.getElementById('comboLaunchBtn').onclick = () => triggerStarmineCombo();
+document.getElementById('manualSuddenBtn').onclick = () => {
+    soundEngine.init();
+    launchRocket(null, null, null, true);
+};
+
+const autoBtn = document.getElementById('autoLaunchBtn');
+autoBtn.onclick = () => {
+    autoLaunch = !autoLaunch;
+    autoBtn.classList.toggle('active', autoLaunch);
+    autoBtn.querySelector('span').textContent = autoLaunch ? '✨ 自動巡航' : '⏸️ 巡航暫停';
+};
+
+const finaleBtn = document.getElementById('finaleBtn');
+finaleBtn.onclick = () => {
+    if (isFinaleActive || isComboActive) return;
+    isFinaleActive = true;
+    soundEngine.init();
+    showComboToast('💥 錦冠終曲・千輪大連發');
+
+    finaleBtn.style.opacity = '0.6';
+    let count = 0;
+    const maxFinale = 18;
+    const finaleTimer = setInterval(() => {
+        count++;
+        const targetX = width * (0.15 + Math.random() * 0.7);
+        const targetY = height * (0.12 + Math.random() * 0.38);
+        const styles = ['lush_kamuro_curtain', 'lush_shidare_sakura', 'lush_senrin_hyakka', 'gosin_kiku', 'yurei_ghost', 'ginpa_saki_wari'];
+        const chosen = styles[Math.floor(Math.random() * styles.length)];
+        launchRocket(targetX, targetY, chosen, false, { densityMult: 0.65 });
+
+        if (count >= maxFinale) {
+            clearInterval(finaleTimer);
+            setTimeout(() => {
+                isFinaleActive = false;
+                finaleBtn.style.opacity = '1';
+            }, 3000);
+        }
+    }, 180);
+};
+
+const soundBtn = document.getElementById('soundToggleBtn');
+soundBtn.onclick = () => {
+    soundEnabled = !soundEnabled;
+    soundEngine.init();
+    document.getElementById('soundText').textContent = soundEnabled ? '🔊 音效: 開' : '🔇 音效: 關';
+    soundBtn.classList.toggle('active', soundEnabled);
+};
+
+const fullBtn = document.getElementById('fullscreenBtn');
+fullBtn.onclick = () => {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+    else document.exitFullscreen().catch(() => {});
+};
+
+const settingsDrawer = document.getElementById('settingsDrawer');
+document.getElementById('settingsToggleBtn').onclick = () => settingsDrawer.classList.toggle('open');
+document.getElementById('closeDrawerBtn').onclick = () => settingsDrawer.classList.remove('open');
+document.getElementById('applyAndCloseBtn').onclick = () => settingsDrawer.classList.remove('open');
+
+document.getElementById('densitySlider').oninput = (e) => {
+    particleMult = parseFloat(e.target.value);
+    const dText = document.getElementById('densityText');
+    if (particleMult >= 1.4) dText.textContent = `超狂茂盛 (${particleMult}x)`;
+    else if (particleMult >= 1.1) dText.textContent = `極致茂盛 (${particleMult}x)`;
+    else dText.textContent = `標準精巧 (${particleMult}x)`;
+};
+
+const autoComboProbRange = document.getElementById('autoComboProbRange');
+const autoComboProbText = document.getElementById('autoComboProbText');
+const comboFreqTexts = ['關閉自動 Combo', '每 10 發穿插 1 次', '每 6~8 發穿插 1 次', '每 4 發穿插 1 次', '每 2 發穿插 1 次'];
+autoComboProbRange.oninput = (e) => {
+    autoComboFrequencyLevel = parseInt(e.target.value);
+    autoComboProbText.textContent = comboFreqTexts[autoComboFrequencyLevel];
+};
+
+document.getElementById('speedFactorRange').oninput = (e) => {
+    ascentBaseSteps = parseInt(e.target.value);
+    const sec = (ascentBaseSteps * 0.0166).toFixed(1);
+    document.getElementById('speedText').textContent = `${sec} 秒 (頂點減速)`;
+};
+
+document.getElementById('caliberRange').oninput = (e) => {
+    const val = parseInt(e.target.value);
+    const calNames = ['', '5號玉 (小輪精巧)', '10號尺玉 (標準大輪)', '15號尺半玉 (高空壯闊)', '20號二尺玉 (終極巨彈)'];
+    const calScales = [0, 0.75, 1.0, 1.4, 2.0];
+    document.getElementById('calText').textContent = calNames[val];
+    caliberMultiplier = calScales[val];
+};
+
+document.getElementById('waterReflectionCheck').onchange = (e) => {
+    showReflection = e.target.checked;
+    document.getElementById('reflText').textContent = showReflection ? '開啟 (高效取樣)' : '關閉';
+};
+</script>
+</body>
+</html>
