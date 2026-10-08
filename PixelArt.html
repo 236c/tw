@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>像素棋盤標號生成器 - Pixel Art & Numbered Grid Generator</title>
+  <!-- 載入 Tailwind CSS 與 Google 專業字體 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+            mono: ['Fira Code', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+            'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* 強制鎖定全頁高度，禁止頁面本體發生溢出滾動 */
+    html, body {
+      height: 100vh !important;
+      max-height: 100vh !important;
+      overflow: hidden !important;
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafc;
+    }
+
+    /* 左側面板流暢細捲軸優化 */
+    .sidebar-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sidebar-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+    .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .dark .sidebar-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+    }
+
+    /* 右側調色盤高對比專屬滾動條 */
+    .palette-scroll-container {
+      scrollbar-width: thin;
+      scrollbar-color: #6366f1 transparent;
+      overflow-y: auto !important;
+      overflow-x: hidden;
+    }
+    .palette-scroll-container::-webkit-scrollbar {
+      width: 8px !important;
+    }
+    .palette-scroll-container::-webkit-scrollbar-track {
+      background: transparent !important;
+    }
+    .palette-scroll-container::-webkit-scrollbar-thumb {
+      background: #818cf8 !important;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+    .palette-scroll-container::-webkit-scrollbar-thumb:hover {
+      background: #4f46e5 !important;
+      border: 0;
+    }
+    .dark .palette-scroll-container::-webkit-scrollbar-thumb {
+      background: #6366f1 !important;
+    }
+
+    /* 亮色畫布棋盤透明底紋 */
+    .bg-checker {
+      background-color: #f1f5f9;
+      background-image: 
+        linear-gradient(45deg, #e2e8f0 25%, transparent 25%), 
+        linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #e2e8f0 75%), 
+        linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+    }
+    .dark .bg-checker {
+      background-color: #0b0f19;
+      background-image: 
+        linear-gradient(45deg, #131b2e 25%, transparent 25%), 
+        linear-gradient(-45deg, #131b2e 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #131b2e 75%), 
+        linear-gradient(-45deg, transparent 75%, #131b2e 75%);
+    }
+
+    .cursor-grab-canvas { cursor: grab; }
+    .cursor-grab-canvas:active { cursor: grabbing; }
+    .cursor-brush { cursor: crosshair; }
+
+    .badge-pop {
+      animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes popIn {
+      from { transform: translateY(10px) scale(0.95); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    input[type="number"]:focus, input[type="text"]:focus, select:focus {
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+    .dark input[type="number"]:focus, .dark input[type="text"]:focus, .dark select:focus {
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 h-screen max-h-screen flex flex-col font-sans select-none overflow-hidden transition-colors duration-200">
+
+  <!-- 頂部應用程式標題與主要工具列 -->
+  <header class="h-16 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-5 flex items-center justify-between shrink-0 z-30 shadow-sm">
+    <div class="flex items-center gap-3.5">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-base font-bold text-slate-900 dark:text-white tracking-wide flex items-center gap-2.5">
+          像素棋盤標號生成器
+          <span class="text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-500/30 font-mono font-bold tracking-normal">即時連動版</span>
+        </h1>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Pixel Art & Numbered Grid Generator</p>
+      </div>
+    </div>
+
+    <!-- 頂部工作模式、主題切換與匯出選單 -->
+    <div class="flex items-center gap-3">
+      <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 text-sm shadow-inner-soft">
+        <button id="btnToolInspect" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 font-bold text-slate-900 dark:text-white shadow-sm flex items-center gap-1.5 transition-all">
+          <span>🔍</span> 檢查/聚焦
+        </button>
+        <button id="btnToolBrush" class="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition-all">
+          <span>✏️</span> 筆刷塗色
+        </button>
+      </div>
+
+      <div class="hidden lg:flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-mono">
+        <span class="text-slate-500 dark:text-slate-400">網格:</span>
+        <span id="headerGridInfo" class="text-indigo-700 dark:text-indigo-300 font-bold">32 × 32</span>
+        <span class="text-slate-300 dark:text-slate-600 mx-1">|</span>
+        <span class="text-slate-500 dark:text-slate-400">當前色數:</span>
+        <span id="headerColorInfo" class="text-emerald-700 dark:text-emerald-400 font-bold">16 色</span>
+      </div>
+
+      <button id="btnToggleTheme" class="px-3 py-2 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 shadow-sm transition-all" title="切換亮色/深色模式">
+        <span id="themeIcon" class="text-lg leading-none">☀️</span>
+        <span id="themeLabel" class="hidden sm:inline">亮色模式</span>
+      </button>
+
+      <div class="relative inline-block text-left" id="exportDropdownContainer">
+        <button id="btnExportMenu" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 active:scale-95 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-500/30 flex items-center gap-2 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+          </svg>
+          匯出作品
+          <svg class="w-4 h-4 text-indigo-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+
+        <div id="exportMenu" class="hidden absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 shadow-2xl py-2 z-50 text-sm overflow-hidden backdrop-blur-xl">
+          <div class="px-4 py-2 text-xs font-bold text-slate-400 dark:text-slate-500 tracking-widest">圖像匯出 (PNG)</div>
+          <button id="btnExportPixelSharp" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-slate-800 dark:text-slate-200 transition-colors">
+            <span class="font-medium">純像素圖 (放大 12x 銳利無損)</span>
+            <span class="text-xs text-slate-500 font-mono font-semibold bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">PNG</span>
+          </button>
+          <button id="btnExportPatternSheet" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-slate-800 dark:text-slate-200 transition-colors">
+            <span class="font-medium">含標尺/格線與對照表圖樣紙</span>
+            <span class="text-xs text-indigo-600 dark:text-indigo-400 font-mono font-bold bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded">手工圖樣</span>
+          </button>
+          <div class="my-1.5 border-t border-slate-100 dark:border-slate-800"></div>
+          <div class="px-4 py-2 text-xs font-bold text-slate-400 dark:text-slate-500 tracking-widest">色彩資料匯出</div>
+          <button id="btnExportPaletteCSV" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-slate-800 dark:text-slate-200 transition-colors">
+            <span class="font-medium">色碼與統計明細清單</span>
+            <span class="text-xs text-slate-500 font-mono font-semibold bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">.CSV</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主工作區 -->
+  <main class="flex w-full overflow-hidden" style="height: calc(100vh - 64px); max-height: calc(100vh - 64px);">
+    
+    <!-- 左側設定控制面板 -->
+    <aside class="w-[360px] border-r border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 flex flex-col shrink-0 overflow-y-auto sidebar-scroll z-20 h-full max-h-full">
+      
+      <!-- 區塊 1: 圖片輸入來源 -->
+      <section class="p-5 border-b border-slate-100 dark:border-slate-800/60">
+        <div class="flex items-center justify-between mb-3">
+          <label class="text-sm font-bold text-slate-900 dark:text-slate-200 flex items-center gap-2">
+            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            圖片輸入來源
+          </label>
+          <span class="text-xs text-slate-400 font-mono font-medium">支援 Ctrl+V 貼上</span>
+        </div>
+
+        <div id="dropZone" class="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/10 rounded-2xl p-5 text-center cursor-pointer transition-all duration-200 relative group bg-slate-50/70 dark:bg-slate-950/40">
+          <input type="file" id="fileInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+          <div class="flex flex-col items-center gap-2 py-2">
+            <div class="w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+              <svg class="w-6 h-6 text-slate-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+            </div>
+            <p class="text-sm font-bold text-slate-800 dark:text-slate-200">點擊選取或拖曳圖片至此</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">支援 PNG, JPG, WEBP, GIF, SVG</p>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="text-xs text-slate-500 dark:text-slate-400 font-medium mb-2">或點選內建範例圖快速體驗：</div>
+          <div class="grid grid-cols-3 gap-2">
+            <button id="btnSampleHeart" class="px-2 py-2 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-95 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow">
+              <span class="text-base">❤️</span> 愛心
+            </button>
+            <button id="btnSampleMushroom" class="px-2 py-2 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-95 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow">
+              <span class="text-base">🍄</span> 蘑菇
+            </button>
+            <button id="btnSampleSunset" class="px-2 py-2 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-95 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow">
+              <span class="text-base">🌄</span> 夕陽
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 區塊 2: 棋盤解析度 -->
+      <section class="p-5 border-b border-slate-100 dark:border-slate-800/60">
+        <label class="text-sm font-bold text-slate-900 dark:text-slate-200 flex items-center justify-between mb-3">
+          <span class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            棋盤解析度 (網格數)
+          </span>
+        </label>
+
+        <select id="selectResolution" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-mono font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors shadow-sm cursor-pointer mb-4">
+          <option value="24">24 × 24</option>
+          <option value="32" selected>32 × 32</option>
+          <option value="48">48 × 48</option>
+          <option value="64">64 × 64</option>
+          <option value="96">96 × 96</option>
+          <option value="128">128 × 128</option>
+          <option value="custom" class="hidden font-sans">✏️ 自訂尺寸...</option>
+        </select>
+
+        <div class="bg-slate-50 dark:bg-slate-950/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 space-y-3 shadow-inner-soft">
+          <div class="flex items-center justify-between text-sm font-bold">
+            <span class="text-slate-800 dark:text-slate-200">自訂網格尺寸:</span>
+            <label class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 cursor-pointer font-medium hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
+              <input type="checkbox" id="chkKeepAspect" checked class="w-3.5 h-3.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+              鎖定長寬比
+            </label>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-medium block mb-1">寬 (W 欄數)</span>
+              <input type="number" id="numWidth" min="4" max="256" value="32" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-sm font-mono font-bold text-slate-800 dark:text-slate-100 focus:border-indigo-500 focus:outline-none transition-all shadow-sm">
+            </div>
+            <div>
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-medium block mb-1">高 (H 列數)</span>
+              <input type="number" id="numHeight" min="4" max="256" value="32" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-sm font-mono font-bold text-slate-800 dark:text-slate-100 focus:border-indigo-500 focus:outline-none transition-all shadow-sm">
+            </div>
+          </div>
+
+          <div class="pt-1 flex items-center justify-between text-sm font-medium">
+            <span class="text-slate-700 dark:text-slate-300">縮放取樣模式:</span>
+            <select id="selectSampling" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1 text-sm text-slate-800 dark:text-slate-200 focus:outline-none shadow-sm cursor-pointer">
+              <option value="nearest">最近鄰 (保持硬邊)</option>
+              <option value="bilinear" selected>平滑插值 (Bilinear)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 區塊 3: 棋盤標尺與格內文字標示 -->
+      <section class="p-5 border-b border-slate-100 dark:border-slate-800/60">
+        <label class="text-sm font-bold text-slate-900 dark:text-slate-200 flex items-center gap-2 mb-3">
+          <svg class="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+          棋盤標尺與格內文字標示
+        </label>
+
+        <div class="space-y-3 text-sm">
+          <div class="bg-slate-50 dark:bg-slate-950/50 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 space-y-2.5 shadow-inner-soft">
+            <span class="text-slate-800 dark:text-slate-200 text-sm font-bold block">格子內部標記文字:</span>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button id="btnTextPaletteId" class="btn-text-mode px-2 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-center shadow-md shadow-indigo-500/30 text-xs lg:text-sm">顏色編號</button>
+              <button id="btnTextCoords" class="btn-text-mode px-2 py-1.5 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium border border-slate-200 dark:border-slate-700 text-center shadow-sm text-xs lg:text-sm">座標 (X,Y)</button>
+              <button id="btnTextNone" class="btn-text-mode px-2 py-1.5 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium border border-slate-200 dark:border-slate-700 text-center shadow-sm text-xs lg:text-sm">隱藏文字</button>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 pt-0.5">※ 自動計算黑/白高對比清晰文字</p>
+          </div>
+
+          <div class="space-y-2 pt-1 font-medium bg-white dark:bg-transparent p-3 rounded-xl border border-slate-100 dark:border-transparent">
+            <label class="flex items-center justify-between text-slate-700 dark:text-slate-300 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+              <span>顯示四周座標標尺 (Rulers)</span>
+              <input type="checkbox" id="chkShowRulers" checked class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+            </label>
+            <label class="flex items-center justify-between text-slate-700 dark:text-slate-300 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+              <span>顯示網格格線 (Grid Lines)</span>
+              <input type="checkbox" id="chkShowGrid" checked class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+            </label>
+            <div class="flex items-center justify-between text-slate-700 dark:text-slate-300 pt-1">
+              <span>粗主格線強調 (間隔):</span>
+              <select id="selectMajorLines" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1 text-sm text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer">
+                <option value="5">每 5 格 (拼豆/十字繡)</option>
+                <option value="10" selected>每 10 格 (標準棋盤)</option>
+                <option value="0">無強調線</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 重算按鈕 -->
+      <div class="p-4 border-t border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/90 mt-auto shrink-0 z-10 backdrop-blur">
+        <button id="btnRegenerate" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          重新運算網格 (保留當前色盤)
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- 中間主要畫布視窗 -->
+    <div class="flex-1 flex flex-col relative bg-checker overflow-hidden h-full shadow-inner" id="canvasContainer">
+      <!-- 畫布頂部懸浮狀態與視角工具列 -->
+      <div class="absolute top-4 left-5 right-5 z-10 flex items-center justify-between pointer-events-none">
+        <div id="hoverCard" class="pointer-events-auto bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2 shadow-lg flex items-center gap-4 text-sm transition-opacity duration-150">
+          <div class="flex items-center gap-2 font-mono">
+            <span class="text-slate-500 dark:text-slate-400 font-medium">座標:</span>
+            <span id="hoverCoords" class="text-slate-900 dark:text-white font-bold">-- , --</span>
+          </div>
+          <div class="w-px h-5 bg-slate-200 dark:bg-slate-700"></div>
+          <div class="flex items-center gap-2.5">
+            <div id="hoverSwatch" class="w-5 h-5 rounded-md border-2 border-white dark:border-slate-800 shadow bg-transparent"></div>
+            <span id="hoverColorId" class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">#--</span>
+            <span id="hoverColorHex" class="font-mono text-slate-500 dark:text-slate-400 text-xs font-semibold">#------</span>
+          </div>
+        </div>
+
+        <div class="pointer-events-auto flex items-center gap-1 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-1.5 rounded-2xl shadow-lg">
+          <button id="btnZoomOut" class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition-colors" title="縮小 (滾輪向下)">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"></path></svg>
+          </button>
+          <span id="labelZoomPct" class="font-mono text-sm px-2 text-slate-800 dark:text-slate-200 font-bold min-w-[56px] text-center">100%</span>
+          <button id="btnZoomIn" class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition-colors" title="放大 (滾輪向上)">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+          </button>
+          <div class="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+          <button id="btnZoomFit" class="px-3 h-8 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold transition-colors" title="自動適配視窗大小">適應螢幕</button>
+          <button id="btnZoom100" class="px-3 h-8 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold transition-colors" title="重設為 100%">1:1</button>
+        </div>
+      </div>
+
+      <canvas id="mainCanvas" class="w-full h-full block cursor-grab-canvas"></canvas>
+
+      <div class="absolute bottom-4 left-5 pointer-events-none text-xs text-slate-700 dark:text-slate-300 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-2.5 shadow-md font-bold">
+        <span>🖱️ 拖曳平移</span>
+        <span class="text-slate-300 dark:text-slate-600">·</span>
+        <span>🔍 滾輪縮放</span>
+        <span class="text-slate-300 dark:text-slate-600">·</span>
+        <span id="canvasModeHint" class="text-indigo-600 dark:text-indigo-400">🎯 點擊格子聚焦/高亮顏色</span>
+      </div>
+    </div>
+
+    <!-- 右側調色盤側邊欄 -->
+    <aside id="paletteSidebar" class="w-[420px] border-l border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 flex flex-col shrink-0 z-20 h-full max-h-full overflow-hidden shadow-[-4px_0_24px_rgba(0,0,0,0.02)]">
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 shrink-0 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block animate-pulse shadow-sm"></span>
+            <div>
+              <h2 class="text-sm font-bold text-slate-900 dark:text-slate-200">調色盤管理 (即時連動)</h2>
+              <p id="paletteCountSubtitle" class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">共 16 色 · 編輯色塊即時換色</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="btnScrollTop" title="快速滾動至頂部" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-95 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg transition-colors">
+              ▲ 置頂
+            </button>
+            <button id="btnScrollBottom" title="快速滾動至底部" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-95 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg transition-colors">
+              ▼ 置底
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
+            <span>提取色彩數量：</span>
+            <span id="paletteModeBadge" class="text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/40 px-2 py-0.5 rounded-md">16 色</span>
+          </div>
+          <select id="selectColorCount" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-200 font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm cursor-pointer" title="設定後將自動從目前圖片重新提取指定數量的代表色">
+            <option value="4">4 色</option>
+            <option value="8">8 色</option>
+            <option value="16" selected>16 色</option>
+            <option value="24">24 色</option>
+            <option value="32">32 色</option>
+            <option value="48">48 色</option>
+            <option value="custom">✏️ 自訂數量...</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mt-1">
+          <button id="btnAddColor" class="px-2 py-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:hover:bg-emerald-800/40 active:scale-95 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/60 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm">
+            <span>➕</span> 新增色票
+          </button>
+          <button id="btnRequantize" class="px-2 py-2 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/30 dark:hover:bg-amber-800/40 active:scale-95 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-700/60 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm" title="依當前調色盤色彩重新對原圖進行距離匹配 (取消直接替換效果，按原圖重新分配)">
+            <span>🎯</span> 重新匹配原圖
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between text-sm bg-slate-50 dark:bg-slate-950/50 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner-soft mt-1">
+          <div>
+            <span class="text-slate-800 dark:text-slate-200 font-bold block">重新匹配時抖色 (Dither)</span>
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Floyd-Steinberg 演算法</span>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="chkDither" class="sr-only peer">
+            <div class="w-10 h-5 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+          </label>
+        </div>
+
+        <div id="clearHighlightRow" class="hidden flex items-center justify-between bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 px-3 py-2 rounded-xl shadow-sm">
+          <span class="text-xs text-amber-800 dark:text-amber-300 font-bold flex items-center gap-1.5 truncate">
+            <span class="text-base">🎯</span> <span id="highlightInfoText">已聚焦顏色 #1</span>
+          </span>
+          <button id="btnClearHighlight" class="text-xs bg-amber-200 hover:bg-amber-300 dark:bg-amber-500/30 dark:hover:bg-amber-500/50 text-amber-900 dark:text-amber-100 px-2.5 py-1 rounded-lg font-bold transition-colors shrink-0">
+            ✕ 清除聚焦
+          </button>
+        </div>
+      </div>
+
+      <div class="relative flex-1 min-h-0 h-0 w-full overflow-hidden bg-slate-50/50 dark:bg-slate-900/50" style="flex: 1 1 0%;">
+        <div id="paletteList" class="absolute inset-0 overflow-y-scroll overflow-x-hidden p-3 space-y-2 palette-scroll-container"></div>
+      </div>
+
+      <div class="p-4 border-t border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 shrink-0 text-sm text-slate-600 dark:text-slate-400 flex items-center justify-between font-mono font-medium shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+        <span>總像素數: <strong id="totalPixelsLabel" class="text-slate-900 dark:text-slate-200 text-base">1024</strong></span>
+        <span>使用色數: <strong id="uniqueColorCountLabel" class="text-indigo-600 dark:text-indigo-400 text-base">16 / 16</strong></span>
+      </div>
+    </aside>
+
+  </main>
+
+  <div id="toastContainer" class="fixed bottom-6 right-6 flex flex-col gap-3 z-50 pointer-events-none"></div>
+
+  <script>
+    const state = {
+      isDark: false, sourceImage: null, gridWidth: 32, gridHeight: 32, samplingMode: 'bilinear', enableDither: false,
+      zoom: 1.0, panX: 0, panY: 0, isDraggingCanvas: false, dragStartX: 0, dragStartY: 0, dragInitialPanX: 0, dragInitialPanY: 0,
+      currentTool: 'inspect', brushColorIndex: 0, isPainting: false,
+      showRulers: true, showGrid: true, majorLineStep: 10, textMode: 'id',
+      colorCount: 16, palette: [], rawDownsampledPixels: [], quantizedMatrix: [],
+      selectedColorIndex: null, hoveredCell: null, rulerSize: 32,
+    };
+
+    const canvas = document.getElementById('mainCanvas'), ctx = canvas.getContext('2d');
+    const canvasContainer = document.getElementById('canvasContainer'), paletteList = document.getElementById('paletteList');
+    const selectResolution = document.getElementById('selectResolution'); 
+    const selectColorCount = document.getElementById('selectColorCount');
+
+    function hexToRgb(hex) {
+      let clean = hex.replace('#', '').trim();
+      if (clean.length === 3) clean = clean.split('').map(c => c + c).join('');
+      const num = parseInt(clean, 16);
+      if (isNaN(num)) return { r: 0, g: 0, b: 0 };
+      return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+    }
+    function rgbToHex(r, g, b) { return '#' + [r, g, b].map(x => { const h = Math.min(255, Math.max(0, Math.round(x))).toString(16); return h.length === 1 ? '0' + h : h; }).join('').toUpperCase(); }
+    function colorDistanceSq(r1, g1, b1, r2, g2, b2) { const rmean = (r1 + r2) / 2, dr = r1 - r2, dg = g1 - g2, db = b1 - b2; return (2 + rmean / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rmean) / 256) * db * db; }
+    function findClosestColorIndex(r, g, b, palette) {
+      let minDist = Infinity, closestIdx = 0;
+      for (let i = 0; i < palette.length; i++) {
+        const dist = colorDistanceSq(r, g, b, palette[i].r, palette[i].g, palette[i].b);
+        if (dist < minDist) { minDist = dist; closestIdx = i; }
+      }
+      return closestIdx;
+    }
+    function buildPaletteFromHexList(hexList) { return hexList.map((hex, idx) => { const { r, g, b } = hexToRgb(hex); return { id: idx + 1, hex: hex.toUpperCase(), r, g, b, count: 0, pct: '0%' }; }); }
+
+    const btnToggleTheme = document.getElementById('btnToggleTheme'), themeIcon = document.getElementById('themeIcon'), themeLabel = document.getElementById('themeLabel');
+    function applyTheme(isDark) {
+      state.isDark = isDark;
+      if (isDark) { document.documentElement.classList.add('dark'); themeIcon.textContent = '🌙'; themeLabel.textContent = '深色模式'; } 
+      else { document.documentElement.classList.remove('dark'); themeIcon.textContent = '☀️'; themeLabel.textContent = '亮色模式'; }
+      requestAnimationFrame(renderCanvas);
+    }
+    btnToggleTheme.addEventListener('click', () => { applyTheme(!state.isDark); showToast(state.isDark ? '已切換為深色模式' : '已切換為清晰亮色模式', 'info'); });
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer'), toast = document.createElement('div');
+      toast.className = `badge-pop pointer-events-auto px-4 py-2.5 rounded-xl text-sm font-bold shadow-xl border flex items-center gap-2.5 ${ type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : type === 'warning' ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-white text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700' }`;
+      toast.innerHTML = `<span class="font-extrabold text-lg leading-none">${type === 'success' ? '✓' : type === 'warning' ? '⚠' : 'ℹ'}</span><span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(10px) scale(0.95)'; toast.style.transition = 'all 0.3s ease-in'; setTimeout(() => toast.remove(), 300); }, 2500);
+    }
+
+    function downsampleImageToGrid() {
+      if (!state.sourceImage) return;
+      const w = state.gridWidth, h = state.gridHeight, offCanvas = document.createElement('canvas');
+      offCanvas.width = w; offCanvas.height = h;
+      const offCtx = offCanvas.getContext('2d', { willReadFrequently: true });
+      offCtx.imageSmoothingEnabled = (state.samplingMode === 'bilinear');
+      if (offCtx.imageSmoothingEnabled) offCtx.imageSmoothingQuality = 'high';
+      offCtx.fillStyle = '#FFFFFF'; offCtx.fillRect(0, 0, w, h); offCtx.drawImage(state.sourceImage, 0, 0, w, h);
+      const data = offCtx.getImageData(0, 0, w, h).data, raw = [];
+      for (let y = 0; y < h; y++) {
+        const row = [];
+        for (let x = 0; x < w; x++) { const idx = (y * w + x) * 4; row.push([data[idx], data[idx + 1], data[idx + 2]]); }
+        raw.push(row);
+      }
+      state.rawDownsampledPixels = raw;
+    }
+
+    function remapPixelsToPalette() {
+      if (!state.rawDownsampledPixels.length || !state.palette.length) return;
+      const w = state.gridWidth, h = state.gridHeight, totalPixels = w * h;
+      state.palette.forEach(p => p.count = 0);
+      const currentPixels = state.rawDownsampledPixels.map(row => row.map(rgb => [rgb[0], rgb[1], rgb[2]])), matrix = Array.from({ length: h }, () => new Array(w).fill(0));
+
+      if (state.enableDither) {
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            const oldR = Math.min(255, Math.max(0, currentPixels[y][x][0])), oldG = Math.min(255, Math.max(0, currentPixels[y][x][1])), oldB = Math.min(255, Math.max(0, currentPixels[y][x][2]));
+            const colorIdx = findClosestColorIndex(oldR, oldG, oldB, state.palette);
+            matrix[y][x] = colorIdx; state.palette[colorIdx].count++;
+            const target = state.palette[colorIdx], errR = oldR - target.r, errG = oldG - target.g, errB = oldB - target.b;
+            if (x + 1 < w) { currentPixels[y][x + 1][0] += (errR * 7) / 16; currentPixels[y][x + 1][1] += (errG * 7) / 16; currentPixels[y][x + 1][2] += (errB * 7) / 16; }
+            if (x - 1 >= 0 && y + 1 < h) { currentPixels[y + 1][x - 1][0] += (errR * 3) / 16; currentPixels[y + 1][x - 1][1] += (errG * 3) / 16; currentPixels[y + 1][x - 1][2] += (errB * 3) / 16; }
+            if (y + 1 < h) { currentPixels[y + 1][x][0] += (errR * 5) / 16; currentPixels[y + 1][x][1] += (errG * 5) / 16; currentPixels[y + 1][x][2] += (errB * 5) / 16; }
+            if (x + 1 < w && y + 1 < h) { currentPixels[y + 1][x + 1][0] += (errR * 1) / 16; currentPixels[y + 1][x + 1][1] += (errG * 1) / 16; currentPixels[y + 1][x + 1][2] += (errB * 1) / 16; }
+          }
+        }
+      } else {
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            const [r, g, b] = currentPixels[y][x], colorIdx = findClosestColorIndex(r, g, b, state.palette);
+            matrix[y][x] = colorIdx; state.palette[colorIdx].count++;
+          }
+        }
+      }
+      state.palette.forEach(p => p.pct = ((p.count / totalPixels) * 100).toFixed(1) + '%');
+      state.quantizedMatrix = matrix;
+      updateUIHeader(); renderPaletteList(); requestAnimationFrame(renderCanvas);
+    }
+
+    function processImageWithCurrentPalette() { 
+      downsampleImageToGrid(); 
+      remapPixelsToPalette(); 
+    }
+    
+    function processImageAndExtractNewPalette() { 
+      downsampleImageToGrid(); 
+      extractColorsFromImageMedianCut(state.colorCount); 
+    }
+
+    function extractColorsFromImageMedianCut(k = 16) {
+      if (!state.rawDownsampledPixels.length) return;
+      const flatPixels = []; state.rawDownsampledPixels.forEach(row => row.forEach(p => flatPixels.push([p[0], p[1], p[2]])));
+      class Box {
+        constructor(pixels) {
+          this.pixels = pixels; this.rMin = 255; this.rMax = 0; this.gMin = 255; this.gMax = 0; this.bMin = 255; this.bMax = 0;
+          for (let i = 0; i < pixels.length; i++) {
+            const p = pixels[i];
+            if (p[0] < this.rMin) this.rMin = p[0]; if (p[0] > this.rMax) this.rMax = p[0];
+            if (p[1] < this.gMin) this.gMin = p[1]; if (p[1] > this.gMax) this.gMax = p[1];
+            if (p[2] < this.bMin) this.bMin = p[2]; if (p[2] > this.bMax) this.bMax = p[2];
+          }
+        }
+        get spread() { return Math.max(this.rMax - this.rMin, this.gMax - this.gMin, this.bMax - this.bMin); }
+        get mainChannel() {
+          const rRange = this.rMax - this.rMin, gRange = this.gMax - this.gMin, bRange = this.bMax - this.bMin;
+          if (rRange >= gRange && rRange >= bRange) return 0; if (gRange >= rRange && gRange >= bRange) return 1; return 2;
+        }
+        split() {
+          if (this.pixels.length <= 1) return [this];
+          const ch = this.mainChannel; this.pixels.sort((a, b) => a[ch] - b[ch]);
+          const mid = Math.floor(this.pixels.length / 2);
+          return [new Box(this.pixels.slice(0, mid)), new Box(this.pixels.slice(mid))];
+        }
+        average() {
+          let r = 0, g = 0, b = 0;
+          for (let i = 0; i < this.pixels.length; i++) { r += this.pixels[i][0]; g += this.pixels[i][1]; b += this.pixels[i][2]; }
+          const n = this.pixels.length || 1; return [Math.round(r / n), Math.round(g / n), Math.round(b / n)];
+        }
+      }
+      let boxes = [new Box(flatPixels)];
+      while (boxes.length < k) {
+        let bestIdx = -1, maxSpread = -1;
+        for (let i = 0; i < boxes.length; i++) { if (boxes[i].pixels.length > 1 && boxes[i].spread > maxSpread) { maxSpread = boxes[i].spread; bestIdx = i; } }
+        if (bestIdx === -1 || maxSpread === 0) break;
+        const target = boxes.splice(bestIdx, 1)[0], [b1, b2] = target.split();
+        boxes.push(b1); if (b2) boxes.push(b2);
+      }
+      const hexList = boxes.map(b => { const [r, g, b_val] = b.average(); return rgbToHex(r, g, b_val); });
+      state.palette = buildPaletteFromHexList(hexList); remapPixelsToPalette();
+      showToast(`已從圖像成功提取 ${state.palette.length} 種代表色彩！`, 'success');
+    }
+
+    function updateUIHeader() {
+      document.getElementById('headerGridInfo').textContent = `${state.gridWidth} × ${state.gridHeight}`;
+      document.getElementById('headerColorInfo').textContent = `${state.palette.length} 色`;
+      document.getElementById('totalPixelsLabel').textContent = `${state.gridWidth * state.gridHeight}`;
+      document.getElementById('uniqueColorCountLabel').textContent = `${state.palette.filter(p => p.count > 0).length} / ${state.palette.length}`;
+      document.getElementById('paletteCountSubtitle').textContent = `共 ${state.palette.length} 色 · 編輯色塊即時換色`;
+      document.getElementById('labelZoomPct').textContent = `${Math.round(state.zoom * 100)}%`;
+      
+      const clearRow = document.getElementById('clearHighlightRow');
+      if (state.selectedColorIndex !== null && state.palette[state.selectedColorIndex]) {
+        clearRow.classList.remove('hidden'); document.getElementById('highlightInfoText').textContent = `已聚焦色彩 #${state.palette[state.selectedColorIndex].id} (${state.palette[state.selectedColorIndex].hex})`;
+      } else { clearRow.classList.add('hidden'); }
+    }
+
+    function renderPaletteList() {
+      paletteList.innerHTML = '';
+      state.palette.forEach((p, idx) => {
+        const isSelected = (state.selectedColorIndex === idx), isCurrentBrush = (state.currentTool === 'brush' && state.brushColorIndex === idx);
+        const card = document.createElement('div');
+        card.id = `palette-item-${idx}`;
+        card.className = `group flex items-center justify-between p-3 rounded-2xl border text-sm transition-all shadow-sm ${ isSelected ? 'bg-indigo-50/95 dark:bg-indigo-900/60 border-indigo-400 dark:border-indigo-500 shadow-md ring-2 ring-indigo-400 dark:ring-indigo-500' : isCurrentBrush ? 'bg-emerald-50/95 dark:bg-emerald-900/60 border-emerald-400 dark:border-emerald-500 ring-2 ring-emerald-400 dark:ring-emerald-500' : 'bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800/80 border-slate-200 dark:border-slate-700' }`;
+        
+        const lum = (0.299 * p.r + 0.587 * p.g + 0.114 * p.b), textOnColor = lum > 130 ? '#0f172a' : '#ffffff';
+        const leftWrap = document.createElement('div'); leftWrap.className = 'flex items-center gap-3 flex-1 min-w-0';
+        
+        const swatchWrap = document.createElement('div');
+        swatchWrap.id = `palette-swatch-${idx}`;
+        swatchWrap.className = 'relative w-9 h-9 rounded-xl shadow-sm border border-black/10 dark:border-white/10 flex items-center justify-center font-mono font-bold text-sm shrink-0 cursor-pointer overflow-hidden transition-transform active:scale-90 hover:scale-105';
+        swatchWrap.style.backgroundColor = p.hex; swatchWrap.style.color = textOnColor; 
+        swatchWrap.title = '點擊叫出選色器 (即時替換棋盤上該編號的色彩)';
+        const idLabel = document.createElement('span'); idLabel.textContent = p.id; idLabel.className = 'pointer-events-none z-10 text-[15px]';
+        
+        const colorInput = document.createElement('input'); 
+        colorInput.type = 'color'; 
+        colorInput.value = p.hex.length === 7 ? p.hex : '#000000'; 
+        colorInput.className = 'absolute inset-0 opacity-0 cursor-pointer w-full h-full';
+        colorInput.addEventListener('input', (e) => updatePaletteColorDirectly(idx, e.target.value.toUpperCase()));
+        
+        swatchWrap.appendChild(idLabel); 
+        swatchWrap.appendChild(colorInput);
+        
+        const infoWrap = document.createElement('div'); infoWrap.className = 'flex flex-col min-w-0 flex-1 pr-2';
+        const hexRow = document.createElement('div'); hexRow.className = 'flex items-center gap-1.5 mb-0.5';
+        
+        const hexInput = document.createElement('input'); 
+        hexInput.type = 'text'; 
+        hexInput.id = `palette-hex-${idx}`; 
+        hexInput.value = p.hex; 
+        hexInput.maxLength = 7;
+        hexInput.title = '手動輸入 HEX 色碼 (即時替換棋盤上該編號的色彩)';
+        hexInput.className = 'w-[4.5rem] px-1.5 py-1 font-mono text-xs font-bold text-slate-800 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:border-indigo-500 focus:outline-none uppercase transition-colors';
+        hexInput.addEventListener('change', (e) => {
+          let val = e.target.value.trim(); if (!val.startsWith('#')) val = '#' + val;
+          if (/^#[0-9A-Fa-f]{6}$/.test(val)) updatePaletteColorDirectly(idx, val.toUpperCase());
+          else { e.target.value = p.hex; showToast('無效的 HEX 色碼格式', 'warning'); }
+        });
+        hexInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') hexInput.blur(); });
+        
+        const pickerBtn = document.createElement('button');
+        pickerBtn.className = 'w-6 h-6 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-indigo-100 dark:bg-slate-800 dark:hover:bg-indigo-900/50 text-slate-400 hover:text-indigo-600 dark:text-slate-500 dark:hover:text-indigo-400 transition-colors cursor-pointer shrink-0 border border-transparent hover:border-indigo-200 dark:hover:border-indigo-700';
+        pickerBtn.title = '開啟視覺化選色器 (即時替換棋盤上該編號的色彩)';
+        pickerBtn.innerHTML = `
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 2l7.5 7.5"></path>
+            <path d="M22 9.5l-6.5 6.5"></path>
+            <path d="M15.5 16l-8 8H2v-5.5l8-8"></path>
+            <path d="M7.5 8.5l7.5-7.5"></path>
+            <path d="M10 12l2 2"></path>
+          </svg>
+        `;
+        pickerBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          colorInput.click();
+        });
+
+        hexRow.appendChild(hexInput);
+        hexRow.appendChild(pickerBtn); 
+
+        const rgbSub = document.createElement('div'); rgbSub.id = `palette-rgb-${idx}`; rgbSub.className = 'text-xs text-slate-500 dark:text-slate-400 font-mono truncate tracking-tight font-medium'; rgbSub.textContent = `rgb(${p.r},${p.g},${p.b})`;
+        infoWrap.appendChild(hexRow); infoWrap.appendChild(rgbSub); leftWrap.appendChild(swatchWrap); leftWrap.appendChild(infoWrap);
+        
+        const rightWrap = document.createElement('div'); rightWrap.className = 'flex items-center gap-2 shrink-0';
+        const badgeBtn = document.createElement('button'); badgeBtn.className = 'text-right font-mono px-2 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer'; badgeBtn.title = state.currentTool === 'brush' ? '點擊設為當前塗色筆刷' : '點擊聚焦/高亮畫布對應格位';
+        badgeBtn.innerHTML = `<span class="text-slate-900 dark:text-slate-100 font-bold block text-sm leading-tight">${p.count} <span class="text-[10px] text-slate-500 font-normal">px</span></span><span class="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold block leading-tight mt-0.5">${p.pct}</span>`;
+        badgeBtn.addEventListener('click', (e) => { e.stopPropagation(); handlePaletteItemClick(idx); });
+        
+        const btnDelete = document.createElement('button'); btnDelete.className = 'p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors'; btnDelete.title = '刪除此顏色 (棋盤內對應格位將轉移至最相近色)';
+        btnDelete.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>`;
+        if (state.palette.length <= 1) { btnDelete.disabled = true; btnDelete.classList.add('opacity-30', 'cursor-not-allowed'); } else { btnDelete.addEventListener('click', (e) => { e.stopPropagation(); deletePaletteColor(idx); }); }
+        
+        rightWrap.appendChild(badgeBtn); rightWrap.appendChild(btnDelete); card.appendChild(leftWrap); card.appendChild(rightWrap);
+        card.addEventListener('click', (e) => { if (e.target !== hexInput && e.target !== colorInput && e.target !== pickerBtn && !pickerBtn.contains(e.target) && !btnDelete.contains(e.target)) handlePaletteItemClick(idx); });
+        paletteList.appendChild(card);
+      });
+    }
+
+    function updatePaletteColorDirectly(idx, newHex) {
+      if (!state.palette[idx]) return;
+      const { r, g, b } = hexToRgb(newHex);
+      state.palette[idx].hex = newHex; state.palette[idx].r = r; state.palette[idx].g = g; state.palette[idx].b = b;
+      document.getElementById('paletteModeBadge').textContent = '自訂編輯';
+      const swatch = document.getElementById(`palette-swatch-${idx}`);
+      if (swatch) {
+        swatch.style.backgroundColor = newHex; swatch.style.color = (0.299 * r + 0.587 * g + 0.114 * b) > 130 ? '#0f172a' : '#ffffff';
+        const colorInp = swatch.querySelector('input[type="color"]'); if (colorInp && colorInp.value !== newHex) colorInp.value = newHex;
+      }
+      const hexInp = document.getElementById(`palette-hex-${idx}`); if (hexInp && hexInp.value !== newHex) hexInp.value = newHex;
+      const rgbSub = document.getElementById(`palette-rgb-${idx}`); if (rgbSub) rgbSub.textContent = `rgb(${r},${g},${b})`;
+      requestAnimationFrame(renderCanvas);
+    }
+
+    function deletePaletteColor(idx) {
+      if (state.palette.length <= 1) { showToast('至少需保留 1 種調色盤顏色', 'warning'); return; }
+      const removed = state.palette[idx], remainingCandidates = state.palette.map((p, i) => ({ index: i, ...p })).filter(p => p.index !== idx);
+      let fallbackIdx = remainingCandidates[0].index, minDistance = Infinity;
+      remainingCandidates.forEach(cand => {
+        const d = colorDistanceSq(removed.r, removed.g, removed.b, cand.r, cand.g, cand.b);
+        if (d < minDistance) { minDistance = d; fallbackIdx = cand.index; }
+      });
+      for (let y = 0; y < state.gridHeight; y++) { for (let x = 0; x < state.gridWidth; x++) { if (state.quantizedMatrix[y][x] === idx) state.quantizedMatrix[y][x] = fallbackIdx; } }
+      state.palette.splice(idx, 1);
+      for (let y = 0; y < state.gridHeight; y++) { for (let x = 0; x < state.gridWidth; x++) { if (state.quantizedMatrix[y][x] > idx) state.quantizedMatrix[y][x]--; } }
+      state.palette.forEach((p, i) => p.id = i + 1); recalculatePaletteCountsFromMatrix();
+      if (state.selectedColorIndex === idx) state.selectedColorIndex = null; else if (state.selectedColorIndex > idx) state.selectedColorIndex--;
+      if (state.brushColorIndex === idx) state.brushColorIndex = 0; else if (state.brushColorIndex > idx) state.brushColorIndex--;
+      document.getElementById('paletteModeBadge').textContent = '自訂編輯';
+      updateUIHeader(); renderPaletteList(); requestAnimationFrame(renderCanvas);
+      showToast(`已刪除顏色 #${removed.id}，棋盤格位已無縫轉移`, 'info');
+    }
+
+    function addNewColorToPalette(hex = '#3B82F6') {
+      const { r, g, b } = hexToRgb(hex), newColor = { id: state.palette.length + 1, hex: hex.toUpperCase(), r, g, b, count: 0, pct: '0%' };
+      state.palette.push(newColor); 
+      document.getElementById('paletteModeBadge').textContent = '自訂編輯';
+      updateUIHeader(); renderPaletteList(); setTimeout(() => paletteList.scrollTo({ top: paletteList.scrollHeight, behavior: 'smooth' }), 50);
+      showToast(`已新增顏色 #${newColor.id} (${newColor.hex})`, 'success');
+    }
+
+    function recalculatePaletteCountsFromMatrix() {
+      const totalPixels = state.gridWidth * state.gridHeight; state.palette.forEach(p => p.count = 0);
+      for (let y = 0; y < state.gridHeight; y++) { for (let x = 0; x < state.gridWidth; x++) { const idx = state.quantizedMatrix[y][x]; if (state.palette[idx]) state.palette[idx].count++; } }
+      state.palette.forEach(p => p.pct = ((p.count / totalPixels) * 100).toFixed(1) + '%');
+    }
+
+    function handlePaletteItemClick(idx) {
+      if (state.currentTool === 'brush') { state.brushColorIndex = idx; showToast(`已切換筆刷色為 #${state.palette[idx].id} (${state.palette[idx].hex})`); renderPaletteList(); } 
+      else toggleColorFocus(idx);
+    }
+    function toggleColorFocus(idx) {
+      if (state.selectedColorIndex === idx) { state.selectedColorIndex = null; showToast('已取消顏色聚焦'); } 
+      else { state.selectedColorIndex = idx; showToast(`已聚焦色彩 #${state.palette[idx].id} (${state.palette[idx].hex}) - 共 ${state.palette[idx].count} 格`); }
+      updateUIHeader(); renderPaletteList(); requestAnimationFrame(renderCanvas);
+    }
+
+    function renderCanvas() {
+      const rect = canvasContainer.getBoundingClientRect();
+      if (canvas.width !== Math.round(rect.width) || canvas.height !== Math.round(rect.height)) { canvas.width = Math.round(rect.width); canvas.height = Math.round(rect.height); }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!state.quantizedMatrix.length || !state.palette.length) {
+        ctx.fillStyle = state.isDark ? '#94a3b8' : '#64748b'; ctx.font = '600 16px "Noto Sans TC", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('請載入圖片以開始生成像素棋盤', canvas.width / 2, canvas.height / 2); return;
+      }
+      const gw = state.gridWidth, gh = state.gridHeight, rulerOffset = state.showRulers ? state.rulerSize : 0;
+      const baseCellSize = 18, cellSize = baseCellSize * state.zoom, boardWidth = gw * cellSize, boardHeight = gh * cellSize;
+      ctx.save(); ctx.translate(state.panX, state.panY);
+
+      for (let y = 0; y < gh; y++) {
+        for (let x = 0; x < gw; x++) {
+          const colorIdx = state.quantizedMatrix[y][x], colorObj = state.palette[colorIdx] || state.palette[0];
+          const px = rulerOffset + x * cellSize, py = rulerOffset + y * cellSize, isHighlightActive = (state.selectedColorIndex !== null), isThisColorSelected = (state.selectedColorIndex === colorIdx);
+          if (isHighlightActive && !isThisColorSelected) { ctx.fillStyle = colorObj.hex; ctx.globalAlpha = 0.12; ctx.fillRect(px, py, cellSize, cellSize); ctx.globalAlpha = 1.0; } 
+          else {
+            ctx.fillStyle = colorObj.hex; ctx.fillRect(px, py, cellSize, cellSize);
+            if (isHighlightActive && isThisColorSelected) { ctx.lineWidth = Math.max(2, cellSize * 0.1); ctx.strokeStyle = '#4f46e5'; ctx.strokeRect(px + 0.5, py + 0.5, cellSize - 1, cellSize - 1); }
+          }
+          if (cellSize >= 14 && state.textMode !== 'none') {
+            const lum = (0.299 * colorObj.r + 0.587 * colorObj.g + 0.114 * colorObj.b); ctx.fillStyle = lum > 130 ? '#0f172a' : '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            let textToDraw = '', fontSize = Math.min(14, Math.max(10, Math.floor(cellSize * 0.44)));
+            if (state.textMode === 'id') textToDraw = `${colorObj.id}`; else if (state.textMode === 'coords') { fontSize = Math.min(10, Math.max(8, Math.floor(cellSize * 0.32))); textToDraw = `${x + 1},${y + 1}`; }
+            ctx.font = `700 ${fontSize}px "Fira Code", monospace`; ctx.fillText(textToDraw, px + cellSize / 2, py + cellSize / 2);
+          }
+        }
+      }
+
+      if (state.showGrid && cellSize >= 4) {
+        ctx.beginPath(); ctx.strokeStyle = state.isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(15, 23, 42, 0.15)'; ctx.lineWidth = 1;
+        for (let x = 0; x <= gw; x++) { const px = rulerOffset + x * cellSize; ctx.moveTo(px, rulerOffset); ctx.lineTo(px, rulerOffset + boardHeight); }
+        for (let y = 0; y <= gh; y++) { const py = rulerOffset + y * cellSize; ctx.moveTo(rulerOffset, py); ctx.lineTo(rulerOffset + boardWidth, py); }
+        ctx.stroke();
+        if (state.majorLineStep > 0) {
+          ctx.beginPath(); ctx.strokeStyle = state.isDark ? 'rgba(129, 140, 248, 0.85)' : 'rgba(79, 70, 229, 0.8)'; ctx.lineWidth = 2;
+          for (let x = 0; x <= gw; x += state.majorLineStep) { const px = rulerOffset + x * cellSize; ctx.moveTo(px, rulerOffset); ctx.lineTo(px, rulerOffset + boardHeight); }
+          for (let y = 0; y <= gh; y += state.majorLineStep) { const py = rulerOffset + y * cellSize; ctx.moveTo(rulerOffset, py); ctx.lineTo(rulerOffset + boardWidth, py); }
+          ctx.stroke();
+        }
+      }
+
+      if (state.hoveredCell) {
+        const { x, y } = state.hoveredCell;
+        if (x >= 0 && x < gw && y >= 0 && y < gh) { const px = rulerOffset + x * cellSize, py = rulerOffset + y * cellSize; ctx.lineWidth = 2.5; ctx.strokeStyle = state.currentTool === 'brush' ? '#10b981' : '#f59e0b'; ctx.strokeRect(px + 1, py + 1, cellSize - 2, cellSize - 2); }
+      }
+
+      if (state.showRulers) {
+        ctx.fillStyle = state.isDark ? '#0f172a' : '#f8fafc'; ctx.fillRect(rulerOffset, 0, boardWidth, rulerOffset); ctx.fillRect(0, rulerOffset, rulerOffset, boardHeight);
+        ctx.fillStyle = state.isDark ? '#1e293b' : '#f1f5f9'; ctx.fillRect(0, 0, rulerOffset, rulerOffset);
+        ctx.strokeStyle = state.isDark ? '#334155' : '#cbd5e1'; ctx.lineWidth = 1; ctx.strokeRect(0, 0, rulerOffset + boardWidth, rulerOffset + boardHeight);
+        ctx.font = '600 11px "Fira Code", monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        for (let x = 0; x < gw; x++) {
+          const px = rulerOffset + x * cellSize + cellSize / 2, num = x + 1, isMajor = (state.majorLineStep > 0 && num % state.majorLineStep === 0);
+          ctx.fillStyle = isMajor ? (state.isDark ? '#818cf8' : '#4f46e5') : (state.isDark ? '#94a3b8' : '#475569');
+          if (cellSize >= 16 || isMajor || num === 1 || num === gw) ctx.fillText(num, px, rulerOffset / 2);
+        }
+        for (let y = 0; y < gh; y++) {
+          const py = rulerOffset + y * cellSize + cellSize / 2, num = y + 1, isMajor = (state.majorLineStep > 0 && num % state.majorLineStep === 0);
+          ctx.fillStyle = isMajor ? (state.isDark ? '#818cf8' : '#4f46e5') : (state.isDark ? '#94a3b8' : '#475569');
+          if (cellSize >= 16 || isMajor || num === 1 || num === gh) ctx.fillText(num, rulerOffset / 2, py);
+        }
+      }
+      ctx.restore();
+    }
+
+    function screenToGridCoords(screenX, screenY) {
+      const rulerOffset = state.showRulers ? state.rulerSize : 0, cellSize = 18 * state.zoom, boardX = screenX - state.panX - rulerOffset, boardY = screenY - state.panY - rulerOffset;
+      if (boardX < 0 || boardY < 0) return null;
+      const cellX = Math.floor(boardX / cellSize), cellY = Math.floor(boardY / cellSize);
+      if (cellX >= 0 && cellX < state.gridWidth && cellY >= 0 && cellY < state.gridHeight) return { x: cellX, y: cellY };
+      return null;
+    }
+
+    function paintCellAt(cellX, cellY) {
+      if (!state.quantizedMatrix.length || !state.palette[state.brushColorIndex]) return;
+      if (cellX >= 0 && cellX < state.gridWidth && cellY >= 0 && cellY < state.gridHeight) {
+        if (state.quantizedMatrix[cellY][cellX] !== state.brushColorIndex) { state.quantizedMatrix[cellY][cellX] = state.brushColorIndex; recalculatePaletteCountsFromMatrix(); updateUIHeader(); renderPaletteList(); requestAnimationFrame(renderCanvas); }
+      }
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      if (e.button === 0) {
+        if (state.currentTool === 'brush') { state.isPainting = true; const rect = canvas.getBoundingClientRect(), cell = screenToGridCoords(e.clientX - rect.left, e.clientY - rect.top); if (cell) paintCellAt(cell.x, cell.y); } 
+        else { state.isDraggingCanvas = true; state.dragStartX = e.clientX; state.dragStartY = e.clientY; state.dragInitialPanX = state.panX; state.dragInitialPanY = state.panY; }
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect(), mouseX = e.clientX - rect.left, mouseY = e.clientY - rect.top;
+      if (state.isPainting && state.currentTool === 'brush') { const cell = screenToGridCoords(mouseX, mouseY); if (cell) paintCellAt(cell.x, cell.y); } 
+      else if (state.isDraggingCanvas) { state.panX = state.dragInitialPanX + (e.clientX - state.dragStartX); state.panY = state.dragInitialPanY + (e.clientY - state.dragStartY); requestAnimationFrame(renderCanvas); } 
+      else {
+        const cell = screenToGridCoords(mouseX, mouseY); state.hoveredCell = cell;
+        if (cell && state.quantizedMatrix.length) {
+          const color = state.palette[state.quantizedMatrix[cell.y][cell.x]];
+          if (color) {
+            document.getElementById('hoverCoords').textContent = `X: ${cell.x + 1}, Y: ${cell.y + 1}`; document.getElementById('hoverSwatch').style.backgroundColor = color.hex;
+            document.getElementById('hoverColorId').textContent = `#${color.id}`; document.getElementById('hoverColorHex').textContent = color.hex;
+          }
+        } else {
+          document.getElementById('hoverCoords').textContent = `-- , --`; document.getElementById('hoverSwatch').style.backgroundColor = 'transparent';
+          document.getElementById('hoverColorId').textContent = `#--`; document.getElementById('hoverColorHex').textContent = `#------`;
+        }
+        requestAnimationFrame(renderCanvas);
+      }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (state.isPainting) state.isPainting = false;
+      if (state.isDraggingCanvas) {
+        const movedDist = Math.hypot(e.clientX - state.dragStartX, e.clientY - state.dragStartY); state.isDraggingCanvas = false;
+        if (movedDist < 4 && state.currentTool === 'inspect') {
+          const rect = canvas.getBoundingClientRect(), cell = screenToGridCoords(e.clientX - rect.left, e.clientY - rect.top);
+          if (cell && state.quantizedMatrix.length) {
+            const colorIdx = state.quantizedMatrix[cell.y][cell.x]; toggleColorFocus(colorIdx);
+            setTimeout(() => { const targetCard = document.getElementById(`palette-item-${colorIdx}`); if (targetCard) targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 50);
+          }
+        }
+      }
+    });
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect(), mouseX = e.clientX - rect.left, mouseY = e.clientY - rect.top, zoomFactor = e.deltaY < 0 ? 1.15 : 0.87, newZoom = Math.min(10.0, Math.max(0.15, state.zoom * zoomFactor));
+      state.panX = mouseX - (mouseX - state.panX) * (newZoom / state.zoom); state.panY = mouseY - (mouseY - state.panY) * (newZoom / state.zoom); state.zoom = newZoom;
+      updateUIHeader(); requestAnimationFrame(renderCanvas);
+    }, { passive: false });
+
+    function fitCanvasToView() {
+      const rect = canvasContainer.getBoundingClientRect(), rulerOffset = state.showRulers ? state.rulerSize : 0, availW = rect.width - 60 - rulerOffset, availH = rect.height - 60 - rulerOffset, requiredW = state.gridWidth * 18, requiredH = state.gridHeight * 18;
+      state.zoom = Math.max(0.2, Math.min(availW / requiredW, availH / requiredH, 2.5));
+      const totalW = state.gridWidth * 18 * state.zoom + rulerOffset, totalH = state.gridHeight * 18 * state.zoom + rulerOffset;
+      state.panX = Math.round((rect.width - totalW) / 2); state.panY = Math.round((rect.height - totalH) / 2);
+      updateUIHeader(); requestAnimationFrame(renderCanvas);
+    }
+
+    function setTool(tool) {
+      state.currentTool = tool; const btnInspect = document.getElementById('btnToolInspect'), btnBrush = document.getElementById('btnToolBrush');
+      if (tool === 'inspect') {
+        btnInspect.className = 'px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 font-bold text-slate-900 dark:text-white shadow-sm flex items-center gap-1.5 transition-all';
+        btnBrush.className = 'px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition-all';
+        canvas.className = 'w-full h-full block cursor-grab-canvas'; document.getElementById('canvasModeHint').textContent = '🎯 點擊格子聚焦/高亮顏色'; document.getElementById('canvasModeHint').className = 'text-indigo-600 dark:text-indigo-400';
+      } else {
+        btnBrush.className = 'px-3 py-1.5 rounded-lg bg-emerald-600 font-bold text-white shadow-sm flex items-center gap-1.5 transition-all';
+        btnInspect.className = 'px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 font-medium hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition-all';
+        canvas.className = 'w-full h-full block cursor-brush'; document.getElementById('canvasModeHint').textContent = '✏️ 拖曳塗色棋盤格位'; document.getElementById('canvasModeHint').className = 'text-emerald-600 dark:text-emerald-400';
+      }
+      renderPaletteList(); requestAnimationFrame(renderCanvas);
+    }
+    document.getElementById('btnToolInspect').addEventListener('click', () => setTool('inspect')); document.getElementById('btnToolBrush').addEventListener('click', () => setTool('brush'));
+
+    function createProceduralSampleImage(type) {
+      const temp = document.createElement('canvas'), tCtx = temp.getContext('2d'); temp.width = 128; temp.height = 128;
+      if (type === 'heart') {
+        tCtx.fillStyle = '#f8fafc'; tCtx.fillRect(0, 0, 128, 128); tCtx.fillStyle = '#ef4444';
+        tCtx.beginPath(); tCtx.arc(44, 48, 24, Math.PI, 0, false); tCtx.arc(84, 48, 24, Math.PI, 0, false); tCtx.lineTo(64, 104); tCtx.fill();
+        tCtx.fillStyle = '#fca5a5'; tCtx.beginPath(); tCtx.arc(38, 42, 8, 0, Math.PI * 2); tCtx.fill();
+      } else if (type === 'mushroom') {
+        tCtx.fillStyle = '#f8fafc'; tCtx.fillRect(0, 0, 128, 128); tCtx.fillStyle = '#dc2626'; tCtx.beginPath(); tCtx.arc(64, 60, 44, Math.PI, 0); tCtx.fill();
+        tCtx.fillStyle = '#ffffff'; tCtx.beginPath(); tCtx.arc(42, 44, 10, 0, Math.PI * 2); tCtx.arc(86, 44, 10, 0, Math.PI * 2); tCtx.arc(64, 28, 8, 0, Math.PI * 2); tCtx.fill();
+        tCtx.fillStyle = '#fed7aa'; tCtx.fillRect(44, 60, 40, 40); tCtx.fillStyle = '#1e293b'; tCtx.fillRect(52, 70, 6, 14); tCtx.fillRect(70, 70, 6, 14);
+      } else if (type === 'sunset') {
+        const grad = tCtx.createLinearGradient(0, 0, 0, 128); grad.addColorStop(0, '#f97316'); grad.addColorStop(0.5, '#ec4899'); grad.addColorStop(1, '#3b82f6');
+        tCtx.fillStyle = grad; tCtx.fillRect(0, 0, 128, 128); tCtx.fillStyle = '#fef08a'; tCtx.beginPath(); tCtx.arc(64, 64, 28, 0, Math.PI * 2); tCtx.fill();
+        tCtx.fillStyle = '#0f172a'; tCtx.beginPath(); tCtx.moveTo(0, 128); tCtx.lineTo(36, 75); tCtx.lineTo(75, 128); tCtx.lineTo(95, 85); tCtx.lineTo(128, 128); tCtx.fill();
+      }
+      const img = new Image(); img.onload = () => { state.sourceImage = img; processImageAndExtractNewPalette(); fitCanvasToView(); }; img.src = temp.toDataURL();
+    }
+
+    function loadUserImageFile(file) {
+      if (!file || !file.type.startsWith('image/')) { showToast('請選取有效的圖檔格式 (PNG, JPG, WEBP, SVG)', 'warning'); return; }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          state.sourceImage = img;
+          if (document.getElementById('chkKeepAspect').checked) {
+            const aspect = img.height / img.width; state.gridHeight = Math.max(4, Math.min(256, Math.round(state.gridWidth * aspect)));
+            document.getElementById('numHeight').value = state.gridHeight; selectResolution.value = 'custom';
+          }
+          processImageAndExtractNewPalette(); fitCanvasToView(); showToast(`已成功載入圖片 (${img.width} × ${img.height})`, 'success');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById('fileInput').addEventListener('change', (e) => { if (e.target.files && e.target.files[0]) loadUserImageFile(e.target.files[0]); });
+    const dropZone = document.getElementById('dropZone');
+    ['dragenter', 'dragover'].forEach(name => dropZone.addEventListener(name, (e) => { e.preventDefault(); dropZone.classList.add('border-indigo-500', 'bg-indigo-50/60'); }));
+    ['dragleave', 'drop'].forEach(name => dropZone.addEventListener(name, (e) => { e.preventDefault(); dropZone.classList.remove('border-indigo-500', 'bg-indigo-50/60'); }));
+    dropZone.addEventListener('drop', (e) => { if (e.dataTransfer.files && e.dataTransfer.files[0]) loadUserImageFile(e.dataTransfer.files[0]); });
+    window.addEventListener('paste', (e) => { for (const item of (e.clipboardData || e.originalEvent.clipboardData).items) { if (item.kind === 'file' && item.type.startsWith('image/')) { loadUserImageFile(item.getAsFile()); break; } } });
+
+    document.getElementById('btnSampleHeart').addEventListener('click', () => createProceduralSampleImage('heart'));
+    document.getElementById('btnSampleMushroom').addEventListener('click', () => createProceduralSampleImage('mushroom'));
+    document.getElementById('btnSampleSunset').addEventListener('click', () => createProceduralSampleImage('sunset'));
+
+    selectResolution.addEventListener('change', (e) => {
+      const val = e.target.value; if (val === 'custom') return;
+      const res = parseInt(val); state.gridWidth = res; state.gridHeight = res;
+      document.getElementById('numWidth').value = res; document.getElementById('numHeight').value = res;
+      processImageWithCurrentPalette(); fitCanvasToView();
+    });
+
+    document.getElementById('numWidth').addEventListener('change', (e) => {
+      const val = Math.max(4, Math.min(256, parseInt(e.target.value) || 32));
+      state.gridWidth = val; e.target.value = val;
+      if (document.getElementById('chkKeepAspect').checked && state.sourceImage) {
+        state.gridHeight = Math.max(4, Math.min(256, Math.round(val * (state.sourceImage.height / state.sourceImage.width))));
+        document.getElementById('numHeight').value = state.gridHeight;
+      }
+      selectResolution.value = 'custom'; processImageWithCurrentPalette();
+    });
+    document.getElementById('numHeight').addEventListener('change', (e) => {
+      const val = Math.max(4, Math.min(256, parseInt(e.target.value) || 32));
+      state.gridHeight = val; e.target.value = val;
+      selectResolution.value = 'custom'; processImageWithCurrentPalette();
+    });
+
+    document.getElementById('selectSampling').addEventListener('change', (e) => { state.samplingMode = e.target.value; processImageWithCurrentPalette(); });
+    
+    selectColorCount.addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (val === 'custom') {
+        const input = prompt('請輸入自訂提取的色彩數量 (建議 2~256 之間)：', state.colorCount);
+        const count = parseInt(input);
+        if (!isNaN(count) && count >= 2 && count <= 256) {
+          state.colorCount = count;
+          document.getElementById('paletteModeBadge').textContent = `${count} 色`;
+          extractColorsFromImageMedianCut(state.colorCount);
+        } else {
+          showToast('請輸入 2 到 256 之間的有效數字', 'warning');
+          let found = false;
+          for(let opt of selectColorCount.options) {
+            if(opt.value == state.colorCount) { opt.selected = true; found = true; break; }
+          }
+          if(!found) {
+            const newOpt = new Option(`${state.colorCount} 色 (自訂)`, state.colorCount);
+            selectColorCount.insertBefore(newOpt, selectColorCount.lastElementChild);
+            selectColorCount.value = state.colorCount;
+          }
+        }
+      } else {
+        state.colorCount = parseInt(val);
+        document.getElementById('paletteModeBadge').textContent = `${state.colorCount} 色`;
+        extractColorsFromImageMedianCut(state.colorCount);
+      }
+    });
+
+    document.getElementById('btnAddColor').addEventListener('click', () => addNewColorToPalette('#3B82F6'));
+    
+    document.getElementById('btnRequantize').title = '依當前調色盤色彩重新對原圖進行距離匹配 (取消直接替換效果，按原圖重新分配)';
+    document.getElementById('btnRequantize').addEventListener('click', () => { remapPixelsToPalette(); showToast('已根據當前調色盤重新匹配原圖色彩！', 'success'); });
+    
+    document.getElementById('chkDither').addEventListener('change', (e) => { state.enableDither = e.target.checked; remapPixelsToPalette(); });
+    document.getElementById('chkShowRulers').addEventListener('change', (e) => { state.showRulers = e.target.checked; requestAnimationFrame(renderCanvas); });
+    document.getElementById('chkShowGrid').addEventListener('change', (e) => { state.showGrid = e.target.checked; requestAnimationFrame(renderCanvas); });
+    document.getElementById('selectMajorLines').addEventListener('change', (e) => { state.majorLineStep = parseInt(e.target.value); requestAnimationFrame(renderCanvas); });
+
+    const textModeBtns = { id: document.getElementById('btnTextPaletteId'), coords: document.getElementById('btnTextCoords'), none: document.getElementById('btnTextNone') };
+    function setTextMode(mode) {
+      state.textMode = mode;
+      Object.keys(textModeBtns).forEach(k => { textModeBtns[k].className = k === mode ? 'btn-text-mode px-2 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-center shadow-md shadow-indigo-500/30 text-xs lg:text-sm' : 'btn-text-mode px-2 py-1.5 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium border border-slate-200 dark:border-slate-700 text-center shadow-sm text-xs lg:text-sm'; });
+      requestAnimationFrame(renderCanvas);
+    }
+    textModeBtns.id.addEventListener('click', () => setTextMode('id')); textModeBtns.coords.addEventListener('click', () => setTextMode('coords')); textModeBtns.none.addEventListener('click', () => setTextMode('none'));
+
+    document.getElementById('btnRegenerate').addEventListener('click', () => { processImageWithCurrentPalette(); showToast('已重新計算像素化棋盤', 'success'); });
+    document.getElementById('btnScrollTop').addEventListener('click', () => paletteList.scrollTo({ top: 0, behavior: 'smooth' }));
+    document.getElementById('btnScrollBottom').addEventListener('click', () => paletteList.scrollTo({ top: paletteList.scrollHeight, behavior: 'smooth' }));
+    document.getElementById('btnClearHighlight').addEventListener('click', () => { state.selectedColorIndex = null; updateUIHeader(); renderPaletteList(); requestAnimationFrame(renderCanvas); showToast('已恢復完整棋盤顯示'); });
+
+    document.getElementById('btnZoomIn').addEventListener('click', () => { state.zoom = Math.min(10.0, state.zoom * 1.25); updateUIHeader(); requestAnimationFrame(renderCanvas); });
+    document.getElementById('btnZoomOut').addEventListener('click', () => { state.zoom = Math.max(0.15, state.zoom * 0.8); updateUIHeader(); requestAnimationFrame(renderCanvas); });
+    document.getElementById('btnZoomFit').addEventListener('click', fitCanvasToView);
+    document.getElementById('btnZoom100').addEventListener('click', () => { state.zoom = 1.0; updateUIHeader(); requestAnimationFrame(renderCanvas); });
+    window.addEventListener('resize', () => requestAnimationFrame(renderCanvas));
+
+    const btnExportMenu = document.getElementById('btnExportMenu'), exportMenu = document.getElementById('exportMenu');
+    btnExportMenu.addEventListener('click', (e) => { e.stopPropagation(); exportMenu.classList.toggle('hidden'); });
+    window.addEventListener('click', () => { if (!exportMenu.classList.contains('hidden')) exportMenu.classList.add('hidden'); });
+
+    // 修改：匯出功能加入跨瀏覽器相容修復與非同步等待提示
+    document.getElementById('btnExportPixelSharp').addEventListener('click', () => {
+      if (!state.quantizedMatrix.length) { showToast('請先載入圖片或生成棋盤', 'warning'); return; }
+      showToast('高畫質純像素圖匯出中...', 'info');
+      
+      setTimeout(() => {
+        const scale = 12, expCanvas = document.createElement('canvas'); expCanvas.width = state.gridWidth * scale; expCanvas.height = state.gridHeight * scale;
+        const expCtx = expCanvas.getContext('2d');
+        for (let y = 0; y < state.gridHeight; y++) {
+          for (let x = 0; x < state.gridWidth; x++) {
+            const color = state.palette[state.quantizedMatrix[y][x]] || state.palette[0];
+            expCtx.fillStyle = color.hex; expCtx.fillRect(x * scale, y * scale, scale, scale);
+          }
+        }
+        const link = document.createElement('a'); link.download = `pixel_art_${state.gridWidth}x${state.gridHeight}.png`; link.href = expCanvas.toDataURL('image/png'); 
+        document.body.appendChild(link); // 解決 Firefox 等瀏覽器點擊無效問題
+        link.click();
+        document.body.removeChild(link);
+        showToast('已匯出純像素圖 (PNG)', 'success');
+      }, 50);
+    });
+
+    document.getElementById('btnExportPatternSheet').addEventListener('click', () => {
+      if (!state.quantizedMatrix.length) { showToast('請先載入圖片或生成棋盤', 'warning'); return; }
+      showToast('圖樣設計紙生成中，請稍候...', 'info');
+      
+      setTimeout(() => {
+        const cellSize = 30, rulerSize = 40, gw = state.gridWidth, gh = state.gridHeight, boardW = gw * cellSize, boardH = gh * cellSize;
+        const legendItemH = 30, legendCols = 4, legendRows = Math.ceil(state.palette.length / legendCols), legendH = legendRows * legendItemH + 50;
+        const totalW = rulerSize + boardW + 40, totalH = rulerSize + boardH + legendH + 60;
+        const expCanvas = document.createElement('canvas'); expCanvas.width = totalW; expCanvas.height = totalH; const expCtx = expCanvas.getContext('2d');
+        expCtx.fillStyle = '#ffffff'; expCtx.fillRect(0, 0, totalW, totalH);
+        const startX = 20, startY = 20;
+
+        for (let y = 0; y < gh; y++) {
+          for (let x = 0; x < gw; x++) {
+            const color = state.palette[state.quantizedMatrix[y][x]] || state.palette[0], px = startX + rulerSize + x * cellSize, py = startY + rulerSize + y * cellSize;
+            expCtx.fillStyle = color.hex; expCtx.fillRect(px, py, cellSize, cellSize);
+            expCtx.strokeStyle = '#cccccc'; expCtx.lineWidth = 1; expCtx.strokeRect(px, py, cellSize, cellSize);
+            const lum = (0.299 * color.r + 0.587 * color.g + 0.114 * color.b); expCtx.fillStyle = lum > 130 ? '#0f172a' : '#ffffff';
+            expCtx.font = 'bold 13px monospace'; expCtx.textAlign = 'center'; expCtx.textBaseline = 'middle'; expCtx.fillText(`${color.id}`, px + cellSize / 2, py + cellSize / 2);
+          }
+        }
+
+        expCtx.strokeStyle = '#000000'; expCtx.lineWidth = 2;
+        for (let x = 0; x <= gw; x += 10) { const px = startX + rulerSize + x * cellSize; expCtx.beginPath(); expCtx.moveTo(px, startY + rulerSize); expCtx.lineTo(px, startY + rulerSize + boardH); expCtx.stroke(); }
+        for (let y = 0; y <= gh; y += 10) { const py = startY + rulerSize + y * cellSize; expCtx.beginPath(); expCtx.moveTo(startX + rulerSize, py); expCtx.lineTo(startX + rulerSize + boardW); expCtx.stroke(); }
+
+        expCtx.fillStyle = '#f1f5f9'; expCtx.fillRect(startX + rulerSize, startY, boardW, rulerSize); expCtx.fillRect(startX, startY + rulerSize, rulerSize, boardH);
+        expCtx.fillStyle = '#1e293b'; expCtx.font = 'bold 12px monospace'; expCtx.textAlign = 'center'; expCtx.textBaseline = 'middle';
+        for (let x = 0; x < gw; x++) { const px = startX + rulerSize + x * cellSize + cellSize / 2; expCtx.fillText(x + 1, px, startY + rulerSize / 2); }
+        for (let y = 0; y < gh; y++) { const py = startY + rulerSize + y * cellSize + cellSize / 2; expCtx.fillText(y + 1, startX + rulerSize / 2, py); }
+
+        const legendStartY = startY + rulerSize + boardH + 30;
+        expCtx.fillStyle = '#0f172a'; expCtx.font = 'bold 15px sans-serif'; expCtx.textAlign = 'left'; expCtx.fillText('🎨 調色盤編號與色碼對照表 (Color Legend):', startX, legendStartY);
+
+        const colW = (boardW + rulerSize) / legendCols;
+        state.palette.forEach((p, idx) => {
+          const c = idx % legendCols, r = Math.floor(idx / legendCols), lx = startX + c * colW, ly = legendStartY + 25 + r * legendItemH;
+          expCtx.fillStyle = p.hex; expCtx.fillRect(lx, ly, 18, 18); expCtx.strokeStyle = '#94a3b8'; expCtx.lineWidth = 1; expCtx.strokeRect(lx, ly, 18, 18);
+          expCtx.fillStyle = '#0f172a'; expCtx.font = 'bold 13px monospace'; expCtx.textAlign = 'left'; expCtx.textBaseline = 'middle'; expCtx.fillText(`#${p.id} ${p.hex} (${p.count}格, ${p.pct})`, lx + 26, ly + 9);
+        });
+
+        const link = document.createElement('a'); link.download = `pixel_grid_pattern_sheet_${gw}x${gh}.png`; link.href = expCanvas.toDataURL('image/png'); 
+        document.body.appendChild(link); // 解決 Firefox 等瀏覽器點擊無效問題
+        link.click();
+        document.body.removeChild(link);
+        showToast('已匯出完整標號設計圖樣紙 (PNG)', 'success');
+      }, 50);
+    });
+
+    document.getElementById('btnExportPaletteCSV').addEventListener('click', () => {
+      if (!state.palette.length) { showToast('請先載入圖片或生成棋盤', 'warning'); return; }
+      let csvContent = '\uFEFF編號,HEX色碼,R,G,B,像素數量,佔比\n';
+      state.palette.forEach(p => { csvContent += `"${p.id}","${p.hex}",${p.r},${p.g},${p.b},${p.count},"${p.pct}"\n`; });
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }), url = URL.createObjectURL(blob), link = document.createElement('a');
+      link.href = url; link.download = `pixel_palette_${state.palette.length}_colors.csv`; 
+      document.body.appendChild(link);
+      link.click(); 
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('已匯出調色盤清單 (CSV)', 'success');
+    });
+
+    window.addEventListener('load', () => { 
+      createProceduralSampleImage('mushroom'); 
+      showToast('即時連動版像素棋盤生成器已就緒！', 'success'); 
+    });
+  </script>
+</body>
+</html>
