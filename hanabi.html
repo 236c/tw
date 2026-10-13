@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>日本職人競技花火大會 - 隅田川 Star Mine 連射特等席 (12大Combo旗艦版)</title>
+    <title>日本職人競技花火大會 - 隅田川 Star Mine 連射特等席 (19大Combo旗艦版)</title>
     <style>
         * {
             margin: 0;
@@ -298,7 +298,7 @@
         </button>
 
         <button class="btn-ui" id="soundToggleBtn" title="立體聲爆轟與呼嘯聲">
-            <span id="soundText">🔊 音效: 開</span>
+            <span id="soundText">🔇 音效: 關</span>
         </button>
 
         <button class="btn-ui" id="settingsToggleBtn" title="規格設定與花火品項挑選">
@@ -320,11 +320,11 @@
 
         <div class="control-section">
             <div class="control-label">
-                <span>指定發動的 Combo 組合技 (12大名作)</span>
+                <span>指定發動的 Combo 組合技 (19大名作)</span>
                 <span id="comboSelectText" style="color:#38bdf8;">隨機輪播</span>
             </div>
             <select class="control-input" id="comboStyleSelect">
-                <option value="random">🎲 12大 Combo 隨機輪播</option>
+                <option value="random">🎲 19大 Combo 隨機輪播</option>
                 <option value="fan_wide">🦚 扇状ワイド・千輪扇型 (7發扇型展開)</option>
                 <option value="rainbow_cascade">🌈 七色連段・虹彩レインボー (7色漸層光譜)</option>
                 <option value="tiger_tail">🐅 虎の尾・黄金昇天連射 (金火柱連環)</option>
@@ -337,12 +337,19 @@
                 <option value="thousand_strobe">💎 銀河乱点滅・百花ダイヤモンド (極限閃爍鑽石群)</option>
                 <option value="spiral_dna">🧬 昇龍螺旋・DNAダブルヘリックス (交織雙螺旋梯)</option>
                 <option value="sakura_blizzard">🌸 満開桜嵐・隅田川花吹雪 (急速櫻花風暴)</option>
+                <option value="heart_beat">💓 愛の鼓動・ハートビート連射</option>
+                <option value="wabi_sabi_zen">🏮 侘寂の極意・和火絵巻</option>
+                <option value="ufo_invasion">🛸 未知の襲来・宇宙サターン</option>
+                <option value="triple_peacock">🦚 三連孔雀・極上扇絵巻</option>
+                <option value="ruby_sapphire">💎 双璧の宝石・紅藍の舞</option>
+                <option value="golden_climax">👑 黄金王冠・千重錦冠大瀑布</option>
+                <option value="random_lush_rush">🌟 繁華極致・隨機大輪亂舞</option>
             </select>
         </div>
 
         <div class="control-section">
             <div class="control-label">
-                <span>單發職人花火樣式 (40+ 款名物)</span>
+                <span>單發職人花火樣式 (50+ 款名物)</span>
                 <span id="styleCountText" style="color:#38bdf8;">隨機輪播</span>
             </div>
             <select class="control-input" id="fireworkStyleSelect"></select>
@@ -399,10 +406,11 @@
 
     <script>
 /**
- * 40+ 款日本頂級競技花火資料庫 (依專業流派分組)
+ * 50+ 款日本頂級競技花火資料庫
  */
 const HANABI_STYLES_CATALOG = [
     { id: 'all', group: '綜合', icon: '🌌', name: '全造型隨機輪播', desc: '日本大會最高榮譽綜合競技' },
+    { id: 'random_lush', group: '綜合', icon: '🌟', name: '隨機茂盛大輪輪播', desc: '專門隨機挑選天幕級的繁密極致大輪花火' },
 
     // ===== 🌟【極致茂盛・天幕大輪】 =====
     { 
@@ -439,7 +447,13 @@ const HANABI_STYLES_CATALOG = [
         id: 'kiku_taki_niagara', group: '極致茂盛・天幕大輪', icon: '🌊', name: '白銀・菊花大瀑布', desc: '萬道銀輝如尼加拉大瀑布傾瀉，沉降尾羽細緻收窄',
         colors: ['#ffffff', '#e0f2fe', '#bae6fd', '#f8fafc'],
         particles: 240, baseSpeed: 3.2, airDrag: 0.962, gravity: 0.064, decayRate: 0.0046,
-        decayProfile: 'willow_long', cutoffLifetime: 140
+        decayProfile: 'willow_long', cutoffLifetime: 140, isLush: true
+    },
+    { 
+        id: 'emerald_niagara', group: '極致茂盛・天幕大輪', icon: '🌊', name: '翠玉・エメラルド瀑布', desc: '罕見的翡翠綠瀑布，優雅地向水面垂墜，夢幻唯美',
+        colors: ['#10b981', '#34d399', '#a7f3d0', '#ffffff'],
+        particles: 260, baseSpeed: 3.2, airDrag: 0.966, gravity: 0.060, decayRate: 0.0038,
+        decayProfile: 'willow_long', cutoffLifetime: 155, isLush: true
     },
 
     // ===== 🏆【競技大會・多重芯割物】 =====
@@ -488,7 +502,13 @@ const HANABI_STYLES_CATALOG = [
         decayProfile: 'instant_cutoff', isSenrin: true, cutoffLifetime: 110
     },
     { 
-        id: 'yukiwariso_pastel', group: '小割物・千輪百花・先割', icon: '🌱', name: '小割浮模様・千輪雪割草', desc: '春日早開野花般的粉彩小花（粉櫻、薄荷綠、嫩黃、淡紫）輕柔浮游',
+        id: 'senrin_gold', group: '小割物・千輪百花・先割', icon: '🎆', name: '黄金・千輪錦冠', desc: '小子玉炸開後，化作無數微小的金色垂柳，華麗至極',
+        colors: ['#facc15', '#fbbf24', '#fef08a'],
+        particles: 220, baseSpeed: 3.1, airDrag: 0.965, gravity: 0.040, decayRate: 0.0042,
+        decayProfile: 'willow_long', isSenrin: true, cutoffLifetime: 140, isLush: true
+    },
+    { 
+        id: 'yukiwariso_pastel', group: '小割物・千輪百花・先割', icon: '🌱', name: '小割浮模様・千輪雪割草', desc: '春日早開野花般的粉彩小花輕柔浮游',
         colors: ['#fbcfe8', '#a7f3d0', '#fed7aa', '#ddd6fe', '#bae6fd'],
         particles: 210, baseSpeed: 3.1, airDrag: 0.958, gravity: 0.034, decayRate: 0.0044,
         decayProfile: 'flutter', isSenrin: true, cutoffLifetime: 125
@@ -532,24 +552,54 @@ const HANABI_STYLES_CATALOG = [
         decayProfile: 'instant_cutoff', isRing: true, cutoffLifetime: 110
     },
     { 
+        id: 'double_ring_blue', group: '型物・幾何學輪型', icon: '🪐', name: '連環・二重サターン', desc: '蔚藍色與翡翠色交織的立體雙重行星圓環',
+        colors: ['#06b6d4', '#0284c7'], coreColors: ['#10b981', '#34d399'],
+        particles: 220, baseSpeed: 3.2, airDrag: 0.960, gravity: 0.032, decayRate: 0.0048,
+        decayProfile: 'instant_cutoff', isDoubleRing: true, cutoffLifetime: 110, isLush: true
+    },
+    { 
         id: 'peacock_feather', group: '型物・幾何學輪型', icon: '🦚', name: '孔雀開屏・七彩尾羽', desc: '扇形向兩翼展開的青翠與鈷藍孔雀屏風，末端鑲嵌金眼微星',
         colors: ['#06b6d4', '#0284c7', '#10b981', '#facc15'],
         particles: 200, baseSpeed: 3.3, airDrag: 0.962, gravity: 0.038, decayRate: 0.0046,
         decayProfile: 'instant_cutoff', cutoffLifetime: 115
     },
+    { 
+        id: 'peacock_gold', group: '型物・幾何學輪型', icon: '🦚', name: '黄金孔雀・千すじ', desc: '以黃金火花展現孔雀開屏的極致奢華與寬廣感',
+        colors: ['#fbbf24', '#facc15', '#fef08a', '#ffffff'],
+        particles: 220, baseSpeed: 3.4, airDrag: 0.964, gravity: 0.038, decayRate: 0.0046,
+        decayProfile: 'instant_cutoff', isPeacock: true, cutoffLifetime: 115, isLush: true
+    },
+    { 
+        id: 'crimson_heart', group: '型物・幾何學輪型', icon: '❤️', name: '真心・クリムゾンハート', desc: '鮮豔的紅寶石色愛心於夜空綻放，充滿愛意的設計',
+        colors: ['#ef4444', '#f43f5e', '#f87171'],
+        particles: 130, baseSpeed: 3.1, airDrag: 0.965, gravity: 0.035, decayRate: 0.0050,
+        decayProfile: 'instant_cutoff', isHeart: true, cutoffLifetime: 105
+    },
+    { 
+        id: 'smile_face', group: '型物・幾何學輪型', icon: '😊', name: '微笑み・ニコニコ星', desc: '由亮黃色星星組成的巨大笑臉，帶給觀眾歡樂',
+        colors: ['#facc15', '#fde047'],
+        particles: 150, baseSpeed: 3.0, airDrag: 0.960, gravity: 0.030, decayRate: 0.0045,
+        decayProfile: 'instant_cutoff', isSmiley: true, cutoffLifetime: 110
+    },
 
     // ===== ⏳【時差・段咲き・變色】 =====
     { 
-        id: 'yurei_ghost', group: '時差・段咲き・變色', icon: '👻', name: '幻影・幽霊時差花火', desc: '爆開後全黑隱形潛行，虛無中突然二度復燃！',
+        id: 'yurei_ghost', group: '時差・段咲き・變色', icon: '👻', name: '幻影・幽霊時差花火', desc: '爆開後隱入夜色悄然潛行，虛無中突然二度復燃！',
         colors: ['#e0f2fe', '#bae6fd'], reigniteColors: ['#00f5d4', '#f43f5e', '#a855f7', '#fbbf24'],
         particles: 200, baseSpeed: 3.2, airDrag: 0.961, gravity: 0.036, decayRate: 0.0046,
         decayProfile: 'ghost', darkAgeStart: 18, darkAgeEnd: 48, cutoffLifetime: 130
     },
     { 
+        id: 'yurei_blood', group: '時差・段咲き・變色', icon: '🩸', name: '紅幽霊・ブラッドムーン', desc: '暗影中無聲潛行，隨後如血月般猛烈燃起猩紅火光',
+        colors: ['#475569'], reigniteColors: ['#dc2626', '#991b1b', '#ef4444'],
+        particles: 180, baseSpeed: 3.2, airDrag: 0.961, gravity: 0.036, decayRate: 0.0046,
+        decayProfile: 'ghost', darkAgeStart: 15, darkAgeEnd: 55, cutoffLifetime: 135
+    },
+    { 
         id: 'danzaki_tri_burst', group: '時差・段咲き・變色', icon: '🪜', name: '階梯段咲き・三層波紋', desc: '內芯先爆開，0.3秒後中層綻放，0.6秒後外層巨環方才開花，波浪式延展',
         colors: ['#38bdf8', '#0284c7'], middleColors: ['#facc15'], coreColors: ['#ef4444'],
         particles: 220, baseSpeed: 3.2, airDrag: 0.961, gravity: 0.036, decayRate: 0.0046,
-        decayProfile: 'danzaki', cutoffLifetime: 125
+        decayProfile: 'danzaki', cutoffLifetime: 125, isLush: true
     },
     { 
         id: 'henshoku_botan', group: '時差・段咲き・變色', icon: '🌺', name: '現代職人・変色牡丹', desc: '冰川蔚藍平滑漸變為濃郁洋紅，隨後瞬間冷卻凝縮',
@@ -587,19 +637,19 @@ const HANABI_STYLES_CATALOG = [
         id: 'kamuro_lush', group: '傳統和火・金波銀波', icon: '🌾', name: '極上・錦冠大柳', desc: '金光流絲如瀑，長久重力垂地，久久不散',
         colors: ['#ffeaa7', '#ffd32a', '#ff9f1a', '#fff200', '#ffffff'],
         particles: 240, baseSpeed: 2.8, airDrag: 0.968, gravity: 0.046, decayRate: 0.0034,
-        decayProfile: 'willow_long', cutoffLifetime: 160
+        decayProfile: 'willow_long', cutoffLifetime: 160, isLush: true
     },
     { 
         id: 'gold_willow_dragon', group: '傳統和火・金波銀波', icon: '⚜️', name: '昇天銀龍・黄金冠', desc: '銀光衝天隨後化為沉降金柳，長垂至水面',
         colors: ['#f6e58d', '#ffbe76', '#f9ca24', '#ffffff'],
         particles: 200, baseSpeed: 3.0, airDrag: 0.966, gravity: 0.044, decayRate: 0.0036,
-        decayProfile: 'willow_long', cutoffLifetime: 155
+        decayProfile: 'willow_long', cutoffLifetime: 155, isLush: true
     },
     { 
         id: 'yashi_ginpa', group: '傳統和火・金波銀波', icon: '🌴', name: '南國・巨木椰子銀波', desc: '粗壯銀幹筆直升騰，頂點張開繁茂銀白椰子樹冠沉落',
         colors: ['#ffffff', '#e2e8f0', '#cbd5e1'],
         particles: 190, baseSpeed: 3.4, airDrag: 0.964, gravity: 0.048, decayRate: 0.0042,
-        decayProfile: 'willow_long', cutoffLifetime: 138
+        decayProfile: 'willow_long', cutoffLifetime: 138, isLush: true
     },
     { 
         id: 'senko_shiranami', group: '傳統和火・金波銀波', icon: '💡', name: '閃光白波・冠菊', desc: '耀眼白鎂劇烈爆閃後，化為千萬條細膩白色浪花銀波',
@@ -616,10 +666,16 @@ const HANABI_STYLES_CATALOG = [
 
     // ===== ✨【閃光・點滅・亂舞奇想】 =====
     { 
-        id: 'diamond_strobe', group: '閃光・點滅・亂舞奇想', icon: '💎', name: '天空之鑽・白光群點滅', desc: '白金鑽石般的高頻劇烈閃爍微星，刺破夜幕如繁星閃耀',
+        id: 'diamond_strobe', group: '閃光・點滅・亂舞奇想', icon: '💎', name: '天空之鑽・白光群点滅', desc: '白金鑽石般的高頻劇烈閃爍微星，刺破夜幕如繁星閃耀',
         colors: ['#ffffff', '#f0f9ff', '#e0f2fe'],
         particles: 210, baseSpeed: 3.2, airDrag: 0.962, gravity: 0.036, decayRate: 0.0042,
         decayProfile: 'strobe_fade', strobeStartAge: 20, cutoffLifetime: 130
+    },
+    { 
+        id: 'strobe_ruby', group: '閃光・點滅・亂舞奇想', icon: '✨', name: '紅宝石・ルビー点滅', desc: '如同紅寶石般深紅的劇烈閃爍微星',
+        colors: ['#ef4444', '#be123c', '#fda4af'],
+        particles: 190, baseSpeed: 3.2, airDrag: 0.962, gravity: 0.036, decayRate: 0.0042,
+        decayProfile: 'strobe_fade', strobeStartAge: 30, cutoffLifetime: 125
     },
     { 
         id: 'kamuro_tenmetsu', group: '閃光・點滅・亂舞奇想', icon: '✨', name: '錦冠先点滅・蛍火', desc: '金色柳絲末端轉為劇烈閃爍微光，如夏夜螢火熄滅',
@@ -684,7 +740,7 @@ const HANABI_STYLES_CATALOG = [
 ];
 
 /**
- * 12 大正統競技連射組合 (スターマイン / Star Mine 專屬編排)
+ * 19 大正統競技連射組合 (スターマイン / Star Mine 專屬編排)
  */
 const STARMINE_COMBOS = [
     { id: 'fan_wide', name: '🦚 扇状ワイド・千輪扇型スターマイン', desc: '7發扇型齊放，孔雀開屏展開百花天幕', shotCount: 7 },
@@ -698,14 +754,21 @@ const STARMINE_COMBOS = [
     { id: 'meteor_shower', name: '🌠 流れ星群・彗星銀河シャワー', desc: '超密集銀龍衝頂，爆散為流星雨銀波長垂江面', shotCount: 8 },
     { id: 'thousand_strobe', name: '💎 銀河乱点滅・百花ダイヤモンド', desc: '白鑽與翡翠點滅交錯，超新星群連續引爆', shotCount: 8 },
     { id: 'spiral_dna', name: '🧬 昇龍螺旋・DNAダブルヘリックス', desc: '左右交織雙螺旋升天梯，爆出土星環與萬華鏡', shotCount: 8 },
-    { id: 'sakura_blizzard', name: '🌸 満開桜嵐・隅田川花吹雪', desc: '粉櫻、玫瑰金急速波浪推移，天幕櫻花暴風雨', shotCount: 8 }
+    { id: 'sakura_blizzard', name: '🌸 満開桜嵐・隅田川花吹雪', desc: '粉櫻、玫瑰金急速波浪推移，天幕櫻花暴風雨', shotCount: 8 },
+    { id: 'heart_beat', name: '💓 愛の鼓動・ハートビート連射', desc: '連續施放心型煙火，染紅整個夜空', shotCount: 6 },
+    { id: 'wabi_sabi_zen', name: '🏮 侘寂の極意・和火絵巻', desc: '傳統江戶和火與幽靈煙火交織的靜謐美學', shotCount: 7 },
+    { id: 'ufo_invasion', name: '🛸 未知の襲来・宇宙サターン', desc: '雙重土星環與變色星體連續升空，科幻感十足', shotCount: 8 },
+    { id: 'triple_peacock', name: '🦚 三連孔雀・極上扇絵巻', desc: '三面黃金孔雀屏風齊開，覆蓋廣闊江面', shotCount: 6 },
+    { id: 'ruby_sapphire', name: '💎 双璧の宝石・紅藍の舞', desc: '紅寶石點滅與薩菲爾純藍交錯對射的極致色彩', shotCount: 8 },
+    { id: 'golden_climax', name: '👑 黄金王冠・千重錦冠大瀑布', desc: '純金花火極限連發，壓倒性的黃金天幕', shotCount: 10 },
+    { id: 'random_lush_rush', name: '🌟 繁華極致・隨機大輪亂舞', desc: '連續施放隨機的極致茂盛大輪花火，震撼夜空', shotCount: 8 }
 ];
 
 /* 狀態管理 */
 let currentStyleId = 'all';
 let selectedComboId = 'random';
 let autoLaunch = true;
-let soundEnabled = true;
+let soundEnabled = false; 
 let showReflection = true;
 let caliberMultiplier = 1.0;
 let particleMult = 1.25;
@@ -719,7 +782,11 @@ let trailAlphaScale = 0.75;
 let autoComboFrequencyLevel = 2;
 let consecutiveSingleLaunches = 0;
 
-/* 離線預烘焙爆閃貼圖 (GPU 硬體貼圖，徹底消除即時 createRadialGradient 卡頓) */
+/* 動態硬體效能調節因子 (60 FPS 守護者) */
+let perfQuality = 1.0;
+let lastFrameTime = performance.now();
+
+/* 離線預烘焙爆閃貼圖 */
 const FLASH_TEXTURE = document.createElement('canvas');
 FLASH_TEXTURE.width = 256;
 FLASH_TEXTURE.height = 256;
@@ -732,36 +799,70 @@ ftCtx.fillStyle = ftGrad;
 ftCtx.fillRect(0, 0, 256, 256);
 
 /**
- * Web Audio 物理音效合成引擎 (含防暴衝與防掉幀閥門)
+ * Web Audio 物理音效合成引擎 (修復高負載卡頓)
  */
 class HanabiSoundEngine {
     constructor() {
         this.ctx = null;
         this.masterGain = null;
+        this.compressor = null;
+        this.convolver = null;
         this.noiseBuffer = null;
         this.crackleBuffer = null;
         this.activeVoices = 0;
-        this.maxVoices = 8;
+        this.maxVoices = 10;
         this.lastCrackleTime = 0;
+        this.lastGhostSoundTime = 0;
     }
 
     init() {
         if (!this.ctx) {
             const AudioCtx = window.AudioContext || window.webkitAudioContext;
             this.ctx = new AudioCtx();
-            this.masterGain = this.ctx.createGain();
-            this.masterGain.gain.setValueAtTime(0.7, this.ctx.currentTime);
-            this.masterGain.connect(this.ctx.destination);
+            
+            this.compressor = this.ctx.createDynamicsCompressor();
+            this.compressor.threshold.value = -12;
+            this.compressor.knee.value = 10;
+            this.compressor.ratio.value = 4;
+            this.compressor.attack.value = 0.005;
+            this.compressor.release.value = 0.1;
+            this.compressor.connect(this.ctx.destination);
 
-            const bufferSize = Math.floor(this.ctx.sampleRate * 0.38);
+            // 空間殘響長度控制在適中的 0.45 秒，避免連發時音訊線程阻塞造成畫面掉幀
+            this.convolver = this.ctx.createConvolver();
+            const reverbLength = Math.round(this.ctx.sampleRate * 0.45); 
+            const impulse = this.ctx.createBuffer(2, reverbLength, this.ctx.sampleRate);
+            const leftData = impulse.getChannelData(0);
+            const rightData = impulse.getChannelData(1);
+            for (let i = 0; i < reverbLength; i++) {
+                const decay = Math.pow(1 - i / reverbLength, 3.0);
+                leftData[i] = (Math.random() * 2 - 1) * decay * 0.5;
+                rightData[i] = (Math.random() * 2 - 1) * decay * 0.5;
+            }
+            this.convolver.buffer = impulse;
+            this.reverbGain = this.ctx.createGain();
+            this.reverbGain.gain.value = 0.35;
+            this.convolver.connect(this.reverbGain);
+            this.reverbGain.connect(this.compressor);
+
+            this.masterGain = this.ctx.createGain();
+            this.masterGain.gain.setValueAtTime(0.75, this.ctx.currentTime);
+            this.masterGain.connect(this.compressor); 
+            this.masterGain.connect(this.convolver);  
+
+            const bufferSize = Math.round(this.ctx.sampleRate * 1.5);
             this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
             const output = this.noiseBuffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
 
-            const crackleSize = Math.floor(this.ctx.sampleRate * 0.2);
+            const crackleSize = Math.round(this.ctx.sampleRate * 0.4);
             this.crackleBuffer = this.ctx.createBuffer(1, crackleSize, this.ctx.sampleRate);
             const cOut = this.crackleBuffer.getChannelData(0);
-            for (let i = 0; i < crackleSize; i++) cOut[i] = (Math.random() > 0.95) ? (Math.random() * 2 - 1) : 0;
+            for (let i = 0; i < crackleSize; i++) {
+                cOut[i] = (Math.random() > 0.98) ? (Math.random() * 2 - 1) : 0;
+            }
         }
         if (this.ctx.state === 'suspended') this.ctx.resume();
     }
@@ -769,35 +870,54 @@ class HanabiSoundEngine {
     playLaunch(panRatio = 0, durationSec = 1.8, isTigerTail = false) {
         if (!soundEnabled) return;
         this.init();
-        if (this.activeVoices >= this.maxVoices) return;
+        if (this.activeVoices >= this.maxVoices + 2) return;
         this.activeVoices++;
 
         const now = this.ctx.currentTime;
-        const dur = Math.max(0.8, durationSec * 0.95);
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
+        const dur = Math.max(0.6, durationSec * 0.9);
         const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
+        if (panner) panner.pan.value = Math.max(-0.8, Math.min(0.8, panRatio));
+        const dest = panner ? panner : this.masterGain;
+        if (panner) panner.connect(this.masterGain);
 
-        osc.type = isTigerTail ? 'sawtooth' : 'sine';
-        osc.frequency.setValueAtTime(isTigerTail ? 260 : 320, now);
-        osc.frequency.exponentialRampToValueAtTime(isTigerTail ? 1100 : 840, now + dur);
+        const thumpOsc = this.ctx.createOscillator();
+        const thumpGain = this.ctx.createGain();
+        thumpOsc.type = 'sine';
+        thumpOsc.frequency.setValueAtTime(120, now);
+        thumpOsc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
+        thumpGain.gain.setValueAtTime(0.4, now);
+        thumpGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        thumpOsc.connect(thumpGain).connect(dest);
+        thumpOsc.start(now);
+        thumpOsc.stop(now + 0.2);
 
-        gain.gain.setValueAtTime(0.005, now);
-        gain.gain.linearRampToValueAtTime(isTigerTail ? 0.07 : 0.05, now + dur * 0.4);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-
-        if (panner) {
-            panner.pan.value = Math.max(-0.9, Math.min(0.9, panRatio));
-            osc.connect(gain);
-            gain.connect(panner);
-            panner.connect(this.masterGain);
+        const noiseNode = this.ctx.createBufferSource();
+        noiseNode.buffer = this.noiseBuffer;
+        noiseNode.loop = true;
+        const filter = this.ctx.createBiquadFilter();
+        
+        if (isTigerTail) {
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(400, now);
+            filter.frequency.linearRampToValueAtTime(800, now + dur * 0.5);
+            filter.frequency.linearRampToValueAtTime(200, now + dur);
         } else {
-            osc.connect(gain);
-            gain.connect(this.masterGain);
+            filter.type = 'bandpass';
+            filter.Q.value = 1.5;
+            filter.frequency.setValueAtTime(300, now);
+            filter.frequency.exponentialRampToValueAtTime(1200, now + dur * 0.6);
+            filter.frequency.exponentialRampToValueAtTime(400, now + dur);
         }
 
-        osc.start(now);
-        osc.stop(now + dur + 0.05);
+        const noiseGain = this.ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.001, now);
+        noiseGain.gain.linearRampToValueAtTime(isTigerTail ? 0.35 : 0.2, now + dur * 0.2);
+        noiseGain.gain.linearRampToValueAtTime(0.001, now + dur);
+
+        noiseNode.connect(filter).connect(noiseGain).connect(dest);
+        noiseNode.start(now);
+        noiseNode.stop(now + dur + 0.1);
+
         setTimeout(() => { this.activeVoices = Math.max(0, this.activeVoices - 1); }, (dur + 0.1) * 1000);
     }
 
@@ -805,69 +925,83 @@ class HanabiSoundEngine {
         if (!soundEnabled) return;
         this.init();
         if (this.activeVoices >= this.maxVoices) return;
+        this.activeVoices++;
 
         const now = this.ctx.currentTime;
         const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
-        if (panner) panner.pan.value = Math.max(-0.95, Math.min(0.95, panRatio));
+        if (panner) panner.pan.value = Math.max(-0.9, Math.min(0.9, panRatio));
+        const dest = panner ? panner : this.masterGain;
+        if (panner) panner.connect(this.masterGain);
+
+        const scale = Math.min(1.5, Math.max(0.7, caliberScale));
+        const dur = (isSudden ? 1.0 : (isLush ? 1.8 : 1.4)) * scale;
+
+        const snapNoise = this.ctx.createBufferSource();
+        snapNoise.buffer = this.noiseBuffer;
+        const snapFilter = this.ctx.createBiquadFilter();
+        snapFilter.type = 'highpass';
+        snapFilter.frequency.value = 1500;
+        const snapGain = this.ctx.createGain();
+        snapGain.gain.setValueAtTime(0.9, now);
+        snapGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        snapNoise.connect(snapFilter).connect(snapGain).connect(dest);
+        snapNoise.start(now);
+        snapNoise.stop(now + 0.12);
 
         const subOsc = this.ctx.createOscillator();
-        const subGain = this.ctx.createGain();
         subOsc.type = 'triangle';
-        const startFreq = (isSudden ? 120 : (isLush ? 82 : 92)) * Math.min(1.2, 1 / caliberScale);
-        subOsc.frequency.setValueAtTime(startFreq, now);
-        subOsc.frequency.exponentialRampToValueAtTime(20, now + (isSudden ? 0.42 : 0.58));
-
-        const vol = (isSudden ? 0.95 : (isLush ? 0.88 : 0.72)) * Math.min(1.35, caliberScale);
-        subGain.gain.setValueAtTime(vol, now);
-        subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.62);
-
-        subOsc.connect(subGain);
-        if (panner) subGain.connect(panner);
-        else subGain.connect(this.masterGain);
+        const baseFreq = isSudden ? 180 : (isLush ? 140 : 160);
+        subOsc.frequency.setValueAtTime(baseFreq / scale, now);
+        subOsc.frequency.exponentialRampToValueAtTime(40 / scale, now + 0.15);
+        subOsc.frequency.exponentialRampToValueAtTime(15 / scale, now + dur * 0.8);
+        const subGain = this.ctx.createGain();
+        subGain.gain.setValueAtTime(1.6 * scale, now);
+        subGain.gain.exponentialRampToValueAtTime(0.01, now + dur * 0.7);
+        subOsc.connect(subGain).connect(dest);
         subOsc.start(now);
-        subOsc.stop(now + 0.65);
+        subOsc.stop(now + dur);
 
-        if (this.noiseBuffer) {
-            const noise = this.ctx.createBufferSource();
-            noise.buffer = this.noiseBuffer;
-            const filter = this.ctx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(isSudden ? 900 : 720, now);
-            filter.frequency.exponentialRampToValueAtTime(100, now + 0.38);
+        const boomNoise = this.ctx.createBufferSource();
+        boomNoise.buffer = this.noiseBuffer;
+        const boomFilter = this.ctx.createBiquadFilter();
+        boomFilter.type = 'lowpass';
+        boomFilter.frequency.setValueAtTime(isSudden ? 3500 : 2500, now);
+        boomFilter.frequency.exponentialRampToValueAtTime(80, now + dur * 0.85);
+        const boomGain = this.ctx.createGain();
+        boomGain.gain.setValueAtTime(0.9 * scale, now);
+        boomGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+        boomNoise.connect(boomFilter).connect(boomGain).connect(dest);
+        boomNoise.start(now);
+        boomNoise.stop(now + dur + 0.1);
 
-            const noiseGain = this.ctx.createGain();
-            noiseGain.gain.setValueAtTime(0.46 * caliberScale, now);
-            noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.40);
-
-            noise.connect(filter);
-            filter.connect(noiseGain);
-            if (panner) noiseGain.connect(panner);
-            else noiseGain.connect(this.masterGain);
-            noise.start(now);
-        }
+        setTimeout(() => { this.activeVoices = Math.max(0, this.activeVoices - 1); }, (dur + 0.1) * 1000);
     }
 
     playCrackle(panRatio = 0) {
         if (!soundEnabled || !this.crackleBuffer) return;
         this.init();
         const now = this.ctx.currentTime;
-        if (now - this.lastCrackleTime < 0.045) return;
+        if (now - this.lastCrackleTime < 0.06) return;
         this.lastCrackleTime = now;
 
         const src = this.ctx.createBufferSource();
         src.buffer = this.crackleBuffer;
+        src.playbackRate.value = 0.6 + Math.random() * 0.8;
+        
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 2000;
+
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.18, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+
         const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
         if (panner) {
-            panner.pan.value = Math.max(-0.9, Math.min(0.9, panRatio));
-            src.connect(gain);
-            gain.connect(panner);
-            panner.connect(this.masterGain);
+            panner.pan.value = Math.max(-0.8, Math.min(0.8, panRatio));
+            src.connect(filter).connect(gain).connect(panner).connect(this.masterGain);
         } else {
-            src.connect(gain);
-            gain.connect(this.masterGain);
+            src.connect(filter).connect(gain).connect(this.masterGain);
         }
         src.start(now);
     }
@@ -876,17 +1010,31 @@ class HanabiSoundEngine {
         if (!soundEnabled) return;
         this.init();
         const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
+        if (now - this.lastGhostSoundTime < 0.08) return;
+        this.lastGhostSoundTime = now;
+        
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = this.noiseBuffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.Q.value = 2.0;
+        filter.frequency.setValueAtTime(800, now);
+        filter.frequency.exponentialRampToValueAtTime(2000, now + 0.2);
+
         const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(340, now);
-        osc.frequency.exponentialRampToValueAtTime(680, now + 0.18);
-        gain.gain.setValueAtTime(0.26, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.20);
-        osc.connect(gain);
-        gain.connect(this.masterGain);
-        osc.start(now);
-        osc.stop(now + 0.22);
+        gain.gain.setValueAtTime(0.5, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+
+        const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
+        const dest = panner ? panner : this.masterGain;
+        if (panner) {
+            panner.pan.value = Math.max(-0.8, Math.min(0.8, panRatio));
+            panner.connect(this.masterGain);
+        }
+        
+        noise.connect(filter).connect(gain).connect(dest);
+        noise.start(now);
+        noise.stop(now + 0.3);
     }
 }
 const soundEngine = new HanabiSoundEngine();
@@ -911,7 +1059,7 @@ let lastFpsUpdateTime = performance.now();
 const fpsDisplay = document.getElementById('fpsDisplay');
 
 /**
- * 繪製隅田川浪漫夜景 (維持前一個版本經典簡約東京晴空塔)
+ * 繪製隅田川浪漫夜景與真實細緻晴空塔
  */
 function buildRomanticScenery() {
     sceneryCanvas.width = canvas.width;
@@ -922,7 +1070,6 @@ function buildRomanticScenery() {
 
     const horizonY = height * 0.82;
 
-    // 1. 深邃遠景天際
     const skyGrad = sctx.createLinearGradient(0, 0, 0, horizonY);
     skyGrad.addColorStop(0, '#010207');
     skyGrad.addColorStop(0.7, '#040714');
@@ -930,7 +1077,6 @@ function buildRomanticScenery() {
     sctx.fillStyle = skyGrad;
     sctx.fillRect(0, 0, width, horizonY);
 
-    // 2. 遠方富士山剪影
     const fujiX = width * 0.28;
     const fujiPeakY = horizonY - height * 0.16;
     const fujiBaseW = width * 0.32;
@@ -943,7 +1089,6 @@ function buildRomanticScenery() {
     sctx.closePath();
     sctx.fill();
 
-    // 3. 遠方東京天際線建築剪影
     sctx.fillStyle = '#050814';
     const bCount = Math.floor(width / 34);
     for (let i = 0; i < bCount; i++) {
@@ -962,31 +1107,127 @@ function buildRomanticScenery() {
         }
     }
 
-    // 4. 【東京晴空塔 - 前一個版本經典剪影】
-    const treeX = width * 0.72;
-    const treeTopY = horizonY - height * 0.24;
-    sctx.strokeStyle = '#091226';
-    sctx.lineWidth = 4;
+    // 東京晴空塔 (Tokyo Skytree) 比例精修
+    const skytreeX = width * 0.72;
+    const skytreeHeight = Math.min(height * 0.38, 380); 
+    const deck1Y = horizonY - skytreeHeight * 0.65;
+    const deck2Y = horizonY - skytreeHeight * 0.80;
+    const topY = horizonY - skytreeHeight;
+    const baseW = 26;
+    const deck1W = 16;
+    const deck2W = 10;
+    const spireW = 1.5;
+
+    // 心柱 (Shimbashira)
+    const coreGrad = sctx.createLinearGradient(skytreeX - baseW/3, 0, skytreeX + baseW/3, 0);
+    coreGrad.addColorStop(0, 'rgba(2, 6, 23, 0.8)');
+    coreGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.22)'); 
+    coreGrad.addColorStop(1, 'rgba(2, 6, 23, 0.8)');
+    
+    sctx.fillStyle = coreGrad;
     sctx.beginPath();
-    sctx.moveTo(treeX - 14, horizonY);
-    sctx.lineTo(treeX, treeTopY);
-    sctx.lineTo(treeX + 14, horizonY);
+    sctx.moveTo(skytreeX - baseW/3, horizonY);
+    sctx.lineTo(skytreeX - deck1W/3, deck1Y);
+    sctx.lineTo(skytreeX + deck1W/3, deck1Y);
+    sctx.lineTo(skytreeX + baseW/3, horizonY);
+    sctx.fill();
+
+    // 外部鋼骨輪廓
+    sctx.fillStyle = 'rgba(6, 10, 20, 0.6)';
+    sctx.beginPath();
+    sctx.moveTo(skytreeX - baseW/2, horizonY);
+    sctx.quadraticCurveTo(skytreeX - deck1W/2 - 1, horizonY - skytreeHeight * 0.3, skytreeX - deck1W/2, deck1Y);
+    sctx.lineTo(skytreeX + deck1W/2, deck1Y);
+    sctx.quadraticCurveTo(skytreeX + deck1W/2 + 1, horizonY - skytreeHeight * 0.3, skytreeX + baseW/2, horizonY);
+    sctx.fill();
+
+    sctx.beginPath();
+    sctx.moveTo(skytreeX - deck1W/2 + 1, deck1Y - 8);
+    sctx.lineTo(skytreeX - deck2W/2, deck2Y);
+    sctx.lineTo(skytreeX + deck2W/2, deck2Y);
+    sctx.lineTo(skytreeX + deck1W/2 - 1, deck1Y - 8);
+    sctx.fill();
+
+    sctx.beginPath();
+    sctx.moveTo(skytreeX - deck2W/2 + 1, deck2Y - 6);
+    sctx.lineTo(skytreeX - spireW/2, topY);
+    sctx.lineTo(skytreeX + spireW/2, topY);
+    sctx.lineTo(skytreeX + deck2W/2 - 1, deck2Y - 6);
+    sctx.fill();
+
+    // 細緻鋼骨紋理 (Truss)
+    sctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
+    sctx.lineWidth = 0.6;
+    sctx.beginPath();
+    for (let y = horizonY; y > deck1Y; y -= 6) {
+        let prog = (horizonY - y) / (horizonY - deck1Y);
+        let currW = baseW - (baseW - deck1W) * prog;
+        let nextProg = (horizonY - (y - 6)) / (horizonY - deck1Y);
+        let nextW = baseW - (baseW - deck1W) * nextProg;
+        
+        sctx.moveTo(skytreeX - currW/2, y);
+        sctx.lineTo(skytreeX + nextW/2, y - 6);
+        sctx.moveTo(skytreeX + currW/2, y);
+        sctx.lineTo(skytreeX - nextW/2, y - 6);
+        if (y % 12 === 0) {
+            sctx.moveTo(skytreeX - currW/2, y);
+            sctx.lineTo(skytreeX + currW/2, y);
+        }
+    }
     sctx.stroke();
 
-    sctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
-    sctx.lineWidth = 2.2;
-    sctx.beginPath();
-    sctx.ellipse(treeX, horizonY - height * 0.13, 10, 2.5, 0, 0, Math.PI * 2);
-    sctx.ellipse(treeX, horizonY - height * 0.17, 7, 2, 0, 0, Math.PI * 2);
-    sctx.stroke();
+    // 第一觀景台 (天望甲板)
+    sctx.fillStyle = '#050812';
+    sctx.fillRect(skytreeX - deck1W/2 - 1.5, deck1Y - 10, deck1W + 3, 10);
+    sctx.fillStyle = '#0a1122';
+    sctx.fillRect(skytreeX - deck1W/2 - 2.5, deck1Y - 8, deck1W + 5, 4);
+    
+    sctx.fillStyle = 'rgba(224, 242, 254, 0.6)';
+    sctx.shadowColor = 'rgba(125, 211, 252, 0.4)';
+    sctx.shadowBlur = 4;
+    for(let i=0; i<3; i++) {
+        sctx.fillRect(skytreeX - deck1W/2 + 1, deck1Y - 3 - i*3, deck1W - 2, 1.2);
+    }
+    sctx.shadowBlur = 0;
 
-    // 5. 隅田川水面底色
+    // 第二觀景台 (天望回廊)
+    sctx.fillStyle = '#0a1122';
+    sctx.beginPath();
+    sctx.moveTo(skytreeX - deck2W/2 - 1.5, deck2Y);
+    sctx.lineTo(skytreeX + deck2W/2 + 1.5, deck2Y - 1);
+    sctx.lineTo(skytreeX + deck2W/2 + 0.5, deck2Y - 6);
+    sctx.lineTo(skytreeX - deck2W/2 - 0.5, deck2Y - 5);
+    sctx.closePath();
+    sctx.fill();
+
+    sctx.fillStyle = 'rgba(224, 242, 254, 0.7)';
+    sctx.shadowColor = 'rgba(125, 211, 252, 0.4)';
+    sctx.shadowBlur = 3;
+    sctx.beginPath();
+    sctx.moveTo(skytreeX - deck2W/2 - 1, deck2Y - 1);
+    sctx.lineTo(skytreeX + deck2W/2 + 1, deck2Y - 2.5);
+    sctx.lineTo(skytreeX + deck2W/2 + 1, deck2Y - 3.5);
+    sctx.lineTo(skytreeX - deck2W/2 - 1, deck2Y - 2);
+    sctx.fill();
+    sctx.shadowBlur = 0;
+
     const waterGrad = sctx.createLinearGradient(0, horizonY, 0, height);
     waterGrad.addColorStop(0, '#040713');
     waterGrad.addColorStop(0.5, '#02040b');
     waterGrad.addColorStop(1, '#010206');
     sctx.fillStyle = waterGrad;
     sctx.fillRect(0, horizonY, width, height - horizonY);
+
+    const reflGrad = sctx.createLinearGradient(0, horizonY, 0, horizonY + skytreeHeight * 0.25);
+    reflGrad.addColorStop(0, 'rgba(56, 189, 248, 0.08)');
+    reflGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+    sctx.fillStyle = reflGrad;
+    sctx.beginPath();
+    sctx.moveTo(skytreeX - baseW/2, horizonY);
+    sctx.lineTo(skytreeX + baseW/2, horizonY);
+    sctx.lineTo(skytreeX + 8, horizonY + skytreeHeight * 0.25);
+    sctx.lineTo(skytreeX - 8, horizonY + skytreeHeight * 0.25);
+    sctx.fill();
 
     sctx.strokeStyle = 'rgba(56, 189, 248, 0.16)';
     sctx.lineWidth = 1;
@@ -995,7 +1236,6 @@ function buildRomanticScenery() {
     sctx.lineTo(width, horizonY);
     sctx.stroke();
 
-    // 6. 江畔近景堤防
     sctx.fillStyle = '#03050c';
     sctx.beginPath();
     sctx.moveTo(width * 0.58, height);
@@ -1004,7 +1244,6 @@ function buildRomanticScenery() {
     sctx.closePath();
     sctx.fill();
 
-    // 7. 堤防長椅與戀人剪影
     const benchX = width * 0.88;
     const benchY = height - 34;
 
@@ -1034,7 +1273,6 @@ function buildRomanticScenery() {
     sctx.closePath();
     sctx.fill();
 
-    // 8. 右上角枝垂柳剪影
     sctx.strokeStyle = '#05070f';
     sctx.lineWidth = 1.8;
     for (let k = 0; k < 6; k++) {
@@ -1060,19 +1298,25 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-/**
- * 發射火箭主函式
- */
 function launchRocket(targetX = null, targetY = null, customStyleId = null, forceSudden = false, options = {}) {
     const horizonY = height * 0.82;
     const destX = targetX !== null ? targetX : (width * 0.15 + Math.random() * width * 0.7);
     const destY = targetY !== null ? targetY : (height * 0.12 + Math.random() * height * 0.38);
 
     let styleId = customStyleId || currentStyleId;
+    
     if (styleId === 'all') {
-        const available = HANABI_STYLES_CATALOG.filter(s => s.id !== 'all');
+        const available = HANABI_STYLES_CATALOG.filter(s => s.id !== 'all' && s.id !== 'random_lush');
         styleId = available[Math.floor(Math.random() * available.length)].id;
+    } else if (styleId === 'random_lush') {
+        const available = HANABI_STYLES_CATALOG.filter(s => s.isLush);
+        if (available.length > 0) {
+            styleId = available[Math.floor(Math.random() * available.length)].id;
+        } else {
+            styleId = HANABI_STYLES_CATALOG[1].id;
+        }
     }
+    
     const style = HANABI_STYLES_CATALOG.find(s => s.id === styleId) || HANABI_STYLES_CATALOG[1];
 
     if (forceSudden) {
@@ -1116,9 +1360,6 @@ function showComboToast(title) {
     toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 2800);
 }
 
-/**
- * 12 大正統競技 Star Mine 連射組合演出引擎
- */
 function triggerStarmineCombo(forcedComboId = null) {
     if (isFinaleActive || isComboActive) return;
     isComboActive = true;
@@ -1132,9 +1373,6 @@ function triggerStarmineCombo(forcedComboId = null) {
     const comboInfo = STARMINE_COMBOS.find(c => c.id === comboKey) || STARMINE_COMBOS[0];
     showComboToast(comboInfo.name);
 
-    const horizonY = height * 0.82;
-
-    // 1. 【扇状ワイド・千輪扇型スターマイン (7發扇型展開)】
     if (comboKey === 'fan_wide') {
         const count = 7;
         const centerX = width * 0.5;
@@ -1146,18 +1384,11 @@ function triggerStarmineCombo(forcedComboId = null) {
                 const ty = height * 0.28 - arcHeight;
                 const fanStyles = ['lush_senrin_hyakka', 'lush_mangekyo_hanabi', 'yukiwariso_pastel', 'gosin_kiku'];
                 const st = fanStyles[i % fanStyles.length];
-
-                launchRocket(tx, ty, st, false, {
-                    startX: centerX + (spreadRatio - 0.5) * 80,
-                    durationMult: 0.95,
-                    densityMult: 0.72
-                });
-
+                launchRocket(tx, ty, st, false, { startX: centerX + (spreadRatio - 0.5) * 80, durationMult: 0.95, densityMult: 0.72 });
                 if (i === count - 1) setTimeout(() => { isComboActive = false; }, 2600);
             }, i * 90);
         }
     } 
-    // 2. 【七色連段・虹彩レインボー (7色漸層光譜)】
     else if (comboKey === 'rainbow_cascade') {
         const rainbowColors = [
             { col: '#ef4444' }, { col: '#f97316' }, { col: '#facc15' },
@@ -1168,19 +1399,11 @@ function triggerStarmineCombo(forcedComboId = null) {
             setTimeout(() => {
                 const tx = width * 0.15 + (i / (count - 1)) * (width * 0.7);
                 const ty = height * (0.16 + (i % 2) * 0.08);
-
-                launchRocket(tx, ty, 'gosin_kiku', false, {
-                    startX: width * 0.2 + (i / count) * (width * 0.6),
-                    durationMult: 0.9,
-                    densityMult: 0.70,
-                    colorOverride: rc.col
-                });
-
+                launchRocket(tx, ty, 'gosin_kiku', false, { startX: width * 0.2 + (i / count) * (width * 0.6), durationMult: 0.9, densityMult: 0.70, colorOverride: rc.col });
                 if (i === count - 1) setTimeout(() => { isComboActive = false; }, 2600);
             }, i * 130);
         });
     } 
-    // 3. 【虎の尾・黄金昇天連射 (金火柱連環)】
     else if (comboKey === 'tiger_tail') {
         const count = 6;
         for (let i = 0; i < count; i++) {
@@ -1188,61 +1411,36 @@ function triggerStarmineCombo(forcedComboId = null) {
                 const sx = width * 0.22 + (i / (count - 1)) * (width * 0.56);
                 const tx = sx + (Math.random() - 0.5) * 40;
                 const ty = height * 0.18 + Math.random() * (height * 0.1);
-
-                launchRocket(tx, ty, 'lush_kamuro_curtain', false, {
-                    startX: sx,
-                    durationMult: 0.85,
-                    densityMult: 0.75,
-                    isTigerTail: true
-                });
-
+                launchRocket(tx, ty, 'lush_kamuro_curtain', false, { startX: sx, durationMult: 0.85, densityMult: 0.75, isTigerTail: true });
                 if (i === count - 1) setTimeout(() => { isComboActive = false; }, 3000);
             }, i * 110);
         }
     } 
-    // 4. 【交差連発・双龍錦冠 (左右交錯對射)】
     else if (comboKey === 'crossfire_dragons') {
         const pairs = 3;
         let shot = 0;
         for (let p = 0; p < pairs; p++) {
             setTimeout(() => {
-                launchRocket(width * 0.75, height * 0.20 + p * 20, 'lush_kamuro_curtain', false, {
-                    startX: width * 0.22,
-                    durationMult: 1.05,
-                    densityMult: 0.72
-                });
-
+                launchRocket(width * 0.75, height * 0.20 + p * 20, 'lush_kamuro_curtain', false, { startX: width * 0.22, durationMult: 1.05, densityMult: 0.72 });
                 setTimeout(() => {
-                    launchRocket(width * 0.25, height * 0.20 + p * 20, 'lush_ogon_niagara', false, {
-                        startX: width * 0.78,
-                        durationMult: 1.05,
-                        densityMult: 0.72
-                    });
+                    launchRocket(width * 0.25, height * 0.20 + p * 20, 'lush_ogon_niagara', false, { startX: width * 0.78, durationMult: 1.05, densityMult: 0.72 });
                 }, 90);
-
                 shot += 2;
                 if (shot >= pairs * 2) setTimeout(() => { isComboActive = false; }, 3200);
             }, p * 340);
         }
     } 
-    // 5. 【時差百花・幽霊変色ラッシュ (潛行骨牌復燃)】
     else if (comboKey === 'ghost_rush') {
         const count = 6;
         for (let i = 0; i < count; i++) {
             setTimeout(() => {
                 const tx = width * 0.18 + (i / (count - 1)) * (width * 0.64);
                 const ty = height * (0.15 + (i % 3) * 0.07);
-
-                launchRocket(tx, ty, 'yurei_ghost', false, {
-                    durationMult: 0.92,
-                    densityMult: 0.72
-                });
-
+                launchRocket(tx, ty, 'yurei_ghost', false, { durationMult: 0.92, densityMult: 0.72 });
                 if (i === count - 1) setTimeout(() => { isComboActive = false; }, 3200);
             }, i * 140);
         }
     }
-    // 6. 【翼翔乱舞・V字ツインウィング (雙翼V型展翅)】
     else if (comboKey === 'v_shape_wings') {
         const pairs = 4;
         let done = 0;
@@ -1251,39 +1449,27 @@ function triggerStarmineCombo(forcedComboId = null) {
                 const ratio = (k + 1) / pairs;
                 const lx = width * 0.5 - (ratio * width * 0.38);
                 const rx = width * 0.5 + (ratio * width * 0.38);
-                const ty = height * 0.40 - (ratio * height * 0.25); // 越兩側越高
-
+                const ty = height * 0.40 - (ratio * height * 0.25);
                 launchRocket(lx, ty, 'yonsin_kiku', false, { startX: width * 0.46, durationMult: 0.9 + ratio * 0.15, densityMult: 0.70 });
                 launchRocket(rx, ty, 'gosin_kiku', false, { startX: width * 0.54, durationMult: 0.9 + ratio * 0.15, densityMult: 0.70 });
-
                 done += 2;
                 if (done >= pairs * 2) setTimeout(() => { isComboActive = false; }, 2800);
             }, k * 180);
         }
     }
-    // 7. 【天河大瀑布・超ワイド黄金ナイアガラ (全江面5砲台金瀑)】
     else if (comboKey === 'kamuro_waterfall') {
         const spots = [0.15, 0.32, 0.50, 0.68, 0.85];
         spots.forEach((pos, idx) => {
             setTimeout(() => {
-                launchRocket(width * pos, height * 0.20, 'lush_kamuro_curtain', false, {
-                    startX: width * pos,
-                    durationMult: 0.95,
-                    densityMult: 0.65,
-                    isTigerTail: true
-                });
+                launchRocket(width * pos, height * 0.20, 'lush_kamuro_curtain', false, { startX: width * pos, durationMult: 0.95, densityMult: 0.65, isTigerTail: true });
                 if (idx === spots.length - 1) setTimeout(() => { isComboActive = false; }, 3400);
             }, idx * 70);
         });
     }
-    // 8. 【霊峰黎明・紅富士ご来光 (富士旭日昇天)】
     else if (comboKey === 'fuji_sunrise') {
         const fujiX = width * 0.28;
-        // 兩側金柱連射
         launchRocket(fujiX - width * 0.14, height * 0.28, 'gold_willow_dragon', false, { startX: fujiX - width * 0.14, isTigerTail: true, densityMult: 0.7 });
         launchRocket(fujiX + width * 0.14, height * 0.28, 'gold_willow_dragon', false, { startX: fujiX + width * 0.14, isTigerTail: true, densityMult: 0.7 });
-
-        // 頂點富士紅日三段昇華
         [0, 1, 2].forEach(stg => {
             setTimeout(() => {
                 const targetY = height * (0.24 - stg * 0.06);
@@ -1293,23 +1479,17 @@ function triggerStarmineCombo(forcedComboId = null) {
             }, 260 + stg * 240);
         });
     }
-    // 9. 【流れ星群・彗星銀河シャワー (超密集銀龍流星雨)】
     else if (comboKey === 'meteor_shower') {
         const count = 8;
         for (let i = 0; i < count; i++) {
             setTimeout(() => {
                 const tx = width * 0.18 + (i / (count - 1)) * (width * 0.64);
                 const ty = height * (0.14 + (i % 3) * 0.06);
-                launchRocket(tx, ty, 'senko_shiranami', false, {
-                    startX: tx + (Math.random() - 0.5) * 50,
-                    durationMult: 0.82,
-                    densityMult: 0.68
-                });
+                launchRocket(tx, ty, 'senko_shiranami', false, { startX: tx + (Math.random() - 0.5) * 50, durationMult: 0.82, densityMult: 0.68 });
                 if (i === count - 1) setTimeout(() => { isComboActive = false; }, 2900);
             }, i * 90);
         }
     }
-    // 10. 【銀河乱点滅・百花ダイヤモンド (極限閃爍鑽石群)】
     else if (comboKey === 'thousand_strobe') {
         const count = 8;
         for (let i = 0; i < count; i++) {
@@ -1322,24 +1502,19 @@ function triggerStarmineCombo(forcedComboId = null) {
             }, i * 110);
         }
     }
-    // 11. 【昇龍螺旋・DNAダブルヘリックス (交織雙螺旋梯)】
     else if (comboKey === 'spiral_dna') {
         const steps = 4;
         let shots = 0;
         for (let s = 0; s < steps; s++) {
             setTimeout(() => {
                 const ty = height * 0.34 - s * (height * 0.05);
-                // 左旋
                 launchRocket(width * 0.42, ty, 'saturn_ring', false, { startX: width * 0.36, durationMult: 0.85 + s * 0.08, densityMult: 0.68 });
-                // 右旋
                 launchRocket(width * 0.58, ty, 'lush_mangekyo_hanabi', false, { startX: width * 0.64, durationMult: 0.85 + s * 0.08, densityMult: 0.68 });
-
                 shots += 2;
                 if (shots >= steps * 2) setTimeout(() => { isComboActive = false; }, 2800);
             }, s * 220);
         }
     }
-    // 12. 【満開桜嵐・隅田川花吹雪 (急速櫻花風暴)】
     else if (comboKey === 'sakura_blizzard') {
         const count = 8;
         for (let i = 0; i < count; i++) {
@@ -1352,12 +1527,100 @@ function triggerStarmineCombo(forcedComboId = null) {
             }, i * 100);
         }
     }
+    else if (comboKey === 'heart_beat') {
+        const count = 6;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const tx = width * 0.2 + (i / (count - 1)) * (width * 0.6);
+                const ty = height * (0.15 + (i % 2) * 0.1);
+                launchRocket(tx, ty, 'crimson_heart', false, { durationMult: 0.9, densityMult: 0.8 });
+                if (i === count - 1) setTimeout(() => { isComboActive = false; }, 2600);
+            }, i * 200);
+        }
+    }
+    else if (comboKey === 'wabi_sabi_zen') {
+        const steps = [
+            { x: 0.2, y: 0.3, st: 'wabi_edo_charcoal' },
+            { x: 0.8, y: 0.3, st: 'suifu_wabi_willow' },
+            { x: 0.35, y: 0.2, st: 'yurei_ghost' },
+            { x: 0.65, y: 0.2, st: 'yurei_blood' },
+            { x: 0.5, y: 0.15, st: 'tosa_wabi_cascade' },
+            { x: 0.25, y: 0.18, st: 'senrin_gold' },
+            { x: 0.75, y: 0.18, st: 'senrin_gold' }
+        ];
+        steps.forEach((step, i) => {
+            setTimeout(() => {
+                launchRocket(width * step.x, height * step.y, step.st, false, { durationMult: 0.95, densityMult: 0.75, isTigerTail: (i < 2) });
+                if (i === steps.length - 1) setTimeout(() => { isComboActive = false; }, 3500);
+            }, i * 350);
+        });
+    }
+    else if (comboKey === 'ufo_invasion') {
+        const count = 8;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const tx = width * 0.15 + (i / (count - 1)) * (width * 0.7);
+                const ty = height * (0.12 + Math.random() * 0.15);
+                const st = (i % 2 === 0) ? 'double_ring_blue' : 'saturn_ring';
+                launchRocket(tx, ty, st, false, { durationMult: 0.85, densityMult: 0.75 });
+                if (i === count - 1) setTimeout(() => { isComboActive = false; }, 2800);
+            }, i * 180);
+        }
+    }
+    else if (comboKey === 'triple_peacock') {
+        setTimeout(() => { launchRocket(width * 0.5, height * 0.25, 'peacock_feather', false, { densityMult: 0.8 }); }, 0);
+        setTimeout(() => { 
+            launchRocket(width * 0.25, height * 0.3, 'peacock_gold', false, { startX: width * 0.35, densityMult: 0.8 }); 
+            launchRocket(width * 0.75, height * 0.3, 'peacock_gold', false, { startX: width * 0.65, densityMult: 0.8 }); 
+        }, 600);
+        setTimeout(() => {
+            launchRocket(width * 0.35, height * 0.15, 'peacock_feather', false, { densityMult: 0.8 }); 
+            launchRocket(width * 0.65, height * 0.15, 'peacock_feather', false, { densityMult: 0.8 }); 
+        }, 1200);
+        setTimeout(() => { launchRocket(width * 0.5, height * 0.1, 'peacock_gold', false, { densityMult: 1.0 }); }, 1800);
+        setTimeout(() => { isComboActive = false; }, 4000);
+    }
+    else if (comboKey === 'ruby_sapphire') {
+        const pairs = 4;
+        let shot = 0;
+        for (let p = 0; p < pairs; p++) {
+            setTimeout(() => {
+                launchRocket(width * 0.3, height * 0.20 + p * 15, 'strobe_ruby', false, { startX: width * 0.7, durationMult: 0.9, densityMult: 0.75 });
+                setTimeout(() => {
+                    launchRocket(width * 0.7, height * 0.20 + p * 15, 'blue_sapphire_pure', false, { startX: width * 0.3, durationMult: 0.9, densityMult: 0.75 });
+                }, 120);
+                shot += 2;
+                if (shot >= pairs * 2) setTimeout(() => { isComboActive = false; }, 3000);
+            }, p * 300);
+        }
+    }
+    else if (comboKey === 'golden_climax') {
+        const count = 10;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const tx = width * 0.1 + Math.random() * (width * 0.8);
+                const ty = height * (0.1 + Math.random() * 0.2);
+                const styles = ['lush_kamuro_curtain', 'gold_willow_dragon', 'senrin_gold', 'kamuro_saki_wari'];
+                const st = styles[i % styles.length];
+                launchRocket(tx, ty, st, false, { durationMult: 0.8, densityMult: 0.8, isTigerTail: true });
+                if (i === count - 1) setTimeout(() => { isComboActive = false; }, 3500);
+            }, i * 150);
+        }
+    }
+    else if (comboKey === 'random_lush_rush') {
+        const count = 8;
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const tx = width * 0.15 + Math.random() * (width * 0.70);
+                const ty = height * 0.12 + Math.random() * (height * 0.25);
+                launchRocket(tx, ty, 'random_lush', false, { durationMult: 0.85, densityMult: 0.85, isTigerTail: Math.random() > 0.5 });
+                if (i === count - 1) setTimeout(() => { isComboActive = false; }, 3200);
+            }, i * 160);
+        }
+    }
 }
 
-/**
- * 頂點爆破 (支援型物輪型、段咲き階梯、以及動態自適應負載平衡)
- */
-const MAX_GLOBAL_STARS = 1250;
+const MAX_GLOBAL_STARS = 1350;
 
 function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, colorOverride = null) {
     ambientFlashes.push({
@@ -1373,10 +1636,11 @@ function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, 
 
     let loadFactor = 1.0;
     if (stars.length > 400) {
-        loadFactor = Math.max(0.38, (MAX_GLOBAL_STARS - stars.length) / (MAX_GLOBAL_STARS - 400));
+        loadFactor = Math.max(0.4, (MAX_GLOBAL_STARS - stars.length) / (MAX_GLOBAL_STARS - 400));
     }
 
-    const baseCount = Math.round(style.particles * particleMult * caliberMultiplier * densityScale * loadFactor);
+    // 依據動態品質因數調節生成的粒子量，避免低端硬體掉幀
+    const baseCount = Math.round(style.particles * particleMult * caliberMultiplier * densityScale * loadFactor * perfQuality);
     const totalCount = Math.max(45, baseCount);
     const speedMult = Math.max(1.0, (height / 850)) * caliberMultiplier;
     const baseSpeed = style.baseSpeed * speedMult;
@@ -1430,11 +1694,45 @@ function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, 
                 color = style.colors[0];
                 bloomDelay = 28;
             }
-        } else if (style.id === 'peacock_feather') {
+        } else if (style.id === 'peacock_feather' || style.isPeacock) {
             const fanAngle = -Math.PI * 0.95 + (k / totalCount) * Math.PI * 0.9;
             const sp = baseSpeed * (0.85 + Math.random() * 0.3);
             vx = Math.cos(fanAngle) * sp * 1.2;
             vy = Math.sin(fanAngle) * sp;
+        } else if (style.isDoubleRing) {
+            const isCore = (k < totalCount * 0.4);
+            const countPart = isCore ? (totalCount * 0.4) : (totalCount * 0.6);
+            const angle = (k / countPart) * Math.PI * 2;
+            const ringTilt = 0.38;
+            const sp = isCore ? (baseSpeed * 0.6) : (baseSpeed * 1.15);
+            vx = Math.cos(angle) * sp;
+            vy = Math.sin(angle) * (sp * ringTilt) - (vx * 0.25);
+            color = isCore ? style.coreColors[0] : style.colors[k % style.colors.length];
+        } else if (style.isHeart) {
+            const t = (k / totalCount) * Math.PI * 2;
+            const hx = 16 * Math.pow(Math.sin(t), 3);
+            const hy = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+            const scale = baseSpeed * 0.055;
+            vx = hx * scale;
+            vy = -hy * scale; 
+        } else if (style.isSmiley) {
+            let ptX = 0, ptY = 0;
+            if (k < totalCount * 0.6) {
+                const t = (k / (totalCount * 0.6)) * Math.PI * 2;
+                ptX = Math.cos(t) * 16; ptY = Math.sin(t) * 16;
+            } else if (k < totalCount * 0.65) {
+                ptX = -6; ptY = -5; 
+            } else if (k < totalCount * 0.70) {
+                ptX = 6; ptY = -5;
+            } else {
+                const t = ((k - totalCount * 0.70) / (totalCount * 0.30));
+                const a = Math.PI * 0.15 + t * Math.PI * 0.7;
+                ptX = Math.cos(a) * 10; ptY = Math.sin(a) * 10;
+            }
+            const scale = baseSpeed * 0.055;
+            vx = ptX * scale;
+            vy = ptY * scale;
+            color = style.colors[0];
         } else if (style.id === 'lush_mangekyo_hanabi' && !colorOverride) {
             const angle = (k / totalCount) * Math.PI * 2;
             const layer = k % 6;
@@ -1465,8 +1763,9 @@ function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, 
             vy = Math.sin(angle) * sp;
         }
 
-        const lifetimeJitter = (Math.random() - 0.5) * (baseLifetime * 0.26);
-        const individualLifetime = Math.max(48, Math.round(baseLifetime + lifetimeJitter));
+        const lifetimeJitter = (Math.random() - 0.5) * (baseLifetime * 0.4);
+        const individualLifetime = Math.max(56, Math.round(baseLifetime + lifetimeJitter));
+        const individualDrag = style.airDrag * (0.99 + Math.random() * 0.02);
 
         stars.push({
             x, y,
@@ -1476,11 +1775,12 @@ function explodeRocketDirect(x, y, style, isSudden = false, densityScale = 1.0, 
             vx, vy,
             alpha: 1.0,
             style,
+            drag: individualDrag,
             color,
             radius,
             age: 0,
             cutoffLifetime: individualLifetime,
-            fadeDuration: Math.round(individualLifetime * 0.22),
+            fadeDuration: Math.round(individualLifetime * (0.22 + Math.random() * 0.12)),
             phase: Math.random() * Math.PI * 2,
             wobbleSpeed: 0.25 + Math.random() * 0.2,
             sakiWariAge: Math.round((style.sakiWariAge || 72) + (Math.random() - 0.5) * 12),
@@ -1524,29 +1824,37 @@ function renderDynamicBoats(now) {
             ctx.globalAlpha = flicker;
             ctx.fillRect(lx - 2, ly - 2, 4, 4);
 
-            if (showReflection) {
+            if (showReflection && perfQuality > 0.75) {
                 const refH = 24 + idx * 8;
                 ctx.fillStyle = b.lanternColor;
-                ctx.globalAlpha = flicker * 0.25;
+                ctx.globalAlpha = flicker * 0.22;
                 ctx.fillRect(lx - 1.5, by + 12, 3, refH);
             }
         }
     });
 
-    // 晴空塔頂部紅航空信號燈 (前一版本經典呼吸頻率)
-    const treeX = width * 0.72;
-    const treeTopY = horizonY - height * 0.24 - 22;
+    const skytreeX = width * 0.72;
+    const skytreeHeight = Math.min(height * 0.38, 380); 
+    const topY = horizonY - skytreeHeight;
     const beaconPulse = Math.pow(Math.max(0, Math.sin(now * 0.002)), 3);
     if (beaconPulse > 0.05) {
         ctx.fillStyle = '#ef4444';
-        ctx.globalAlpha = beaconPulse * 0.85;
-        ctx.fillRect(treeX - 2, treeTopY - 2, 4, 4);
+        ctx.globalAlpha = beaconPulse * 0.6;
+        ctx.fillRect(skytreeX - 1, topY - 1, 2, 2);
     }
 }
 
-/* 主動畫渲染迴圈 */
 function animate(now) {
     requestAnimationFrame(animate);
+
+    // 硬體偵測：依據即時影格耗時動態調整負載
+    const delta = now - lastFrameTime;
+    lastFrameTime = now;
+    if (delta > 22) { // 低於 45 FPS
+        perfQuality = Math.max(0.65, perfQuality - 0.02);
+    } else if (delta < 17 && perfQuality < 1.0) { // 穩定 60 FPS
+        perfQuality = Math.min(1.0, perfQuality + 0.005);
+    }
 
     frameCount++;
     if (now - lastFpsUpdateTime >= 500) {
@@ -1556,22 +1864,19 @@ function animate(now) {
         fpsDisplay.textContent = `${fps} FPS`;
     }
 
-    ctx.fillStyle = 'rgba(1, 2, 7, 0.22)';
-    ctx.fillRect(0, 0, width, height);
-
+    // 渲染背景底圖
     ctx.drawImage(sceneryCanvas, 0, 0, width, height);
     renderDynamicBoats(now);
 
     const horizonY = height * 0.82;
 
-    // 爆閃貼圖直接硬體 Blit
     for (let i = ambientFlashes.length - 1; i >= 0; i--) {
         const fl = ambientFlashes[i];
         ctx.globalAlpha = fl.alpha;
         ctx.drawImage(FLASH_TEXTURE, fl.x - fl.radius, fl.y - fl.radius, fl.radius * 2, fl.radius * 2);
-
-        fl.alpha -= 0.035;
-        if (fl.alpha <= 0) {
+        fl.alpha *= 0.92;
+        fl.alpha -= 0.01;
+        if (fl.alpha <= 0.01) {
             ambientFlashes[i] = ambientFlashes[ambientFlashes.length - 1];
             ambientFlashes.pop();
         }
@@ -1579,12 +1884,11 @@ function animate(now) {
 
     ctx.globalCompositeOperation = 'lighter';
 
-    // 昇空火箭
     for (let i = rockets.length - 1; i >= 0; i--) {
         const r = rockets[i];
         r.t++;
         const prog = Math.min(1.0, r.t / r.totalDuration);
-        const ease = 1 - Math.pow(1 - prog, 2.0);
+        const ease = 1 - (1 - prog) * (1 - prog);
 
         r.ppx = r.px; r.ppy = r.py;
         r.px = r.x; r.py = r.y;
@@ -1592,7 +1896,7 @@ function animate(now) {
         r.y = r.startY - (r.startY - r.targetY) * ease;
 
         if (r.isTigerTail) {
-            if (ascentSparks.length < 90) {
+            if (ascentSparks.length < 80) {
                 ascentSparks.push({
                     x: r.x + (Math.random() - 0.5) * 6,
                     y: r.y + Math.random() * 4,
@@ -1601,7 +1905,7 @@ function animate(now) {
                     alpha: 0.9, decay: 0.035, isTiger: true
                 });
             }
-        } else if (ascentSparks.length < 50 && Math.random() > 0.45) {
+        } else if (ascentSparks.length < 45 && Math.random() > 0.45) {
             ascentSparks.push({
                 x: r.x + (Math.random() - 0.5) * 3,
                 y: r.y,
@@ -1628,7 +1932,6 @@ function animate(now) {
         }
     }
 
-    // 昇空微粒
     for (let i = ascentSparks.length - 1; i >= 0; i--) {
         const sp = ascentSparks[i];
         sp.x += sp.vx;
@@ -1643,7 +1946,9 @@ function animate(now) {
         ctx.fillRect(sp.x, sp.y, sp.isTiger ? 2.0 : 1.3, sp.isTiger ? 2.0 : 1.3);
     }
 
-    // 花火星光粒子
+    // 將線條端點類型提前設定，省去迴圈內上千次多餘的上下文狀態切換
+    ctx.lineCap = 'round';
+
     for (let i = stars.length - 1; i >= 0; i--) {
         const st = stars[i];
 
@@ -1670,20 +1975,11 @@ function animate(now) {
         st.x1 = st.x;  st.y1 = st.y;
         st.x += st.vx;
         st.y += st.vy;
-        st.vx *= st.style.airDrag;
-        st.vy = st.vy * st.style.airDrag + st.style.gravity;
+        st.vx *= st.drag;
+        st.vy = st.vy * st.drag + st.style.gravity;
 
         let alphaFactor = 1.0;
         const remainingTicks = st.cutoffLifetime - st.age;
-        if (remainingTicks <= st.fadeDuration) {
-            if (remainingTicks <= 0) {
-                stars[i] = stars[stars.length - 1];
-                stars.pop();
-                continue;
-            }
-            const p = remainingTicks / st.fadeDuration;
-            alphaFactor = p * p * (3 - 2 * p);
-        }
 
         if (profile === 'color_cool') {
             const lifeRatio = st.age / st.cutoffLifetime;
@@ -1703,23 +1999,23 @@ function animate(now) {
         } else if (profile === 'saki_wari') {
             if (st.age >= st.sakiWariAge && !st.sakiWariTriggered) {
                 st.sakiWariTriggered = true;
-                const pan = (st.x / width) * 2 - 1;
-                soundEngine.playCrackle(pan);
+                soundEngine.playCrackle((st.x / width) * 2 - 1);
 
-                if (microSparks.length < 80) {
-                    for (let s = 0; s < 2; s++) {
-                        const ma = Math.random() * Math.PI * 2;
-                        const msp = 1.2 + Math.random() * 0.8;
-                        microSparks.push({
-                            x: st.x, y: st.y,
-                            vx: Math.cos(ma) * msp, vy: Math.sin(ma) * msp,
-                            alpha: 1.0,
-                            color: st.style.sakiColor || ((Math.random() > 0.5) ? '#ffffff' : '#fde047'),
-                            decay: 0.052
-                        });
-                    }
+                if (microSparks.length < 50 && perfQuality > 0.7) {
+                    const ma = Math.random() * Math.PI * 2;
+                    const msp = 1.2 + Math.random() * 0.8;
+                    microSparks.push({
+                        x: st.x, y: st.y,
+                        vx: Math.cos(ma) * msp, vy: Math.sin(ma) * msp,
+                        alpha: 1.0,
+                        color: st.style.sakiColor || ((Math.random() > 0.5) ? '#ffffff' : '#fde047'),
+                        decay: 0.055
+                    });
                 }
-                st.age = st.cutoffLifetime - 5;
+                // 先割擴散：離散衰退時間，避免所有先割星玉在同一個影格同時消失
+                const extraLife = 14 + Math.floor(Math.random() * 14);
+                st.cutoffLifetime = st.age + extraLife;
+                st.fadeDuration = extraLife;
             } else {
                 st.alpha -= st.style.decayRate;
             }
@@ -1727,25 +2023,52 @@ function animate(now) {
             const darkStart = st.style.darkAgeStart || 18;
             const darkEnd = st.style.darkAgeEnd || 48;
             if (st.age >= darkStart && st.age < darkEnd) {
-                alphaFactor = 0;
+                // 幽靈暗態：平順過渡至極淡餘燼，避免瞬間完全切斷造成閃動停頓感
+                const darkProg = (st.age - darkStart) / (darkEnd - darkStart);
+                alphaFactor = 0.04 + 0.05 * Math.sin(darkProg * Math.PI);
             } else if (st.age >= darkEnd) {
                 if (!st.ghostReignited) {
                     st.ghostReignited = true;
                     const reignitePalette = st.style.reigniteColors || ['#00f5d4'];
                     st.color = reignitePalette[Math.floor(Math.random() * reignitePalette.length)];
-                    st.radius = 2.3;
-                    if (Math.random() < 0.25) soundEngine.playGhostReignite((st.x / width) * 2 - 1);
+                    st.radius = 2.2;
+                    soundEngine.playGhostReignite((st.x / width) * 2 - 1);
                 }
-                st.alpha -= 0.008;
+                st.alpha -= 0.007;
             } else {
-                st.alpha -= 0.004;
+                st.alpha -= 0.003;
             }
         } else {
             st.alpha -= st.style.decayRate;
         }
 
+        // 高效平滑消散計算 (SmoothStep 代替開方與指數，完全消滅 CPU 掉幀)
+        if (remainingTicks <= st.fadeDuration) {
+            const p = Math.max(0, remainingTicks / st.fadeDuration);
+            // 代數平滑過渡曲線 S-curve: 3p^2 - 2p^3
+            const pSmooth = p * p * (3 - 2 * p);
+            alphaFactor *= pSmooth;
+            displayRadius *= (0.5 + 0.5 * p);
+
+            // 光軌尾巴平滑縮進
+            const shrink = (1.0 - p) * 0.45;
+            st.x3 += (st.x2 - st.x3) * shrink;
+            st.y3 += (st.y2 - st.y3) * shrink;
+            st.x2 += (st.x1 - st.x2) * shrink * 0.5;
+            st.y2 += (st.y1 - st.y2) * shrink * 0.5;
+        }
+
         const renderAlpha = Math.max(0, Math.min(1, st.alpha * alphaFactor));
-        if (renderAlpha <= 0.02) continue;
+
+        // 核心修復：只有在真正到達壽命上限時才移出陣列，未達前僅略過繪製，徹底杜絕突發性集體消失
+        if (remainingTicks <= 0) {
+            stars[i] = stars[stars.length - 1];
+            stars.pop();
+            continue;
+        }
+        if (renderAlpha < 0.015) {
+            continue;
+        }
 
         ctx.beginPath();
         ctx.moveTo(st.x3, st.y3);
@@ -1754,7 +2077,6 @@ function animate(now) {
         ctx.lineTo(st.x, st.y);
         ctx.strokeStyle = st.color;
         ctx.lineWidth = (profile === 'willow_long' || st.style.isLush) ? Math.max(0.85, displayRadius * 0.95) : 1.15;
-        ctx.lineCap = 'round';
         ctx.globalAlpha = renderAlpha * 0.85;
         ctx.stroke();
 
@@ -1764,25 +2086,26 @@ function animate(now) {
             ctx.globalAlpha = renderAlpha;
             ctx.fillRect(st.x - displayRadius, st.y - displayRadius, sz, sz);
 
-            if (renderAlpha > 0.35) {
+            // 消退中的暗星不再繪製白色核心，節省大量 GPU 填充率
+            if (renderAlpha > 0.45) {
                 ctx.fillStyle = '#ffffff';
                 ctx.globalAlpha = renderAlpha * 0.9;
                 ctx.fillRect(st.x - 0.75, st.y - 0.75, 1.5, 1.5);
             }
         }
 
-        if (showReflection && st.isEven && st.y < horizonY && renderAlpha > 0.2) {
+        // 倒影優化：微弱星光不再計算水面倒影
+        if (showReflection && st.isEven && st.y < horizonY && renderAlpha > 0.35 && perfQuality > 0.7) {
             const dy = horizonY - st.y;
             const refY = horizonY + dy * 0.62;
             if (refY < height) {
                 ctx.fillStyle = st.color;
-                ctx.globalAlpha = renderAlpha * 0.2;
+                ctx.globalAlpha = renderAlpha * 0.18;
                 ctx.fillRect(st.x - displayRadius, refY, displayRadius * 2.2, 1.4);
             }
         }
     }
 
-    // 先割微星
     for (let i = microSparks.length - 1; i >= 0; i--) {
         const m = microSparks[i];
         m.x += m.vx;
@@ -1804,7 +2127,6 @@ function animate(now) {
         if (now - lastAutoTime > autoInterval) {
             lastAutoTime = now;
             consecutiveSingleLaunches++;
-
             const comboThresholds = [9999, 10, 7, 4, 2];
             const threshold = comboThresholds[autoComboFrequencyLevel];
 
@@ -1862,7 +2184,6 @@ initSelectOptions();
 canvas.addEventListener('pointerdown', (e) => {
     soundEngine.init();
     launchRocket(e.clientX, e.clientY, null, false);
-
     const hint = document.getElementById('touchHint');
     if (hint) {
         hint.style.opacity = '0';
