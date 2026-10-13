@@ -753,7 +753,7 @@ const STARMINE_COMBOS = [
     { id: 'fuji_sunrise', name: '🌅 霊峰黎明・紅富士ご来光', desc: '以富士山為背景，左右金火柱升起，中央綻放旭日', shotCount: 7 },
     { id: 'meteor_shower', name: '🌠 流れ星群・彗星銀河シャワー', desc: '超密集銀龍衝頂，爆散為流星雨銀波長垂江面', shotCount: 8 },
     { id: 'thousand_strobe', name: '💎 銀河乱点滅・百花ダイヤモンド', desc: '白鑽與翡翠點滅交錯，超新星群連續引爆', shotCount: 8 },
-    { id: 'spiral_dna', name: '🧬 昇龍螺旋・DNAダブルヘリックス', desc: '左右交織雙螺旋升天梯，爆出土星環與萬華鏡', shotCount: 8 },
+    { id: 'spiral_dna', name: '🧬 昇龍螺旋・DNAダブルヘリックス', desc: '交織雙螺旋升天梯，爆出土星環與萬華鏡', shotCount: 8 },
     { id: 'sakura_blizzard', name: '🌸 満開桜嵐・隅田川花吹雪', desc: '粉櫻、玫瑰金急速波浪推移，天幕櫻花暴風雨', shotCount: 8 },
     { id: 'heart_beat', name: '💓 愛の鼓動・ハートビート連射', desc: '連續施放心型煙火，染紅整個夜空', shotCount: 6 },
     { id: 'wabi_sabi_zen', name: '🏮 侘寂の極意・和火絵巻', desc: '傳統江戶和火與幽靈煙火交織的靜謐美學', shotCount: 7 },
@@ -798,9 +798,6 @@ ftGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
 ftCtx.fillStyle = ftGrad;
 ftCtx.fillRect(0, 0, 256, 256);
 
-/**
- * Web Audio 物理音效合成引擎 (修復高負載卡頓)
- */
 class HanabiSoundEngine {
     constructor() {
         this.ctx = null;
@@ -810,7 +807,7 @@ class HanabiSoundEngine {
         this.noiseBuffer = null;
         this.crackleBuffer = null;
         this.activeVoices = 0;
-        this.maxVoices = 10;
+        this.maxVoices = 20; // 放寬發聲數以容納長尾音與多重轟鳴
         this.lastCrackleTime = 0;
         this.lastGhostSoundTime = 0;
     }
@@ -820,36 +817,41 @@ class HanabiSoundEngine {
             const AudioCtx = window.AudioContext || window.webkitAudioContext;
             this.ctx = new AudioCtx();
             
+            // 動態壓縮器：保護揚聲器，並在多重爆炸時產生「被推擠」的物理音壓感
             this.compressor = this.ctx.createDynamicsCompressor();
             this.compressor.threshold.value = -12;
             this.compressor.knee.value = 10;
-            this.compressor.ratio.value = 4;
-            this.compressor.attack.value = 0.005;
-            this.compressor.release.value = 0.1;
+            this.compressor.ratio.value = 6;
+            this.compressor.attack.value = 0.002;
+            this.compressor.release.value = 0.2;
             this.compressor.connect(this.ctx.destination);
 
-            // 空間殘響長度控制在適中的 0.45 秒，避免連發時音訊線程阻塞造成畫面掉幀
+            // 廣域天空卷積混響：高頻迅速被空氣吸收，低頻殘響深遠
             this.convolver = this.ctx.createConvolver();
-            const reverbLength = Math.round(this.ctx.sampleRate * 0.45); 
+            const reverbLength = Math.round(this.ctx.sampleRate * 0.8); 
             const impulse = this.ctx.createBuffer(2, reverbLength, this.ctx.sampleRate);
             const leftData = impulse.getChannelData(0);
             const rightData = impulse.getChannelData(1);
             for (let i = 0; i < reverbLength; i++) {
-                const decay = Math.pow(1 - i / reverbLength, 3.0);
-                leftData[i] = (Math.random() * 2 - 1) * decay * 0.5;
-                rightData[i] = (Math.random() * 2 - 1) * decay * 0.5;
+                const t = i / this.ctx.sampleRate;
+                const decay = Math.exp(-t * 5.0); // 延長衰減時間，營造更大空間
+                const highFreqDamp = Math.max(0, 1 - (t * 4.0)); // 高頻吸收模擬
+                leftData[i] = (Math.random() * 2 - 1) * decay * highFreqDamp * 0.4;
+                rightData[i] = (Math.random() * 2 - 1) * decay * highFreqDamp * 0.4;
             }
             this.convolver.buffer = impulse;
+            
             this.reverbGain = this.ctx.createGain();
-            this.reverbGain.gain.value = 0.35;
+            this.reverbGain.gain.value = 0.5; 
             this.convolver.connect(this.reverbGain);
             this.reverbGain.connect(this.compressor);
 
             this.masterGain = this.ctx.createGain();
-            this.masterGain.gain.setValueAtTime(0.75, this.ctx.currentTime);
+            this.masterGain.gain.setValueAtTime(0.85, this.ctx.currentTime);
             this.masterGain.connect(this.compressor); 
             this.masterGain.connect(this.convolver);  
 
+            // 全頻段白雜訊 (用於高頻撕裂與低頻轟鳴的基底)
             const bufferSize = Math.round(this.ctx.sampleRate * 1.5);
             this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
             const output = this.noiseBuffer.getChannelData(0);
@@ -857,11 +859,13 @@ class HanabiSoundEngine {
                 output[i] = Math.random() * 2 - 1;
             }
 
+            // 真實物理劈啪聲 (Acoustic Crackle) - 極度稀疏的突波 (Impulses)
             const crackleSize = Math.round(this.ctx.sampleRate * 0.4);
             this.crackleBuffer = this.ctx.createBuffer(1, crackleSize, this.ctx.sampleRate);
             const cOut = this.crackleBuffer.getChannelData(0);
             for (let i = 0; i < crackleSize; i++) {
-                cOut[i] = (Math.random() > 0.98) ? (Math.random() * 2 - 1) : 0;
+                // 只有 0.8% 的機率出現爆音，但振幅極大，產生真實鞭炮般的清脆折斷聲
+                cOut[i] = (Math.random() > 0.992) ? ((Math.random() * 2 - 1) * 1.5) : 0;
             }
         }
         if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -874,23 +878,25 @@ class HanabiSoundEngine {
         this.activeVoices++;
 
         const now = this.ctx.currentTime;
-        const dur = Math.max(0.6, durationSec * 0.9);
+        const dur = Math.max(0.6, durationSec * (0.85 + Math.random() * 0.3));
         const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
         if (panner) panner.pan.value = Math.max(-0.8, Math.min(0.8, panRatio));
         const dest = panner ? panner : this.masterGain;
         if (panner) panner.connect(this.masterGain);
 
+        // 1. 砲管發射共振 (Mortar Thump) - 真實彈體離開金屬管的低頻聲
         const thumpOsc = this.ctx.createOscillator();
         const thumpGain = this.ctx.createGain();
-        thumpOsc.type = 'sine';
-        thumpOsc.frequency.setValueAtTime(120, now);
+        thumpOsc.type = 'sine'; 
+        thumpOsc.frequency.setValueAtTime(200 + Math.random() * 50, now);
         thumpOsc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
-        thumpGain.gain.setValueAtTime(0.4, now);
+        thumpGain.gain.setValueAtTime(1.2, now);
         thumpGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
         thumpOsc.connect(thumpGain).connect(dest);
         thumpOsc.start(now);
         thumpOsc.stop(now + 0.2);
 
+        // 2. 空氣撕裂呼嘯聲 (Doppler Hiss)
         const noiseNode = this.ctx.createBufferSource();
         noiseNode.buffer = this.noiseBuffer;
         noiseNode.loop = true;
@@ -898,21 +904,21 @@ class HanabiSoundEngine {
         
         if (isTigerTail) {
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(400, now);
-            filter.frequency.linearRampToValueAtTime(800, now + dur * 0.5);
-            filter.frequency.linearRampToValueAtTime(200, now + dur);
+            filter.frequency.setValueAtTime(300 + Math.random() * 150, now);
+            filter.frequency.linearRampToValueAtTime(1200 + Math.random() * 300, now + dur * 0.3);
+            filter.frequency.exponentialRampToValueAtTime(100, now + dur);
         } else {
             filter.type = 'bandpass';
-            filter.Q.value = 1.5;
-            filter.frequency.setValueAtTime(300, now);
-            filter.frequency.exponentialRampToValueAtTime(1200, now + dur * 0.6);
-            filter.frequency.exponentialRampToValueAtTime(400, now + dur);
+            filter.Q.value = 2.5 + Math.random() * 1.5; 
+            filter.frequency.setValueAtTime(400 + Math.random() * 200, now);
+            filter.frequency.exponentialRampToValueAtTime(2500 + Math.random() * 800, now + dur * 0.4);
+            filter.frequency.exponentialRampToValueAtTime(300, now + dur);
         }
 
         const noiseGain = this.ctx.createGain();
         noiseGain.gain.setValueAtTime(0.001, now);
-        noiseGain.gain.linearRampToValueAtTime(isTigerTail ? 0.35 : 0.2, now + dur * 0.2);
-        noiseGain.gain.linearRampToValueAtTime(0.001, now + dur);
+        noiseGain.gain.linearRampToValueAtTime(isTigerTail ? 0.4 : 0.25, now + dur * 0.15);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
 
         noiseNode.connect(filter).connect(noiseGain).connect(dest);
         noiseNode.start(now);
@@ -933,68 +939,102 @@ class HanabiSoundEngine {
         const dest = panner ? panner : this.masterGain;
         if (panner) panner.connect(this.masterGain);
 
-        const scale = Math.min(1.5, Math.max(0.7, caliberScale));
-        const dur = (isSudden ? 1.0 : (isLush ? 1.8 : 1.4)) * scale;
+        // 引入高度隨機性，保證每發煙火的重量感與破裂感都完全不同
+        const randomVariability = 0.75 + Math.random() * 0.5; 
+        const scale = Math.min(1.8, Math.max(0.6, caliberScale)) * randomVariability;
+        const dur = (isSudden ? 1.0 : (isLush ? 2.5 : 1.8)) * scale;
 
+        // 1. 瞬態紙殼破裂音 (Transient Snap) - 極短的尖銳爆音
         const snapNoise = this.ctx.createBufferSource();
         snapNoise.buffer = this.noiseBuffer;
         const snapFilter = this.ctx.createBiquadFilter();
         snapFilter.type = 'highpass';
-        snapFilter.frequency.value = 1500;
+        snapFilter.frequency.value = isSudden ? 2000 : 800 + Math.random() * 1000;
         const snapGain = this.ctx.createGain();
-        snapGain.gain.setValueAtTime(0.9, now);
-        snapGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        snapGain.gain.setValueAtTime(2.5, now);
+        snapGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08 + Math.random() * 0.04);
         snapNoise.connect(snapFilter).connect(snapGain).connect(dest);
         snapNoise.start(now);
-        snapNoise.stop(now + 0.12);
+        snapNoise.stop(now + 0.15);
 
-        const subOsc = this.ctx.createOscillator();
-        subOsc.type = 'triangle';
-        const baseFreq = isSudden ? 180 : (isLush ? 140 : 160);
-        subOsc.frequency.setValueAtTime(baseFreq / scale, now);
-        subOsc.frequency.exponentialRampToValueAtTime(40 / scale, now + 0.15);
-        subOsc.frequency.exponentialRampToValueAtTime(15 / scale, now + dur * 0.8);
-        const subGain = this.ctx.createGain();
-        subGain.gain.setValueAtTime(1.6 * scale, now);
-        subGain.gain.exponentialRampToValueAtTime(0.01, now + dur * 0.7);
-        subOsc.connect(subGain).connect(dest);
-        subOsc.start(now);
-        subOsc.stop(now + dur);
+        // 2. 星玉擴散燃燒聲 (Chemical Sizzle)
+        const sizzleNoise = this.ctx.createBufferSource();
+        sizzleNoise.buffer = this.noiseBuffer;
+        const sizzleFilter = this.ctx.createBiquadFilter();
+        sizzleFilter.type = 'bandpass';
+        sizzleFilter.frequency.setValueAtTime(3000 + Math.random() * 2000, now);
+        sizzleFilter.frequency.exponentialRampToValueAtTime(800, now + dur * 0.5);
+        const sizzleGain = this.ctx.createGain();
+        sizzleGain.gain.setValueAtTime(0.6, now);
+        sizzleGain.gain.exponentialRampToValueAtTime(0.01, now + dur * 0.6);
+        sizzleNoise.connect(sizzleFilter).connect(sizzleGain).connect(dest);
+        sizzleNoise.start(now);
+        sizzleNoise.stop(now + dur * 0.6 + 0.1);
 
-        const boomNoise = this.ctx.createBufferSource();
-        boomNoise.buffer = this.noiseBuffer;
-        const boomFilter = this.ctx.createBiquadFilter();
-        boomFilter.type = 'lowpass';
-        boomFilter.frequency.setValueAtTime(isSudden ? 3500 : 2500, now);
-        boomFilter.frequency.exponentialRampToValueAtTime(80, now + dur * 0.85);
-        const boomGain = this.ctx.createGain();
-        boomGain.gain.setValueAtTime(0.9 * scale, now);
-        boomGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-        boomNoise.connect(boomFilter).connect(boomGain).connect(dest);
-        boomNoise.start(now);
-        boomNoise.stop(now + dur + 0.1);
+        // 3. 爆炸實體衝擊 (Physical Punch) - 快速下潛的三角波
+        const punchOsc = this.ctx.createOscillator();
+        punchOsc.type = 'triangle'; 
+        punchOsc.frequency.setValueAtTime(150 / scale, now);
+        punchOsc.frequency.exponentialRampToValueAtTime(30 / scale, now + 0.12);
+        const punchGain = this.ctx.createGain();
+        punchGain.gain.setValueAtTime(1.8 * scale, now); 
+        punchGain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        punchOsc.connect(punchGain).connect(dest);
+        punchOsc.start(now);
+        punchOsc.stop(now + 0.3);
 
-        setTimeout(() => { this.activeVoices = Math.max(0, this.activeVoices - 1); }, (dur + 0.1) * 1000);
+        // 4. 空氣置換轟鳴 (Air Displacement Rumble) - 真正的爆炸雷聲，非電子合成音
+        const rumbleNoise = this.ctx.createBufferSource();
+        rumbleNoise.buffer = this.noiseBuffer;
+        const rumbleFilter = this.ctx.createBiquadFilter();
+        rumbleFilter.type = 'lowpass';
+        // 嚴格截斷高頻，只保留渾厚的低頻空氣震動
+        rumbleFilter.frequency.setValueAtTime(120 + Math.random() * 80, now); 
+        const rumbleGain = this.ctx.createGain();
+        rumbleGain.gain.setValueAtTime(0.001, now);
+        // 轟鳴聲會稍晚幾毫秒到達最高點，創造出巨大能量推開空氣的延遲感
+        rumbleGain.gain.exponentialRampToValueAtTime(2.2 * scale, now + 0.08); 
+        rumbleGain.gain.exponentialRampToValueAtTime(0.001, now + dur * 1.2);
+        rumbleNoise.connect(rumbleFilter).connect(rumbleGain).connect(dest);
+        rumbleNoise.start(now);
+        rumbleNoise.stop(now + dur * 1.2 + 0.1);
+
+        // 5. 城市建築群反射延遲 (Slapback Echo)
+        if (Math.random() > 0.3 && !isSudden) {
+            const echoDelay = this.ctx.createDelay();
+            echoDelay.delayTime.value = 0.05 + Math.random() * 0.08; 
+            const echoGain = this.ctx.createGain();
+            echoGain.gain.value = 0.25 + Math.random() * 0.35;
+            
+            snapGain.connect(echoGain);
+            punchGain.connect(echoGain);
+            echoGain.connect(echoDelay).connect(dest);
+        }
+
+        setTimeout(() => { this.activeVoices = Math.max(0, this.activeVoices - 1); }, (dur * 1.2 + 0.1) * 1000);
     }
 
     playCrackle(panRatio = 0) {
         if (!soundEnabled || !this.crackleBuffer) return;
         this.init();
         const now = this.ctx.currentTime;
-        if (now - this.lastCrackleTime < 0.06) return;
+        if (now - this.lastCrackleTime < 0.04) return;
         this.lastCrackleTime = now;
 
         const src = this.ctx.createBufferSource();
-        src.buffer = this.crackleBuffer;
+        src.buffer = this.crackleBuffer; // 使用新寫的超高對比度突波陣列
         src.playbackRate.value = 0.6 + Math.random() * 0.8;
         
+        // 使用帶通濾波器雕塑出真實的「木柴斷裂/鞭炮」頻段
         const filter = this.ctx.createBiquadFilter();
-        filter.type = 'highpass';
-        filter.frequency.value = 2000;
+        filter.type = 'bandpass';
+        filter.frequency.value = 2500 + Math.random() * 3000;
+        filter.Q.value = 0.8 + Math.random() * 1.5;
 
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.8 + Math.random() * 0.4, now + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12); 
 
         const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
         if (panner) {
@@ -1017,12 +1057,12 @@ class HanabiSoundEngine {
         noise.buffer = this.noiseBuffer;
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'bandpass';
-        filter.Q.value = 2.0;
-        filter.frequency.setValueAtTime(800, now);
-        filter.frequency.exponentialRampToValueAtTime(2000, now + 0.2);
+        filter.Q.value = 2.0 + Math.random() * 2.0; 
+        filter.frequency.setValueAtTime(300 + Math.random() * 200, now);
+        filter.frequency.exponentialRampToValueAtTime(1500 + Math.random() * 1000, now + 0.15);
 
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.5, now);
+        gain.gain.setValueAtTime(0.8, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
 
         const panner = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
