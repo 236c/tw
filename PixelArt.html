@@ -136,7 +136,7 @@
 
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 h-screen max-h-screen flex flex-col font-sans select-none overflow-hidden transition-colors duration-200">
 
-  <!-- 頂部應用程式標題與主要工具列 -->
+  <!-- 頂部應用程式標題與主要工具列 (已移除匯出按鈕) -->
   <header class="h-16 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-5 flex items-center justify-between shrink-0 z-30 shadow-sm">
     <div class="flex items-center gap-3.5">
       <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
@@ -153,7 +153,7 @@
       </div>
     </div>
 
-    <!-- 頂部工作模式、主題切換與匯出選單 -->
+    <!-- 頂部工作模式與主題切換 -->
     <div class="flex items-center gap-3">
       <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 text-sm shadow-inner-soft">
         <button id="btnToolInspect" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 font-bold text-slate-900 dark:text-white shadow-sm flex items-center gap-1.5 transition-all">
@@ -176,36 +176,6 @@
         <span id="themeIcon" class="text-lg leading-none">☀️</span>
         <span id="themeLabel" class="hidden sm:inline">亮色模式</span>
       </button>
-
-      <div class="relative inline-block text-left" id="exportDropdownContainer">
-        <button id="btnExportMenu" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 active:scale-95 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-500/30 flex items-center gap-2 transition-all">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-          </svg>
-          匯出作品
-          <svg class="w-4 h-4 text-indigo-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </button>
-
-        <div id="exportMenu" class="hidden absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 shadow-2xl py-2 z-50 text-sm overflow-hidden backdrop-blur-xl">
-          <div class="px-4 py-2 text-xs font-bold text-slate-400 dark:text-slate-500 tracking-widest">圖像匯出 (PNG)</div>
-          <button id="btnExportPixelSharp" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-slate-800 dark:text-slate-200 transition-colors">
-            <span class="font-medium">純像素圖 (放大 12x 銳利無損)</span>
-            <span class="text-xs text-slate-500 font-mono font-semibold bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">PNG</span>
-          </button>
-          <button id="btnExportPatternSheet" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-slate-800 dark:text-slate-200 transition-colors">
-            <span class="font-medium">含標尺/格線與對照表圖樣紙</span>
-            <span class="text-xs text-indigo-600 dark:text-indigo-400 font-mono font-bold bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded">手工圖樣</span>
-          </button>
-          <div class="my-1.5 border-t border-slate-100 dark:border-slate-800"></div>
-          <div class="px-4 py-2 text-xs font-bold text-slate-400 dark:text-slate-500 tracking-widest">色彩資料匯出</div>
-          <button id="btnExportPaletteCSV" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-slate-800 dark:text-slate-200 transition-colors">
-            <span class="font-medium">色碼與統計明細清單</span>
-            <span class="text-xs text-slate-500 font-mono font-semibold bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">.CSV</span>
-          </button>
-        </div>
-      </div>
     </div>
   </header>
 
@@ -1032,8 +1002,6 @@
     });
 
     document.getElementById('btnAddColor').addEventListener('click', () => addNewColorToPalette('#3B82F6'));
-    
-    document.getElementById('btnRequantize').title = '依當前調色盤色彩重新對原圖進行距離匹配 (取消直接替換效果，按原圖重新分配)';
     document.getElementById('btnRequantize').addEventListener('click', () => { remapPixelsToPalette(); showToast('已根據當前調色盤重新匹配原圖色彩！', 'success'); });
     
     document.getElementById('chkDither').addEventListener('change', (e) => { state.enableDither = e.target.checked; remapPixelsToPalette(); });
@@ -1059,94 +1027,6 @@
     document.getElementById('btnZoomFit').addEventListener('click', fitCanvasToView);
     document.getElementById('btnZoom100').addEventListener('click', () => { state.zoom = 1.0; updateUIHeader(); requestAnimationFrame(renderCanvas); });
     window.addEventListener('resize', () => requestAnimationFrame(renderCanvas));
-
-    const btnExportMenu = document.getElementById('btnExportMenu'), exportMenu = document.getElementById('exportMenu');
-    btnExportMenu.addEventListener('click', (e) => { e.stopPropagation(); exportMenu.classList.toggle('hidden'); });
-    window.addEventListener('click', () => { if (!exportMenu.classList.contains('hidden')) exportMenu.classList.add('hidden'); });
-
-    // 修改：匯出功能加入跨瀏覽器相容修復與非同步等待提示
-    document.getElementById('btnExportPixelSharp').addEventListener('click', () => {
-      if (!state.quantizedMatrix.length) { showToast('請先載入圖片或生成棋盤', 'warning'); return; }
-      showToast('高畫質純像素圖匯出中...', 'info');
-      
-      setTimeout(() => {
-        const scale = 12, expCanvas = document.createElement('canvas'); expCanvas.width = state.gridWidth * scale; expCanvas.height = state.gridHeight * scale;
-        const expCtx = expCanvas.getContext('2d');
-        for (let y = 0; y < state.gridHeight; y++) {
-          for (let x = 0; x < state.gridWidth; x++) {
-            const color = state.palette[state.quantizedMatrix[y][x]] || state.palette[0];
-            expCtx.fillStyle = color.hex; expCtx.fillRect(x * scale, y * scale, scale, scale);
-          }
-        }
-        const link = document.createElement('a'); link.download = `pixel_art_${state.gridWidth}x${state.gridHeight}.png`; link.href = expCanvas.toDataURL('image/png'); 
-        document.body.appendChild(link); // 解決 Firefox 等瀏覽器點擊無效問題
-        link.click();
-        document.body.removeChild(link);
-        showToast('已匯出純像素圖 (PNG)', 'success');
-      }, 50);
-    });
-
-    document.getElementById('btnExportPatternSheet').addEventListener('click', () => {
-      if (!state.quantizedMatrix.length) { showToast('請先載入圖片或生成棋盤', 'warning'); return; }
-      showToast('圖樣設計紙生成中，請稍候...', 'info');
-      
-      setTimeout(() => {
-        const cellSize = 30, rulerSize = 40, gw = state.gridWidth, gh = state.gridHeight, boardW = gw * cellSize, boardH = gh * cellSize;
-        const legendItemH = 30, legendCols = 4, legendRows = Math.ceil(state.palette.length / legendCols), legendH = legendRows * legendItemH + 50;
-        const totalW = rulerSize + boardW + 40, totalH = rulerSize + boardH + legendH + 60;
-        const expCanvas = document.createElement('canvas'); expCanvas.width = totalW; expCanvas.height = totalH; const expCtx = expCanvas.getContext('2d');
-        expCtx.fillStyle = '#ffffff'; expCtx.fillRect(0, 0, totalW, totalH);
-        const startX = 20, startY = 20;
-
-        for (let y = 0; y < gh; y++) {
-          for (let x = 0; x < gw; x++) {
-            const color = state.palette[state.quantizedMatrix[y][x]] || state.palette[0], px = startX + rulerSize + x * cellSize, py = startY + rulerSize + y * cellSize;
-            expCtx.fillStyle = color.hex; expCtx.fillRect(px, py, cellSize, cellSize);
-            expCtx.strokeStyle = '#cccccc'; expCtx.lineWidth = 1; expCtx.strokeRect(px, py, cellSize, cellSize);
-            const lum = (0.299 * color.r + 0.587 * color.g + 0.114 * color.b); expCtx.fillStyle = lum > 130 ? '#0f172a' : '#ffffff';
-            expCtx.font = 'bold 13px monospace'; expCtx.textAlign = 'center'; expCtx.textBaseline = 'middle'; expCtx.fillText(`${color.id}`, px + cellSize / 2, py + cellSize / 2);
-          }
-        }
-
-        expCtx.strokeStyle = '#000000'; expCtx.lineWidth = 2;
-        for (let x = 0; x <= gw; x += 10) { const px = startX + rulerSize + x * cellSize; expCtx.beginPath(); expCtx.moveTo(px, startY + rulerSize); expCtx.lineTo(px, startY + rulerSize + boardH); expCtx.stroke(); }
-        for (let y = 0; y <= gh; y += 10) { const py = startY + rulerSize + y * cellSize; expCtx.beginPath(); expCtx.moveTo(startX + rulerSize, py); expCtx.lineTo(startX + rulerSize + boardW); expCtx.stroke(); }
-
-        expCtx.fillStyle = '#f1f5f9'; expCtx.fillRect(startX + rulerSize, startY, boardW, rulerSize); expCtx.fillRect(startX, startY + rulerSize, rulerSize, boardH);
-        expCtx.fillStyle = '#1e293b'; expCtx.font = 'bold 12px monospace'; expCtx.textAlign = 'center'; expCtx.textBaseline = 'middle';
-        for (let x = 0; x < gw; x++) { const px = startX + rulerSize + x * cellSize + cellSize / 2; expCtx.fillText(x + 1, px, startY + rulerSize / 2); }
-        for (let y = 0; y < gh; y++) { const py = startY + rulerSize + y * cellSize + cellSize / 2; expCtx.fillText(y + 1, startX + rulerSize / 2, py); }
-
-        const legendStartY = startY + rulerSize + boardH + 30;
-        expCtx.fillStyle = '#0f172a'; expCtx.font = 'bold 15px sans-serif'; expCtx.textAlign = 'left'; expCtx.fillText('🎨 調色盤編號與色碼對照表 (Color Legend):', startX, legendStartY);
-
-        const colW = (boardW + rulerSize) / legendCols;
-        state.palette.forEach((p, idx) => {
-          const c = idx % legendCols, r = Math.floor(idx / legendCols), lx = startX + c * colW, ly = legendStartY + 25 + r * legendItemH;
-          expCtx.fillStyle = p.hex; expCtx.fillRect(lx, ly, 18, 18); expCtx.strokeStyle = '#94a3b8'; expCtx.lineWidth = 1; expCtx.strokeRect(lx, ly, 18, 18);
-          expCtx.fillStyle = '#0f172a'; expCtx.font = 'bold 13px monospace'; expCtx.textAlign = 'left'; expCtx.textBaseline = 'middle'; expCtx.fillText(`#${p.id} ${p.hex} (${p.count}格, ${p.pct})`, lx + 26, ly + 9);
-        });
-
-        const link = document.createElement('a'); link.download = `pixel_grid_pattern_sheet_${gw}x${gh}.png`; link.href = expCanvas.toDataURL('image/png'); 
-        document.body.appendChild(link); // 解決 Firefox 等瀏覽器點擊無效問題
-        link.click();
-        document.body.removeChild(link);
-        showToast('已匯出完整標號設計圖樣紙 (PNG)', 'success');
-      }, 50);
-    });
-
-    document.getElementById('btnExportPaletteCSV').addEventListener('click', () => {
-      if (!state.palette.length) { showToast('請先載入圖片或生成棋盤', 'warning'); return; }
-      let csvContent = '\uFEFF編號,HEX色碼,R,G,B,像素數量,佔比\n';
-      state.palette.forEach(p => { csvContent += `"${p.id}","${p.hex}",${p.r},${p.g},${p.b},${p.count},"${p.pct}"\n`; });
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }), url = URL.createObjectURL(blob), link = document.createElement('a');
-      link.href = url; link.download = `pixel_palette_${state.palette.length}_colors.csv`; 
-      document.body.appendChild(link);
-      link.click(); 
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      showToast('已匯出調色盤清單 (CSV)', 'success');
-    });
 
     window.addEventListener('load', () => { 
       createProceduralSampleImage('mushroom'); 
