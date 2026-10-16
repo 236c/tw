@@ -51,3 +51,6 @@ https://236c.github.io/tw/hanabi.html
 
 像素棋盤標號生成器 - Pixel Art
 https://236c.github.io/tw/PixelArt.html
+
+HOOPS PRO 5v5 — 總教練戰術指揮旗艦版
+https://236c.github.io/tw/hoops_pro_5v5.html
