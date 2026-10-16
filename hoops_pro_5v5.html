@@ -1,0 +1,3904 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>HOOPS PRO 5v5 — 總教練戰術指揮旗艦版 (Skill Moves & Start Screen Edition)</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #070b12;
+      font-family: 'Inter', 'Noto Sans TC', sans-serif;
+      color: #f8fafc;
+    }
+    .scoreboard-glass {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(9, 13, 22, 0.98) 100%);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+    .tactic-btn, .def-btn, .pace-btn {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tactic-btn.active {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: #fff;
+      border-color: #fdba74;
+      box-shadow: 0 0 12px rgba(249, 115, 22, 0.55);
+    }
+    .def-btn.active {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: #fff;
+      border-color: #7dd3fc;
+      box-shadow: 0 0 12px rgba(14, 165, 233, 0.55);
+    }
+    .pace-btn.active {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      border-color: #6ee7b7;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    }
+    .coach-cmd-btn {
+      touch-action: manipulation;
+      transition: transform 0.08s ease, box-shadow 0.15s ease, filter 0.15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .coach-cmd-btn:hover {
+      filter: brightness(1.12);
+      transform: translateY(-1px);
+    }
+    .coach-cmd-btn:active {
+      transform: scale(0.92);
+    }
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(249, 115, 22, 0.45); }
+      50% { transform: scale(1.03); box-shadow: 0 0 36px rgba(249, 115, 22, 0.85); }
+    }
+    .press-any-key-badge {
+      animation: pulseGlow 1.8s infinite ease-in-out;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="flex flex-col h-screen w-screen overflow-hidden select-none">
+
+  <!-- ===================================================================== -->
+  <!-- BROADCAST TITLE / START SCREEN OVERLAY (按下任一鍵開始遊戲)              -->
+  <!-- ===================================================================== -->
+  <div id="startScreenOverlay" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-4 cursor-pointer transition-opacity duration-300">
+    <!-- Decorative Top Broadcast Ribbon -->
+    <div class="flex items-center gap-2 px-4 py-1 rounded-full bg-orange-500/15 border border-orange-500/40 text-orange-300 text-xs font-bold mb-3 tracking-widest uppercase">
+      <span>🏀 OFFICIAL 5v5 TACTICAL BASKETBALL SIMULATION</span>
+    </div>
+
+    <!-- Main Game Title -->
+    <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-center text-white drop-shadow-[0_6px_24px_rgba(249,115,22,0.5)]">
+      HOOPS PRO <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-rose-500">5v5</span>
+    </h1>
+    <p class="text-sm sm:text-lg font-extrabold text-sky-300 mt-1 tracking-wide">
+      總教練戰術指揮旗艦版 — 華麗球員技巧與真實物理引擎
+    </p>
+
+    <!-- Matchup Showcase Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl w-full mt-5">
+      <!-- Home Team Card -->
+      <div class="bg-slate-900/90 border border-blue-500/40 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-6 rounded bg-blue-500 shadow-[0_0_10px_#3b82f6]"></span>
+            <div>
+              <div class="text-xs font-bold text-blue-400">HOME • 玩家執教代表隊</div>
+              <div class="text-lg font-black text-white">LIONS 雄獅戰隊</div>
+            </div>
+          </div>
+          <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-400/30">👔 您擔任總教練</span>
+        </div>
+        <div class="grid grid-cols-5 gap-1.5 text-center text-[11px]">
+          <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+            <div class="font-black text-blue-400">PG #1</div>
+            <div class="font-bold text-white">陳飛</div>
+            <div class="text-[9px] text-emerald-400">後撤步三分</div>
+          </div>
+          <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+            <div class="font-black text-blue-400">SG #7</div>
+            <div class="font-bold text-white">林烈</div>
+            <div class="text-[9px] text-orange-400">大風車爆扣</div>
+          </div>
+          <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+            <div class="font-black text-blue-400">SF #23</div>
+            <div class="font-bold text-white">張鋒</div>
+            <div class="text-[9px] text-purple-400">迷蹤歐洲步</div>
+          </div>
+          <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+            <div class="font-black text-blue-400">PF #34</div>
+            <div class="font-bold text-white">雷霸</div>
+            <div class="text-[9px] text-amber-400">陀螺轉身扣</div>
+          </div>
+          <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+            <div class="font-black text-blue-400">C #55</div>
+            <div class="font-bold text-white">高塔</div>
+            <div class="text-[9px] text-rose-400">禁區追魂鍋</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Away Team Card -->
+      <div class="bg-slate-900/90 border border-rose-500/40 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-6 rounded bg-rose-500 shadow-[0_0_10px_#f43f5e]"></span>
+            <div>
+              <div class="text-xs font-bold text-rose-400">AWAY • 電腦全明星隊</div>
+              <div class="text-lg font-black text-white">TITANS 泰坦霸主</div>
+            </div>
+          </div>
+          <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-400/30">🤖 智慧戰術 AI</span>
+        </div>
+        <div class="grid grid-cols-5 gap-1.5 text-center text-[11px]">
+          <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+            <div class="font-black text-rose-400">PG #0</div>
+            <div class="font-bold text-white">Irving</div>
+            <div class="text-[9px] text-sky-400">極限蝴蝶步</div>
+          </div>
+          <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+            <div class="font-black text-rose-400">SG #13</div>
+            <div class="font-bold text-white">Booker</div>
+            <div class="text-[9px] text-emerald-400">後仰跳投</div>
+          </div>
+          <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+            <div class="font-black text-rose-400">SF #6</div>
+            <div class="font-bold text-white">James</div>
+            <div class="text-[9px] text-orange-400">戰斧隔人扣</div>
+          </div>
+          <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+            <div class="font-black text-rose-400">PF #35</div>
+            <div class="font-bold text-white">Durant</div>
+            <div class="text-[9px] text-amber-400">死神大幅變向</div>
+          </div>
+          <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+            <div class="font-black text-rose-400">C #15</div>
+            <div class="font-bold text-white">Jokic</div>
+            <div class="text-[9px] text-purple-400">不看人妙傳</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skill Moves Showcase Badges -->
+    <div class="flex flex-wrap items-center justify-center gap-2 max-w-3xl mt-4 text-xs">
+      <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-amber-300 font-bold">👣 哈登式後撤步三分 (Step-Back)</span>
+      <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-cyan-300 font-bold">🌪️ 360°陀螺轉身過人 (Spin Move)</span>
+      <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-purple-300 font-bold">🩰 迷蹤歐洲步上籃 (Euro-Step)</span>
+      <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-emerald-300 font-bold">🌈 禁區彩虹高拋投 (Floater)</span>
+      <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-rose-300 font-bold">⚡ 胯下變向晃倒對手 (Ankle-Breaker)</span>
+      <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-orange-300 font-bold">🔥 大風車與雙人空接爆扣 (Alley-Oop)</span>
+    </div>
+
+    <!-- PRESS ANY KEY TO START BUTTON -->
+    <div class="mt-7 flex flex-col items-center">
+      <button id="btnStartGameNow" type="button" class="press-any-key-badge px-8 py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-rose-600 text-white font-black text-base sm:text-xl tracking-wider border-2 border-amber-200/80 shadow-2xl">
+        ⚡ 按下任一鍵 或 點擊此處開始執教開球 ⚡
+      </button>
+      <span class="text-xs text-slate-400 mt-2 font-semibold">PRESS ANY KEY OR CLICK ANYWHERE TO TIP-OFF</span>
+    </div>
+  </div>
+
+  <!-- TOP BROADCAST SCOREBOARD & TOOLBAR -->
+  <header class="w-full px-2 sm:px-4 py-1.5 bg-slate-950/95 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-2 z-20 shrink-0">
+    <!-- Left: Brand, FPS & Speed Controls -->
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <div class="flex items-center gap-1.5 bg-orange-500/15 border border-orange-500/40 px-2.5 py-1 rounded-lg">
+        <span class="text-orange-400 text-base">📋</span>
+        <span class="font-black tracking-wider text-xs sm:text-sm text-orange-400">HOOPS 5v5 總教練旗艦版</span>
+      </div>
+      <div id="fpsBadge" class="hidden md:flex items-center gap-1.5 text-[11px] font-mono bg-slate-900 border border-slate-800 px-2 py-1 rounded text-emerald-400">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="fpsText">60 FPS</span>
+      </div>
+      <button id="btnSimSpeed" type="button" class="text-[11px] font-bold px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-300 transition" title="切換比賽模擬倍速">
+        ⏩ 速度: <span id="simSpeedLabel">1.0x</span>
+      </button>
+      <button id="btnPerfMode" type="button" class="text-[11px] font-semibold px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition" title="切換高低配備畫質模式">
+        ⚡ 畫質: <span id="perfModeLabel" class="text-amber-400">高畫質</span>
+      </button>
+      <button id="btnCameraMode" type="button" class="hidden lg:inline-flex text-[11px] font-semibold px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition">
+        🎥 視角: <span id="cameraModeLabel" class="text-sky-400 ml-0.5">2.5D轉播</span>
+      </button>
+    </div>
+
+    <!-- Center: NBA Broadcast Scorebug -->
+    <div class="scoreboard-glass rounded-xl px-3 py-1 flex items-center gap-2 sm:gap-4">
+      <!-- Home (Coach's Team) -->
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-7 rounded-sm bg-blue-500 shadow-[0_0_8px_#3b82f6]"></div>
+        <div class="text-left">
+          <div class="text-[10px] font-bold tracking-widest text-blue-300 uppercase flex items-center gap-1">
+            <span>LIONS 教練隊</span>
+            <span id="possHome" class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+          </div>
+          <div id="scoreHome" class="text-lg sm:text-2xl font-black leading-none text-white tabular-nums">0</div>
+        </div>
+      </div>
+
+      <!-- Clock & Quarter -->
+      <div class="flex flex-col items-center px-2 sm:px-3 border-x border-slate-700/70">
+        <div class="flex items-center gap-1.5">
+          <span id="quarterText" class="text-[11px] font-extrabold px-1.5 py-0.2 rounded bg-slate-800 text-amber-400">Q1</span>
+          <span id="gameClockText" class="text-sm sm:text-base font-black font-mono text-white tabular-nums">02:00</span>
+        </div>
+        <div class="flex items-center gap-1 mt-0.5">
+          <span class="text-[10px] text-slate-400 uppercase font-semibold">24秒:</span>
+          <span id="shotClockText" class="text-xs font-black font-mono text-rose-400 tabular-nums">24</span>
+        </div>
+      </div>
+
+      <!-- Away (CPU AI) -->
+      <div class="flex items-center gap-2">
+        <div class="text-right">
+          <div class="text-[10px] font-bold tracking-widest text-rose-300 uppercase flex items-center justify-end gap-1">
+            <span id="possAway" class="w-1.5 h-1.5 rounded-full bg-amber-400 hidden"></span>
+            <span>TITANS 客隊AI</span>
+          </div>
+          <div id="scoreAway" class="text-lg sm:text-2xl font-black leading-none text-white tabular-nums">0</div>
+        </div>
+        <div class="w-3 h-7 rounded-sm bg-rose-500 shadow-[0_0_8px_#f43f5e]"></div>
+      </div>
+    </div>
+
+    <!-- Right: Sub, Stats & Controls -->
+    <div class="flex items-center gap-1.5">
+      <button id="btnSubModal" type="button" class="text-[11px] font-bold px-2.5 py-1 rounded bg-indigo-500/25 hover:bg-indigo-500/40 border border-indigo-400/50 text-indigo-200 transition" title="板凳換人調度 (快捷鍵 T)">
+        🔄 換人調度 [T]
+      </button>
+      <button id="btnToggleLines" type="button" class="hidden sm:inline-flex text-[11px] font-semibold px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-300 transition">
+        📋 戰術線: 開
+      </button>
+      <button id="btnAudio" type="button" class="text-[11px] font-semibold px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition">
+        🔊 音效
+      </button>
+      <button id="btnStats" type="button" class="text-[11px] font-semibold px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition">
+        📊 數據盒
+      </button>
+      <button id="btnHelp" type="button" class="hidden md:inline-flex text-[11px] font-semibold px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition">
+        ❓ 指南
+      </button>
+      <button id="btnPause" type="button" class="text-[11px] font-bold px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 transition">
+        ⏸ 暫停
+      </button>
+      <button id="btnRestart" type="button" class="text-[11px] font-bold px-2 py-1 rounded bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/50 text-rose-300 transition">
+        ↻ 重開
+      </button>
+    </div>
+  </header>
+
+  <!-- TACTICAL PLAYBOOK, PACE & AI STATUS BAR -->
+  <section class="w-full px-2 sm:px-4 py-1 bg-slate-900/95 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-1.5 z-10 shrink-0 text-xs">
+    <!-- Offensive Playbook -->
+    <div class="flex items-center gap-1 overflow-x-auto py-0.5">
+      <span class="text-[11px] font-bold text-orange-400 mr-0.5 shrink-0">進攻戰術:</span>
+      <button type="button" data-tactic="PNR" class="tactic-btn active text-[11px] font-bold px-2 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300 shrink-0">
+        [1] 擋拆配合
+      </button>
+      <button type="button" data-tactic="FIVE_OUT" class="tactic-btn text-[11px] font-bold px-2 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300 shrink-0">
+        [2] 五外拉開
+      </button>
+      <button type="button" data-tactic="FLOPPY" class="tactic-btn text-[11px] font-bold px-2 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300 shrink-0">
+        [3] 雙擋三分
+      </button>
+      <button type="button" data-tactic="POST_CUT" class="tactic-btn text-[11px] font-bold px-2 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300 shrink-0">
+        [4] 高低位空切
+      </button>
+
+      <!-- Pace Control -->
+      <span class="text-[11px] font-bold text-emerald-400 ml-2 mr-0.5 shrink-0">節奏:</span>
+      <button type="button" data-pace="FAST" class="pace-btn text-[11px] font-bold px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300 shrink-0" title="推進極快、積極施展個人花式技巧與快攻灌籃">
+        ⚡跑轟
+      </button>
+      <button type="button" data-pace="BALANCED" class="pace-btn active text-[11px] font-bold px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300 shrink-0" title="均衡傳導與尋找最佳空檔">
+        ⚖️均衡
+      </button>
+      <button type="button" data-pace="PATIENT" class="pace-btn text-[11px] font-bold px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300 shrink-0" title="耐心導球尋找高命中率空檔，節省體能">
+        🐢陣地
+      </button>
+    </div>
+
+    <!-- Defensive Playbook & CPU AI Status -->
+    <div class="flex items-center gap-1 overflow-x-auto py-0.5">
+      <span class="text-[11px] font-bold text-sky-400 shrink-0">防守策略:</span>
+      <button type="button" data-deftactic="MAN" class="def-btn active text-[11px] font-bold px-2 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300 shrink-0">
+        [5] 人盯人
+      </button>
+      <button type="button" data-deftactic="ZONE" class="def-btn text-[11px] font-bold px-2 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300 shrink-0">
+        [6] 2-3聯防
+      </button>
+      <button type="button" data-deftactic="PRESS" class="def-btn text-[11px] font-bold px-2 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300 shrink-0">
+        [7] 全場包夾
+      </button>
+      <button type="button" data-deftactic="DROP" class="def-btn text-[11px] font-bold px-2 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300 shrink-0">
+        [8] 沉退護框
+      </button>
+      <div class="hidden xl:flex items-center gap-1.5 ml-1 pl-2 border-l border-slate-700 text-[11px]">
+        <span class="text-slate-400">對手難度:</span>
+        <select id="aiDifficultySelect" class="bg-slate-800 border border-slate-700 rounded px-1.5 py-0.5 text-amber-300 font-bold text-[11px] focus:outline-none">
+          <option value="rookie">新秀 (休閒體驗)</option>
+          <option value="pro" selected>職業 (聰明戰術)</option>
+          <option value="allstar">全明星 (極限花式對抗)</option>
+        </select>
+        <span id="cpuTacticBadge" class="ml-1 px-2 py-0.5 rounded bg-rose-950/80 border border-rose-700/50 text-rose-300 font-semibold">
+          對手戰術: 擋拆配合
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN COURT CANVAS CONTAINER -->
+  <main id="canvasContainer" class="relative flex-1 w-full bg-slate-950 overflow-hidden flex items-center justify-center">
+    <canvas id="courtCanvas" class="block w-full h-full cursor-pointer"></canvas>
+
+    <!-- Dynamic Play-by-Play Banner & Coach Feedback Overlay -->
+    <div id="feedbackBanner" class="pointer-events-none absolute top-2.5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 transition-all duration-200 opacity-0 z-20">
+      <div id="feedbackMainText" class="px-4 py-1 rounded-full font-black text-sm sm:text-base tracking-wide shadow-lg bg-slate-900/95 border border-amber-400/60 text-amber-300">
+        📣 總教練指令下達！
+      </div>
+      <div id="feedbackSubText" class="text-xs font-bold text-slate-200 bg-slate-950/90 px-2.5 py-0.5 rounded border border-slate-800">
+        全隊士氣高昂 • 戰術執行中
+      </div>
+    </div>
+
+    <!-- Top-Right Live Play-by-Play Broadcast Ticker (即時文字轉播跑馬燈) -->
+    <div class="pointer-events-none absolute top-2.5 right-3 hidden xl:flex flex-col gap-1 w-80 bg-slate-950/85 border border-slate-800/90 rounded-xl p-2.5 backdrop-blur-md shadow-xl z-10">
+      <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 border-b border-slate-800 pb-1">
+        <span class="flex items-center gap-1 text-sky-400"><span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping"></span> LIVE 場邊即時戰況播報</span>
+        <span id="autoSubStatusText" class="text-emerald-400">自動輪換: 開啟</span>
+      </div>
+      <div id="playByPlayList" class="flex flex-col gap-1 text-[11px] text-slate-200 max-h-20 overflow-hidden">
+        <div class="text-slate-400 truncate">[賽前熱身] 雙方球員已就位，等待總教練開球指令！</div>
+      </div>
+    </div>
+
+    <!-- Bottom-Left Focus Player, On-Court Lineup Stamina & Team Morale HUD Card -->
+    <div class="pointer-events-none absolute bottom-2.5 left-3 bg-slate-950/92 border border-slate-800/90 rounded-2xl px-3 py-2.5 backdrop-blur-md shadow-2xl hidden xl:flex flex-col gap-2 w-76 z-10">
+      <!-- Team Morale & Coach Buff Status -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <span class="text-sm">🔥</span>
+          <span class="text-xs font-black text-amber-300">團隊士氣 (Morale)</span>
+        </div>
+        <span id="moraleStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">85% 高昂</span>
+      </div>
+      <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+        <div id="moraleBarFill" class="h-full bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 transition-all duration-200" style="width: 85%"></div>
+      </div>
+
+      <!-- Mini 5-Player On-Court Stamina & Streak Bar -->
+      <div id="lineupMiniStrip" class="grid grid-cols-5 gap-1 pt-0.5 border-t border-slate-800/80"></div>
+
+      <!-- Current Focus / Ball-Handler Player Info -->
+      <div class="flex items-center gap-2.5 pt-1 border-t border-slate-800/80">
+        <div id="hudPosBadge" class="w-10 h-10 rounded-xl bg-blue-600 flex flex-col items-center justify-center font-black text-white shadow shrink-0">
+          <span class="text-xs leading-none" id="hudPlayerPos">PG</span>
+          <span class="text-[10px] text-blue-200" id="hudPlayerNum">#1</span>
+        </div>
+        <div class="text-xs flex-1 min-w-0">
+          <div class="flex items-center justify-between">
+            <span id="hudPlayerName" class="font-bold text-white text-xs truncate">陳飛 (控衛)</span>
+            <span id="hudHotZoneBadge" class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-orange-500/20 text-orange-300 border border-orange-500/40 shrink-0">組織神射</span>
+          </div>
+          <div class="flex items-center justify-between mt-1 text-[11px] text-slate-300">
+            <span>三分 <b id="hudStat3pt" class="text-emerald-400">92</b></span>
+            <span>中距 <b id="hudStatMid" class="text-sky-400">88</b></span>
+            <span>灌籃 <b id="hudStatDunk" class="text-amber-400">76</b></span>
+            <span>體能 <b id="hudStatStam" class="text-teal-300">100%</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- BOTTOM COACH COMMAND DECK (8大場邊總教練喊話與花式技巧指令台)          -->
+    <!-- =================================================================== -->
+    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 xl:left-auto xl:translate-x-0 xl:right-3 flex flex-col items-center xl:items-end gap-1.5 z-20 w-[98%] sm:w-auto">
+      <div class="flex items-center gap-2 px-3 py-0.5 rounded-full bg-slate-950/90 border border-slate-800 text-[11px] text-slate-300 shadow">
+        <span class="text-amber-400 font-bold">📣 場邊總教練即時喊話與花式技巧指令台</span>
+        <span class="hidden sm:inline text-slate-400">｜點擊場上我方球員可直接指定妙傳或空接</span>
+      </div>
+
+      <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 bg-slate-950/95 p-2 rounded-2xl border border-slate-800/90 backdrop-blur-md shadow-2xl w-full sm:w-auto">
+        <!-- 1. 喊加油 -->
+        <button id="btnCmdCheer" type="button" class="coach-cmd-btn px-2.5 py-2 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-slate-950 font-black text-xs shadow-lg border border-amber-300/60 flex flex-col items-center justify-center">
+          <span class="text-xs sm:text-sm leading-none mb-0.5">📣 喊加油！</span>
+          <span class="text-[9px] sm:text-[10px] font-bold text-amber-950">士氣體力UP [空白/Q]</span>
+        </button>
+
+        <!-- 2. 喊投籃 -->
+        <button id="btnCmdShoot" type="button" class="coach-cmd-btn px-2.5 py-2 rounded-xl bg-gradient-to-br from-rose-500 to-red-600 text-white font-black text-xs shadow-lg border border-rose-300/50 flex flex-col items-center justify-center">
+          <span class="text-xs sm:text-sm leading-none mb-0.5">🎯 喊投籃！</span>
+          <span class="text-[9px] sm:text-[10px] font-normal text-rose-100">果斷出手 [按 J / S]</span>
+        </button>
+
+        <!-- 3. 喊切入 -->
+        <button id="btnCmdDrive" type="button" class="coach-cmd-btn px-2.5 py-2 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white font-black text-xs shadow-lg border border-orange-300/50 flex flex-col items-center justify-center">
+          <span class="text-xs sm:text-sm leading-none mb-0.5">⚡ 喊切入！</span>
+          <span class="text-[9px] sm:text-[10px] font-normal text-orange-100">突破灌籃 [按 D]</span>
+        </button>
+
+        <!-- 4. NEW: 喊炫技過人 (Spin Move / Euro-Step / Ankle-Breaker) -->
+        <button id="btnCmdSkillMove" type="button" class="coach-cmd-btn px-2.5 py-2 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white font-black text-xs shadow-lg border border-cyan-300/50 flex flex-col items-center justify-center">
+          <span class="text-xs sm:text-sm leading-none mb-0.5">🌀 喊炫技！</span>
+          <span class="text-[9px] sm:text-[10px] font-normal text-cyan-100">轉身/歐洲步 [按 X/C]</span>
+        </button>
+
+        <!-- 5. NEW: 喊後撤步/拋投 (Step-Back 3PT & Tear-Drop Floater) -->
+        <button id="btnCmdStepBack" type="button" class="coach-cmd-btn px-2.5 py-2 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 text-white font-black text-xs shadow-lg border border-pink-300/50 flex flex-col items-center justify-center">
+          <span class="text-xs sm:text-sm leading-none mb-0.5">🏹 喊後撤步！</span>
+          <span class="text-[9px] sm:text-[10px] font-normal text-pink-100">後撤三分/拋投 [Z/V]</span>
+        </button>
+
+        <!-- 6. 喊傳球 -->
+        <button id="btnCmdPass" type="button" class="coach-cmd-btn px-2.5 py-2 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-black text-xs shadow-lg border border-blue-300/50 flex flex-col items-center justify-center">
+          <span class="text-xs sm:text-sm leading-none mb-0.5">🔄 喊傳球！</span>
+          <span class="text-[9px] sm:text-[10px] font-normal text-blue-100">尋找空檔 [按 K / P]</span>
+        </button>
+
+        <!-- 7. 喊空接 -->
+        <button id="btnCmdAlley" type="button" class="coach-cmd-btn px-2.5 py-2 rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-600 text-white font-black text-xs shadow-lg border border-purple-300/50 flex flex-col items-center justify-center">
+          <span class="text-xs sm:text-sm leading-none mb-0.5">🚀 喊空接！</span>
+          <span class="text-[9px] sm:text-[10px] font-normal text-purple-100">擋拆空接 [按 U / A]</span>
+        </button>
+
+        <!-- 8. 喊防守 -->
+        <button id="btnCmdDefense" type="button" class="coach-cmd-btn px-2.5 py-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black text-xs shadow-lg border border-emerald-300/50 flex flex-col items-center justify-center">
+          <span class="text-xs sm:text-sm leading-none mb-0.5">🛡️ 喊防守！</span>
+          <span class="text-[9px] sm:text-[10px] font-normal text-emerald-100">壓迫抄鍋 [按 L / F]</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- BENCH SUBSTITUTION & LINEUP ROTATION MODAL (板凳換人調度視窗) -->
+  <div id="subModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🔄</span>
+          <div>
+            <h2 class="text-base sm:text-lg font-black text-white">總教練板凳換人與體力調度 (Lineup & Bench Rotation)</h2>
+            <p class="text-[11px] text-slate-400">先點選一位「場上球員」，再點選「板凳替補球員」即可立即換人上場</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnToggleAutoSub" type="button" class="px-3 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-xs font-bold">
+            🤖 AI自動換人: 開啟
+          </button>
+          <button id="btnCloseSub" type="button" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">✕ 返回比賽</button>
+        </div>
+      </div>
+      <div class="p-4 overflow-y-auto space-y-4 text-xs">
+        <div>
+          <h3 class="font-black text-blue-400 text-sm mb-2">🏀 目前場上五人陣容 (On-Court 5)</h3>
+          <div id="subOnCourtList" class="grid grid-cols-1 sm:grid-cols-5 gap-2"></div>
+        </div>
+        <div>
+          <h3 class="font-black text-amber-400 text-sm mb-2">🪑 板凳席待命球員 (Bench Reserves — 休息時自動快速恢復體力)</h3>
+          <div id="subBenchList" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOX SCORE & STATS MODAL -->
+  <div id="statsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📊</span>
+          <h2 class="text-base sm:text-lg font-black text-white">即時賽況與球員技術統計 (5v5 Box Score)</h2>
+        </div>
+        <button id="btnCloseStats" type="button" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">✕ 關閉</button>
+      </div>
+      <div id="statsModalBody" class="p-4 overflow-y-auto space-y-4 text-xs"></div>
+    </div>
+  </div>
+
+  <!-- HELP & COACH GUIDE MODAL -->
+  <div id="helpModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📋</span>
+          <h2 class="text-base sm:text-lg font-black text-white">HOOPS PRO 5v5 — 總教練戰術與花式技巧指南</h2>
+        </div>
+        <button id="btnCloseHelp" type="button" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">✕ 關閉</button>
+      </div>
+      <div class="p-5 overflow-y-auto space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+            <h3 class="font-black text-cyan-400 mb-1.5">🌀 花式過人技巧 (Spin / Euro-Step / Crossover)</h3>
+            <p class="text-xs text-slate-300">按下 <b class="text-white">X / C 鍵（喊炫技！）</b> 或由高能力球員自主觸發：持球者會根據場上位置施展 <b class="text-cyan-300">360°陀螺轉身過人</b>、<b class="text-purple-300">迷蹤歐洲步上籃</b> 或 <b class="text-amber-300">胯下變向晃倒 (Ankle-Breaker)</b>，帶有彩色動態殘影！</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+            <h3 class="font-black text-pink-400 mb-1.5">🏹 後撤步三分與高拋投 (Step-Back & Floater)</h3>
+            <p class="text-xs text-slate-300">按下 <b class="text-white">Z / V 鍵（喊後撤步！）</b>：若持球者在中遠距離，會立即向後大跨步施展 <b class="text-pink-300">哈登式後撤步跳投</b>（大幅降低防守干擾度）；若在禁區附近，則會施展超高弧度 <b class="text-emerald-300">彩虹高拋投 (Floater)</b> 閃避中鋒火鍋！</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+            <h3 class="font-black text-amber-400 mb-1.5">🔥 連進手感發燙 (On-Fire) 與士氣</h3>
+            <p class="text-xs text-slate-300">當球員連續命中 2 球以上，腳下會燃起 <b class="text-orange-400">🔥發燙雙層光環</b>，大幅提升綠燈區間與切入速度！適時按下 <b class="text-white">空白鍵 / Q 鍵（喊加油）</b> 更能讓全隊體力與士氣瞬間沸騰。</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+            <h3 class="font-black text-indigo-400 mb-1.5">🔄 板凳換人與體力輪換 [按 T]</h3>
+            <p class="text-xs text-slate-300">劇烈花式動作與衝刺會消耗體力。您可以按 <b class="text-white">T 鍵</b> 打開換人視窗派遣板凳奇兵上場，或交給 AI 自動輪換休息。</p>
+          </div>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-800/50 border border-slate-700 text-xs">
+          <div class="font-bold text-white mb-1">總教練鍵盤快捷鍵一覽：</div>
+          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-1 text-slate-300">
+            <li>• <b>[空白鍵 / Q] 喊加油：</b> 全隊恢復體力 + 士氣熱血加成</li>
+            <li>• <b>[J / S] 喊投籃：</b> 命令持球球員立刻果斷跳投或強起終結</li>
+            <li>• <b>[D] 喊切入：</b> 命令持球球員強行加速衝擊籃框飛身爆扣</li>
+            <li>• <b>[X / C] 喊炫技：</b> 施展 360°陀螺轉身、迷蹤歐洲步或變向晃倒對手</li>
+            <li>• <b>[Z / V] 喊後撤步：</b> 施展後撤步三分跳投 (Step-Back) 或禁區高拋投</li>
+            <li>• <b>[K / P] 喊傳球：</b> 施展不看人妙傳或擊地傳球給最佳空檔隊友</li>
+            <li>• <b>[U / A] 喊空接/擋拆：</b> 呼叫中鋒掩護順下或直接高吊空中接力爆扣</li>
+            <li>• <b>[L / F] 喊防守：</b> 命令全隊進入壓迫防守，積極抄截與追魂鍋封阻</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME OVER OVERLAY -->
+  <div id="gameOverModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl">
+      <div class="text-4xl mb-2">🏆</div>
+      <h2 id="gameOverTitle" class="text-2xl font-black text-white mb-1">全場比賽結束</h2>
+      <p id="gameOverSubtitle" class="text-sm text-amber-400 font-bold mb-4">LIONS 教練隊 獲勝！</p>
+      <div class="flex items-center justify-center gap-6 bg-slate-950 py-4 px-6 rounded-xl border border-slate-800 mb-5">
+        <div>
+          <div class="text-xs text-blue-400 font-bold">LIONS 教練隊</div>
+          <div id="finalScoreHome" class="text-3xl font-black text-white">0</div>
+        </div>
+        <div class="text-slate-600 font-black text-xl">VS</div>
+        <div>
+          <div class="text-xs text-rose-400 font-bold">TITANS 客隊AI</div>
+          <div id="finalScoreAway" class="text-3xl font-black text-white">0</div>
+        </div>
+      </div>
+      <div class="flex items-center justify-center gap-3">
+        <button id="btnGameOverStats" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm">📊 查看完整數據</button>
+        <button id="btnPlayAgain" type="button" class="px-5 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-400 hover:to-rose-500 text-white font-black text-sm shadow-lg">🏀 再執教一場</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // 1. WEB AUDIO SYNTHESIZER (Arena Sound Effects, Swoosh & Coach Voice)
+      // =========================================================================
+      const SoundFX = {
+        ctx: null,
+        muted: false,
+        init() {
+          if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) {
+              this.ctx = new AudioCtx();
+            }
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+        },
+        bounce(intensity = 0.7) {
+          if (this.muted || !this.ctx) return;
+          try {
+            const t = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(135, t);
+            osc.frequency.exponentialRampToValueAtTime(48, t + 0.085);
+            gain.gain.setValueAtTime(Math.min(0.32, 0.22 * intensity), t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.095);
+          } catch (e) {}
+        },
+        squeak() {
+          if (this.muted || !this.ctx) return;
+          try {
+            const t = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            const baseFreq = 2200 + Math.random() * 600;
+            osc.frequency.setValueAtTime(baseFreq, t);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.25, t + 0.045);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.85, t + 0.09);
+            gain.gain.setValueAtTime(0.04, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.095);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.1);
+          } catch (e) {}
+        },
+        skillWhoosh() {
+          if (this.muted || !this.ctx) return;
+          try {
+            const t = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(280, t);
+            osc.frequency.exponentialRampToValueAtTime(680, t + 0.07);
+            osc.frequency.exponentialRampToValueAtTime(190, t + 0.15);
+            gain.gain.setValueAtTime(0.14, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.165);
+          } catch (e) {}
+        },
+        coachShout(pitch = 520) {
+          if (this.muted || !this.ctx) return;
+          try {
+            const t = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const osc2 = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc2.type = 'sine';
+            osc.frequency.setValueAtTime(pitch, t);
+            osc.frequency.exponentialRampToValueAtTime(pitch * 1.35, t + 0.08);
+            osc.frequency.exponentialRampToValueAtTime(pitch * 1.15, t + 0.18);
+            osc2.frequency.setValueAtTime(pitch * 1.5, t);
+            osc2.frequency.exponentialRampToValueAtTime(pitch * 2.0, t + 0.16);
+            gain.gain.setValueAtTime(0.15, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.19);
+            osc.connect(gain);
+            osc2.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(t);
+            osc2.start(t);
+            osc.stop(t + 0.2);
+            osc2.stop(t + 0.2);
+          } catch (e) {}
+        },
+        rimClank() {
+          if (this.muted || !this.ctx) return;
+          try {
+            const t = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const osc2 = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'square';
+            osc2.type = 'triangle';
+            osc.frequency.setValueAtTime(420, t);
+            osc.frequency.exponentialRampToValueAtTime(190, t + 0.14);
+            osc2.frequency.setValueAtTime(890, t);
+            osc2.frequency.exponentialRampToValueAtTime(310, t + 0.12);
+            gain.gain.setValueAtTime(0.16, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+            osc.connect(gain);
+            osc2.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(t);
+            osc2.start(t);
+            osc.stop(t + 0.15);
+            osc2.stop(t + 0.15);
+          } catch (e) {}
+        },
+        swish() {
+          if (this.muted || !this.ctx) return;
+          try {
+            const t = this.ctx.currentTime;
+            const bufferSize = this.ctx.sampleRate * 0.18;
+            const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+              data[i] = (Math.random() * 2 - 1) * Math.sin((i / bufferSize) * Math.PI);
+            }
+            const noise = this.ctx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(1800, t);
+            filter.frequency.exponentialRampToValueAtTime(900, t + 0.18);
+            const gain = this.ctx.createGain();
+            gain.gain.setValueAtTime(0.32, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.18);
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.ctx.destination);
+            noise.start(t);
+          } catch (e) {}
+        },
+        dunkBoom() {
+          if (this.muted || !this.ctx) return;
+          try {
+            const t = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, t);
+            osc.frequency.exponentialRampToValueAtTime(32, t + 0.35);
+            gain.gain.setValueAtTime(0.42, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.39);
+            this.swish();
+            this.crowdCheer(0.35);
+          } catch (e) {}
+        },
+        crowdCheer(duration = 0.55) {
+          if (this.muted || !this.ctx) return;
+          try {
+            const t = this.ctx.currentTime;
+            const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+            const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+              const env = Math.sin((i / bufferSize) * Math.PI);
+              data[i] = (Math.random() * 2 - 1) * env * 0.5;
+            }
+            const noise = this.ctx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(750, t);
+            const gain = this.ctx.createGain();
+            gain.gain.setValueAtTime(0.22, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + duration);
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.ctx.destination);
+            noise.start(t);
+          } catch (e) {}
+        },
+        whistle() {
+          if (this.muted || !this.ctx) return;
+          try {
+            const t = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(2850, t);
+            osc.frequency.setValueAtTime(2980, t + 0.06);
+            osc.frequency.setValueAtTime(2820, t + 0.12);
+            gain.gain.setValueAtTime(0.16, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.23);
+          } catch (e) {}
+        }
+      };
+
+      // =========================================================================
+      // 2. COURT CONSTANTS & 5v5 ROSTERS + BENCH RESERVES
+      // =========================================================================
+      const COURT = {
+        W: 1200,
+        H: 620,
+        MARGIN_X: 70,
+        MARGIN_Y: 45,
+        LEFT_HOOP_X: 112,
+        RIGHT_HOOP_X: 1088,
+        HOOP_Y: 310,
+        HOOP_Z: 105,
+        RIM_RADIUS: 15,
+        THREE_PT_RADIUS: 238,
+        KEY_W: 190,
+        KEY_H: 160
+      };
+
+      const HOME_STARTERS_TEMPLATE = [
+        { pos: 'PG', num: '#1',  name: '陳飛', role: '後撤步神射', spd: 94, three: 92, mid: 88, dunk: 76, def: 85, height: 1.00, skin: '#f1c27d', hair: '#1e293b' },
+        { pos: 'SG', num: '#7',  name: '林烈', role: '大風車飛人', spd: 92, three: 87, mid: 90, dunk: 95, def: 82, height: 1.04, skin: '#e0ac69', hair: '#0f172a' },
+        { pos: 'SF', num: '#23', name: '張鋒', role: '迷蹤歐洲步', spd: 88, three: 84, mid: 89, dunk: 94, def: 89, height: 1.08, skin: '#c68642', hair: '#18181b' },
+        { pos: 'PF', num: '#34', name: '雷霸', role: '禁區陀螺獸', spd: 82, three: 74, mid: 82, dunk: 96, def: 91, height: 1.13, skin: '#8d5524', hair: '#090d16' },
+        { pos: 'C',  num: '#55', name: '高塔', role: '追魂鍋中鋒', spd: 75, three: 65, mid: 78, dunk: 92, def: 96, height: 1.18, skin: '#e0ac69', hair: '#334155' }
+      ];
+
+      const HOME_BENCH_TEMPLATE = [
+        { pos: 'G',  num: '#11', name: '趙雲', role: '閃電拋投王', spd: 96, three: 88, mid: 91, dunk: 85, def: 84, height: 1.02, skin: '#f1c27d', hair: '#0f172a' },
+        { pos: 'F',  num: '#30', name: '吳準', role: '高砲台射手', spd: 86, three: 95, mid: 89, dunk: 80, def: 86, height: 1.09, skin: '#e0ac69', hair: '#1e293b' },
+        { pos: 'C',  num: '#99', name: '石剛', role: '禁區鐵壁',   spd: 78, three: 70, mid: 80, dunk: 94, def: 95, height: 1.17, skin: '#c68642', hair: '#090d16' }
+      ];
+
+      const AWAY_ROSTER_TEMPLATE = [
+        { pos: 'PG', num: '#0',  name: 'K. Irving', role: '極限蝴蝶步', spd: 93, three: 90, mid: 92, dunk: 78, def: 83, height: 1.00, skin: '#8d5524', hair: '#090d16' },
+        { pos: 'SG', num: '#13', name: 'D. Booker', role: '後撤冷血槍', spd: 89, three: 91, mid: 93, dunk: 85, def: 82, height: 1.05, skin: '#e0ac69', hair: '#1e293b' },
+        { pos: 'SF', num: '#6',  name: 'L. James',  role: '戰斧全能王', spd: 90, three: 83, mid: 87, dunk: 97, def: 90, height: 1.10, skin: '#8d5524', hair: '#090d16' },
+        { pos: 'PF', num: '#35', name: 'K. Durant', role: '死神大變向', spd: 86, three: 91, mid: 95, dunk: 90, def: 88, height: 1.14, skin: '#6b3e26', hair: '#090d16' },
+        { pos: 'C',  num: '#15', name: 'N. Jokic',  role: '魔術妙傳手', spd: 76, three: 82, mid: 90, dunk: 86, def: 92, height: 1.18, skin: '#f1c27d', hair: '#475569' }
+      ];
+
+      const TACTIC_NAMES = {
+        PNR: '擋拆配合 (Pick & Roll)',
+        FIVE_OUT: '五外拉開 (5-Out Iso)',
+        FLOPPY: '雙擋三分 (Floppy 3PT)',
+        POST_CUT: '高低位空切 (Post & Cut)'
+      };
+
+      const DEF_TACTIC_NAMES = {
+        MAN: '人盯人防守 (Man-to-Man)',
+        ZONE: '2-3 區域聯防 (2-3 Zone)',
+        PRESS: '全場包夾持球者 (Double Team)',
+        DROP: '沉退禁區護框 (Paint Drop)'
+      };
+
+      const PACE_NAMES = {
+        FAST: '⚡ 七秒快攻跑轟 (7-Sec Run & Gun)',
+        BALANCED: '⚖️ 均衡戰術傳導 (Balanced Pace)',
+        PATIENT: '🐢 耐心陣地強攻 (Patient Half-Court)'
+      };
+
+      // =========================================================================
+      // 3. GAME STATE & ENTITIES
+      // =========================================================================
+      const canvas = document.getElementById('courtCanvas');
+      const ctx = canvas.getContext('2d');
+      const container = document.getElementById('canvasContainer');
+
+      // Offscreen Pre-rendered Parquet Hardwood Court
+      const courtBuffer = document.createElement('canvas');
+      courtBuffer.width = COURT.W;
+      courtBuffer.height = COURT.H;
+      const courtCtx = courtBuffer.getContext('2d');
+
+      const state = {
+        inStartScreen: true, // Start screen active until user presses any key or clicks!
+        highQuality: true,
+        broadcastView: true,
+        showTacticalLines: true,
+        paused: false,
+        gameOver: false,
+        simSpeed: 1.0,
+        autoSub: true,
+        selectedSubCourtIdx: 0,
+        difficulty: 'pro',
+        quarter: 1,
+        gameClock: 120,
+        shotClock: 24,
+        scoreHome: 0,
+        scoreAway: 0,
+        possession: 'home',
+        focusIdx: 0,
+        userOffTactic: 'PNR',
+        userDefTactic: 'MAN',
+        userPace: 'BALANCED',
+        cpuOffTactic: 'PNR',
+        cpuDefTactic: 'MAN',
+        cpuTacticTimer: 0,
+        // Coach Sideline State & Team Buffs
+        teamMorale: 85,
+        cheerBuffTimer: 0,
+        defLockdownTimer: 0,
+        forceDriveTimer: 0,
+        activeCutIdx: -1,
+        cutTimer: 0,
+        lastHomePasser: null,
+        lastAwayPasser: null,
+        coachAvatar: {
+          x: 270,
+          y: 28,
+          jumpZ: 0,
+          vz: 0,
+          speechText: '📣 按下任一鍵開球！打出我們的王牌戰術！',
+          speechTimer: 300,
+          speechColor: '#fbbf24'
+        },
+        refereeAvatar: {
+          x: 600,
+          y: COURT.H - 22,
+          facing: -Math.PI / 2,
+          whistleTimer: 0
+        },
+        cameraShake: 0,
+        cameraFocusX: COURT.W / 2,
+        particles: [],
+        floatingTexts: [],
+        ballTrail: [],
+        playLogs: [],
+        crowdFans: [],
+        netRipples: { left: 0, right: 0 },
+        rimFlex: { left: 0, right: 0 },
+        fpsFrames: 0,
+        fpsLastTime: performance.now(),
+        currentFps: 60
+      };
+
+      const ball = {
+        x: COURT.W / 2,
+        y: COURT.H / 2,
+        z: 30,
+        vx: 0,
+        vy: 0,
+        vz: 0,
+        holder: null,
+        inFlight: false,
+        isShot: false,
+        isFloater: false,
+        isStepBackShot: false,
+        isPass: false,
+        isFlashyPass: false,
+        isAlleyLob: false,
+        passTarget: null,
+        shooter: null,
+        targetX: COURT.W / 2,
+        targetY: COURT.H / 2,
+        isThreePointAttempt: false,
+        targetHoop: 'right',
+        greenRelease: false,
+        madeBasketLock: 0,
+        dribblePhase: 0,
+        spinAngle: 0
+      };
+
+      let homePlayers = [];
+      let homeBench = [];
+      let awayPlayers = [];
+      let allPlayers = [];
+
+      function createPlayer(tpl, team, idx, isBench = false) {
+        const isHome = team === 'home';
+        const startX = isHome ? 380 - idx * 35 : 820 + idx * 35;
+        const startY = 140 + idx * 85;
+        return {
+          id: `${team}_${tpl.num}`,
+          team,
+          idx,
+          isBench,
+          pos: tpl.pos,
+          num: tpl.num,
+          name: tpl.name,
+          role: tpl.role,
+          spd: tpl.spd,
+          three: tpl.three,
+          mid: tpl.mid,
+          dunk: tpl.dunk,
+          def: tpl.def,
+          height: tpl.height,
+          skin: tpl.skin,
+          hair: tpl.hair,
+          x: startX,
+          y: startY,
+          z: 0,
+          vx: 0,
+          vy: 0,
+          vz: 0,
+          facing: isHome ? 0 : Math.PI,
+          stamina: 100,
+          streak: 0,
+          // Skill Moves & Animations State
+          chargingShot: false,
+          shotMeter: 0,
+          isFloaterShot: false,
+          isStepBackShot: false,
+          isDunking: false,
+          dunkStyle: 'tomahawk', // 'windmill' | 'tomahawk' | 'reverse'
+          dunkProgress: 0,
+          dunkStartX: 0,
+          dunkStartY: 0,
+          dunkTargetX: 0,
+          dunkTargetY: 0,
+          crossoverTimer: 0,
+          spinMoveTimer: 0,      // 360° Spin Move timer
+          stepBackTimer: 0,      // Harden Step-Back hop timer
+          euroStepTimer: 0,      // Euro-Step zig-zag drive timer
+          euroPhase: 1,
+          stumbleTimer: 0,       // Defender ankle-broken stumble timer!
+          skillCooldown: 0,
+          ghosts: [],            // Afterimage trail silhouettes during skill moves
+          stealCooldown: 0,
+          blockCooldown: 0,
+          isSettingScreen: false,
+          targetX: startX,
+          targetY: startY,
+          aiShootHoldTarget: 0.76,
+          coachOrderTag: '',
+          coachOrderTimer: 0,
+          stats: { pts: 0, fgm: 0, fga: 0, tpm: 0, tpa: 0, reb: 0, ast: 0, stl: 0, blk: 0, dunks: 0 }
+        };
+      }
+
+      function initTeams() {
+        homePlayers = HOME_STARTERS_TEMPLATE.map((tpl, i) => createPlayer(tpl, 'home', i, false));
+        homeBench = HOME_BENCH_TEMPLATE.map((tpl, i) => createPlayer(tpl, 'home', i + 5, true));
+        awayPlayers = AWAY_ROSTER_TEMPLATE.map((tpl, i) => createPlayer(tpl, 'away', i, false));
+        allPlayers = [...homePlayers, ...awayPlayers];
+        state.focusIdx = 0;
+      }
+
+      function rebuildActivePlayersList() {
+        allPlayers = [...homePlayers, ...awayPlayers];
+      }
+
+      function initCrowd() {
+        state.crowdFans = [];
+        for (let i = 0; i < 68; i++) {
+          state.crowdFans.push({
+            x: 65 + (i * 16.5) % (COURT.W - 130),
+            row: i % 2,
+            color: i % 3 === 0 ? '#3b82f6' : (i % 3 === 1 ? '#f43f5e' : '#f59e0b'),
+            phase: Math.random() * Math.PI * 2,
+            cheerTimer: 0
+          });
+        }
+      }
+
+      function lerpAngle(current, target, factor) {
+        const diff = Math.atan2(Math.sin(target - current), Math.cos(target - current));
+        return current + diff * factor;
+      }
+
+      // =========================================================================
+      // 4. PRE-RENDER HARDWOOD PARQUET COURT BUFFER
+      // =========================================================================
+      function buildCourtBuffer() {
+        const c = courtCtx;
+        const W = COURT.W;
+        const H = COURT.H;
+        const mx = COURT.MARGIN_X;
+        const my = COURT.MARGIN_Y;
+        const cw = W - mx * 2;
+        const ch = H - my * 2;
+
+        c.fillStyle = '#090d16';
+        c.fillRect(0, 0, W, H);
+
+        c.fillStyle = '#1e293b';
+        c.fillRect(mx - 18, my - 18, cw + 36, ch + 36);
+
+        const woodGrad = c.createLinearGradient(mx, my, mx, my + ch);
+        woodGrad.addColorStop(0, '#c88a4b');
+        woodGrad.addColorStop(0.5, '#de9f5a');
+        woodGrad.addColorStop(1, '#c08040');
+        c.fillStyle = woodGrad;
+        c.fillRect(mx, my, cw, ch);
+
+        const plankH = 14;
+        const plankW = 68;
+        for (let py = my; py < my + ch; py += plankH) {
+          const rowIdx = Math.floor((py - my) / plankH);
+          const offset = (rowIdx % 2) * (plankW / 2);
+          for (let px = mx - offset; px < mx + cw; px += plankW) {
+            const x0 = Math.max(mx, px);
+            const x1 = Math.min(mx + cw, px + plankW);
+            const y1 = Math.min(my + ch, py + plankH);
+            if (x1 > x0) {
+              const shade = ((rowIdx * 17 + Math.floor(px / plankW) * 31) % 7) - 3;
+              c.fillStyle = shade > 0 ? `rgba(255, 235, 200, ${shade * 0.022})` : `rgba(80, 40, 10, ${Math.abs(shade) * 0.025})`;
+              c.fillRect(x0, py, x1 - x0, y1 - py);
+              c.strokeStyle = 'rgba(90, 48, 15, 0.14)';
+              c.lineWidth = 1;
+              c.strokeRect(x0, py, x1 - x0, y1 - py);
+            }
+          }
+        }
+
+        const keyTop = COURT.HOOP_Y - COURT.KEY_H / 2;
+        c.fillStyle = 'rgba(29, 78, 216, 0.80)';
+        c.fillRect(mx, keyTop, COURT.KEY_W, COURT.KEY_H);
+        c.fillStyle = 'rgba(190, 18, 60, 0.80)';
+        c.fillRect(W - mx - COURT.KEY_W, keyTop, COURT.KEY_W, COURT.KEY_H);
+
+        c.strokeStyle = 'rgba(255,255,255,0.75)';
+        c.lineWidth = 2.5;
+        for (const offsetX of [70, 105, 140]) {
+          c.beginPath();
+          c.moveTo(mx + offsetX, keyTop - 5);
+          c.lineTo(mx + offsetX, keyTop);
+          c.moveTo(mx + offsetX, keyTop + COURT.KEY_H);
+          c.lineTo(mx + offsetX, keyTop + COURT.KEY_H + 5);
+          c.moveTo(W - mx - offsetX, keyTop - 5);
+          c.lineTo(W - mx - offsetX, keyTop);
+          c.moveTo(W - mx - offsetX, keyTop + COURT.KEY_H);
+          c.lineTo(W - mx - offsetX, keyTop + COURT.KEY_H + 5);
+          c.stroke();
+        }
+
+        // Center Court Logo
+        c.save();
+        c.beginPath();
+        c.arc(W / 2, H / 2, 72, 0, Math.PI * 2);
+        c.fillStyle = 'rgba(15, 23, 42, 0.88)';
+        c.fill();
+        c.lineWidth = 4;
+        c.strokeStyle = '#f97316';
+        c.stroke();
+
+        c.font = '900 22px Inter, sans-serif';
+        c.fillStyle = '#f8fafc';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText('HOOPS', W / 2, H / 2 - 9);
+        c.font = '800 12px Inter, sans-serif';
+        c.fillStyle = '#fb923c';
+        c.fillText('PRO COACH', W / 2, H / 2 + 11);
+        c.restore();
+
+        c.strokeStyle = 'rgba(255, 255, 255, 0.92)';
+        c.lineWidth = 3;
+        c.strokeRect(mx, my, cw, ch);
+
+        c.beginPath();
+        c.moveTo(W / 2, my);
+        c.lineTo(W / 2, my + ch);
+        c.stroke();
+
+        c.strokeRect(mx, keyTop, COURT.KEY_W, COURT.KEY_H);
+        c.strokeRect(W - mx - COURT.KEY_W, keyTop, COURT.KEY_W, COURT.KEY_H);
+
+        c.beginPath();
+        c.arc(mx + COURT.KEY_W, COURT.HOOP_Y, 58, -Math.PI / 2, Math.PI / 2);
+        c.stroke();
+        c.beginPath();
+        c.arc(W - mx - COURT.KEY_W, COURT.HOOP_Y, 58, Math.PI / 2, -Math.PI / 2);
+        c.stroke();
+
+        c.beginPath();
+        c.arc(COURT.LEFT_HOOP_X, COURT.HOOP_Y, 44, -Math.PI / 2, Math.PI / 2);
+        c.stroke();
+        c.beginPath();
+        c.arc(COURT.RIGHT_HOOP_X, COURT.HOOP_Y, 44, Math.PI / 2, -Math.PI / 2);
+        c.stroke();
+
+        const cornerDy = 212;
+        const arcAngle = Math.asin(cornerDy / COURT.THREE_PT_RADIUS);
+        const cornerLen = COURT.LEFT_HOOP_X - mx + Math.cos(arcAngle) * COURT.THREE_PT_RADIUS;
+
+        c.beginPath();
+        c.moveTo(mx, COURT.HOOP_Y - cornerDy);
+        c.lineTo(mx + cornerLen, COURT.HOOP_Y - cornerDy);
+        c.arc(COURT.LEFT_HOOP_X, COURT.HOOP_Y, COURT.THREE_PT_RADIUS, -arcAngle, arcAngle);
+        c.lineTo(mx, COURT.HOOP_Y + cornerDy);
+        c.stroke();
+
+        c.beginPath();
+        c.moveTo(W - mx, COURT.HOOP_Y - cornerDy);
+        c.lineTo(W - mx - cornerLen, COURT.HOOP_Y - cornerDy);
+        c.arc(COURT.RIGHT_HOOP_X, COURT.HOOP_Y, COURT.THREE_PT_RADIUS, Math.PI - arcAngle, Math.PI + arcAngle, true);
+        c.lineTo(W - mx, COURT.HOOP_Y + cornerDy);
+        c.stroke();
+      }
+
+      // =========================================================================
+      // 5. TACTICAL PLAYBOOK COORDINATE GENERATOR
+      // =========================================================================
+      function getOffensiveFormationSpot(player, ballCarrier, tactic, isHome) {
+        const hoopX = isHome ? COURT.RIGHT_HOOP_X : COURT.LEFT_HOOP_X;
+        const dir = isHome ? -1 : 1;
+        const cy = COURT.HOOP_Y;
+
+        if (tactic === 'PNR') {
+          const spots = [
+            { x: hoopX + dir * 285, y: cy - 40 },
+            { x: hoopX + dir * 215, y: cy - 185 },
+            { x: hoopX + dir * 65,  y: cy + 205 },
+            { x: hoopX + dir * 95,  y: cy - 115 },
+            { x: hoopX + dir * 185, y: cy + 25 }
+          ];
+          return spots[player.idx] || spots[0];
+        } else if (tactic === 'FIVE_OUT') {
+          const spots = [
+            { x: hoopX + dir * 295, y: cy },
+            { x: hoopX + dir * 225, y: cy - 175 },
+            { x: hoopX + dir * 225, y: cy + 175 },
+            { x: hoopX + dir * 58,  y: cy - 210 },
+            { x: hoopX + dir * 58,  y: cy + 210 }
+          ];
+          return spots[player.idx] || spots[0];
+        } else if (tactic === 'FLOPPY') {
+          const phase = Math.sin(performance.now() * 0.0022);
+          const spots = [
+            { x: hoopX + dir * 300, y: cy },
+            { x: hoopX + dir * (195 + phase * 35), y: cy - 165 + phase * 40 },
+            { x: hoopX + dir * (195 - phase * 35), y: cy + 165 - phase * 40 },
+            { x: hoopX + dir * 130, y: cy - 85 },
+            { x: hoopX + dir * 130, y: cy + 85 }
+          ];
+          return spots[player.idx] || spots[0];
+        } else {
+          const spots = [
+            { x: hoopX + dir * 285, y: cy - 60 },
+            { x: hoopX + dir * 230, y: cy - 185 },
+            { x: hoopX + dir * 220, y: cy + 180 },
+            { x: hoopX + dir * 175, y: cy - 95 },
+            { x: hoopX + dir * 82,  y: cy + 65 }
+          ];
+          return spots[player.idx] || spots[0];
+        }
+      }
+
+      function getDefensiveTarget(defender, offTeamPlayers, defTactic, isHomeDefending) {
+        const ownHoopX = isHomeDefending ? COURT.LEFT_HOOP_X : COURT.RIGHT_HOOP_X;
+        const dir = isHomeDefending ? 1 : -1;
+        const cy = COURT.HOOP_Y;
+        const matchedOff = offTeamPlayers[defender.idx] || offTeamPlayers[0];
+
+        if (defTactic === 'ZONE') {
+          const bx = ball.x;
+          const by = ball.y;
+          const shiftY = (by - cy) * 0.25;
+          const zoneSpots = [
+            { x: ownHoopX + dir * 215, y: cy - 85 + shiftY },
+            { x: ownHoopX + dir * 215, y: cy + 85 + shiftY },
+            { x: ownHoopX + dir * 105, y: cy - 135 + shiftY },
+            { x: ownHoopX + dir * 105, y: cy + 135 + shiftY },
+            { x: ownHoopX + dir * 72,  y: cy + shiftY * 0.6 }
+          ];
+          const zSpot = zoneSpots[defender.idx];
+          if (Math.hypot(bx - zSpot.x, by - zSpot.y) < 130) {
+            return {
+              x: bx + (ownHoopX - bx) * 0.16,
+              y: by + (cy - by) * 0.14
+            };
+          }
+          return zSpot;
+        }
+
+        if (defTactic === 'DROP') {
+          if (defender.idx >= 3) {
+            return {
+              x: ownHoopX + dir * (62 + (defender.idx === 4 ? 0 : 28)),
+              y: cy + (defender.idx === 4 ? 18 : -32)
+            };
+          }
+        }
+
+        if (defTactic === 'PRESS' && ball.holder && ball.holder.team !== defender.team) {
+          if (matchedOff === ball.holder || defender.idx === 1) {
+            const offsetAngle = defender.idx === 1 ? 0.42 : -0.32;
+            const toHoopAngle = Math.atan2(cy - ball.holder.y, ownHoopX - ball.holder.x) + offsetAngle;
+            return {
+              x: ball.holder.x + Math.cos(toHoopAngle) * 28,
+              y: ball.holder.y + Math.sin(toHoopAngle) * 28
+            };
+          }
+        }
+
+        const isGuardingBall = ball.holder === matchedOff;
+        const tightBonus = isHomeDefending && state.defLockdownTimer > 0;
+        const sagFactor = tightBonus ? 0.08 : (isGuardingBall ? 0.14 : 0.24);
+        return {
+          x: matchedOff.x + (ownHoopX - matchedOff.x) * sagFactor,
+          y: matchedOff.y + (cy - matchedOff.y) * sagFactor
+        };
+      }
+
+      // =========================================================================
+      // 6. FLOATING POPUPS, PLAY-BY-PLAY LOG, BANNERS & HUD UPDATES
+      // =========================================================================
+      let bannerTimeout = null;
+      function showBanner(mainText, subText = '', colorClass = 'text-amber-300 border-amber-400/60') {
+        const banner = document.getElementById('feedbackBanner');
+        const mainEl = document.getElementById('feedbackMainText');
+        const subEl = document.getElementById('feedbackSubText');
+        mainEl.textContent = mainText;
+        mainEl.className = `px-4 py-1 rounded-full font-black text-sm sm:text-base tracking-wide shadow-lg bg-slate-900/95 border ${colorClass}`;
+        subEl.textContent = subText;
+        subEl.style.display = subText ? 'block' : 'none';
+        banner.style.opacity = '1';
+        if (bannerTimeout) clearTimeout(bannerTimeout);
+        bannerTimeout = setTimeout(() => {
+          banner.style.opacity = '0';
+        }, 2300);
+      }
+
+      function spawnFloatingText(x, y, z, text, color = '#fbbf24', size = 15) {
+        state.floatingTexts.push({
+          x,
+          y,
+          z: z + 18,
+          vz: 1.4,
+          text,
+          color,
+          size,
+          life: 1.0
+        });
+      }
+
+      function addPlayLog(text, colorClass = 'text-slate-200') {
+        const mins = Math.floor(Math.max(0, state.gameClock) / 60);
+        const secs = Math.floor(Math.max(0, state.gameClock) % 60);
+        const clockStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        state.playLogs.unshift({ clock: `Q${state.quarter} ${clockStr}`, text, colorClass });
+        if (state.playLogs.length > 4) state.playLogs.pop();
+
+        const listEl = document.getElementById('playByPlayList');
+        if (listEl) {
+          listEl.innerHTML = state.playLogs
+            .map((item) => `<div class="${item.colorClass} truncate"><span class="text-slate-500 font-mono mr-1">[${item.clock}]</span>${item.text}</div>`)
+            .join('');
+        }
+      }
+
+      function triggerCoachSidelineShout(speechText, speechColor = '#fbbf24', pitch = 520) {
+        state.coachAvatar.speechText = speechText;
+        state.coachAvatar.speechColor = speechColor;
+        state.coachAvatar.speechTimer = 155;
+        state.coachAvatar.vz = 4.2;
+        SoundFX.coachShout(pitch);
+      }
+
+      function setPlayerOrderTag(player, tagText, frames = 90) {
+        if (!player) return;
+        player.coachOrderTag = tagText;
+        player.coachOrderTimer = frames;
+      }
+
+      function spawnParticles(x, y, z, color, count = 18, speed = 4) {
+        if (!state.highQuality) count = Math.min(6, count);
+        for (let i = 0; i < count; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const spd = (0.3 + Math.random() * 0.7) * speed;
+          state.particles.push({
+            x,
+            y,
+            z,
+            vx: Math.cos(angle) * spd,
+            vy: Math.sin(angle) * spd,
+            vz: 1.5 + Math.random() * 4.5,
+            color,
+            size: 2.5 + Math.random() * 3.5,
+            life: 1.0
+          });
+        }
+      }
+
+      function triggerCrowdExcitement() {
+        for (let i = 0; i < state.crowdFans.length; i++) {
+          state.crowdFans[i].cheerTimer = 95 + Math.random() * 55;
+        }
+      }
+
+      function updateCoachHUD() {
+        if (ball.holder && ball.holder.team === 'home') {
+          state.focusIdx = ball.holder.idx;
+        }
+        const p = homePlayers[state.focusIdx] || homePlayers[0];
+        if (!p) return;
+
+        document.getElementById('hudPlayerPos').textContent = p.pos;
+        document.getElementById('hudPlayerNum').textContent = p.num;
+        document.getElementById('hudPlayerName').textContent = `${p.name} ${p.streak >= 2 ? '🔥' : ''}`;
+        document.getElementById('hudHotZoneBadge').textContent = p.role;
+        document.getElementById('hudStat3pt').textContent = p.three;
+        document.getElementById('hudStatMid').textContent = p.mid;
+        document.getElementById('hudStatDunk').textContent = p.dunk;
+        document.getElementById('hudStatStam').textContent = `${Math.round(p.stamina)}%`;
+
+        const stripEl = document.getElementById('lineupMiniStrip');
+        if (stripEl) {
+          stripEl.innerHTML = homePlayers.map((hp, idx) => {
+            const stamPct = Math.max(5, Math.round(hp.stamina));
+            const barColor = stamPct > 55 ? 'bg-emerald-400' : (stamPct > 30 ? 'bg-amber-400' : 'bg-rose-500');
+            const isFocus = idx === state.focusIdx;
+            return `
+              <div class="px-1.5 py-1 rounded-lg border ${isFocus ? 'bg-blue-950/80 border-sky-400' : 'bg-slate-900/80 border-slate-800'} flex flex-col items-center">
+                <div class="text-[10px] font-black text-white truncate">${hp.pos} ${hp.name}${hp.streak >= 2 ? '🔥' : ''}</div>
+                <div class="w-full h-1 bg-slate-800 rounded-full overflow-hidden mt-1">
+                  <div class="h-full ${barColor}" style="width:${stamPct}%"></div>
+                </div>
+              </div>`;
+          }).join('');
+        }
+
+        const moralePct = Math.round(state.teamMorale);
+        const moraleFill = document.getElementById('moraleBarFill');
+        const moraleBadge = document.getElementById('moraleStatusBadge');
+        if (moraleFill) moraleFill.style.width = `${moralePct}%`;
+        if (moraleBadge) {
+          if (state.cheerBuffTimer > 0) {
+            moraleBadge.textContent = `🔥 熱血爆發 (${moralePct}%)`;
+            moraleBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-orange-500/30 text-orange-300 border border-orange-400 animate-pulse';
+          } else {
+            moraleBadge.textContent = `${moralePct}% ${moralePct >= 80 ? '高昂' : '穩定'}`;
+            moraleBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40';
+          }
+        }
+      }
+
+      function updateScoreboardDOM() {
+        document.getElementById('scoreHome').textContent = state.scoreHome;
+        document.getElementById('scoreAway').textContent = state.scoreAway;
+        document.getElementById('quarterText').textContent = state.quarter <= 4 ? `Q${state.quarter}` : 'OT';
+
+        const mins = Math.floor(Math.max(0, state.gameClock) / 60);
+        const secs = Math.floor(Math.max(0, state.gameClock) % 60);
+        document.getElementById('gameClockText').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        document.getElementById('shotClockText').textContent = Math.ceil(Math.max(0, state.shotClock));
+
+        const homeHas = state.possession === 'home';
+        document.getElementById('possHome').classList.toggle('hidden', !homeHas);
+        document.getElementById('possAway').classList.toggle('hidden', homeHas);
+      }
+
+      // =========================================================================
+      // 7. SUBSTITUTION SYSTEM
+      // =========================================================================
+      function performSubstitution(courtIdx, benchIdx, isAuto = false) {
+        const outgoing = homePlayers[courtIdx];
+        const incoming = homeBench[benchIdx];
+        if (!outgoing || !incoming) return;
+
+        incoming.x = outgoing.x;
+        incoming.y = outgoing.y;
+        incoming.z = 0;
+        incoming.vx = 0;
+        incoming.vy = 0;
+        incoming.idx = courtIdx;
+        incoming.isBench = false;
+        incoming.chargingShot = false;
+        incoming.isDunking = false;
+
+        outgoing.isBench = true;
+        outgoing.chargingShot = false;
+        outgoing.isDunking = false;
+
+        if (ball.holder === outgoing) ball.holder = incoming;
+        if (ball.passTarget === outgoing) ball.passTarget = incoming;
+
+        homePlayers[courtIdx] = incoming;
+        homeBench[benchIdx] = outgoing;
+        rebuildActivePlayersList();
+
+        setPlayerOrderTag(incoming, '🔄生力軍登場!', 90);
+        spawnFloatingText(incoming.x, incoming.y, 25, `🔄 換上 ${incoming.name}`, '#818cf8', 13);
+        addPlayLog(
+          `${isAuto ? '[AI輪換]' : '[教練調度]'} 換下體力消耗的 ${outgoing.name}，換上生力軍 ${incoming.name} (${incoming.num})！`,
+          'text-indigo-300 font-semibold'
+        );
+        updateCoachHUD();
+      }
+
+      function checkAutoSubstitution() {
+        if (!state.autoSub) return;
+        for (let i = 0; i < homePlayers.length; i++) {
+          const p = homePlayers[i];
+          if (p.stamina < 46 && !p.isDunking && !p.chargingShot) {
+            let bestBenchIdx = -1;
+            let bestStam = 80;
+            for (let b = 0; b < homeBench.length; b++) {
+              if (homeBench[b].stamina > bestStam) {
+                bestStam = homeBench[b].stamina;
+                bestBenchIdx = b;
+              }
+            }
+            if (bestBenchIdx !== -1) {
+              performSubstitution(i, bestBenchIdx, true);
+              break;
+            }
+          }
+        }
+      }
+
+      function renderSubModal() {
+        const onCourtEl = document.getElementById('subOnCourtList');
+        const benchEl = document.getElementById('subBenchList');
+        if (!onCourtEl || !benchEl) return;
+
+        onCourtEl.innerHTML = homePlayers.map((p, idx) => {
+          const isSel = idx === state.selectedSubCourtIdx;
+          const stam = Math.round(p.stamina);
+          return `
+            <div data-courtidx="${idx}" class="cursor-pointer p-2.5 rounded-xl border transition ${isSel ? 'bg-blue-950/90 border-sky-400 shadow-lg' : 'bg-slate-950/70 border-slate-800 hover:border-slate-600'}">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-black text-white text-xs">${p.pos} ${p.name}</span>
+                <span class="text-[10px] font-bold text-blue-300">${p.num}</span>
+              </div>
+              <div class="text-[10px] text-amber-300 mb-1.5">${p.role} ${p.streak >= 2 ? '🔥發燙' : ''}</div>
+              <div class="text-[10px] text-slate-400 flex justify-between">
+                <span>三分:${p.three}</span><span>灌籃:${p.dunk}</span><span>防守:${p.def}</span>
+              </div>
+              <div class="mt-2">
+                <div class="flex justify-between text-[10px] mb-0.5">
+                  <span class="text-slate-400">體能</span>
+                  <span class="font-bold ${stam > 55 ? 'text-emerald-400' : 'text-amber-400'}">${stam}%</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full ${stam > 55 ? 'bg-emerald-400' : 'bg-amber-400'}" style="width:${stam}%"></div>
+                </div>
+              </div>
+            </div>`;
+        }).join('');
+
+        benchEl.innerHTML = homeBench.map((p, bIdx) => {
+          const stam = Math.round(p.stamina);
+          const targetOut = homePlayers[state.selectedSubCourtIdx];
+          return `
+            <div data-benchidx="${bIdx}" class="cursor-pointer p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-amber-400 transition flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-black text-amber-300 text-sm">${p.pos} ${p.name} <span class="text-xs text-slate-400">${p.num}</span></span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">體能 ${stam}%</span>
+                </div>
+                <div class="text-[11px] text-slate-300 mb-2">定位：<b class="text-white">${p.role}</b> ｜ 三分 <b>${p.three}</b> • 灌籃 <b>${p.dunk}</b> • 速度 <b>${p.spd}</b></div>
+              </div>
+              <button type="button" class="w-full py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow">
+                🔄 換下 ${targetOut ? targetOut.name : '場上球員'} 上場
+              </button>
+            </div>`;
+        }).join('');
+
+        onCourtEl.querySelectorAll('[data-courtidx]').forEach((el) => {
+          el.addEventListener('click', () => {
+            state.selectedSubCourtIdx = parseInt(el.getAttribute('data-courtidx'), 10);
+            renderSubModal();
+          });
+        });
+
+        benchEl.querySelectorAll('[data-benchidx]').forEach((el) => {
+          el.addEventListener('click', () => {
+            const bIdx = parseInt(el.getAttribute('data-benchidx'), 10);
+            performSubstitution(state.selectedSubCourtIdx, bIdx, false);
+            renderSubModal();
+          });
+        });
+      }
+
+      // =========================================================================
+      // 8. SIGNATURE SKILL MOVES ENGINE (轉身、歐洲步、後撤步、拋投、晃倒、大風車)
+      // =========================================================================
+      function isThreePointPosition(x, y, targetHoop) {
+        const hx = targetHoop === 'right' ? COURT.RIGHT_HOOP_X : COURT.LEFT_HOOP_X;
+        const hy = COURT.HOOP_Y;
+        const dist = Math.hypot(x - hx, y - hy);
+        const cornerDy = 212;
+        if (Math.abs(y - hy) >= cornerDy) return true;
+        return dist >= COURT.THREE_PT_RADIUS;
+      }
+
+      function getClosestDefenderInfo(shooter) {
+        const opponents = shooter.team === 'home' ? awayPlayers : homePlayers;
+        let minDist = 9999;
+        let closest = null;
+        for (const opp of opponents) {
+          const d = Math.hypot(opp.x - shooter.x, opp.y - shooter.y);
+          if (d < minDist) {
+            minDist = d;
+            closest = opp;
+          }
+        }
+        let contestPct = 0;
+        if (minDist < 110) {
+          contestPct = Math.round(Math.pow((110 - minDist) / 110, 1.5) * 75);
+          if (closest && closest.z > 8) contestPct += 22;
+          // If defender is ankle-broken / stumbling, contest drops drastically!
+          if (closest && closest.stumbleTimer > 0) contestPct = Math.max(0, contestPct - 45);
+        }
+        if (shooter.isStepBackShot) {
+          contestPct = Math.max(0, contestPct - 38); // Step-back creates huge space!
+        }
+        return { closest, dist: minDist, contestPct: Math.min(99, Math.max(0, contestPct)) };
+      }
+
+      // Trigger Spin Move, Euro-Step, or Ankle-Breaker Crossover!
+      function performSignatureSkillMove(player, forcedByCoach = false) {
+        if (!player || player.skillCooldown > 0 || player.isDunking || player.chargingShot) return;
+        const isHome = player.team === 'home';
+        const hoopX = isHome ? COURT.RIGHT_HOOP_X : COURT.LEFT_HOOP_X;
+        const distToHoop = Math.hypot(hoopX - player.x, COURT.HOOP_Y - player.y);
+        const defInfo = getClosestDefenderInfo(player);
+
+        player.skillCooldown = 85;
+        SoundFX.skillWhoosh();
+
+        if (distToHoop < 185 && distToHoop > 65) {
+          // Inside/Mid Paint Drive -> Choose between 360° Spin Move or Euro-Step!
+          if (Math.random() < 0.52 || player.idx >= 3) {
+            // 1. 360° SPIN MOVE (陀螺轉身過人)
+            player.spinMoveTimer = 28;
+            const dirX = isHome ? 1 : -1;
+            player.vx = dirX * 4.2;
+            player.vy = (player.y > COURT.HOOP_Y ? -1 : 1) * 3.4;
+            setPlayerOrderTag(player, '🌪️360°陀螺轉身!', 75);
+            spawnParticles(player.x, player.y, 6, '#22d3ee', 16, 4.2);
+            spawnFloatingText(player.x, player.y, 34, '🌪️ SPIN MOVE 轉身過人!', '#22d3ee', 14);
+            if (defInfo.closest && defInfo.dist < 58) {
+              defInfo.closest.stumbleTimer = 36;
+            }
+            if (forcedByCoach) {
+              addPlayLog(`🌪️ ${player.name} 施展華麗 360 度陀螺轉身抹進禁區！`, 'text-cyan-300 font-bold');
+            }
+          } else {
+            // 2. EURO-STEP LAYUP DRIVE (迷蹤歐洲步)
+            player.euroStepTimer = 34;
+            player.euroPhase = player.y > COURT.HOOP_Y ? -1 : 1;
+            setPlayerOrderTag(player, '🩰迷蹤歐洲步!', 80);
+            spawnParticles(player.x, player.y, 6, '#c084fc', 16, 4.0);
+            spawnFloatingText(player.x, player.y, 34, '🩰 EURO-STEP 歐洲步!', '#c084fc', 14);
+            if (defInfo.closest && defInfo.dist < 60) {
+              defInfo.closest.stumbleTimer = 38;
+            }
+            if (forcedByCoach) {
+              addPlayLog(`🩰 ${player.name} 踏出大幅度迷蹤歐洲步晃開護框球員！`, 'text-purple-300 font-bold');
+            }
+          }
+        } else {
+          // Perimeter / Wing -> Killer Ankle-Breaker Crossover (胯下背後變向晃倒)
+          player.crossoverTimer = 32;
+          SoundFX.squeak();
+          setPlayerOrderTag(player, '⚡極限變向!', 75);
+          spawnParticles(player.x, player.y, 4, '#f59e0b', 16, 4.2);
+
+          if (defInfo.closest && defInfo.dist < 68) {
+            defInfo.closest.stumbleTimer = 48;
+            defInfo.closest.vx = (isHome ? -1 : 1) * 3.8;
+            defInfo.closest.vy = (Math.random() > 0.5 ? 1 : -1) * 5.2;
+            spawnFloatingText(player.x, player.y, 36, '⚡ ANKLE BREAKER 晃倒!', '#fbbf24', 16);
+            setPlayerOrderTag(defInfo.closest, '💫重心不穩!', 60);
+            addPlayLog(`⚡ ${player.name} 連續胯下背後運球，直接晃倒了 ${defInfo.closest.name}！`, 'text-amber-300 font-bold');
+          } else {
+            spawnFloatingText(player.x, player.y, 32, '⚡ KILLER CROSS 變向!', '#38bdf8', 14);
+          }
+        }
+      }
+
+      // Trigger Step-Back Jumper (後撤步跳投) or Tear-Drop Floater (禁區拋投)
+      function performStepBackOrFloater(player, forcedByCoach = false) {
+        if (!player || player.isDunking || player.chargingShot) return;
+        const isHome = player.team === 'home';
+        const hoopX = isHome ? COURT.RIGHT_HOOP_X : COURT.LEFT_HOOP_X;
+        const distToHoop = Math.hypot(hoopX - player.x, COURT.HOOP_Y - player.y);
+
+        SoundFX.squeak();
+        SoundFX.skillWhoosh();
+
+        if (distToHoop < 165) {
+          // Inside Paint/Mid -> Tear-Drop High Floater (彩虹高拋投)
+          player.isFloaterShot = true;
+          player.isStepBackShot = false;
+          player.chargingShot = true;
+          player.shotMeter = 0.18;
+          player.aiShootHoldTarget = 0.76 + (Math.random() - 0.5) * 0.03;
+          if (player.z === 0) player.vz = 5.2;
+          setPlayerOrderTag(player, '🌈高拋投 FLOATER!', 80);
+          spawnFloatingText(player.x, player.y, 36, '🌈 TEAR-DROP 拋投!', '#34d399', 15);
+          if (forcedByCoach) {
+            addPlayLog(`🌈 ${player.name} 在禁區急停使出高弧度彩虹拋投，越過中鋒十指關！`, 'text-emerald-300 font-bold');
+          }
+        } else {
+          // Perimeter / Mid-Range -> Harden Step-Back Jumper (哈登式後撤步跳投)
+          const retreatDir = isHome ? -1 : 1;
+          player.x = Math.max(COURT.MARGIN_X + 20, Math.min(COURT.W - COURT.MARGIN_X - 20, player.x + retreatDir * 44));
+          player.vx = retreatDir * 3.5;
+          player.stepBackTimer = 24;
+          player.isStepBackShot = true;
+          player.isFloaterShot = false;
+          player.chargingShot = true;
+          player.shotMeter = 0.12;
+          player.aiShootHoldTarget = 0.76 + (Math.random() - 0.5) * 0.028;
+          if (player.z === 0) player.vz = 4.9;
+
+          const defInfo = getClosestDefenderInfo(player);
+          if (defInfo.closest && defInfo.dist < 75) {
+            defInfo.closest.stumbleTimer = 32;
+          }
+
+          setPlayerOrderTag(player, '👣後撤步跳投!', 85);
+          spawnParticles(player.x, player.y, 4, '#f472b6', 18, 4.5);
+          spawnFloatingText(player.x, player.y, 38, '👣 STEP-BACK 後撤步!', '#f472b6', 15);
+          if (forcedByCoach) {
+            addPlayLog(`👣 ${player.name} 施展招牌後撤步拉開超大空檔，拔起三分出手！`, 'text-pink-300 font-bold');
+          }
+        }
+      }
+
+      function startDunk(player) {
+        const isHome = player.team === 'home';
+        const hoopX = isHome ? COURT.RIGHT_HOOP_X : COURT.LEFT_HOOP_X;
+        const hoopY = COURT.HOOP_Y;
+
+        player.isDunking = true;
+        player.chargingShot = false;
+        player.dunkProgress = 0;
+        player.dunkStartX = player.x;
+        player.dunkStartY = player.y;
+        player.dunkTargetX = hoopX + (isHome ? -14 : 14);
+        player.dunkTargetY = hoopY;
+        player.dunkStyle = player.dunk >= 94 ? 'windmill' : (player.spinMoveTimer > 0 ? 'reverse' : 'tomahawk');
+        SoundFX.squeak();
+        const styleLabel = player.dunkStyle === 'windmill' ? '🌪️ 大風車起飛!' : '🛫 戰斧騰空!';
+        spawnFloatingText(player.x, player.y, 30, styleLabel, '#fb923c', 14);
+      }
+
+      function finishDunk(player) {
+        const isHome = player.team === 'home';
+        const targetHoop = isHome ? 'right' : 'left';
+        const defInfo = getClosestDefenderInfo(player);
+
+        if (defInfo.closest && defInfo.dist < 38 && defInfo.closest.z > 15 && defInfo.closest.stumbleTimer <= 0) {
+          let blockChance = (defInfo.closest.def - player.dunk) * 0.008 + 0.14;
+          if (!isHome && state.defLockdownTimer > 0) blockChance += 0.22;
+          if (Math.random() < blockChance) {
+            defInfo.closest.stats.blk++;
+            player.isDunking = false;
+            player.streak = 0;
+            ball.holder = null;
+            ball.inFlight = true;
+            ball.isShot = false;
+            ball.vx = (isHome ? -1 : 1) * (4 + Math.random() * 3);
+            ball.vy = (Math.random() - 0.5) * 6;
+            ball.vz = 3.5;
+            state.possession = 'loose';
+            SoundFX.rimClank();
+            spawnParticles(player.x, player.y, COURT.HOOP_Z, '#f43f5e', 24, 6);
+            spawnFloatingText(defInfo.closest.x, defInfo.closest.y, 45, '🚫 追魂大火鍋!', '#f43f5e', 16);
+            addPlayLog(`🚫 ${defInfo.closest.name} 送出雷霆追魂鍋，直接封阻了 ${player.name} 的爆扣！`, 'text-rose-400 font-bold');
+            showBanner(`🚫 驚天大火鍋！ ${defInfo.closest.name} 封阻了灌籃！`, '好防守！爭搶籃板！', 'text-rose-400 border-rose-500');
+            return;
+          }
+        }
+
+        // SLAM DUNK SUCCESS!
+        player.isDunking = false;
+        player.z = 35;
+        player.vz = -1.5;
+        player.streak++;
+
+        ball.holder = null;
+        ball.inFlight = true;
+        ball.isShot = false;
+        ball.x = targetHoop === 'right' ? COURT.RIGHT_HOOP_X : COURT.LEFT_HOOP_X;
+        ball.y = COURT.HOOP_Y;
+        ball.z = COURT.HOOP_Z - 6;
+        ball.vx = (Math.random() - 0.5) * 1.2;
+        ball.vy = (Math.random() - 0.5) * 1.2;
+        ball.vz = -7.5;
+
+        state.netRipples[targetHoop] = 1.45;
+        state.rimFlex[targetHoop] = 1.0;
+        state.cameraShake = 15;
+        SoundFX.dunkBoom();
+        spawnParticles(ball.x, ball.y, COURT.HOOP_Z, '#f97316', 34, 7.2);
+        const dunkPopup = player.dunkStyle === 'windmill' ? '🌪️ WINDMILL DUNK! +2' : '💥 SLAM DUNK! +2';
+        spawnFloatingText(ball.x, ball.y, COURT.HOOP_Z + 12, dunkPopup, '#fb923c', 17);
+
+        player.stats.fga++;
+        player.stats.fgm++;
+        player.stats.pts += 2;
+        player.stats.dunks++;
+
+        const passer = isHome ? state.lastHomePasser : state.lastAwayPasser;
+        let astNote = '';
+        if (passer && passer !== player) {
+          passer.stats.ast++;
+          astNote = ` (助攻: ${passer.name})`;
+        }
+
+        addPlayLog(`💥 ${player.name} 演出${player.dunkStyle === 'windmill' ? '360度大風車' : '雷霆戰斧'}飛身爆扣！ (+2)${astNote}`, isHome ? 'text-amber-300 font-bold' : 'text-rose-300');
+        const dunkLabel = defInfo.dist < 50 ? '💥 隔人飛身爆扣 POSTER DUNK！' : (player.dunkStyle === 'windmill' ? '🌪️ 華麗大風車灌籃 WINDMILL DUNK！' : '🔥 雷霆飛身灌籃 SLAM DUNK！');
+        awardBasket(player.team, 2, player, dunkLabel, `${player.name} ${player.num} • 灌籃得分 +2${astNote}`);
+      }
+
+      function releaseShot(player) {
+        if (!player.chargingShot || ball.holder !== player) return;
+        player.chargingShot = false;
+
+        const isHome = player.team === 'home';
+        const targetHoop = isHome ? 'right' : 'left';
+        const hx = targetHoop === 'right' ? COURT.RIGHT_HOOP_X : COURT.LEFT_HOOP_X;
+        const hy = COURT.HOOP_Y;
+        const dist = Math.hypot(hx - player.x, hy - player.y);
+        const isThree = isThreePointPosition(player.x, player.y, targetHoop);
+        const defInfo = getClosestDefenderInfo(player);
+
+        // Floater shots arc high over shot blockers!
+        if (!player.isFloaterShot && defInfo.closest && defInfo.dist < 35 && defInfo.closest.z > 13 && defInfo.closest.stumbleTimer <= 0) {
+          let blkProb = 0.42;
+          if (!isHome && state.defLockdownTimer > 0) blkProb = 0.72;
+          if (Math.random() < blkProb) {
+            defInfo.closest.stats.blk++;
+            player.streak = 0;
+            player.isStepBackShot = false;
+            ball.holder = null;
+            ball.inFlight = true;
+            ball.isShot = false;
+            ball.vx = (isHome ? -1 : 1) * 5;
+            ball.vy = (Math.random() - 0.5) * 5;
+            ball.vz = 2.5;
+            state.possession = 'loose';
+            SoundFX.rimClank();
+            spawnParticles(player.x, player.y, player.z + 25, '#f43f5e', 18, 5);
+            spawnFloatingText(defInfo.closest.x, defInfo.closest.y, 40, '🖐️ BLOCKED!', '#f43f5e', 15);
+            addPlayLog(`🖐️ ${defInfo.closest.name} 高高躍起，一掌煽掉了 ${player.name} 的跳投！`, 'text-rose-400 font-bold');
+            showBanner(`🖐️ 火鍋封阻！ ${defInfo.closest.name} 蓋掉了投籃！`, '火鍋 +1', 'text-rose-400 border-rose-500');
+            return;
+          }
+        }
+
+        const skillRating = isThree ? player.three : (dist < 130 ? Math.max(player.mid, player.dunk) : player.mid);
+        const idealRelease = 0.76;
+        const timingError = Math.abs(player.shotMeter - idealRelease);
+
+        const streakBonus = player.streak >= 2 ? 0.12 : 0;
+        const moveBonus = (player.isStepBackShot || player.isFloaterShot) ? 0.08 : 0;
+        const coachBoost = (isHome ? (state.cheerBuffTimer > 0 ? 1.35 : 1.0 + (state.teamMorale - 50) * 0.004) : 1.0) + streakBonus + moveBonus;
+        const greenHalfWidth = Math.max(0.035, (skillRating / 100) * 0.088 * coachBoost * (1 - defInfo.contestPct * 0.006));
+        const isGreen = timingError <= greenHalfWidth;
+
+        let makeProb = (skillRating / 100) * 0.68 * coachBoost;
+        if (dist < 115) makeProb += 0.22;
+        makeProb -= (timingError * 1.25);
+        makeProb -= (defInfo.contestPct * 0.0052);
+        if (!isHome && state.defLockdownTimer > 0) makeProb -= 0.14;
+        if (player.stamina < 40) makeProb -= 0.08;
+        if (isGreen) makeProb = 0.97;
+        makeProb = Math.max(0.06, Math.min(0.98, makeProb));
+
+        const willMake = Math.random() < makeProb;
+
+        player.stats.fga++;
+        if (isThree) player.stats.tpa++;
+
+        ball.holder = null;
+        ball.inFlight = true;
+        ball.isShot = true;
+        ball.isFloater = player.isFloaterShot;
+        ball.isStepBackShot = player.isStepBackShot;
+        ball.isPass = false;
+        ball.shooter = player;
+        ball.targetHoop = targetHoop;
+        ball.isThreePointAttempt = isThree;
+        ball.greenRelease = isGreen;
+
+        player.isFloaterShot = false;
+        player.isStepBackShot = false;
+
+        let aimX = hx;
+        let aimY = hy;
+        if (!willMake) {
+          const missOffset = 14 + Math.min(18, timingError * 38);
+          const missAngle = player.shotMeter < idealRelease
+            ? Math.atan2(player.y - hy, player.x - hx)
+            : Math.atan2(hy - player.y, hx - player.x) + (Math.random() - 0.5) * 0.9;
+          aimX = hx + Math.cos(missAngle) * missOffset;
+          aimY = hy + Math.sin(missAngle) * missOffset;
+        }
+        ball.targetX = aimX;
+        ball.targetY = aimY;
+
+        const flightFrames = Math.max(28, Math.min(62, Math.round(dist * 0.115)));
+        const gravity = ball.isFloater ? 0.44 : 0.36; // Floater has a higher rainbow arc!
+        ball.x = player.x;
+        ball.y = player.y;
+        ball.z = player.z + 34;
+        ball.vx = (aimX - ball.x) / flightFrames;
+        ball.vy = (aimY - ball.y) / flightFrames;
+        ball.vz = ((COURT.HOOP_Z - ball.z) + 0.5 * gravity * flightFrames * flightFrames) / flightFrames;
+
+        const contestLabel = defInfo.contestPct < 15 ? '大空檔 Open' : (defInfo.contestPct < 40 ? '微干擾 Contested' : '嚴密封阻 Smothered');
+        const distMeters = (dist / 42).toFixed(1);
+        const movePrefix = ball.isStepBackShot ? '👣後撤步' : (ball.isFloater ? '🌈彩虹拋投' : '🏀戰術');
+        if (isGreen) {
+          spawnParticles(player.x, player.y, player.z + 35, '#10b981', 20, 4.5);
+          spawnFloatingText(player.x, player.y, player.z + 38, `★ GREEN ${movePrefix}!`, '#34d399', 14);
+          showBanner(
+            `★ GREEN RELEASE 完美${movePrefix}出手！ (${player.name})`,
+            `${isThree ? '三分線外' : '中距離/禁區'} ${distMeters}m • 干擾度 ${defInfo.contestPct}% (${contestLabel})`,
+            'text-emerald-300 border-emerald-400'
+          );
+        } else {
+          showBanner(
+            `${movePrefix}出手 (${player.name})`,
+            `距離 ${distMeters}m • 干擾度 ${defInfo.contestPct}% (${contestLabel})`,
+            'text-sky-300 border-sky-400/60'
+          );
+        }
+      }
+
+      function passBall(fromPlayer, targetPlayer, isAlleyLob = false) {
+        if (!fromPlayer || !targetPlayer || fromPlayer === targetPlayer) return;
+        fromPlayer.chargingShot = false;
+        if (fromPlayer.team === 'home') state.lastHomePasser = fromPlayer;
+        else state.lastAwayPasser = fromPlayer;
+
+        const isNoLook = !isAlleyLob && (fromPlayer.idx === 0 || fromPlayer.three >= 88) && Math.random() < 0.45;
+        if (isNoLook) {
+          setPlayerOrderTag(fromPlayer, '👀不看人妙傳!', 60);
+          spawnParticles(fromPlayer.x, fromPlayer.y, 18, '#38bdf8', 10, 3.5);
+        }
+
+        ball.holder = null;
+        ball.inFlight = true;
+        ball.isShot = false;
+        ball.isPass = true;
+        ball.isFlashyPass = isNoLook;
+        ball.isAlleyLob = isAlleyLob;
+        ball.passTarget = targetPlayer;
+        ball.shooter = fromPlayer;
+
+        const dist = Math.hypot(targetPlayer.x - fromPlayer.x, targetPlayer.y - fromPlayer.y);
+        const frames = isAlleyLob ? Math.max(22, Math.round(dist * 0.09)) : Math.max(10, Math.round(dist * 0.050));
+
+        ball.x = fromPlayer.x;
+        ball.y = fromPlayer.y;
+        ball.z = fromPlayer.z + 24;
+
+        const leadX = targetPlayer.x + targetPlayer.vx * (frames * 0.55);
+        const leadY = targetPlayer.y + targetPlayer.vy * (frames * 0.55);
+        ball.targetX = leadX;
+        ball.targetY = leadY;
+
+        ball.vx = (leadX - ball.x) / frames;
+        ball.vy = (leadY - ball.y) / frames;
+        ball.vz = isAlleyLob ? 7.2 : 2.1;
+        SoundFX.bounce(0.6);
+
+        if (fromPlayer.team === 'home') {
+          state.focusIdx = targetPlayer.idx;
+          updateCoachHUD();
+        }
+      }
+
+      function awardBasket(scoringTeam, points, scorer, bannerTitle, bannerSub) {
+        if (ball.madeBasketLock > 0) return;
+        ball.madeBasketLock = 45;
+
+        state.refereeAvatar.whistleTimer = 45;
+
+        if (scoringTeam === 'home') {
+          state.scoreHome += points;
+          state.teamMorale = Math.min(100, state.teamMorale + 6);
+          triggerCoachSidelineShout(`📣「好球！！${scorer.name} 這招太帥了！」`, '#34d399', 600);
+        } else {
+          state.scoreAway += points;
+          triggerCoachSidelineShout('📣「穩住防線！下一波進攻討回來！」', '#fbbf24', 460);
+        }
+        state.shotClock = 24;
+        triggerCrowdExcitement();
+        showBanner(bannerTitle, bannerSub, scoringTeam === 'home' ? 'text-amber-300 border-amber-400' : 'text-rose-300 border-rose-400');
+
+        const nextTeam = scoringTeam === 'home' ? 'away' : 'home';
+        state.possession = nextTeam;
+        updateScoreboardDOM();
+        checkAutoSubstitution();
+
+        setTimeout(() => {
+          if (state.gameOver) return;
+          const inboundTeam = nextTeam === 'home' ? homePlayers : awayPlayers;
+          const pg = inboundTeam[0];
+          const inboundX = nextTeam === 'home' ? COURT.LEFT_HOOP_X + 60 : COURT.RIGHT_HOOP_X - 60;
+          pg.x = inboundX;
+          pg.y = COURT.HOOP_Y;
+          pg.z = 0;
+          ball.inFlight = false;
+          ball.isShot = false;
+          ball.isPass = false;
+          ball.holder = pg;
+          state.shotClock = 24;
+          if (nextTeam === 'home') {
+            state.focusIdx = 0;
+          }
+          updateCoachHUD();
+          updateScoreboardDOM();
+        }, 680);
+      }
+
+      // =========================================================================
+      // 9. 3D BALL PHYSICS, MOTION TRAIL & RIM / BACKBOARD COLLISION ENGINE
+      // =========================================================================
+      function updateBallPhysics(dtScale) {
+        if (ball.madeBasketLock > 0) ball.madeBasketLock = Math.max(0, ball.madeBasketLock - dtScale);
+
+        if (ball.holder) {
+          const p = ball.holder;
+          ball.inFlight = false;
+          ball.dribblePhase += (Math.hypot(p.vx, p.vy) > 0.5 ? 0.34 : 0.19) * dtScale;
+          const handSide = Math.sin(ball.dribblePhase * 0.5) >= 0 ? 1 : -1;
+          const handOffset = 14;
+          ball.x = p.x + Math.cos(p.facing + handSide * 0.28) * handOffset;
+          ball.y = p.y + Math.sin(p.facing + handSide * 0.28) * handOffset;
+
+          if (p.isDunking || p.chargingShot || p.z > 4) {
+            ball.z = p.z + 30;
+          } else {
+            const bounceWave = Math.abs(Math.sin(ball.dribblePhase));
+            ball.z = bounceWave * 21;
+            if (bounceWave < 0.12 && Math.sin(ball.dribblePhase - 0.25) < 0 && !state.inStartScreen) {
+              SoundFX.bounce(0.45);
+            }
+          }
+          state.ballTrail.length = 0;
+          return;
+        }
+
+        if (state.highQuality && (ball.isShot || ball.isPass)) {
+          state.ballTrail.push({
+            x: ball.x,
+            y: ball.y - ball.z,
+            color: ball.greenRelease ? '#10b981' : (ball.isAlleyLob ? '#c084fc' : (ball.isFlashyPass ? '#38bdf8' : '#fb923c')),
+            life: 1.0
+          });
+          if (state.ballTrail.length > 14) state.ballTrail.shift();
+        }
+
+        ball.x += ball.vx * dtScale;
+        ball.y += ball.vy * dtScale;
+        ball.z += ball.vz * dtScale;
+        ball.spinAngle += 0.22 * dtScale;
+
+        const gravity = ball.isPass && !ball.isAlleyLob ? 0.14 : (ball.isFloater ? 0.44 : 0.36);
+        ball.vz -= gravity * dtScale;
+
+        // Pass reception & interception
+        if (ball.isPass && ball.passTarget) {
+          const t = ball.passTarget;
+          const distToTarget = Math.hypot(t.x - ball.x, t.y - ball.y);
+
+          const opponents = t.team === 'home' ? awayPlayers : homePlayers;
+          for (const opp of opponents) {
+            if (opp.stumbleTimer > 0) continue;
+            if (Math.hypot(opp.x - ball.x, opp.y - ball.y) < 20 && Math.abs(opp.z + 20 - ball.z) < 28) {
+              const interceptChance = (opp.team === 'home' && state.defLockdownTimer > 0) ? 0.55 : 0.28;
+              if (Math.random() < interceptChance) {
+                opp.stats.stl++;
+                ball.holder = opp;
+                ball.isPass = false;
+                ball.inFlight = false;
+                state.possession = opp.team;
+                state.shotClock = 24;
+                if (opp.team === 'home') state.focusIdx = opp.idx;
+                SoundFX.whistle();
+                spawnFloatingText(opp.x, opp.y, 35, '⚡ STEAL 攔截!', '#34d399', 15);
+                addPlayLog(`⚡ ${opp.name} 預判傳球路線成功抄截！發動快攻！`, 'text-emerald-400 font-bold');
+                showBanner(`⚡ 傳球攔截！ ${opp.name} 抄截成功！`, '快攻反擊機會！', 'text-emerald-300 border-emerald-400');
+                updateScoreboardDOM();
+                return;
+              }
+            }
+          }
+
+          if (distToTarget < 28) {
+            if (ball.isAlleyLob) {
+              ball.holder = t;
+              ball.isPass = false;
+              ball.isAlleyLob = false;
+              startDunk(t);
+              showBanner(`🚀 空中接力 ALLEY-OOP！ ${t.name} 騰空暴扣！`, '總教練精妙戰術配合！', 'text-purple-300 border-purple-400');
+              return;
+            } else {
+              ball.holder = t;
+              ball.isPass = false;
+              ball.inFlight = false;
+              state.possession = t.team;
+              if (t.team === 'home') {
+                state.focusIdx = t.idx;
+                updateCoachHUD();
+              }
+              SoundFX.bounce(0.7);
+              return;
+            }
+          }
+        }
+
+        // Rim & Backboard 3D Physics
+        const checkHoop = (hx, hoopSide) => {
+          const hy = COURT.HOOP_Y;
+          const hz = COURT.HOOP_Z;
+          const dist2D = Math.hypot(ball.x - hx, ball.y - hy);
+
+          const boardX = hoopSide === 'right' ? hx + 14 : hx - 14;
+          if (Math.abs(ball.x - boardX) < 7 && Math.abs(ball.y - hy) < 34 && ball.z > hz - 10 && ball.z < hz + 48) {
+            ball.vx = -ball.vx * 0.62;
+            ball.x = hoopSide === 'right' ? boardX - 7 : boardX + 7;
+            SoundFX.bounce(0.8);
+          }
+
+          if (ball.vz < 0 && ball.z <= hz + 6 && ball.z >= hz - 9) {
+            if (dist2D < COURT.RIM_RADIUS - 2.5) {
+              ball.vx *= 0.25;
+              ball.vy *= 0.25;
+              state.netRipples[hoopSide] = 1.18;
+              SoundFX.swish();
+
+              if (ball.isShot && ball.shooter) {
+                ball.isShot = false;
+                const s = ball.shooter;
+                const pts = ball.isThreePointAttempt ? 3 : 2;
+                s.stats.fgm++;
+                if (pts === 3) s.stats.tpm++;
+                s.stats.pts += pts;
+                s.streak++;
+
+                const passer = s.team === 'home' ? state.lastHomePasser : state.lastAwayPasser;
+                let astNote = '';
+                if (passer && passer !== s) {
+                  passer.stats.ast++;
+                  astNote = ` (助攻: ${passer.name})`;
+                }
+
+                spawnParticles(hx, hy, hz, pts === 3 ? '#10b981' : '#38bdf8', 26, 5.5);
+                spawnFloatingText(hx, hy, hz + 15, pts === 3 ? '🎯 SWISH! +3' : '🔥 BUCKET! +2', pts === 3 ? '#34d399' : '#38bdf8', 17);
+                addPlayLog(
+                  `${pts === 3 ? '🎯' : '🏀'} ${s.name} 命中${pts === 3 ? '外線三分球' : '精準跳投'}！ (+${pts})${astNote}`,
+                  s.team === 'home' ? 'text-emerald-300 font-bold' : 'text-rose-300'
+                );
+                const shotTypeLabel = pts === 3 ? '🎯 三分穿心 SWISH +3！' : '🔥 精準命中 BUCKET +2！';
+                awardBasket(s.team, pts, s, `${shotTypeLabel} (${s.name})`, `${s.name} 本場 ${s.stats.pts} 分${astNote}`);
+              }
+            } else if (dist2D >= COURT.RIM_RADIUS - 2.5 && dist2D <= COURT.RIM_RADIUS + 8) {
+              if (ball.shooter) ball.shooter.streak = 0;
+              const normX = (ball.x - hx) / (dist2D || 1);
+              const normY = (ball.y - hy) / (dist2D || 1);
+              ball.vx = normX * (2.6 + Math.random() * 2.2);
+              ball.vy = normY * (2.6 + Math.random() * 2.2);
+              ball.vz = Math.abs(ball.vz) * 0.58 + 2.4;
+              ball.z = hz + 7;
+              ball.isShot = false;
+              state.possession = 'loose';
+              state.netRipples[hoopSide] = 0.4;
+              SoundFX.rimClank();
+              showBanner('🧱 彈框而出！爭搶籃板 REBOUND！', '內線球員卡位起跳！', 'text-amber-300 border-amber-500/60');
+            }
+          }
+        };
+
+        checkHoop(COURT.LEFT_HOOP_X, 'left');
+        checkHoop(COURT.RIGHT_HOOP_X, 'right');
+
+        if (ball.z <= 0) {
+          ball.z = 0;
+          if (Math.abs(ball.vz) > 1.2) {
+            ball.vz = -ball.vz * 0.62;
+            ball.vx *= 0.78;
+            ball.vy *= 0.78;
+            SoundFX.bounce(Math.min(1, Math.abs(ball.vz) / 6));
+          } else {
+            ball.vz = 0;
+            ball.vx *= 0.85;
+            ball.vy *= 0.85;
+          }
+          ball.isShot = false;
+          ball.isPass = false;
+        }
+
+        if (ball.x < COURT.MARGIN_X + 10) { ball.x = COURT.MARGIN_X + 10; ball.vx = Math.abs(ball.vx) * 0.6; }
+        if (ball.x > COURT.W - COURT.MARGIN_X - 10) { ball.x = COURT.W - COURT.MARGIN_X - 10; ball.vx = -Math.abs(ball.vx) * 0.6; }
+        if (ball.y < COURT.MARGIN_Y + 10) { ball.y = COURT.MARGIN_Y + 10; ball.vy = Math.abs(ball.vy) * 0.6; }
+        if (ball.y > COURT.H - COURT.MARGIN_Y - 10) { ball.y = COURT.H - COURT.MARGIN_Y - 10; ball.vy = -Math.abs(ball.vy) * 0.6; }
+
+        if (!ball.isShot && !ball.isPass && ball.z < 58 && ball.madeBasketLock === 0) {
+          let bestPlayer = null;
+          let bestScore = -999;
+          for (const p of allPlayers) {
+            const d = Math.hypot(p.x - ball.x, p.y - ball.y);
+            const reachZ = p.z + 36 * p.height;
+            if (d < 30 && ball.z <= reachZ) {
+              const rebBonus = (p.team === 'home' && state.cheerBuffTimer > 0) ? 10 : 0;
+              const rebScore = (30 - d) + p.height * 18 + (p.z * 0.5) + rebBonus + Math.random() * 8;
+              if (rebScore > bestScore) {
+                bestScore = rebScore;
+                bestPlayer = p;
+              }
+            }
+          }
+          if (bestPlayer) {
+            const prevPoss = state.possession;
+            ball.holder = bestPlayer;
+            ball.inFlight = false;
+            state.possession = bestPlayer.team;
+            if (prevPoss === 'loose') {
+              bestPlayer.stats.reb++;
+              state.shotClock = 24;
+              if (bestPlayer.z === 0) bestPlayer.vz = 3.2;
+              spawnFloatingText(bestPlayer.x, bestPlayer.y, 35, '💪 REBOUND 籃板!', '#38bdf8', 13);
+              addPlayLog(`💪 ${bestPlayer.name} 強勢保護下籃板球 (本場第 ${bestPlayer.stats.reb} 個籃板)！`, 'text-sky-300');
+              showBanner(`💪 ${bestPlayer.name} 抓下籃板球！`, `籃板 +1 (累計 ${bestPlayer.stats.reb} 籃板)`, 'text-sky-300 border-sky-400');
+            }
+            if (bestPlayer.team === 'home') {
+              state.focusIdx = bestPlayer.idx;
+              updateCoachHUD();
+            }
+            updateScoreboardDOM();
+          }
+        }
+      }
+
+      // =========================================================================
+      // 10. SIDELINE COACH COMMAND HANDLERS (8 BUTTONS + START SCREEN DISMISS)
+      // =========================================================================
+      function dismissStartScreenAndTipOff() {
+        if (!state.inStartScreen) return;
+        state.inStartScreen = false;
+        const overlay = document.getElementById('startScreenOverlay');
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          overlay.classList.add('hidden');
+        }, 300);
+
+        SoundFX.init();
+        SoundFX.whistle();
+        SoundFX.crowdCheer(0.6);
+        state.refereeAvatar.whistleTimer = 55;
+        triggerCrowdExcitement();
+        triggerCoachSidelineShout('📣「比賽開打！展現我們的王牌球技！」', '#fbbf24', 560);
+        addPlayLog('🏀 裁判吹響開球哨音！總教練正式坐鎮場邊指揮！', 'text-amber-300 font-bold');
+        showBanner('🏀 比賽正式開球 TIP-OFF！', '隨時點擊下方 8 大指令鈕或按快捷鍵指揮球員施展花式動作！', 'text-amber-300 border-amber-400');
+      }
+
+      function coachCommandCheer() {
+        if (state.paused || state.gameOver || state.inStartScreen) return;
+        SoundFX.init();
+        SoundFX.crowdCheer(0.65);
+        triggerCrowdExcitement();
+
+        state.teamMorale = 100;
+        state.cheerBuffTimer = 360;
+        for (const p of homePlayers) {
+          p.stamina = Math.min(100, p.stamina + 22);
+          setPlayerOrderTag(p, '🔥士氣全開!', 95);
+          spawnParticles(p.x, p.y, 20, '#f59e0b', 10, 3.8);
+        }
+        triggerCoachSidelineShout('📣「加油！！氣勢打出來！相信隊友！」', '#fbbf24', 580);
+        addPlayLog('📣 總教練在場邊振臂高呼「加油！」，全隊體力恢復且士氣進入熱血爆發狀態！', 'text-amber-300 font-bold');
+        showBanner('📣 總教練喊話：「全隊加油！」', '全隊體力恢復 +22% • 士氣進入 🔥熱血爆發狀態（命中率與速度提升）！', 'text-amber-300 border-amber-400');
+        updateCoachHUD();
+      }
+
+      function coachCommandShoot() {
+        if (state.paused || state.gameOver || state.inStartScreen) return;
+        SoundFX.init();
+        if (state.possession !== 'home' || !ball.holder || ball.holder.team !== 'home') {
+          triggerCoachSidelineShout('📣「搶下球權後果斷出手！」', '#f43f5e', 520);
+          showBanner('📣 總教練喊話：「抓準時機果斷投籃！」', '目前為防守回合，待奪回球權後將積極出手', 'text-rose-300 border-rose-400');
+          return;
+        }
+
+        const shooter = ball.holder;
+        const distToHoop = Math.hypot(COURT.RIGHT_HOOP_X - shooter.x, COURT.HOOP_Y - shooter.y);
+        setPlayerOrderTag(shooter, '🎯接令果斷出手!', 80);
+        triggerCoachSidelineShout(`📣「${shooter.name}！大膽投！這球有了！」`, '#fb7185', 610);
+
+        if (distToHoop < 125 && shooter.dunk >= 80 && !shooter.isDunking) {
+          startDunk(shooter);
+          return;
+        }
+
+        if (!shooter.chargingShot && !shooter.isDunking) {
+          shooter.chargingShot = true;
+          shooter.shotMeter = 0.08;
+          shooter.aiShootHoldTarget = 0.76 + (Math.random() - 0.5) * 0.032;
+          if (shooter.z === 0) shooter.vz = 4.6;
+        }
+      }
+
+      function coachCommandDrive() {
+        if (state.paused || state.gameOver || state.inStartScreen) return;
+        SoundFX.init();
+        if (state.possession !== 'home' || !ball.holder || ball.holder.team !== 'home') {
+          triggerCoachSidelineShout('📣「轉換快攻全力衝擊籃框！」', '#fb923c', 500);
+          return;
+        }
+
+        const bh = ball.holder;
+        state.forceDriveTimer = 150;
+        bh.crossoverTimer = 34;
+        setPlayerOrderTag(bh, '⚡強切禁區!', 95);
+        SoundFX.squeak();
+        spawnParticles(bh.x, bh.y, 4, '#38bdf8', 14, 3.8);
+
+        const defInfo = getClosestDefenderInfo(bh);
+        if (defInfo.closest && defInfo.dist < 62) {
+          defInfo.closest.stumbleTimer = 35;
+          defInfo.closest.vx -= 3.5;
+          defInfo.closest.vy += (Math.random() > 0.5 ? 1 : -1) * 4.8;
+          spawnFloatingText(bh.x, bh.y, 32, '⚡ ANKLE BREAKER!', '#38bdf8', 14);
+        }
+
+        triggerCoachSidelineShout(`📣「${bh.name}！加速切進去飛身爆扣！」`, '#fb923c', 550);
+        showBanner(`⚡ 總教練下令：「${bh.name} 強行切入禁區！」`, '觸發變向過人加速，直接挑戰籃框飛身灌籃！', 'text-orange-300 border-orange-400');
+      }
+
+      // NEW Command: 喊炫技過人 (Spin Move / Euro-Step / Killer Crossover)
+      function coachCommandSkillMove() {
+        if (state.paused || state.gameOver || state.inStartScreen) return;
+        SoundFX.init();
+        if (state.possession !== 'home' || !ball.holder || ball.holder.team !== 'home') {
+          triggerCoachSidelineShout('📣「進攻時多用轉身與歐洲步單打！」', '#22d3ee', 540);
+          return;
+        }
+
+        const bh = ball.holder;
+        bh.skillCooldown = 0; // Allow immediate execution when Coach commands!
+        performSignatureSkillMove(bh, true);
+        state.forceDriveTimer = 110;
+        triggerCoachSidelineShout(`📣「${bh.name}！秀出你的招牌花式腳步過他！」`, '#22d3ee', 590);
+        showBanner(`🌀 總教練下令：「${bh.name} 施展花式技巧單打！」`, '觸發 360°陀螺轉身 / 迷蹤歐洲步 / 極限變向晃倒對手！', 'text-cyan-300 border-cyan-400');
+      }
+
+      // NEW Command: 喊後撤步/拋投 (Harden Step-Back 3PT / Tear-Drop Floater)
+      function coachCommandStepBack() {
+        if (state.paused || state.gameOver || state.inStartScreen) return;
+        SoundFX.init();
+        if (state.possession !== 'home' || !ball.holder || ball.holder.team !== 'home') {
+          triggerCoachSidelineShout('📣「外線善用後撤步創造投籃空間！」', '#f472b6', 540);
+          return;
+        }
+
+        const bh = ball.holder;
+        performStepBackOrFloater(bh, true);
+        triggerCoachSidelineShout(`📣「${bh.name}！後撤步拉開空間直接拔起來！」`, '#f472b6', 610);
+        showBanner(`🏹 總教練下令：「${bh.name} 施展後撤步 / 高拋投！」`, '瞬間拉開防守距離、降低干擾度並瞄準綠燈完美出手！', 'text-pink-300 border-pink-400');
+      }
+
+      function coachCommandPass(specificTarget = null) {
+        if (state.paused || state.gameOver || state.inStartScreen) return;
+        SoundFX.init();
+        if (state.possession !== 'home' || !ball.holder || ball.holder.team !== 'home') {
+          triggerCoachSidelineShout('📣「注意球的輪轉與防守輪轉！」', '#60a5fa', 480);
+          return;
+        }
+
+        const bh = ball.holder;
+        let bestMate = specificTarget;
+
+        if (!bestMate || bestMate === bh) {
+          let bestScore = -9999;
+          for (const mate of homePlayers) {
+            if (mate === bh) continue;
+            const distHoop = Math.hypot(COURT.RIGHT_HOOP_X - mate.x, COURT.HOOP_Y - mate.y);
+            const defInfo = getClosestDefenderInfo(mate);
+            const score = (320 - distHoop) + defInfo.dist * 1.6 + (mate.three * 0.5);
+            if (score > bestScore) {
+              bestScore = score;
+              bestMate = mate;
+            }
+          }
+        }
+
+        if (bestMate) {
+          setPlayerOrderTag(bh, '🔄戰術妙傳!', 65);
+          setPlayerOrderTag(bestMate, '🙌接球準備!', 75);
+          triggerCoachSidelineShout(`📣「把球傳給 ${bestMate.name}！空檔出來了！」`, '#60a5fa', 540);
+          passBall(bh, bestMate, false);
+        }
+      }
+
+      function coachCommandAlleyOop() {
+        if (state.paused || state.gameOver || state.inStartScreen) return;
+        SoundFX.init();
+        if (state.possession !== 'home') {
+          triggerCoachSidelineShout('📣「進攻時準備打高低位空接！」', '#c084fc', 510);
+          return;
+        }
+
+        const bh = ball.holder && ball.holder.team === 'home' ? ball.holder : homePlayers[0];
+        let cutter = null;
+        let minDist = 9999;
+        for (const mate of homePlayers) {
+          if (mate === bh) continue;
+          const d = Math.hypot(COURT.RIGHT_HOOP_X - mate.x, COURT.HOOP_Y - mate.y);
+          if (d < 215 && mate.dunk >= 82 && d < minDist) {
+            minDist = d;
+            cutter = mate;
+          }
+        }
+
+        if (ball.holder === bh && cutter) {
+          setPlayerOrderTag(cutter, '🚀起飛空接!', 95);
+          triggerCoachSidelineShout(`📣「高吊籃框！${cutter.name} 空中接力！！」`, '#c084fc', 620);
+          passBall(bh, cutter, true);
+        } else {
+          state.userOffTactic = 'PNR';
+          state.activeCutIdx = bh.idx === 4 ? 3 : 4;
+          state.cutTimer = 150;
+          setOffenseTactic('PNR');
+          const screenMan = homePlayers[state.activeCutIdx];
+          setPlayerOrderTag(screenMan, '🧱上前擋拆順下!', 100);
+          triggerCoachSidelineShout(`📣「${screenMan.name} 上來擋拆！準備順下空接！」`, '#c084fc', 550);
+          showBanner('📋 總教練呼叫：「內線擋拆 + 順下空接！」', `${screenMan.name} 已上前掩護並切入禁區！`, 'text-purple-300 border-purple-400');
+        }
+      }
+
+      function coachCommandDefense() {
+        if (state.paused || state.gameOver || state.inStartScreen) return;
+        SoundFX.init();
+        state.defLockdownTimer = 210;
+
+        for (const p of homePlayers) {
+          setPlayerOrderTag(p, '🛡️壓迫防守!', 95);
+          spawnParticles(p.x, p.y, 10, '#10b981', 8, 3);
+        }
+
+        triggerCoachSidelineShout('📣「防守！！壓迫持球者！準備追魂鍋！」', '#34d399', 490);
+        showBanner('🛡️ 總教練喊話：「全員壓迫防守 DE-FENSE！」', '全隊貼身壓迫、抄截率與起跳追魂鍋率大幅提升！', 'text-emerald-300 border-emerald-400');
+
+        if (ball.holder && ball.holder.team === 'away') {
+          const opp = ball.holder;
+          let closestDef = null;
+          let minD = 9999;
+          for (const hp of homePlayers) {
+            const d = Math.hypot(hp.x - opp.x, hp.y - opp.y);
+            if (d < minD) {
+              minD = d;
+              closestDef = hp;
+            }
+          }
+          if (closestDef && minD < 56) {
+            if (opp.chargingShot || opp.isDunking) {
+              if (closestDef.z === 0) closestDef.vz = 5.6;
+            } else if (closestDef.stealCooldown <= 0) {
+              closestDef.stealCooldown = 28;
+              const stealProb = 0.34 + (closestDef.def - 80) * 0.012 + (state.cheerBuffTimer > 0 ? 0.1 : 0);
+              if (Math.random() < stealProb) {
+                closestDef.stats.stl++;
+                ball.holder = closestDef;
+                state.possession = 'home';
+                state.shotClock = 24;
+                state.focusIdx = closestDef.idx;
+                SoundFX.squeak();
+                spawnParticles(closestDef.x, closestDef.y, 18, '#10b981', 18, 4.5);
+                spawnFloatingText(closestDef.x, closestDef.y, 35, '🔥 STEAL 抄截!', '#34d399', 15);
+                addPlayLog(`🔥 總教練壓迫指令奏效！${closestDef.name} 成功從 ${opp.name} 手中抄截！`, 'text-emerald-400 font-bold');
+                showBanner(`🔥 總教練指令奏效！ ${closestDef.name} 死亡纏繞抄截成功！`, '立即發動快攻反擊！', 'text-emerald-300 border-emerald-400');
+                updateScoreboardDOM();
+              }
+            }
+          }
+        }
+      }
+
+      // Keyboard Shortcuts (Also dismisses Start Screen on ANY key press!)
+      window.addEventListener('keydown', (e) => {
+        if (state.inStartScreen) {
+          e.preventDefault();
+          dismissStartScreenAndTipOff();
+          return;
+        }
+
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', ' '].includes(e.key)) {
+          e.preventDefault();
+        }
+        const k = e.key.toLowerCase();
+
+        if (k === '1') setOffenseTactic('PNR');
+        if (k === '2') setOffenseTactic('FIVE_OUT');
+        if (k === '3') setOffenseTactic('FLOPPY');
+        if (k === '4') setOffenseTactic('POST_CUT');
+        if (k === '5') setDefenseTactic('MAN');
+        if (k === '6') setDefenseTactic('ZONE');
+        if (k === '7') setDefenseTactic('PRESS');
+        if (k === '8') setDefenseTactic('DROP');
+
+        if (k === ' ' || k === 'q') coachCommandCheer();
+        if (k === 'j' || k === 's') coachCommandShoot();
+        if (k === 'd') coachCommandDrive();
+        if (k === 'x' || k === 'c') coachCommandSkillMove();
+        if (k === 'z' || k === 'v') coachCommandStepBack();
+        if (k === 'k' || k === 'p') coachCommandPass();
+        if (k === 'u' || k === 'a') coachCommandAlleyOop();
+        if (k === 'l' || k === 'f') coachCommandDefense();
+        if (k === 't') toggleSubModal();
+      });
+
+      // Click on Court to Pass directly to a clicked Teammate
+      canvas.addEventListener('pointerdown', (e) => {
+        if (state.inStartScreen) {
+          dismissStartScreenAndTipOff();
+          return;
+        }
+        SoundFX.init();
+        const rect = canvas.getBoundingClientRect();
+        const clickX = ((e.clientX - rect.left) / rect.width) * COURT.W;
+        const clickY = ((e.clientY - rect.top) / rect.height) * COURT.H;
+
+        for (const mate of homePlayers) {
+          if (Math.hypot(mate.x - clickX, mate.y - clickY) < 44) {
+            state.focusIdx = mate.idx;
+            updateCoachHUD();
+            if (state.possession === 'home' && ball.holder && ball.holder.team === 'home' && ball.holder !== mate) {
+              const distToHoop = Math.hypot(COURT.RIGHT_HOOP_X - mate.x, COURT.HOOP_Y - mate.y);
+              if (distToHoop < 110 && mate.dunk >= 84) {
+                setPlayerOrderTag(mate, '🚀指定空接!', 90);
+                triggerCoachSidelineShout(`📣「高吊給 ${mate.name} 灌籃！」`, '#c084fc', 600);
+                passBall(ball.holder, mate, true);
+              } else {
+                coachCommandPass(mate);
+              }
+            } else {
+              setPlayerOrderTag(mate, '👀教練關注', 60);
+            }
+            return;
+          }
+        }
+      });
+
+      // =========================================================================
+      // 11. 100% AUTONOMOUS 5v5 AI ENGINE WITH AUTONOMOUS SKILL MOVES
+      // =========================================================================
+      function updatePlayersAndAI(dtScale) {
+        if (state.cheerBuffTimer > 0) state.cheerBuffTimer = Math.max(0, state.cheerBuffTimer - dtScale);
+        if (state.defLockdownTimer > 0) state.defLockdownTimer = Math.max(0, state.defLockdownTimer - dtScale);
+        if (state.forceDriveTimer > 0) state.forceDriveTimer = Math.max(0, state.forceDriveTimer - dtScale);
+        if (state.cutTimer > 0) state.cutTimer = Math.max(0, state.cutTimer - dtScale);
+        state.teamMorale = Math.max(55, state.teamMorale - 0.008 * dtScale);
+
+        for (const bp of homeBench) {
+          bp.stamina = Math.min(100, bp.stamina + 0.26 * dtScale);
+        }
+
+        // Update Coach Sideline Avatar
+        const ca = state.coachAvatar;
+        if (ca.speechTimer > 0) ca.speechTimer = Math.max(0, ca.speechTimer - dtScale);
+        if (ca.jumpZ > 0 || ca.vz !== 0) {
+          ca.jumpZ += ca.vz * dtScale;
+          ca.vz -= 0.45 * dtScale;
+          if (ca.jumpZ <= 0) {
+            ca.jumpZ = 0;
+            ca.vz = 0;
+          }
+        }
+        const targetCoachX = Math.max(110, Math.min(350, ball.x * 0.36));
+        ca.x += (targetCoachX - ca.x) * 0.05 * dtScale;
+
+        // Update Sideline Referee Avatar
+        const ref = state.refereeAvatar;
+        if (ref.whistleTimer > 0) ref.whistleTimer = Math.max(0, ref.whistleTimer - dtScale);
+        const targetRefX = Math.max(220, Math.min(980, ball.x * 0.85 + 90));
+        ref.x += (targetRefX - ref.x) * 0.06 * dtScale;
+        ref.facing = Math.atan2(ball.y - ref.y, ball.x - ref.x);
+
+        // CPU Away Team AI Switches Tactics
+        state.cpuTacticTimer -= dtScale;
+        if (state.cpuTacticTimer <= 0) {
+          state.cpuTacticTimer = 260;
+          const tactics = ['PNR', 'FIVE_OUT', 'FLOPPY', 'POST_CUT'];
+          state.cpuOffTactic = tactics[Math.floor(Math.random() * tactics.length)];
+          const badge = document.getElementById('cpuTacticBadge');
+          if (badge) badge.textContent = `對手戰術: ${TACTIC_NAMES[state.cpuOffTactic].split(' ')[0]}`;
+        }
+
+        const cpuDiffMult = state.difficulty === 'rookie' ? 0.84 : (state.difficulty === 'allstar' ? 1.08 : 0.96);
+        const paceSpeedMult = state.userPace === 'FAST' ? 1.12 : (state.userPace === 'PATIENT' ? 0.92 : 1.0);
+        const paceShootMult = state.userPace === 'FAST' ? 1.45 : (state.userPace === 'PATIENT' ? 0.72 : 1.0);
+        const homeCoachMult = (1.0 + (state.cheerBuffTimer > 0 ? 0.14 : (state.teamMorale - 70) * 0.002)) * paceSpeedMult;
+
+        for (const p of allPlayers) {
+          if (p.stealCooldown > 0) p.stealCooldown = Math.max(0, p.stealCooldown - dtScale);
+          if (p.blockCooldown > 0) p.blockCooldown = Math.max(0, p.blockCooldown - dtScale);
+          if (p.crossoverTimer > 0) p.crossoverTimer = Math.max(0, p.crossoverTimer - dtScale);
+          if (p.spinMoveTimer > 0) p.spinMoveTimer = Math.max(0, p.spinMoveTimer - dtScale);
+          if (p.stepBackTimer > 0) p.stepBackTimer = Math.max(0, p.stepBackTimer - dtScale);
+          if (p.euroStepTimer > 0) p.euroStepTimer = Math.max(0, p.euroStepTimer - dtScale);
+          if (p.stumbleTimer > 0) p.stumbleTimer = Math.max(0, p.stumbleTimer - dtScale);
+          if (p.skillCooldown > 0) p.skillCooldown = Math.max(0, p.skillCooldown - dtScale);
+          if (p.coachOrderTimer > 0) p.coachOrderTimer = Math.max(0, p.coachOrderTimer - dtScale);
+          p.isSettingScreen = false;
+
+          // Record Afterimage Ghost Silhouettes when performing flashy skill moves or dunks!
+          const isDoingFlashySkill = p.isDunking || p.spinMoveTimer > 0 || p.euroStepTimer > 0 || p.stepBackTimer > 0 || p.crossoverTimer > 12;
+          if (state.highQuality && isDoingFlashySkill && state.fpsFrames % 2 === 0) {
+            p.ghosts.push({
+              x: p.x,
+              y: p.y,
+              z: p.z,
+              color: p.spinMoveTimer > 0 ? '#22d3ee' : (p.euroStepTimer > 0 ? '#c084fc' : (p.stepBackTimer > 0 ? '#f472b6' : '#f97316')),
+              life: 0.75
+            });
+            if (p.ghosts.length > 5) p.ghosts.shift();
+          }
+          for (let g = p.ghosts.length - 1; g >= 0; g--) {
+            p.ghosts[g].life -= 0.045 * dtScale;
+            if (p.ghosts[g].life <= 0) p.ghosts.splice(g, 1);
+          }
+
+          // Vertical jump physics
+          if (p.z > 0 || p.vz !== 0) {
+            p.z += p.vz * dtScale;
+            p.vz -= 0.38 * dtScale;
+            if (p.z <= 0) {
+              p.z = 0;
+              p.vz = 0;
+            }
+          }
+
+          // Active Dunk Flight Override
+          if (p.isDunking) {
+            p.dunkProgress += 0.048 * dtScale;
+            const t = Math.min(1, p.dunkProgress);
+            p.x = p.dunkStartX + (p.dunkTargetX - p.dunkStartX) * t;
+            p.y = p.dunkStartY + (p.dunkTargetY - p.dunkStartY) * t;
+            p.z = Math.sin(t * Math.PI) * 56;
+            p.facing = Math.atan2(p.dunkTargetY - p.dunkStartY, p.dunkTargetX - p.dunkStartX);
+            if (p.dunkProgress >= 1.0) {
+              finishDunk(p);
+            }
+            continue;
+          }
+
+          // Shot Meter Charging Logic
+          if (p.chargingShot) {
+            p.shotMeter += 0.025 * dtScale;
+            if (p.shotMeter >= (p.aiShootHoldTarget || 0.76) || p.shotMeter >= 1.10) {
+              releaseShot(p);
+            }
+          }
+
+          // If defender is ankle-broken / stumbling, slow them down!
+          if (p.stumbleTimer > 0) {
+            p.x += p.vx * 0.4 * dtScale;
+            p.y += p.vy * 0.4 * dtScale;
+            p.vx *= 0.85;
+            p.vy *= 0.85;
+            clampPlayerToCourt(p);
+            continue;
+          }
+
+          const moveSpd = Math.hypot(p.vx, p.vy);
+          if (moveSpd > 1.8) {
+            p.stamina = Math.max(15, p.stamina - 0.032 * dtScale);
+          } else {
+            p.stamina = Math.min(100, p.stamina + 0.065 * dtScale);
+          }
+
+          const isHome = p.team === 'home';
+          const teamOnOffense = state.possession === p.team;
+          const tactic = isHome ? state.userOffTactic : state.cpuOffTactic;
+          const defTactic = isHome ? state.userDefTactic : state.cpuDefTactic;
+          const targetHoopX = isHome ? COURT.RIGHT_HOOP_X : COURT.LEFT_HOOP_X;
+          const teamMult = isHome ? homeCoachMult : cpuDiffMult;
+
+          if (teamOnOffense) {
+            if (ball.holder === p) {
+              const distToHoop = Math.hypot(targetHoopX - p.x, COURT.HOOP_Y - p.y);
+              const defInfo = getClosestDefenderInfo(p);
+
+              if (isHome && state.forceDriveTimer > 0) {
+                p.targetX = targetHoopX - 28;
+                p.targetY = COURT.HOOP_Y;
+                if (distToHoop < 155 && !p.isDunking) {
+                  startDunk(p);
+                  state.forceDriveTimer = 0;
+                  continue;
+                }
+              } else if (p.euroStepTimer > 0) {
+                // Zig-Zag lateral Euro-Step path toward the rim!
+                const zigDir = p.euroStepTimer > 17 ? p.euroPhase : -p.euroPhase;
+                p.targetX = targetHoopX + (isHome ? -30 : 30);
+                p.targetY = COURT.HOOP_Y + zigDir * 68;
+                if (distToHoop < 92 && !p.chargingShot && !p.isDunking) {
+                  if (p.dunk >= 88) startDunk(p);
+                  else performStepBackOrFloater(p, false);
+                }
+              } else {
+                const baseSpot = getOffensiveFormationSpot(p, p, tactic, isHome);
+                const probeWave = Math.sin(performance.now() * 0.0024 + p.idx);
+                if (probeWave > 0.25 || defInfo.dist > 60) {
+                  p.targetX = targetHoopX + (isHome ? -95 : 95);
+                  p.targetY = COURT.HOOP_Y + Math.cos(performance.now() * 0.0018 + p.idx) * 70;
+                } else {
+                  p.targetX = baseSpot.x;
+                  p.targetY = baseSpot.y;
+                }
+              }
+
+              // 0) Autonomous Signature Skill Move Trigger when closely guarded!
+              if (defInfo.dist < 56 && p.skillCooldown <= 0 && !p.chargingShot && Math.random() < 0.018 * teamMult * dtScale) {
+                if (distToHoop > 195 && p.three >= 86 && Math.random() < 0.48) {
+                  performStepBackOrFloater(p, false);
+                } else {
+                  performSignatureSkillMove(p, false);
+                }
+              }
+
+              // 1) Autonomous Slam Dunk or High Floater in the paint
+              if (distToHoop < 135 && (defInfo.dist > 40 || p.dunk >= 90) && p.dunk >= 78 && Math.random() < 0.048 * teamMult * dtScale) {
+                startDunk(p);
+                continue;
+              } else if (distToHoop < 135 && defInfo.dist < 42 && p.mid >= 86 && !p.chargingShot && Math.random() < 0.025 * teamMult * dtScale) {
+                performStepBackOrFloater(p, false);
+                continue;
+              }
+
+              // 2) Autonomous Jump Shot
+              const inRange = distToHoop < 268;
+              const openThreshold = isHome ? (state.userPace === 'PATIENT' ? 20 : 32) : (state.difficulty === 'allstar' ? 35 : 24);
+              const openEnough = defInfo.contestPct < openThreshold;
+              const shootFreq = (isHome ? paceShootMult : 1.0) * 0.024 * teamMult * dtScale;
+              if (!p.chargingShot && ((inRange && openEnough && Math.random() < shootFreq) || state.shotClock < 2.8)) {
+                p.chargingShot = true;
+                p.shotMeter = 0.05;
+                const precisionSpread = isHome ? (state.cheerBuffTimer > 0 ? 0.03 : 0.06) : (state.difficulty === 'allstar' ? 0.04 : 0.09);
+                p.aiShootHoldTarget = 0.76 + (Math.random() - 0.5) * precisionSpread;
+                if (p.z === 0) p.vz = 4.5;
+              }
+
+              // 3) Autonomous Smart Passing
+              const mates = isHome ? homePlayers : awayPlayers;
+              if (!p.chargingShot && Math.random() < 0.035 * dtScale) {
+                for (const m of mates) {
+                  if (m === p) continue;
+                  const mDistHoop = Math.hypot(targetHoopX - m.x, COURT.HOOP_Y - m.y);
+                  const mDef = getClosestDefenderInfo(m);
+                  if ((mDistHoop < 140 && mDef.dist > 50) || (mDistHoop < 255 && mDef.contestPct < 14)) {
+                    const isLob = mDistHoop < 110 && m.dunk >= 85 && Math.random() < 0.38;
+                    passBall(p, m, isLob);
+                    break;
+                  }
+                }
+              }
+            } else {
+              // OFF-BALL OFFENSIVE AI
+              const baseSpot = getOffensiveFormationSpot(p, ball.holder, tactic, isHome);
+              p.targetX = baseSpot.x;
+              p.targetY = baseSpot.y;
+
+              if (tactic === 'PNR' && (p.idx === 4 || p.idx === state.activeCutIdx) && ball.holder && ball.holder.team === p.team) {
+                const bh = ball.holder;
+                const bhDef = getClosestDefenderInfo(bh).closest;
+                if (state.cutTimer > 75 || (bhDef && Math.hypot(bh.x - targetHoopX, bh.y - COURT.HOOP_Y) > 190)) {
+                  const screenX = bh.x + (isHome ? 38 : -38);
+                  const screenY = bh.y + (bh.y > COURT.HOOP_Y ? -28 : 28);
+                  p.targetX = screenX;
+                  p.targetY = screenY;
+                  if (Math.hypot(p.x - screenX, p.y - screenY) < 28) {
+                    p.isSettingScreen = true;
+                  }
+                } else {
+                  p.targetX = targetHoopX + (isHome ? -66 : 66);
+                  p.targetY = COURT.HOOP_Y;
+                }
+              }
+
+              if (tactic === 'POST_CUT' && (p.idx === 1 || p.idx === 2)) {
+                const cutWave = Math.sin(performance.now() * 0.0025 + p.idx * 2);
+                if (cutWave > 0.52) {
+                  p.targetX = targetHoopX + (isHome ? -72 : 72);
+                  p.targetY = COURT.HOOP_Y + (p.idx === 1 ? -35 : 35);
+                }
+              }
+            }
+          } else {
+            // DEFENSIVE AI
+            const oppTeam = isHome ? awayPlayers : homePlayers;
+            const defSpot = getDefensiveTarget(p, oppTeam, defTactic, isHome);
+            p.targetX = defSpot.x;
+            p.targetY = defSpot.y;
+
+            if (ball.holder && ball.holder.team !== p.team) {
+              const d = Math.hypot(ball.holder.x - p.x, ball.holder.y - p.y);
+              const blockAggression = (isHome && state.defLockdownTimer > 0) ? 0.35 : 0.16 * teamMult;
+
+              if (d < 46 && (ball.holder.chargingShot || ball.holder.isDunking) && p.z === 0 && p.blockCooldown <= 0) {
+                if (Math.random() < blockAggression * dtScale) {
+                  p.vz = 5.4;
+                  p.blockCooldown = 32;
+                }
+              }
+
+              const stealAggression = (isHome && state.defLockdownTimer > 0) ? 0.028 : 0.006;
+              if (d < 40 && p.stealCooldown <= 0 && Math.random() < stealAggression * dtScale) {
+                p.stealCooldown = 40;
+                if (Math.random() < 0.28 + (p.def - 80) * 0.01) {
+                  p.stats.stl++;
+                  ball.holder = p;
+                  state.possession = p.team;
+                  state.shotClock = 24;
+                  if (isHome) state.focusIdx = p.idx;
+                  SoundFX.squeak();
+                  spawnParticles(p.x, p.y, 18, '#10b981', 15, 4);
+                  spawnFloatingText(p.x, p.y, 35, '🔥 STEAL 抄截!', '#34d399', 15);
+                  addPlayLog(`🔥 ${p.name} 施展死亡纏繞，成功抄截對手！`, 'text-emerald-400 font-bold');
+                  showBanner(`🔥 壓迫抄截 STEAL！ (${p.name})`, '成功奪回球權，發動快攻！', 'text-emerald-300 border-emerald-400');
+                  updateScoreboardDOM();
+                }
+              }
+            }
+
+            if (state.possession === 'loose' && !ball.holder) {
+              p.targetX = ball.x;
+              p.targetY = ball.y;
+            }
+          }
+
+          // Smooth Velocity Steering & Skill Move Speed Boost
+          const dx = p.targetX - p.x;
+          const dy = p.targetY - p.y;
+          const dist = Math.hypot(dx, dy);
+          const staminaFactor = p.stamina < 35 ? 0.86 : 1.0;
+          const streakFactor = p.streak >= 2 ? 1.07 : 1.0;
+          const skillSpeedBoost = (p.crossoverTimer > 0 || p.spinMoveTimer > 0 || p.euroStepTimer > 0) ? 1.32 : 1.0;
+          const speedBoost = skillSpeedBoost * (isHome && state.forceDriveTimer > 0 && ball.holder === p ? 1.25 : 1.0) * staminaFactor * streakFactor;
+          const maxSpd = (2.5 + (p.spd - 70) * 0.03) * teamMult * speedBoost;
+
+          if (dist > 4 && !p.isSettingScreen) {
+            const desiredVx = (dx / dist) * Math.min(maxSpd, dist * 0.20);
+            const desiredVy = (dy / dist) * Math.min(maxSpd, dist * 0.20);
+            p.vx += (desiredVx - p.vx) * 0.26 * dtScale;
+            p.vy += (desiredVy - p.vy) * 0.26 * dtScale;
+            const targetAngle = Math.atan2(p.vy, p.vx);
+            // If performing 360° Spin Move, spin facing angle rapidly!
+            if (p.spinMoveTimer > 0) {
+              p.facing += 0.48 * dtScale;
+            } else {
+              p.facing = lerpAngle(p.facing, targetAngle, 0.28 * dtScale);
+            }
+          } else {
+            p.vx *= Math.pow(0.68, dtScale);
+            p.vy *= Math.pow(0.68, dtScale);
+            const targetAngle = Math.atan2(ball.y - p.y, ball.x - p.x);
+            p.facing = lerpAngle(p.facing, targetAngle, 0.22 * dtScale);
+          }
+
+          // Physical Screen & Player Separation Collision
+          for (const other of allPlayers) {
+            if (other === p) continue;
+            const sep = Math.hypot(p.x - other.x, p.y - other.y);
+            const minSep = other.isSettingScreen && other.team !== p.team ? 32 : 22;
+            if (sep < minSep && sep > 0.1) {
+              const push = (minSep - sep) * (other.isSettingScreen ? 0.55 : 0.25) * dtScale;
+              p.x += ((p.x - other.x) / sep) * push;
+              p.y += ((p.y - other.y) / sep) * push;
+            }
+          }
+
+          p.x += p.vx * dtScale;
+          p.y += p.vy * dtScale;
+          clampPlayerToCourt(p);
+        }
+      }
+
+      function clampPlayerToCourt(p) {
+        p.x = Math.max(COURT.MARGIN_X + 14, Math.min(COURT.W - COURT.MARGIN_X - 14, p.x));
+        p.y = Math.max(COURT.MARGIN_Y + 14, Math.min(COURT.H - COURT.MARGIN_Y - 14, p.y));
+      }
+
+      // =========================================================================
+      // 12. RENDERING ENGINE (2.5D Court, Skill Ghosts, Footwork Rings, Hoops)
+      // =========================================================================
+      function renderScene(dtScale) {
+        const cw = canvas.width;
+        const ch = canvas.height;
+        ctx.clearRect(0, 0, cw, ch);
+
+        const scaleX = cw / COURT.W;
+        const scaleY = ch / COURT.H;
+        const baseScale = Math.min(scaleX, scaleY) * 0.96;
+
+        const targetFocusX = COURT.W / 2 + (ball.x - COURT.W / 2) * (state.broadcastView ? 0.14 : 0);
+        state.cameraFocusX += (targetFocusX - state.cameraFocusX) * 0.09 * dtScale;
+
+        let shakeX = 0;
+        let shakeY = 0;
+        if (state.cameraShake > 0.2) {
+          shakeX = (Math.random() - 0.5) * state.cameraShake;
+          shakeY = (Math.random() - 0.5) * state.cameraShake;
+          state.cameraShake *= Math.pow(0.85, dtScale);
+        } else {
+          state.cameraShake = 0;
+        }
+
+        ctx.save();
+        ctx.translate(cw / 2 + shakeX, ch / 2 + shakeY);
+        ctx.scale(baseScale, baseScale * (state.broadcastView ? 0.93 : 1.0));
+        ctx.translate(-state.cameraFocusX, -COURT.H / 2);
+
+        // 1. Pre-Rendered Hardwood Parquet Court
+        ctx.drawImage(courtBuffer, 0, 0);
+
+        // 2. Arena Stands, Scorer's Table, Head Coach & Bottom Sideline Referee
+        drawArenaStandsAndScorerTable();
+        drawSidelineCoachAvatar();
+        drawSidelineRefereeAvatar();
+
+        // 3. Hardwood Floor Reflections
+        if (state.highQuality) {
+          drawCourtReflections();
+        }
+
+        // 4. Tactical Playbook Floor Lines & Pass Target Ring
+        if (state.showTacticalLines) {
+          drawTacticalPlaybookOverlay();
+        }
+
+        // 5. Depth-Sorted Entities
+        const renderList = [];
+        for (const p of allPlayers) {
+          renderList.push({ type: 'player', y: p.y, obj: p });
+        }
+        renderList.push({ type: 'ball', y: ball.y });
+        renderList.push({ type: 'hoop_left', y: COURT.HOOP_Y });
+        renderList.push({ type: 'hoop_right', y: COURT.HOOP_Y });
+
+        renderList.sort((a, b) => a.y - b.y);
+
+        for (const p of allPlayers) {
+          drawPlayerShadow(p);
+        }
+        drawBallShadow();
+
+        for (const item of renderList) {
+          if (item.type === 'player') drawPlayer(item.obj);
+          else if (item.type === 'ball') drawBasketball();
+          else if (item.type === 'hoop_left') drawHoopStanchion('left');
+          else if (item.type === 'hoop_right') drawHoopStanchion('right');
+        }
+
+        // 6. Particles & 3D Floating Combat Text Popups
+        drawAndUpdateParticles(dtScale);
+        drawAndUpdateFloatingTexts(dtScale);
+
+        ctx.restore();
+      }
+
+      function drawArenaStandsAndScorerTable() {
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(390, 8, 440, 28);
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(390, 8, 440, 28);
+
+        ctx.font = '800 12px Inter, sans-serif';
+        ctx.fillStyle = '#f8fafc';
+        ctx.textAlign = 'center';
+        ctx.fillText('★ HOOPS PRO ARENA • 5v5 COACH & SKILL MOVES EDITION ★', 610, 26);
+
+        const step = state.highQuality ? 1 : 2;
+        const now = performance.now() * 0.008;
+        for (let i = 0; i < state.crowdFans.length; i += step) {
+          const fan = state.crowdFans[i];
+          if (fan.cheerTimer > 0) fan.cheerTimer--;
+          const jump = fan.cheerTimer > 0 ? Math.abs(Math.sin(now * 2 + fan.phase)) * 7 : Math.sin(now * 0.4 + fan.phase) * 1.2;
+          const fy = (fan.row === 0 ? 16 : 30) - jump;
+          if (fan.x > 210 && fan.x < 850) continue;
+
+          ctx.fillStyle = fan.color;
+          ctx.beginPath();
+          ctx.arc(fan.x, fy, 5.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function drawSidelineCoachAvatar() {
+        const ca = state.coachAvatar;
+        const cx = ca.x;
+        const cy = ca.y - ca.jumpZ;
+
+        ctx.save();
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(cx, ca.y + 4, 15, 7, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#1e293b';
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(cx - 10, cy - 22, 20, 20, 5);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(cx - 1.5, cy - 19, 3, 12);
+
+        ctx.fillStyle = '#f1c27d';
+        ctx.beginPath();
+        ctx.arc(cx, cy - 29, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.strokeStyle = '#f97316';
+        ctx.lineWidth = 1.5;
+        ctx.fillRect(cx + 9, cy - 24, 9, 12);
+        ctx.strokeRect(cx + 9, cy - 24, 9, 12);
+
+        ctx.font = '900 10px Inter, sans-serif';
+        ctx.fillStyle = '#fbbf24';
+        ctx.textAlign = 'center';
+        ctx.fillText('👔 總教練 (COACH)', cx, ca.y + 16);
+
+        if (ca.speechTimer > 0 && ca.speechText) {
+          ctx.font = '800 12px "Noto Sans TC", Inter, sans-serif';
+          const textW = ctx.measureText(ca.speechText).width + 20;
+          const bx = Math.max(80, Math.min(COURT.W - textW - 20, cx - textW / 2));
+          const by = cy - 64;
+
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.96)';
+          ctx.strokeStyle = ca.speechColor || '#fbbf24';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.roundRect(bx, by, textW, 24, 8);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = ca.speechColor || '#fbbf24';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(ca.speechText, bx + textW / 2, by + 12);
+        }
+        ctx.restore();
+      }
+
+      function drawSidelineRefereeAvatar() {
+        const ref = state.refereeAvatar;
+        const rx = ref.x;
+        const ry = ref.y;
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(9, 13, 22, 0.4)';
+        ctx.beginPath();
+        ctx.ellipse(rx, ry + 3, 11, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(rx - 8, ry - 20, 16, 18, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(rx - 5, ry - 19, 2.5, 16);
+        ctx.fillRect(rx, ry - 19, 2.5, 16);
+        ctx.fillRect(rx + 4.5, ry - 19, 2.5, 16);
+
+        ctx.fillStyle = '#e0ac69';
+        ctx.beginPath();
+        ctx.arc(rx, ry - 26, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (ref.whistleTimer > 0) {
+          ctx.font = '800 10px Inter, sans-serif';
+          ctx.fillStyle = '#38bdf8';
+          ctx.textAlign = 'center';
+          ctx.fillText('📢 嗶！', rx, ry - 38);
+        }
+        ctx.restore();
+      }
+
+      function drawCourtReflections() {
+        ctx.save();
+        ctx.globalAlpha = 0.11;
+        const spots = [300, 600, 900];
+        for (const sx of spots) {
+          const grad = ctx.createRadialGradient(sx, COURT.HOOP_Y, 10, sx, COURT.HOOP_Y, 180);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(1, 'rgba(255,255,255,0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(sx, COURT.HOOP_Y, 180, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        for (const p of allPlayers) {
+          ctx.fillStyle = p.team === 'home' ? '#2563eb' : '#e11d48';
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y + 18 + p.z * 0.3, 11, 18, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawTacticalPlaybookOverlay() {
+        const isHomeOffense = state.possession === 'home';
+        const team = isHomeOffense ? homePlayers : awayPlayers;
+        const tactic = isHomeOffense ? state.userOffTactic : state.cpuOffTactic;
+
+        ctx.save();
+        for (const p of team) {
+          if (ball.holder === p) continue;
+          const spot = getOffensiveFormationSpot(p, ball.holder, tactic, isHomeOffense);
+          const dist = Math.hypot(spot.x - p.x, spot.y - p.y);
+          if (dist > 22) {
+            ctx.strokeStyle = isHomeOffense ? 'rgba(56, 189, 248, 0.42)' : 'rgba(251, 113, 133, 0.22)';
+            ctx.lineWidth = 2.2;
+            ctx.setLineDash([6, 6]);
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(spot.x, spot.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.strokeStyle = isHomeOffense ? 'rgba(56, 189, 248, 0.65)' : 'rgba(251, 113, 133, 0.35)';
+            ctx.beginPath();
+            ctx.arc(spot.x, spot.y, 11, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+
+          if (p.isSettingScreen) {
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 22, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.font = '800 10px Inter, sans-serif';
+            ctx.fillStyle = '#fbbf24';
+            ctx.textAlign = 'center';
+            ctx.fillText('🧱 擋拆掩護', p.x, p.y - 44);
+          }
+        }
+
+        if (ball.isPass && ball.passTarget) {
+          ctx.strokeStyle = ball.isAlleyLob ? '#c084fc' : '#38bdf8';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.ellipse(ball.passTarget.x, ball.passTarget.y + 3, 22, 11, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawPlayerShadow(p) {
+        const shadowScale = Math.max(0.45, 1 - p.z / 130);
+        ctx.fillStyle = 'rgba(9, 13, 22, 0.44)';
+        ctx.beginPath();
+        ctx.ellipse(p.x, p.y + 4, 14 * shadowScale * p.height, 7 * shadowScale, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawPlayer(p) {
+        const isFocused = p.team === 'home' && p.idx === state.focusIdx;
+        const isBallCarrier = ball.holder === p;
+        const drawY = p.y - p.z;
+        const hScale = p.height;
+
+        // 0. Draw Afterimage Ghost Silhouettes during Skill Moves or Dunks!
+        if (state.highQuality && p.ghosts.length > 0) {
+          ctx.save();
+          for (const g of p.ghosts) {
+            ctx.globalAlpha = Math.max(0, g.life * 0.42);
+            ctx.fillStyle = g.color;
+            ctx.beginPath();
+            ctx.roundRect(g.x - 10 * hScale, (g.y - g.z) - 26 * hScale, 20 * hScale, 22 * hScale, 6);
+            ctx.arc(g.x, (g.y - g.z) - 33 * hScale, 7 * hScale, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        // 1. Skill Move Vortex / Floor Ring / On-Fire Aura
+        if (p.spinMoveTimer > 0) {
+          ctx.save();
+          ctx.strokeStyle = '#22d3ee';
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y + 2, 24, 0, Math.PI * 1.6);
+          ctx.stroke();
+          ctx.restore();
+        } else if (p.euroStepTimer > 0) {
+          ctx.save();
+          ctx.strokeStyle = '#c084fc';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y + 3, 23, 12, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        } else if (p.streak >= 2) {
+          ctx.save();
+          const pulse = 1 + Math.sin(performance.now() * 0.015) * 0.12;
+          ctx.strokeStyle = '#f97316';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y + 3, 21 * pulse, 11 * pulse, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        } else if (isFocused || (p.team === 'home' && state.cheerBuffTimer > 0)) {
+          ctx.save();
+          ctx.strokeStyle = state.cheerBuffTimer > 0 && p.team === 'home' ? '#f97316' : (isBallCarrier ? '#f59e0b' : '#38bdf8');
+          ctx.lineWidth = isFocused ? 3 : 2;
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y + 3, 19, 10, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        } else if (isBallCarrier) {
+          ctx.strokeStyle = '#f43f5e';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y + 3, 18, 9, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // 2. Dunk Trail Flame Effect
+        if (p.isDunking) {
+          ctx.save();
+          ctx.fillStyle = p.dunkStyle === 'windmill' ? 'rgba(34, 211, 238, 0.42)' : 'rgba(249, 115, 22, 0.38)';
+          ctx.beginPath();
+          ctx.arc(p.x - Math.cos(p.facing) * 14, drawY - 16, 17, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // 3. Sneakers & Legs
+        const speed = Math.hypot(p.vx, p.vy);
+        const stride = speed > 0.25 && p.z === 0 ? Math.sin(performance.now() * 0.024 + p.idx) * 5.8 : 0;
+        ctx.fillStyle = '#f8fafc';
+        ctx.beginPath();
+        ctx.ellipse(p.x - 5 + stride, drawY + 1, 5, 3, 0, 0, Math.PI * 2);
+        ctx.ellipse(p.x + 5 - stride, drawY + 1, 5, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 4. Torso / Jersey (Slight tilt if stumbling!)
+        const jerseyPrimary = p.team === 'home' ? '#2563eb' : '#e11d48';
+        const jerseyTrim = p.team === 'home' ? '#93c5fd' : '#fda4af';
+
+        ctx.fillStyle = jerseyPrimary;
+        ctx.strokeStyle = jerseyTrim;
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.roundRect(p.x - 11 * hScale, drawY - 26 * hScale, 22 * hScale, 22 * hScale, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        // 5. Arms (Windmill Dunk rotation or raised contest)
+        ctx.strokeStyle = p.skin;
+        ctx.lineWidth = 4.2 * hScale;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        if (p.isDunking && p.dunkStyle === 'windmill') {
+          const windmillAngle = p.dunkProgress * Math.PI * 4;
+          ctx.moveTo(p.x - 11 * hScale, drawY - 21 * hScale);
+          ctx.lineTo(p.x - 11 * hScale + Math.cos(windmillAngle) * 16, drawY - 21 * hScale + Math.sin(windmillAngle) * 16);
+          ctx.moveTo(p.x + 11 * hScale, drawY - 21 * hScale);
+          ctx.lineTo(p.x + 11 * hScale + Math.cos(windmillAngle + Math.PI) * 16, drawY - 21 * hScale + Math.sin(windmillAngle + Math.PI) * 16);
+        } else if (p.chargingShot || p.isDunking || p.z > 8 || (p.team === 'home' && state.defLockdownTimer > 0 && state.possession !== 'home')) {
+          ctx.moveTo(p.x - 11 * hScale, drawY - 21 * hScale);
+          ctx.lineTo(p.x - 9 * hScale, drawY - 37 * hScale);
+          ctx.moveTo(p.x + 11 * hScale, drawY - 21 * hScale);
+          ctx.lineTo(p.x + 9 * hScale, drawY - 37 * hScale);
+        } else {
+          ctx.moveTo(p.x - 11 * hScale, drawY - 20 * hScale);
+          ctx.lineTo(p.x - 14 * hScale, drawY - 10 * hScale);
+          ctx.moveTo(p.x + 11 * hScale, drawY - 20 * hScale);
+          ctx.lineTo(p.x + 14 * hScale, drawY - 10 * hScale);
+        }
+        ctx.stroke();
+
+        // 6. Head & Hair
+        ctx.fillStyle = p.skin;
+        ctx.beginPath();
+        ctx.arc(p.x, drawY - 33 * hScale, 7.5 * hScale, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = p.hair;
+        ctx.beginPath();
+        ctx.arc(p.x, drawY - 35 * hScale, 7.2 * hScale, Math.PI, Math.PI * 2);
+        ctx.fill();
+
+        if (p.idx === 0 || p.idx === 2) {
+          ctx.strokeStyle = jerseyTrim;
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(p.x - 7 * hScale, drawY - 35 * hScale);
+          ctx.lineTo(p.x + 7 * hScale, drawY - 35 * hScale);
+          ctx.stroke();
+        }
+
+        // 7. Jersey Number & Overhead Name Tag
+        ctx.font = `900 ${Math.round(10 * hScale)}px Inter, sans-serif`;
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(p.num.replace('#', ''), p.x, drawY - 15 * hScale);
+
+        ctx.font = '700 10px Inter, sans-serif';
+        ctx.fillStyle = isFocused ? '#38bdf8' : 'rgba(226, 232, 240, 0.85)';
+        ctx.fillText(`${p.pos} ${p.name}${p.streak >= 2 ? '🔥' : ''}`, p.x, drawY - 46 * hScale);
+
+        // Mini Stamina Indicator Bar under Home Players
+        if (p.team === 'home') {
+          const barW = 22;
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+          ctx.fillRect(p.x - barW / 2, p.y + 8, barW, 3);
+          ctx.fillStyle = p.stamina > 55 ? '#34d399' : (p.stamina > 30 ? '#fbbf24' : '#f43f5e');
+          ctx.fillRect(p.x - barW / 2, p.y + 8, (Math.max(5, p.stamina) / 100) * barW, 3);
+        }
+
+        // 8. Coach Command Response Tag or Ankle-Broken Stumble Tag
+        if (p.stumbleTimer > 0) {
+          ctx.save();
+          ctx.font = '900 10px "Noto Sans TC", Inter, sans-serif';
+          ctx.fillStyle = '#fb7185';
+          ctx.fillText('💫 被晃開!', p.x, drawY - 58 * hScale);
+          ctx.restore();
+        } else if (p.coachOrderTimer > 0 && p.coachOrderTag) {
+          ctx.save();
+          ctx.font = '900 10px "Noto Sans TC", Inter, sans-serif';
+          ctx.fillStyle = '#fef08a';
+          ctx.fillText(p.coachOrderTag, p.x, drawY - 58 * hScale);
+          ctx.restore();
+        }
+
+        // 9. Dynamic Shot Meter
+        if (p.chargingShot) {
+          drawShotMeter(p, drawY - 32 * hScale);
+        }
+      }
+
+      function drawShotMeter(p, centerY) {
+        const mx = p.x + 24;
+        const my = centerY;
+        const barH = 44;
+        const barW = 8;
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(mx - barW / 2, my - barH / 2, barW, barH, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        const greenTop = my + barH / 2 - 0.84 * barH;
+        const greenHeight = 0.15 * barH;
+        ctx.fillStyle = '#10b981';
+        ctx.fillRect(mx - barW / 2 + 1, greenTop, barW - 2, greenHeight);
+
+        const fillRatio = Math.min(1, p.shotMeter / 1.05);
+        const fillH = fillRatio * barH;
+        const isInsideGreen = Math.abs(p.shotMeter - 0.76) <= 0.08;
+        ctx.fillStyle = isInsideGreen ? '#34d399' : (p.shotMeter > 0.86 ? '#f43f5e' : '#f59e0b');
+        ctx.beginPath();
+        ctx.roundRect(mx - barW / 2 + 1.5, my + barH / 2 - fillH, barW - 3, fillH, 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(mx - barW / 2 - 2, my + barH / 2 - fillH - 1, barW + 4, 2.5);
+        ctx.restore();
+      }
+
+      function drawBallShadow() {
+        const scale = Math.max(0.35, 1 - ball.z / 160);
+        ctx.fillStyle = 'rgba(9, 13, 22, 0.48)';
+        ctx.beginPath();
+        ctx.ellipse(ball.x, ball.y + 4, 9 * scale, 5 * scale, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawBasketball() {
+        if (state.highQuality && state.ballTrail.length > 1) {
+          ctx.save();
+          for (let i = 0; i < state.ballTrail.length; i++) {
+            const pt = state.ballTrail[i];
+            const ratio = (i + 1) / state.ballTrail.length;
+            ctx.globalAlpha = ratio * 0.36;
+            ctx.fillStyle = pt.color;
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, 7 * ratio, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        const bx = ball.x;
+        const by = ball.y - ball.z;
+        const r = 8.2 + Math.min(3.5, ball.z * 0.02);
+
+        ctx.save();
+        const grad = ctx.createRadialGradient(bx - r * 0.3, by - r * 0.3, 1, bx, by, r);
+        grad.addColorStop(0, '#fb923c');
+        grad.addColorStop(0.65, '#ea580c');
+        grad.addColorStop(1, '#9a3412');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(bx, by, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#27272a';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(bx, by, r, 0, Math.PI * 2);
+        ctx.moveTo(bx - r, by);
+        ctx.lineTo(bx + r, by);
+        const seamOffset = Math.sin(ball.spinAngle) * r * 0.55;
+        ctx.moveTo(bx + seamOffset, by - r * 0.9);
+        ctx.lineTo(bx + seamOffset, by + r * 0.9);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawHoopStanchion(side) {
+        const isLeft = side === 'left';
+        const hx = isLeft ? COURT.LEFT_HOOP_X : COURT.RIGHT_HOOP_X;
+        const hy = COURT.HOOP_Y;
+        const hz = COURT.HOOP_Z;
+        const rimScreenY = hy - hz + state.rimFlex[side] * 5;
+        if (state.rimFlex[side] > 0.01) state.rimFlex[side] *= 0.82;
+
+        const basePoleX = isLeft ? COURT.MARGIN_X - 24 : COURT.W - COURT.MARGIN_X + 24;
+        const boardX = isLeft ? hx - 13 : hx + 13;
+
+        ctx.save();
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 7;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(basePoleX, hy);
+        ctx.lineTo(basePoleX, hy - hz - 18);
+        ctx.lineTo(boardX, rimScreenY - 12);
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(226, 232, 240, 0.25)';
+        ctx.strokeStyle = state.shotClock <= 5 ? '#ef4444' : '#f8fafc';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.roundRect(boardX - 3, rimScreenY - 36, 6, 46, 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Digital 24-Second Shot Clock Box above Backboard
+        ctx.fillStyle = '#090d16';
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.2;
+        ctx.fillRect(boardX - 10, rimScreenY - 54, 20, 14);
+        ctx.strokeRect(boardX - 10, rimScreenY - 54, 20, 14);
+        ctx.font = '900 9px monospace';
+        ctx.fillStyle = state.shotClock <= 5 ? '#f43f5e' : '#fbbf24';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(Math.ceil(Math.max(0, state.shotClock))).padStart(2, '0'), boardX, rimScreenY - 47);
+
+        ctx.strokeStyle = '#f97316';
+        ctx.lineWidth = 1.8;
+        ctx.strokeRect(boardX - 2, rimScreenY - 16, 4, 15);
+
+        const ripple = state.netRipples[side];
+        if (ripple > 0.01) state.netRipples[side] *= 0.88;
+        const sway = Math.sin(performance.now() * 0.03) * ripple * 11;
+        const netHeight = 22 + ripple * 6;
+
+        ctx.strokeStyle = 'rgba(248, 250, 252, 0.86)';
+        ctx.lineWidth = 1.3;
+        const r = COURT.RIM_RADIUS;
+        for (let i = -3; i <= 3; i++) {
+          const topX = hx + (i / 3) * r;
+          const botX = hx + (i / 3) * (r * 0.58 + ripple * 5) + sway;
+          ctx.beginPath();
+          ctx.moveTo(topX, rimScreenY);
+          ctx.quadraticCurveTo((topX + botX) / 2 + sway * 0.5, rimScreenY + netHeight * 0.55, botX, rimScreenY + netHeight);
+          ctx.stroke();
+        }
+        ctx.beginPath();
+        ctx.moveTo(hx - r * 0.8, rimScreenY + netHeight * 0.45);
+        ctx.lineTo(hx + r * 0.8 + sway * 0.5, rimScreenY + netHeight * 0.45);
+        ctx.moveTo(hx - r * 0.6 + sway * 0.8, rimScreenY + netHeight * 0.85);
+        ctx.lineTo(hx + r * 0.6 + sway * 0.8, rimScreenY + netHeight * 0.85);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#ea580c';
+        ctx.lineWidth = 3.2;
+        ctx.beginPath();
+        ctx.ellipse(hx, rimScreenY, COURT.RIM_RADIUS, COURT.RIM_RADIUS * 0.52, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawAndUpdateParticles(dtScale) {
+        for (let i = state.particles.length - 1; i >= 0; i--) {
+          const pt = state.particles[i];
+          pt.x += pt.vx * dtScale;
+          pt.y += pt.vy * dtScale;
+          pt.z += pt.vz * dtScale;
+          pt.vz -= 0.22 * dtScale;
+          pt.life -= 0.032 * dtScale;
+          if (pt.life <= 0) {
+            state.particles.splice(i, 1);
+            continue;
+          }
+          ctx.globalAlpha = Math.max(0, pt.life);
+          ctx.fillStyle = pt.color;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y - Math.max(0, pt.z), pt.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1.0;
+      }
+
+      function drawAndUpdateFloatingTexts(dtScale) {
+        ctx.save();
+        for (let i = state.floatingTexts.length - 1; i >= 0; i--) {
+          const ft = state.floatingTexts[i];
+          ft.z += ft.vz * dtScale;
+          ft.life -= 0.022 * dtScale;
+          if (ft.life <= 0) {
+            state.floatingTexts.splice(i, 1);
+            continue;
+          }
+          ctx.globalAlpha = Math.min(1, ft.life * 1.4);
+          ctx.font = `900 ${ft.size}px "Noto Sans TC", Inter, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.strokeStyle = '#090d16';
+          ctx.lineWidth = 3.5;
+          ctx.strokeText(ft.text, ft.x, ft.y - ft.z);
+          ctx.fillStyle = ft.color;
+          ctx.fillText(ft.text, ft.x, ft.y - ft.z);
+        }
+        ctx.restore();
+      }
+
+      // =========================================================================
+      // 13. GAME CLOCK, SHOT CLOCK & UI EVENT HANDLERS
+      // =========================================================================
+      function updateClocks(dtSeconds) {
+        if (state.paused || state.gameOver || state.inStartScreen || ball.madeBasketLock > 0) return;
+
+        const scaledDt = dtSeconds * state.simSpeed;
+        state.gameClock -= scaledDt;
+        if (state.possession !== 'loose') {
+          state.shotClock -= scaledDt;
+        }
+
+        if (state.shotClock <= 0) {
+          state.shotClock = 24;
+          state.refereeAvatar.whistleTimer = 50;
+          SoundFX.whistle();
+          const nextTeam = state.possession === 'home' ? 'away' : 'home';
+          state.possession = nextTeam;
+          const nextRoster = nextTeam === 'home' ? homePlayers : awayPlayers;
+          ball.holder = nextRoster[0];
+          ball.inFlight = false;
+          addPlayLog('⏱️ 24 秒進攻超時違例！裁判鳴哨轉換球權。', 'text-rose-400 font-bold');
+          showBanner('⏱️ 24秒進攻違例 SHOT CLOCK VIOLATION！', '球權轉換！', 'text-rose-400 border-rose-500');
+        }
+
+        if (state.gameClock <= 0) {
+          state.refereeAvatar.whistleTimer = 60;
+          SoundFX.whistle();
+          if (state.quarter < 4 || state.scoreHome === state.scoreAway) {
+            state.quarter++;
+            state.gameClock = 120;
+            state.shotClock = 24;
+            const nextTeam = state.quarter % 2 === 1 ? 'home' : 'away';
+            state.possession = nextTeam;
+            ball.holder = (nextTeam === 'home' ? homePlayers : awayPlayers)[0];
+            ball.inFlight = false;
+            triggerCoachSidelineShout(`📣「第 ${state.quarter} 節開始！執行好戰術！」`, '#fbbf24', 540);
+            addPlayLog(`🔔 第 ${state.quarter <= 4 ? state.quarter : 'OT'} 節比賽開始！雙方球員獲得節間體能恢復。`, 'text-amber-300 font-bold');
+            showBanner(`🔔 第 ${state.quarter <= 4 ? state.quarter : 'OT'} 節開始！`, '雙方球員體力恢復！', 'text-amber-300 border-amber-400');
+            for (const p of [...allPlayers, ...homeBench]) p.stamina = Math.min(100, p.stamina + 35);
+          } else {
+            state.gameOver = true;
+            document.getElementById('finalScoreHome').textContent = state.scoreHome;
+            document.getElementById('finalScoreAway').textContent = state.scoreAway;
+            const won = state.scoreHome > state.scoreAway;
+            document.getElementById('gameOverSubtitle').textContent = won
+              ? '🎉 恭喜總教練！LIONS 教練隊 贏得勝利！'
+              : '💪 惜敗！TITANS 客隊AI 險勝一場！';
+            document.getElementById('gameOverModal').classList.remove('hidden');
+            document.getElementById('gameOverModal').classList.add('flex');
+          }
+        }
+        updateScoreboardDOM();
+      }
+
+      function setOffenseTactic(tacticKey) {
+        SoundFX.init();
+        state.userOffTactic = tacticKey;
+        document.querySelectorAll('[data-tactic]').forEach((btn) => {
+          btn.classList.toggle('active', btn.getAttribute('data-tactic') === tacticKey);
+        });
+        triggerCoachSidelineShout(`📣「進攻戰術改打：${TACTIC_NAMES[tacticKey].split(' ')[0]}！」`, '#fb923c', 530);
+        showBanner(`📋 總教練切換進攻戰術：${TACTIC_NAMES[tacticKey]}`, '全隊 AI 已立即調整跑位與掩護路線', 'text-orange-300 border-orange-400');
+      }
+
+      function setDefenseTactic(defKey) {
+        SoundFX.init();
+        state.userDefTactic = defKey;
+        document.querySelectorAll('[data-deftactic]').forEach((btn) => {
+          btn.classList.toggle('active', btn.getAttribute('data-deftactic') === defKey);
+        });
+        triggerCoachSidelineShout(`📣「防守陣型切換：${DEF_TACTIC_NAMES[defKey].split(' ')[0]}！」`, '#38bdf8', 500);
+        showBanner(`🛡️ 總教練切換防守策略：${DEF_TACTIC_NAMES[defKey]}`, '防守陣型已即時變換', 'text-sky-300 border-sky-400');
+      }
+
+      function setOffensivePace(paceKey) {
+        SoundFX.init();
+        state.userPace = paceKey;
+        document.querySelectorAll('[data-pace]').forEach((btn) => {
+          btn.classList.toggle('active', btn.getAttribute('data-pace') === paceKey);
+        });
+        showBanner(`⚡ 總教練調整進攻節奏：${PACE_NAMES[paceKey]}`, '球隊推進速度與出手選擇已同步調整', 'text-emerald-300 border-emerald-400');
+      }
+
+      function toggleSubModal() {
+        if (state.inStartScreen) return;
+        const m = document.getElementById('subModal');
+        const isHidden = m.classList.contains('hidden');
+        if (isHidden) {
+          state.paused = true;
+          renderSubModal();
+          m.classList.remove('hidden');
+          m.classList.add('flex');
+        } else {
+          m.classList.add('hidden');
+          m.classList.remove('flex');
+          state.paused = false;
+        }
+      }
+
+      function renderBoxScoreModal() {
+        const containerEl = document.getElementById('statsModalBody');
+        const buildTable = (title, colorClass, roster) => {
+          let rows = '';
+          for (const p of roster) {
+            const s = p.stats;
+            rows += `
+              <tr class="border-b border-slate-800/80 hover:bg-slate-800/40">
+                <td class="py-2 px-2 font-bold text-white">${p.pos} ${p.name} <span class="text-slate-400">${p.num}</span> ${p.isBench ? '<span class="text-[10px] px-1 rounded bg-slate-800 text-amber-300">替補</span>' : ''}</td>
+                <td class="py-2 px-2 text-right font-black text-amber-300">${s.pts}</td>
+                <td class="py-2 px-2 text-right">${s.fgm}/${s.fga}</td>
+                <td class="py-2 px-2 text-right">${s.tpm}/${s.tpa}</td>
+                <td class="py-2 px-2 text-right text-sky-300 font-bold">${s.reb}</td>
+                <td class="py-2 px-2 text-right text-indigo-300 font-bold">${s.ast}</td>
+                <td class="py-2 px-2 text-right text-emerald-300 font-bold">${s.stl}</td>
+                <td class="py-2 px-2 text-right text-rose-300 font-bold">${s.blk}</td>
+                <td class="py-2 px-2 text-right text-orange-300 font-bold">${s.dunks}</td>
+              </tr>`;
+          }
+          return `
+            <div>
+              <h3 class="font-black text-sm mb-2 ${colorClass}">${title}</h3>
+              <div class="overflow-x-auto rounded-xl border border-slate-800">
+                <table class="w-full text-left border-collapse">
+                  <thead class="bg-slate-950 text-slate-400 text-[11px]">
+                    <tr>
+                      <th class="py-2 px-2">球員 (位置)</th>
+                      <th class="py-2 px-2 text-right">得分 PTS</th>
+                      <th class="py-2 px-2 text-right">投籃 FG</th>
+                      <th class="py-2 px-2 text-right">三分 3PT</th>
+                      <th class="py-2 px-2 text-right">籃板 REB</th>
+                      <th class="py-2 px-2 text-right">助攻 AST</th>
+                      <th class="py-2 px-2 text-right">抄截 STL</th>
+                      <th class="py-2 px-2 text-right">火鍋 BLK</th>
+                      <th class="py-2 px-2 text-right">灌籃 DNK</th>
+                    </tr>
+                  </thead>
+                  <tbody>${rows}</tbody>
+                </table>
+              </div>
+            </div>`;
+        };
+        containerEl.innerHTML = buildTable('🔵 LIONS 教練代表隊 (含板凳輪換陣容)', 'text-blue-400', [...homePlayers, ...homeBench]) +
+                                buildTable('🔴 TITANS 客隊電腦AI (5v5 AI)', 'text-rose-400', awayPlayers);
+      }
+
+      function resetMatch(keepPlaying = true) {
+        initTeams();
+        state.quarter = 1;
+        state.gameClock = 120;
+        state.shotClock = 24;
+        state.scoreHome = 0;
+        state.scoreAway = 0;
+        state.possession = 'home';
+        state.teamMorale = 85;
+        state.cheerBuffTimer = 0;
+        state.defLockdownTimer = 0;
+        state.forceDriveTimer = 0;
+        state.gameOver = false;
+        state.paused = false;
+        state.floatingTexts.length = 0;
+        state.ballTrail.length = 0;
+        state.playLogs.length = 0;
+        ball.holder = homePlayers[0];
+        ball.inFlight = false;
+        ball.isShot = false;
+        ball.isPass = false;
+        document.getElementById('gameOverModal').classList.add('hidden');
+        document.getElementById('gameOverModal').classList.remove('flex');
+        updateCoachHUD();
+        updateScoreboardDOM();
+        if (keepPlaying) {
+          state.inStartScreen = false;
+          triggerCoachSidelineShout('📣「重新開球！打出我們的招牌球風！」', '#fbbf24', 540);
+          addPlayLog('🏀 比賽重新開球！總教練可隨時指揮球員施展花式技巧。', 'text-amber-300 font-bold');
+        }
+      }
+
+      function setupUIListeners() {
+        // Click anywhere on Start Screen Overlay to begin match!
+        document.getElementById('startScreenOverlay').addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          dismissStartScreenAndTipOff();
+        });
+
+        document.querySelectorAll('[data-tactic]').forEach((btn) => {
+          btn.addEventListener('click', () => setOffenseTactic(btn.getAttribute('data-tactic')));
+        });
+        document.querySelectorAll('[data-deftactic]').forEach((btn) => {
+          btn.addEventListener('click', () => setDefenseTactic(btn.getAttribute('data-deftactic')));
+        });
+        document.querySelectorAll('[data-pace]').forEach((btn) => {
+          btn.addEventListener('click', () => setOffensivePace(btn.getAttribute('data-pace')));
+        });
+
+        document.getElementById('aiDifficultySelect').addEventListener('change', (e) => {
+          state.difficulty = e.target.value;
+        });
+
+        document.getElementById('btnSimSpeed').addEventListener('click', () => {
+          const speeds = [1.0, 1.5, 2.0];
+          const nextIdx = (speeds.indexOf(state.simSpeed) + 1) % speeds.length;
+          state.simSpeed = speeds[nextIdx];
+          document.getElementById('simSpeedLabel').textContent = `${state.simSpeed.toFixed(1)}x`;
+        });
+
+        document.getElementById('btnPerfMode').addEventListener('click', () => {
+          state.highQuality = !state.highQuality;
+          const lbl = document.getElementById('perfModeLabel');
+          lbl.textContent = state.highQuality ? '高畫質' : '流暢低配';
+          lbl.className = state.highQuality ? 'text-amber-400' : 'text-emerald-400';
+          showBanner(
+            state.highQuality ? '✨ 已切換至「高畫質球場模式」' : '⚡ 已切換至「流暢低配備模式 (Turbo 60FPS)」',
+            state.highQuality ? '開啟木地板鏡面反光、花式動作殘影與完整觀眾特效' : '已關閉反射與殘影負擔，老舊設備也能絲滑順暢！'
+          );
+        });
+
+        document.getElementById('btnCameraMode').addEventListener('click', () => {
+          state.broadcastView = !state.broadcastView;
+          document.getElementById('cameraModeLabel').textContent = state.broadcastView ? '2.5D轉播' : '2D俯視';
+        });
+
+        document.getElementById('btnToggleLines').addEventListener('click', (e) => {
+          state.showTacticalLines = !state.showTacticalLines;
+          e.currentTarget.textContent = `📋 戰術線: ${state.showTacticalLines ? '開' : '關'}`;
+        });
+
+        document.getElementById('btnAudio').addEventListener('click', (e) => {
+          SoundFX.init();
+          SoundFX.muted = !SoundFX.muted;
+          e.currentTarget.textContent = SoundFX.muted ? '🔇 靜音' : '🔊 音效';
+        });
+
+        document.getElementById('btnSubModal').addEventListener('click', toggleSubModal);
+        document.getElementById('btnCloseSub').addEventListener('click', toggleSubModal);
+
+        document.getElementById('btnToggleAutoSub').addEventListener('click', (e) => {
+          state.autoSub = !state.autoSub;
+          e.currentTarget.textContent = `🤖 AI自動換人: ${state.autoSub ? '開啟' : '關閉'}`;
+          e.currentTarget.className = state.autoSub
+            ? 'px-3 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-xs font-bold'
+            : 'px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold';
+          const tickerStatus = document.getElementById('autoSubStatusText');
+          if (tickerStatus) tickerStatus.textContent = `自動輪換: ${state.autoSub ? '開啟' : '手動'}`;
+        });
+
+        document.getElementById('btnStats').addEventListener('click', () => {
+          state.paused = true;
+          renderBoxScoreModal();
+          const m = document.getElementById('statsModal');
+          m.classList.remove('hidden');
+          m.classList.add('flex');
+        });
+
+        document.getElementById('btnCloseStats').addEventListener('click', () => {
+          const m = document.getElementById('statsModal');
+          m.classList.add('hidden');
+          m.classList.remove('flex');
+          state.paused = false;
+        });
+
+        document.getElementById('btnHelp').addEventListener('click', () => {
+          state.paused = true;
+          const m = document.getElementById('helpModal');
+          m.classList.remove('hidden');
+          m.classList.add('flex');
+        });
+
+        document.getElementById('btnCloseHelp').addEventListener('click', () => {
+          const m = document.getElementById('helpModal');
+          m.classList.add('hidden');
+          m.classList.remove('flex');
+          state.paused = false;
+        });
+
+        document.getElementById('btnPause').addEventListener('click', (e) => {
+          state.paused = !state.paused;
+          e.currentTarget.textContent = state.paused ? '▶ 繼續' : '⏸ 暫停';
+        });
+
+        document.getElementById('btnRestart').addEventListener('click', () => resetMatch(true));
+        document.getElementById('btnPlayAgain').addEventListener('click', () => resetMatch(true));
+        document.getElementById('btnGameOverStats').addEventListener('click', () => {
+          renderBoxScoreModal();
+          const m = document.getElementById('statsModal');
+          m.classList.remove('hidden');
+          m.classList.add('flex');
+        });
+
+        // Bind All 8 Sideline Coach Command Buttons
+        document.getElementById('btnCmdCheer').addEventListener('pointerdown', (e) => { e.preventDefault(); coachCommandCheer(); });
+        document.getElementById('btnCmdShoot').addEventListener('pointerdown', (e) => { e.preventDefault(); coachCommandShoot(); });
+        document.getElementById('btnCmdDrive').addEventListener('pointerdown', (e) => { e.preventDefault(); coachCommandDrive(); });
+        document.getElementById('btnCmdSkillMove').addEventListener('pointerdown', (e) => { e.preventDefault(); coachCommandSkillMove(); });
+        document.getElementById('btnCmdStepBack').addEventListener('pointerdown', (e) => { e.preventDefault(); coachCommandStepBack(); });
+        document.getElementById('btnCmdPass').addEventListener('pointerdown', (e) => { e.preventDefault(); coachCommandPass(); });
+        document.getElementById('btnCmdAlley').addEventListener('pointerdown', (e) => { e.preventDefault(); coachCommandAlleyOop(); });
+        document.getElementById('btnCmdDefense').addEventListener('pointerdown', (e) => { e.preventDefault(); coachCommandDefense(); });
+      }
+
+      // =========================================================================
+      // 14. RESIZE & MAIN DELTA-TIME SMOOTH GAME LOOP
+      // =========================================================================
+      function resizeCanvas() {
+        const rect = container.getBoundingClientRect();
+        canvas.width = Math.max(320, Math.floor(rect.width));
+        canvas.height = Math.max(240, Math.floor(rect.height));
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+
+      let lastFrameTime = performance.now();
+      let animFrameId = null;
+
+      function gameLoop(now) {
+        animFrameId = requestAnimationFrame(gameLoop);
+
+        const rawDt = Math.min(0.05, Math.max(0.001, (now - lastFrameTime) / 1000));
+        lastFrameTime = now;
+        const dtScale = rawDt * 60 * state.simSpeed;
+
+        state.fpsFrames++;
+        if (now - state.fpsLastTime >= 500) {
+          state.currentFps = Math.min(144, Math.round((state.fpsFrames * 1000) / (now - state.fpsLastTime)));
+          document.getElementById('fpsText').textContent = `${state.currentFps} FPS`;
+          state.fpsFrames = 0;
+          state.fpsLastTime = now;
+        }
+
+        // Only advance match simulation once the user has dismissed the Start Screen!
+        if (!state.inStartScreen && !state.paused && !state.gameOver) {
+          updatePlayersAndAI(dtScale);
+          updateBallPhysics(dtScale);
+          updateClocks(rawDt);
+          if (state.fpsFrames % 10 === 0) updateCoachHUD();
+        } else if (state.inStartScreen && ball.holder) {
+          // Subtle warm-up dribble animation on the court behind the Start Screen
+          ball.dribblePhase += 0.14 * dtScale;
+          ball.z = Math.abs(Math.sin(ball.dribblePhase)) * 20;
+        }
+
+        renderScene(state.paused ? 0 : dtScale);
+      }
+
+      window.onload = function () {
+        buildCourtBuffer();
+        initCrowd();
+        setupUIListeners();
+        resizeCanvas();
+        resetMatch(false);
+        state.inStartScreen = true;
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+        lastFrameTime = performance.now();
+        animFrameId = requestAnimationFrame(gameLoop);
+      };
+    })();
+  </script>
+</body>
+</html>
